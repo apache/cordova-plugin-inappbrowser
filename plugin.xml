@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android"
+id="org.apache.cordova.core">
+    version="0.1.0">
+    <name>InAppBrowser</name>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/cordova/plugins">
+            <plugin name="InAppBrowser" value="org.apache.cordova.core.InAppBrowser"/>
+        </config-file>
+
+        <source-file src="InAppBrowser.java" target-dir="org/apache/cordova/core" />
+       </platform>
+</plugin>
