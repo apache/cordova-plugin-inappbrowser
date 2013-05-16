@@ -6,6 +6,10 @@ id="org.apache.cordova.core.InAppBrowser"
     version="0.1.0">
     <name>InAppBrowser</name>
 
+    <js-module src="www/InAppBrowser.js" name="InAppBrowser">
+        <clobbers target="window.InAppBrowser" />
+    </js-module>
+    
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/cordova/plugins">
