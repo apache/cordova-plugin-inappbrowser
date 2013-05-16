@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
-id="org.apache.cordova.core">
+id="org.apache.cordova.core.InAppBrowser"
     version="0.1.0">
     <name>InAppBrowser</name>
 
@@ -13,5 +13,15 @@ id="org.apache.cordova.core">
         </config-file>
 
         <source-file src="InAppBrowser.java" target-dir="org/apache/cordova/core" />
-       </platform>
+    </platform>
+    
+    <!-- ios -->
+    <platform name="ios">    
+        <config-file target="config.xml" parent="plugins">
+	        <plugin name="InAppBrowser" value="CDVInAppBrowser" /> 
+        </config-file>
+        <header-file src="src/ios/CDVInAppBrowser.h" />
+	    <source-file src="src/ios/CDVInAppBrowser.m" />
+    </platform>
+        
 </plugin>
