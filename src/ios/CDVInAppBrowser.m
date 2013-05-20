@@ -18,9 +18,9 @@
  */
 
 #import "CDVInAppBrowser.h"
-#import "CDVPluginResult.h"
-#import "CDVUserAgentUtil.h"
-#import "CDVJSON.h"
+#import <Cordova/CDVPluginResult.h>
+#import <Cordova/CDVUserAgentUtil.h>
+#import <Cordova/CDVJSON.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
 #define    kInAppBrowserTargetSystem @"_system"
