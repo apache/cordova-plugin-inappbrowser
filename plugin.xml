@@ -18,7 +18,7 @@ id="org.apache.cordova.core.InAppBrowser"
             </feature>
         </config-file>
 
-        <source-file src="src/android/InAppBrowser.java" target-dir="org/apache/cordova/core" />
+        <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/core" />
     </platform>
     
     <!-- ios -->
