@@ -21,6 +21,7 @@ package org.apache.cordova.core;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import org.apache.cordova.Config;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CallbackContext;
 import org.apache.cordova.api.CordovaPlugin;
