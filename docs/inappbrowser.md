@@ -20,7 +20,7 @@ license: Licensed to the Apache Software Foundation (ASF) under one
 InAppBrowser
 ============
 
-> The InAppBrowser is a web-browser that is shown in your app when you use the `window.open` call.
+> The `InAppBrowser` is a web browser that displays in the app when calling `window.open`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
 
@@ -51,32 +51,28 @@ Permissions
 
     <plugin name="InAppBrowser" value="CDVInAppBrowser" />
 
-
 ### Windows Phone 7 + 8
 
 #### config.xml
 
     <plugin name="InAppBrowser" />
 
-
-
 addEventListener
 ================
 
-> Adds a listener for an event from the InAppBrowser.
+> Adds a listener for an event from the `InAppBrowser`.
 
     ref.addEventListener(eventname, callback);
 
-- __ref:__ reference to the InAppBrowser window (`InAppBrowser`)
-- __eventname:__ the event to listen for (`String`)
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_
+- __eventname__: the event to listen for _(String)_
 
-        loadstart - event fired when the InAppBrowser starts to load a URL
-        loadstop - event fired when the InAppBrowser finished loading a URL
-        loaderror - event fired when the InAppBrowser encounters an error loading a URL
-        exit - event fired when the InAppBrowser window is closed
+  - __loadstart__: event fires when the `InAppBrowser` starts to load a URL.
+  - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
+  - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
+  - __exit__: event fires when the `InAppBrowser` window is closed.
 
-- __callback:__ the function that is called when the event is fired.
-The function is passed an `InAppBrowserEvent` object.
+- __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
 Supported Platforms
 -------------------
@@ -102,11 +98,11 @@ Full Example
         <script type="text/javascript" charset="utf-8" src="cordova-x.x.x.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for Cordova to load
+        // Wait for device API libraries to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // Cordova is ready
+        // device APIs are available
         //
         function onDeviceReady() {
              var ref = window.open('http://apache.org', '_blank', 'location=yes');
@@ -125,19 +121,19 @@ Full Example
 removeEventListener
 ===================
 
-> Removes a listener for an event from the InAppBrowser.
+> Removes a listener for an event from the `InAppBrowser`.
 
     ref.removeEventListener(eventname, callback);
 
-- __ref:__ reference to the InAppBrowser window (`InAppBrowser`)
-- __eventname:__ the event to stop listening for (`String`)
+- __ref__: reference to the `InAppBrowser` window. _(InAppBrowser)_
+- __eventname__: the event to stop listening for. _(String)_
 
-        loadstart - event fired when the InAppBrowser starts to load a URL
-        loadstop - event fired when the InAppBrowser finished loading a URL
-        loaderror - event fired when the InAppBrowser encounters an error loading a URL
-        exit - event fired when the InAppBrowser window is closed
+  - __loadstart__: event fires when the `InAppBrowser` starts to load a URL.
+  - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
+  - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
+  - __exit__: event fires when the `InAppBrowser` window is closed.
 
-- __callback:__ the function that was to be called when the event is fired.
+- __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
 
 Supported Platforms
@@ -166,7 +162,7 @@ Full Example
         <script type="text/javascript" charset="utf-8" src="cordova-x.x.x.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for Cordova to load
+        // Wait for device API libraries to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -193,7 +189,7 @@ Full Example
              iabRef.removeEventListener('exit', iabClose);
         }
 
-        // Cordova is ready
+        // device APIs are available
         //
         function onDeviceReady() {
              iabRef = window.open('http://apache.org', '_blank', 'location=yes');
@@ -212,11 +208,11 @@ Full Example
 close
 =====
 
-> Closes the InAppBrowser window.
+> Closes the `InAppBrowser` window.
 
     ref.close();
 
-- __ref:__ reference to the InAppBrowser window (`InAppBrowser`)
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_
 
 Supported Platforms
 -------------------
@@ -243,11 +239,11 @@ Full Example
         <script type="text/javascript" charset="utf-8" src="cordova-x.x.x.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for Cordova to load
+        // Wait for device API libraries to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
-        // Cordova is ready
+        // device APIs are available
         //
         function onDeviceReady() {
              var ref = window.open('http://apache.org', '_blank', 'location=yes');
@@ -266,21 +262,20 @@ Full Example
 executeScript
 =============
 
-> Injects JavaScript code into the InAppBrowser window
+> Injects JavaScript code into the `InAppBrowser` window
 
     ref.executeScript(details, callback);
 
-- __ref:__ reference to the InAppBrowser window (`InAppBrowser`)
-- __injectDetails:__ details of the script ot run (`Object`)
-    - Supported keys:  (exactly one of "file" or "code" should be present)
-
-            "file" - URL of the script to inject
-            "code" - Text of the script to inject
-
-- __callback:__ the function that is to be called in the Cordova application after the JavaScript code is injected.
-    - If the injected script is of type "code", then the callback will be called with a single argument, which is
-      the return value of the script, wrapped in an Array. (For multi-line scripts, this is the return value of the
-      last statement, or the last expression evaluated.)
+- __ref__: reference to the `InAppBrowser` window. _(InAppBrowser)_
+- __injectDetails__: details of the script to run, specifying either a `file` or `code` key. _(Object)_
+  - __file__: URL of the script to inject.
+  - __code__: Text of the script to inject.
+- __callback__: the function that executes after the JavaScript code is injected.
+    - If the injected script is of type `code`, the callback executes
+      with a single parameter, which is the return value of the
+      script, wrapped in an `Array`. For multi-line scripts, this is
+      the return value of the last statement, or the last expression
+      evaluated.
 
 Supported Platforms
 -------------------
@@ -304,10 +299,10 @@ Full Example
       <head>
         <title>InAppBrowser.executeScript Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-x.x.x.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for Cordova to load
+        // Wait for device API libraries to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -329,7 +324,7 @@ Full Example
              iabRef.removeEventListener('exit', iabClose);
         }
 
-        // Cordova is ready
+        // device APIs are available
         //
         function onDeviceReady() {
              iabRef = window.open('http://apache.org', '_blank', 'location=yes');
@@ -346,18 +341,15 @@ Full Example
 insertCSS
 =========
 
-> Injects CSS into the InAppBrowser window
+> Injects CSS into the `InAppBrowser` window.
 
     ref.insertCSS(details, callback);
 
-- __ref:__ reference to the InAppBrowser window (`InAppBrowser`)
-- __injectDetails:__ details of the script ot run (`Object`)
-    - Supported keys:  (exactly one of "file" or "code" should be present)
-
-            "file" - URL of the stylesheet to inject
-            "code" - Text of the stylesheet to inject
-
-- __callback:__ the function that is to be called in the Cordova application after the CSS is injected.
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_
+- __injectDetails__: details of the script to run, specifying either a `file` or `code` key. _(Object)_
+  - __file__: URL of the stylesheet to inject.
+  - __code__: Text of the stylesheet to inject.
+- __callback__: the function that executes after the CSS is injected.
 
 Supported Platforms
 -------------------
@@ -381,10 +373,10 @@ Full Example
       <head>
         <title>InAppBrowser.executeScript Example</title>
 
-        <script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-x.x.x.js"></script>
         <script type="text/javascript" charset="utf-8">
 
-        // Wait for Cordova to load
+        // Wait for device API libraries to load
         //
         document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -406,7 +398,7 @@ Full Example
              iabRef.removeEventListener('exit', iabClose);
         }
 
-        // Cordova is ready
+        // device APIs are available
         //
         function onDeviceReady() {
              iabRef = window.open('http://apache.org', '_blank', 'location=yes');
@@ -423,12 +415,13 @@ Full Example
 InAppBrowserEvent
 =================
 
-The object that is passed to the callback function from an addEventListener call on an InAppBrowser object.
+The object that is passed to the callback function from an
+`addEventListener` call on an `InAppBrowser` object.
 
 Properties
 ----------
 
-- __type:__ the eventname (`String`) - one of loadstart, loadstop, loaderror or exit
-- __url:__ the URL that was loaded (`String`)
-- __code:__ the error code (`Number`) - only in the case of loaderror
-- __message:__ the error message (`String`) - only in the case of loaderror
+- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
+- __url__: the URL that was loaded. _(String)_
+- __code__: the error code, only in the case of `loaderror`. _(Number)_
+- __message__: the error message, only in the case of `loaderror`. _(String)_

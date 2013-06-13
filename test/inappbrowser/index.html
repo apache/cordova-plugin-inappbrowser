@@ -173,6 +173,29 @@
             });
         }
     }
+    var hiddenwnd=null;
+    var loadlistener = function(event) { alert('background window loaded ' ); };
+    function openHidden(url, startHidden) {
+        var shopt =(startHidden) ? 'hidden=yes' : '';
+        hiddenwnd = window.open(url,'random_string',shopt);
+        if (!hiddenwnd) {
+            alert('window.open returned ' + hiddenwnd);
+            return;
+        }
+        if(startHidden) hiddenwnd.addEventListener('loadstop', loadlistener);
+    }
+    function showHidden() {
+        if(!!hiddenwnd ) {
+            hiddenwnd.show();
+        }
+    }
+    function closeHidden() {
+       if(!!hiddenwnd ) {
+           hiddenwnd.removeEventListener('loadstop',loadlistener);
+           hiddenwnd.close();
+           hiddenwnd=null;
+       }
+    }
     </script>
   </head>
   <body onload="init();" id="stage" class="theme">
@@ -225,6 +248,11 @@
     <div class="btn large" onclick="openWithScript('inject.html', 'inject.js', true);">Script File Injection (CB)</div>
     <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
     <div class="btn large" onclick="openWithScript('inject.html', null, true);">Script Literal Injection (CB)</div>
+    <h1>Open Hidden </h1>
+    <div class="btn large" onclick="openHidden('http://google.com',true);">google.com hidden</div>
+    <div class="btn large" onclick="showHidden();">show hidden</div>
+    <div class="btn large" onclick="closeHidden();">close hidden</div>
+    <div class="btn large" onclick="openHidden('http://google.com',false);">google.com not hidden</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>
