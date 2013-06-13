@@ -21,6 +21,7 @@ package org.apache.cordova.core;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.api.CallbackContext;
@@ -71,8 +72,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
     // private static final String BLANK = "_blank";
-    private static final String LOCATION = "location";
     private static final String EXIT_EVENT = "exit";
+    private static final String LOCATION = "location";
+    private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -82,8 +84,9 @@ public class InAppBrowser extends CordovaPlugin {
     private Dialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
-    private boolean showLocationBar = true;
     private CallbackContext callbackContext;
+    private boolean showLocationBar = true;
+    private boolean openWindowHidden = false;
     private String buttonLabel = "Done";
     
     /**
@@ -186,6 +189,16 @@ public class InAppBrowser extends CordovaPlugin {
                     jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
                 }
                 injectDeferredObject(args.getString(0), jsWrapper);
+            }
+            else if (action.equals("show")) {
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.show();
+                    }
+                };
+                this.cordova.getActivity().runOnUiThread(runnable);
+                this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             }
             else {
                 return false;
@@ -363,10 +376,15 @@ public class InAppBrowser extends CordovaPlugin {
     public String showWebPage(final String url, HashMap<String, Boolean> features) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
+        openWindowHidden = false;
         if (features != null) {
             Boolean show = features.get(LOCATION);
             if (show != null) {
                 showLocationBar = show.booleanValue();
+            }
+            Boolean hidden = features.get(HIDDEN);
+            if(hidden != null) {
+                openWindowHidden = hidden.booleanValue();
             }
         }
         
@@ -551,6 +569,11 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.setContentView(main);
                 dialog.show();
                 dialog.getWindow().setAttributes(lp);
+                // the goal of openhidden is to load the url and not display it
+                // Show() needs to be called to cause the URL to be loaded
+                if(openWindowHidden) {
+                	dialog.hide();
+                }
             }
         };
         this.cordova.getActivity().runOnUiThread(runnable);

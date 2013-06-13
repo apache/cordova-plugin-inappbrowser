@@ -41,6 +41,9 @@ InAppBrowser.prototype = {
     close: function (eventname) {
         exec(null, null, "InAppBrowser", "close", []);
     },
+    show: function (eventname) {
+      exec(null, null, "InAppBrowser", "show", []);
+    },
     addEventListener: function (eventname,f) {
         if (eventname in this.channels) {
             this.channels[eventname].subscribe(f);
