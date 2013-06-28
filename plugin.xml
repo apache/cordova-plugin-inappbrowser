@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-xmlns:android="http://schemas.android.com/apk/res/android"
-id="org.apache.cordova.core.InAppBrowser"
-    version="0.1.0">
+           id="org.apache.cordova.core.inappbrowser"
+      version="0.1.0">
     <name>InAppBrowser</name>
 
     <js-module src="www/InAppBrowser.js" name="InAppBrowser">
