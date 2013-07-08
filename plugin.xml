@@ -40,7 +40,18 @@
             </feature>
         </config-file>
 
-        <source-file src="src/wp7/InAppBrowser.cs" />
+        <source-file src="src/wp/InAppBrowser.cs" />
+    </platform>
+
+    <!-- wp8 -->
+    <platform name="wp8">
+        <config-file target="config.xml" parent="/*">
+            <feature name="InAppBrowser">
+                <param name="wp-package" value="InAppBrowser"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/wp/InAppBrowser.cs" />
     </platform>
         
 

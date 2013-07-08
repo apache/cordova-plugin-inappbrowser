@@ -94,7 +94,6 @@ namespace WPCordovaClassLib.Cordova.Commands
         }
 
 
-        // Display an inderminate progress indicator
         private void ShowInAppBrowser(string url)
         {
             Uri loc = new Uri(url);
@@ -113,6 +112,8 @@ namespace WPCordovaClassLib.Cordova.Commands
                     {
                         PhoneApplicationPage page = frame.Content as PhoneApplicationPage;
 
+                        string baseImageUrl = "Images/";
+
                         if (page != null)
                         {
                             Grid grid = page.FindName("LayoutRoot") as Grid;
@@ -121,10 +122,10 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 browser = new WebBrowser();
                                 browser.IsScriptEnabled = true;
                                 browser.LoadCompleted += new System.Windows.Navigation.LoadCompletedEventHandler(browser_LoadCompleted);
+
                                 browser.Navigating += new EventHandler<NavigatingEventArgs>(browser_Navigating);
                                 browser.NavigationFailed += new System.Windows.Navigation.NavigationFailedEventHandler(browser_NavigationFailed);
                                 browser.Navigated += new EventHandler<System.Windows.Navigation.NavigationEventArgs>(browser_Navigated);
-                                
                                 browser.Navigate(loc);
                                 //browser.IsGeolocationEnabled = opts.isGeolocationEnabled;
                                 grid.Children.Add(browser);
@@ -136,22 +137,21 @@ namespace WPCordovaClassLib.Cordova.Commands
 
                             backButton = new ApplicationBarIconButton();
                             backButton.Text = "Back";
-                            backButton.IconUri = new Uri("/Images/appbar.back.rest.png", UriKind.Relative);
+
+                            backButton.IconUri = new Uri(baseImageUrl + "appbar.back.rest.png", UriKind.Relative);
                             backButton.Click += new EventHandler(backButton_Click);
-                            //backButton.IsEnabled = false;
                             bar.Buttons.Add(backButton);
 
 
                             fwdButton = new ApplicationBarIconButton();
                             fwdButton.Text = "Forward";
-                            fwdButton.IconUri = new Uri("/Images/appbar.next.rest.png", UriKind.Relative);
+                            fwdButton.IconUri = new Uri(baseImageUrl + "appbar.next.rest.png", UriKind.Relative);
                             fwdButton.Click += new EventHandler(fwdButton_Click);
-                            //fwdButton.IsEnabled = false;
                             bar.Buttons.Add(fwdButton);
 
                             ApplicationBarIconButton closeBtn = new ApplicationBarIconButton();
                             closeBtn.Text = "Close";
-                            closeBtn.IconUri = new Uri("/Images/appbar.close.rest.png", UriKind.Relative);
+                            closeBtn.IconUri = new Uri(baseImageUrl + "appbar.close.rest.png", UriKind.Relative);
                             closeBtn.Click += new EventHandler(closeBtn_Click);
                             bar.Buttons.Add(closeBtn);
 
@@ -174,8 +174,11 @@ namespace WPCordovaClassLib.Cordova.Commands
             {
                 try
                 {
-                    //browser.GoForward();
+#if WP8
+                    browser.GoForward();
+#else
                     browser.InvokeScript("execScript", "history.forward();");
+#endif
                 }
                 catch (Exception)
                 {
@@ -190,8 +193,11 @@ namespace WPCordovaClassLib.Cordova.Commands
             {
                 try
                 {
-                    //browser.GoBack();
+#if WP8
+                    browser.GoBack();
+#else           
                     browser.InvokeScript("execScript", "history.back();");
+#endif
                 }
                 catch (Exception)
                 {
@@ -237,11 +243,14 @@ namespace WPCordovaClassLib.Cordova.Commands
 
         void browser_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
         {
-            //if (browser != null)
-            //{
-            //    backButton.IsEnabled = browser.CanGoBack;
-            //    fwdButton.IsEnabled = browser.CanGoForward;
-            //}
+#if WP8
+            if (browser != null)
+            {
+                backButton.IsEnabled = browser.CanGoBack;
+                fwdButton.IsEnabled = browser.CanGoForward;
+
+            }
+#endif
             string message = "{\"type\":\"loadstop\", \"url\":\"" + e.Uri.AbsoluteUri + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
