@@ -38,7 +38,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -518,13 +517,8 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptEnabled(true);
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(true);
-                /** 
-                 * We need to be careful of this line as a future Android release may deprecate it out of existence.
-                 * Can't replace it with the API 8 level call right now as our minimum SDK is 7 until May 2013
-                 */
-                // @TODO: replace with settings.setPluginState(android.webkit.WebSettings.PluginState.ON)
-                settings.setPluginsEnabled(true);
-                
+                settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
+
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
                 boolean enableDatabase = appSettings == null ? true : appSettings.getBoolean("InAppBrowserStorageEnabled", true);
