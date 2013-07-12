@@ -59,6 +59,15 @@
     self.callbackId = nil;
 }
 
+- (BOOL) isSystemUrl:(NSURL*)url
+{
+	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
+		return YES;
+	}
+	
+	return NO;
+}
+
 - (void)open:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult;
@@ -72,6 +81,11 @@
     if (url != nil) {
         NSURL* baseUrl = [self.webView.request URL];
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+        
+        if ([self isSystemUrl:absoluteUrl]) {
+            target = kInAppBrowserTargetSystem;
+        }
+
         if ([target isEqualToString:kInAppBrowserTargetSelf]) {
             [self openInCordovaWebView:absoluteUrl withOptions:options];
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
