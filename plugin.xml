@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="org.apache.cordova.core.inappbrowser"
       version="0.1.0">
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
+
 
     <js-module src="www/InAppBrowser.js" name="InAppBrowser">
         <clobbers target="window.open" />
