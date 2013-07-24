@@ -30,6 +30,8 @@
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
 	    <source-file src="src/ios/CDVInAppBrowser.m" />
+	    
+	    <framework src="CoreGraphics.framework" />
     </platform>
 
     <!-- wp7 -->
