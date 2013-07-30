@@ -37,6 +37,13 @@
 	    <framework src="CoreGraphics.framework" />
     </platform>
 
+    <!-- blackberry10 -->
+<!--    <platform name="blackberry10">
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="InAppBrowser" value="InAppBrowser"/>
+        </config-file>
+    </platform>
+-->
     <!-- wp7 -->
     <platform name="wp7">
         <config-file target="config.xml" parent="/*">
