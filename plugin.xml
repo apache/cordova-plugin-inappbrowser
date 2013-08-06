@@ -5,7 +5,7 @@
       version="0.1.0">
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
-    <license>Apache</license>
+    <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
 
     <js-module src="www/InAppBrowser.js" name="InAppBrowser">
