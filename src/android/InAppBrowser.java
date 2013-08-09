@@ -79,7 +79,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
-    private static final String CLEAR_ALL_CACHE = "clearallcache";
+    private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
 
     private long MAX_QUOTA = 100 * 1024 * 1024;
