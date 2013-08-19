@@ -66,6 +66,13 @@
 
         <source-file src="src/wp/InAppBrowser.cs" />
     </platform>
+
+    <!-- windows8 -->
+    <platform name="windows8">
+        <js-module src="www/windows8/InAppBrowserProxy.js" name="InAppBrowserProxy">
+            <merges target="" />
+        </js-module>
+    </platform>
         
 
 </plugin>

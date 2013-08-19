@@ -51,6 +51,7 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.JsPromptResult;
@@ -78,6 +79,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
+    private static final String CLEAR_ALL_CACHE = "clearcache";
+    private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+
     private long MAX_QUOTA = 100 * 1024 * 1024;
 
     private Dialog dialog;
@@ -87,7 +91,9 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showLocationBar = true;
     private boolean openWindowHidden = false;
     private String buttonLabel = "Done";
-    
+    private boolean clearAllCache= false;
+    private boolean clearSessionCache=false;
+
     /**
      * Executes the request and returns PluginResult.
      *
@@ -382,8 +388,17 @@ public class InAppBrowser extends CordovaPlugin {
                 showLocationBar = show.booleanValue();
             }
             Boolean hidden = features.get(HIDDEN);
-            if(hidden != null) {
+            if (hidden != null) {
                 openWindowHidden = hidden.booleanValue();
+            }
+            Boolean cache = features.get(CLEAR_ALL_CACHE);
+            if (cache != null) {
+                clearAllCache = cache.booleanValue();
+            } else {
+                cache = features.get(CLEAR_SESSION_CACHE);
+                if (cache != null) {
+                    clearSessionCache = cache.booleanValue();
+                }
             }
         }
         
@@ -522,14 +537,19 @@ public class InAppBrowser extends CordovaPlugin {
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
                 boolean enableDatabase = appSettings == null ? true : appSettings.getBoolean("InAppBrowserStorageEnabled", true);
-                if(enableDatabase)
-                {
+                if (enableDatabase) {
                     String databasePath = cordova.getActivity().getApplicationContext().getDir("inAppBrowserDB", Context.MODE_PRIVATE).getPath();
                     settings.setDatabasePath(databasePath);
                     settings.setDatabaseEnabled(true);
                 }
                 settings.setDomStorageEnabled(true);
-               
+
+                if (clearAllCache) {
+                    CookieManager.getInstance().removeAllCookie();
+                } else if (clearSessionCache) {
+                    CookieManager.getInstance().removeSessionCookie();
+                }
+
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(6);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
