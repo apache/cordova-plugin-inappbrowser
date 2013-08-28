@@ -313,7 +313,17 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void closeDialog() {
         try {
-            this.inAppWebView.loadUrl("about:blank");
+            final WebView childView = this.inAppWebView;
+            Runnable runnable = new Runnable() {
+
+                @Override
+                public void run() {
+                    childView.loadUrl("about:blank");
+                }
+                
+            };
+            
+            this.cordova.getActivity().runOnUiThread(runnable);
             JSONObject obj = new JSONObject();
             obj.put("type", EXIT_EVENT);
 
