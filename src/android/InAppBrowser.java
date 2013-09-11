@@ -203,7 +203,9 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 };
                 this.cordova.getActivity().runOnUiThread(runnable);
-                this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+                pluginResult.setKeepCallback(true);
+                this.callbackContext.sendPluginResult(pluginResult);
             }
             else {
                 return false;
