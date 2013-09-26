@@ -1,4 +1,4 @@
-cordova.define("org.apache.cordova.inappbrowser.InAppBrowserProxy", function(require, exports, module) {  /*
+/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,7 +19,8 @@ cordova.define("org.apache.cordova.inappbrowser.InAppBrowserProxy", function(req
  *
 */
 
-/*global Windows:true */
+/*jslint sloppy:true */
+/*global Windows:true, require, document, setTimeout, window, module */
 
 
 
@@ -30,27 +31,29 @@ var browserWrap;
 
 var IAB = {
 
-    close: function (win,lose) {
+    close: function (win, lose) {
         if (browserWrap) {
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
         }
     },
-    show: function (win,lose) {
+    show: function (win, lose) {
+        /* empty block, ran out of bacon?
         if (browserWrap) {
 
-        }
+        }*/
     },
-    open: function (win,lose,args) {
-        var strUrl = args[0];
-        var target = args[1];
-        var features = args[2];
+    open: function (win, lose, args) {
+        var strUrl = args[0],
+            target = args[1],
+            features = args[2],
+            url,
+            elem;
 
-        if (target == "_system") {
-            var url = new Windows.Foundation.Uri(strUrl)
+        if (target === "_system") {
+            url = new Windows.Foundation.Uri(strUrl);
             Windows.System.Launcher.launchUriAsync(url);
-        }
-        else if (target == "_blank") {
+        } else if (target === "_blank") {
             if (!browserWrap) {
                 browserWrap = document.createElement("div");
                 browserWrap.style.position = "absolute";
@@ -64,28 +67,27 @@ var IAB = {
                     setTimeout(function () {
                         IAB.close();
                     }, 0);
-                }
+                };
 
                 document.body.appendChild(browserWrap);
             }
 
-            var elem = document.createElement("iframe");
-                elem.style.width = (window.innerWidth - 80)+ "px";
-                elem.style.height = (window.innerHeight - 80) + "px";
-                elem.style.borderWidth = "0px";
-                elem.name = "targetFrame";
-                elem.src = strUrl;
+            elem = document.createElement("iframe");
+            elem.style.width = (window.innerWidth - 80) + "px";
+            elem.style.height = (window.innerHeight - 80) + "px";
+            elem.style.borderWidth = "0px";
+            elem.name = "targetFrame";
+            elem.src = strUrl;
 
-                window.addEventListener("resize", function () {
-                    if (browserWrap && elem) {
-                        elem.style.width = (window.innerWidth - 80) + "px";
-                        elem.style.height = (window.innerHeight - 80) + "px";
-                    }
-                });
+            window.addEventListener("resize", function () {
+                if (browserWrap && elem) {
+                    elem.style.width = (window.innerWidth - 80) + "px";
+                    elem.style.height = (window.innerHeight - 80) + "px";
+                }
+            });
 
             browserWrap.appendChild(elem);
-        }
-        else {
+        } else {
             window.location = strUrl;
         }
 
@@ -93,12 +95,12 @@ var IAB = {
 
     },
 
-    injectScriptCode:function(code, bCB) {
+    injectScriptCode: function (code, bCB) {
 
         // "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document)"
     },
 
-    injectScriptFile:function(file, bCB) {
+    injectScriptFile: function (file, bCB) {
 
     }
 };
@@ -106,4 +108,4 @@ var IAB = {
 module.exports = IAB;
 
 
-require("cordova/windows8/commandProxy").add("InAppBrowser",module.exports);
+require("cordova/windows8/commandProxy").add("InAppBrowser", module.exports);
