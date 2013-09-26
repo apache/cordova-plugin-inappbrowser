@@ -20,4 +20,15 @@
 -->
 # Release Notes
 
-
+### 0.2.2 (Sept 25, 2013)
+* CB-4889 bumping&resetting version
+* CB-4788: Modified the onJsPrompt to warn against Cordova calls
+* [windows8] commandProxy was moved
+* CB-4788: Modified the onJsPrompt to warn against Cordova calls
+* [windows8] commandProxy was moved
+* CB-4889 renaming core references
+* CB-4889 renaming org.apache.cordova.core.inappbrowser to org.apache.cordova.inappbrowser
+* CB-4864, CB-4865: Minor improvements to InAppBrowser
+* Rename CHANGELOG.md -> RELEASENOTES.md
+* [CB-4792] Added keepCallback to the show function.
+* [CB-4752] Incremented plugin version on dev branch.
