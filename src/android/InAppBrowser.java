@@ -252,8 +252,6 @@ public class InAppBrowser extends CordovaPlugin {
             
         };
 
-        // This action will have the side-effect of blurring the currently focused element
-        this.inAppWebView.loadUrl("javascript:" + scriptToInject);
     }
 
     /**
