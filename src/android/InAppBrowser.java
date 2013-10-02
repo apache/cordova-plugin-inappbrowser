@@ -231,7 +231,7 @@ public class InAppBrowser extends CordovaPlugin {
      *                    which should be executed directly.
      */
     private void injectDeferredObject(String source, String jsWrapper) {
-        String scriptToInject;
+        final String scriptToInject;
         if (jsWrapper != null) {
             org.json.JSONArray jsonEsc = new org.json.JSONArray();
             jsonEsc.put(source);
@@ -241,8 +241,17 @@ public class InAppBrowser extends CordovaPlugin {
         } else {
             scriptToInject = source;
         }
-        // This action will have the side-effect of blurring the currently focused element
-        this.inAppWebView.loadUrl("javascript:" + scriptToInject);
+        
+        final WebView childView = this.inAppWebView;
+        Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                childView.loadUrl("javascript:" + scriptToInject);
+            }
+            
+        };
+
     }
 
     /**
