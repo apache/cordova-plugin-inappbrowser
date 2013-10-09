@@ -32,3 +32,7 @@
 * Rename CHANGELOG.md -> RELEASENOTES.md
 * [CB-4792] Added keepCallback to the show function.
 * [CB-4752] Incremented plugin version on dev branch.
+
+### 0.2.3 (Oct 9, 2013)
+* [CB-4915] Incremented plugin version on dev branch.
+* [CB-4926] Fixes inappbrowser plugin loading for windows8
