@@ -18,20 +18,6 @@
 */
 package org.apache.cordova.inappbrowser;
 
-import java.util.HashMap;
-import java.util.StringTokenizer;
-
-
-import org.apache.cordova.Config;
-import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.LOG;
-import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -52,17 +38,26 @@ import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
-import android.webkit.WebChromeClient;
-import android.webkit.GeolocationPermissions.Callback;
-import android.webkit.JsPromptResult;
 import android.webkit.WebSettings;
-import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.Config;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.LOG;
+import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -157,7 +152,6 @@ public class InAppBrowser extends CordovaPlugin {
             }
             else if (action.equals("close")) {
                 closeDialog();
-                this.callbackContext.success();
             }
             else if (action.equals("injectScriptCode")) {
                 String jsWrapper = null;
@@ -214,6 +208,22 @@ public class InAppBrowser extends CordovaPlugin {
         return true;
     }
 
+    /**
+     * Called when the view navigates.
+     */
+    @Override
+    public void onReset() {
+        closeDialog();        
+    }
+    
+    /**
+     * Called by AccelBroker when listener is to be shut down.
+     * Stop listener.
+     */
+    public void onDestroy() {
+        closeDialog();
+    }
+    
     /**
      * Inject an object (script or style) into the InAppBrowser WebView.
      *
@@ -442,14 +452,7 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.setCancelable(true);
                 dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         public void onDismiss(DialogInterface dialog) {
-                            try {
-                                JSONObject obj = new JSONObject();
-                                obj.put("type", EXIT_EVENT);
-
-                                sendUpdate(obj, false);
-                            } catch (JSONException e) {
-                                Log.d(LOG_TAG, "Should never happen");
-                            }
+                            closeDialog();
                         }
                 });
 
@@ -624,10 +627,16 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @param obj a JSONObject contain event payload information
      * @param status the status code to return to the JavaScript environment
-     */    private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
-        PluginResult result = new PluginResult(status, obj);
-        result.setKeepCallback(keepCallback);
-        this.callbackContext.sendPluginResult(result);
+     */    
+    private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
+        if (callbackContext != null) {
+            PluginResult result = new PluginResult(status, obj);
+            result.setKeepCallback(keepCallback);
+            callbackContext.sendPluginResult(result);
+            if (!keepCallback) {
+                callbackContext = null;
+            }
+        }
     }
 
 
