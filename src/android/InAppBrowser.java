@@ -48,11 +48,11 @@ import android.widget.RelativeLayout;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
+import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,115 +95,114 @@ public class InAppBrowser extends CordovaPlugin {
      * @param callbackId    The callback id used when calling back into JavaScript.
      * @return              A PluginResult object with a status and message.
      */
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        try {
-            if (action.equals("open")) {
-                this.callbackContext = callbackContext;
-                String url = args.getString(0);
-                String target = args.optString(1);
-                if (target == null || target.equals("") || target.equals(NULL)) {
-                    target = SELF;
-                }
-                HashMap<String, Boolean> features = parseFeature(args.optString(2));
-                
-                Log.d(LOG_TAG, "target = " + target);
-
-                url = updateUrl(url);
-                String result = "";
-
-                // SELF
-                if (SELF.equals(target)) {
-                    Log.d(LOG_TAG, "in self");
-                    // load in webview
-                    if (url.startsWith("file://") || url.startsWith("javascript:") 
-                            || Config.isUrlWhiteListed(url)) {
-                        this.webView.loadUrl(url);
-                    }
-                    //Load the dialer
-                    else if (url.startsWith(WebView.SCHEME_TEL))
-                    {
-                        try {
-                            Intent intent = new Intent(Intent.ACTION_DIAL);
-                            intent.setData(Uri.parse(url));
-                            this.cordova.getActivity().startActivity(intent);
-                        } catch (android.content.ActivityNotFoundException e) {
-                            LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+    public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        if (action.equals("open")) {
+            this.callbackContext = callbackContext;
+            final String url = args.getString(0);
+            String t = args.optString(1);
+            if (t == null || t.equals("") || t.equals(NULL)) {
+                t = SELF;
+            }
+            final String target = t;
+            final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+            
+            Log.d(LOG_TAG, "target = " + target);
+            
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String result = "";
+                    // SELF
+                    if (SELF.equals(target)) {
+                        Log.d(LOG_TAG, "in self");
+                        // load in webview
+                        if (url.startsWith("file://") || url.startsWith("javascript:") 
+                                || Config.isUrlWhiteListed(url)) {
+                            webView.loadUrl(url);
+                        }
+                        //Load the dialer
+                        else if (url.startsWith(WebView.SCHEME_TEL))
+                        {
+                            try {
+                                Intent intent = new Intent(Intent.ACTION_DIAL);
+                                intent.setData(Uri.parse(url));
+                               cordova.getActivity().startActivity(intent);
+                            } catch (android.content.ActivityNotFoundException e) {
+                                LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                            }
+                        }
+                        // load in InAppBrowser
+                        else {
+                            result = showWebPage(url, features);
                         }
                     }
-                    // load in InAppBrowser
+                    // SYSTEM
+                    else if (SYSTEM.equals(target)) {
+                        Log.d(LOG_TAG, "in system");
+                        result = openExternal(url);
+                    }
+                    // BLANK - or anything else
                     else {
-                        result = this.showWebPage(url, features);
+                        Log.d(LOG_TAG, "in blank");
+                        result = showWebPage(url, features);
                     }
+    
+                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+                    pluginResult.setKeepCallback(true);
+                    callbackContext.sendPluginResult(pluginResult);
                 }
-                // SYSTEM
-                else if (SYSTEM.equals(target)) {
-                    Log.d(LOG_TAG, "in system");
-                    result = this.openExternal(url);
+            });
+        }
+        else if (action.equals("close")) {
+            closeDialog();
+        }
+        else if (action.equals("injectScriptCode")) {
+            String jsWrapper = null;
+            if (args.getBoolean(1)) {
+                jsWrapper = String.format("prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')", callbackContext.getCallbackId());
+            }
+            injectDeferredObject(args.getString(0), jsWrapper);
+        }
+        else if (action.equals("injectScriptFile")) {
+            String jsWrapper;
+            if (args.getBoolean(1)) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
+            } else {
+                jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
+            }
+            injectDeferredObject(args.getString(0), jsWrapper);
+        }
+        else if (action.equals("injectStyleCode")) {
+            String jsWrapper;
+            if (args.getBoolean(1)) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+            } else {
+                jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
+            }
+            injectDeferredObject(args.getString(0), jsWrapper);
+        }
+        else if (action.equals("injectStyleFile")) {
+            String jsWrapper;
+            if (args.getBoolean(1)) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+            } else {
+                jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
+            }
+            injectDeferredObject(args.getString(0), jsWrapper);
+        }
+        else if (action.equals("show")) {
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.show();
                 }
-                // BLANK - or anything else
-                else {
-                    Log.d(LOG_TAG, "in blank");
-                    result = this.showWebPage(url, features);
-                }
-
-                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-                pluginResult.setKeepCallback(true);
-                this.callbackContext.sendPluginResult(pluginResult);
-            }
-            else if (action.equals("close")) {
-                closeDialog();
-            }
-            else if (action.equals("injectScriptCode")) {
-                String jsWrapper = null;
-                if (args.getBoolean(1)) {
-                    jsWrapper = String.format("prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')", callbackContext.getCallbackId());
-                }
-                injectDeferredObject(args.getString(0), jsWrapper);
-            }
-            else if (action.equals("injectScriptFile")) {
-                String jsWrapper;
-                if (args.getBoolean(1)) {
-                    jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
-                } else {
-                    jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
-                }
-                injectDeferredObject(args.getString(0), jsWrapper);
-            }
-            else if (action.equals("injectStyleCode")) {
-                String jsWrapper;
-                if (args.getBoolean(1)) {
-                    jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
-                } else {
-                    jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
-                }
-                injectDeferredObject(args.getString(0), jsWrapper);
-            }
-            else if (action.equals("injectStyleFile")) {
-                String jsWrapper;
-                if (args.getBoolean(1)) {
-                    jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
-                } else {
-                    jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
-                }
-                injectDeferredObject(args.getString(0), jsWrapper);
-            }
-            else if (action.equals("show")) {
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.show();
-                    }
-                };
-                this.cordova.getActivity().runOnUiThread(runnable);
-                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-                pluginResult.setKeepCallback(true);
-                this.callbackContext.sendPluginResult(pluginResult);
-            }
-            else {
-                return false;
-            }
-        } catch (JSONException e) {
-            this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
+            });
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
+        }
+        else {
+            return false;
         }
         return true;
     }
@@ -251,8 +250,14 @@ public class InAppBrowser extends CordovaPlugin {
         } else {
             scriptToInject = source;
         }
+        final String finalScriptToInject = scriptToInject;
         // This action will have the side-effect of blurring the currently focused element
-        this.inAppWebView.loadUrl("javascript:" + scriptToInject);
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+            }
+        });
     }
 
     /**
@@ -285,20 +290,6 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
-     * Convert relative URL to full path
-     * 
-     * @param url
-     * @return 
-     */
-    private String updateUrl(String url) {
-        Uri newUrl = Uri.parse(url);
-        if (newUrl.isRelative()) {
-            url = this.webView.getUrl().substring(0, this.webView.getUrl().lastIndexOf("/")+1) + url;
-        }
-        return url;
-    }
-
-    /**
      * Display a new browser with the specified URL.
      *
      * @param url           The url to load.
@@ -328,27 +319,23 @@ public class InAppBrowser extends CordovaPlugin {
         if (childView == null) {
             return;
         }
-        try {
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    childView.loadUrl("about:blank");
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                childView.loadUrl("about:blank");
+                if (dialog != null) {
+                    dialog.dismiss();
                 }
-                
-            };
-            
-            this.cordova.getActivity().runOnUiThread(runnable);
+            }
+        });
+        try {
             JSONObject obj = new JSONObject();
             obj.put("type", EXIT_EVENT);
-
             sendUpdate(obj, false);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Should never happen");
         }
         
-        if (dialog != null) {
-            dialog.dismiss();
-        }
     }
 
     /**
