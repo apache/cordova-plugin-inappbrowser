@@ -157,7 +157,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             else if (action.equals("close")) {
                 closeDialog();
-                this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+                this.callbackContext.success();
             }
             else if (action.equals("injectScriptCode")) {
                 String jsWrapper = null;
@@ -311,11 +311,15 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Closes the dialog
      */
-    private void closeDialog() {
+    public void closeDialog() {
+        final WebView childView = this.inAppWebView;
+        // The JS protects against multiple calls, so this should happen only when
+        // closeDialog() is called by other native code.
+        if (childView == null) {
+            return;
+        }
         try {
-            final WebView childView = this.inAppWebView;
             Runnable runnable = new Runnable() {
-
                 @Override
                 public void run() {
                     childView.loadUrl("about:blank");
