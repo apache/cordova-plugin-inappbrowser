@@ -8,6 +8,9 @@
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
 
+    <engines>
+      <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
+    </engines>
 
     <js-module src="www/InAppBrowser.js" name="InAppBrowser">
         <clobbers target="window.open" />
