@@ -74,6 +74,13 @@
             <merges target="" />
         </js-module>
     </platform>
-        
+
+    <!-- windows81 -->
+    <platform name="windows81">
+      <js-module src="src/windows81/InAppBrowserProxy.js" name="InAppBrowserProxy">
+        <merges target="" />
+      </js-module>
+    </platform>
+
 
 </plugin>
