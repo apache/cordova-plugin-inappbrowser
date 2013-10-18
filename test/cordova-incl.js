@@ -20,7 +20,9 @@
 */
 
 var PLAT;
-if (/Android/.exec(navigator.userAgent)) {
+if (/cordova-amazon-fireos/.exec(navigator.userAgent)) {
+    PLAT = 'amazon-fireos';
+}else if (/Android/.exec(navigator.userAgent)) {
     PLAT = 'android';
 } else if (/(iPad)|(iPhone)|(iPod)/.exec(navigator.userAgent)) {
     PLAT = 'ios';
@@ -61,7 +63,7 @@ if (!window._doNotWriteCordovaScript) {
 }
 
 function backHome() {
-	if (window.device && device.platform && device.platform.toLowerCase() == 'android') {
+	if (window.device && device.platform && (device.platform.toLowerCase() == 'android' || device.platform.toLowerCase() == 'amazon-fireos')) {
             navigator.app.backHistory();
 	}
 	else {
