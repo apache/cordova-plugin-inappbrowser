@@ -56,12 +56,8 @@
 
 - (void)close:(CDVInvokedUrlCommand*)command
 {
-    if (self.inAppBrowserViewController != nil) {
-        [self.inAppBrowserViewController close];
-        self.inAppBrowserViewController = nil;
-    }
-
-    self.callbackId = nil;
+    // Things are cleaned up in browserExit.
+    [self.inAppBrowserViewController close];
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
@@ -372,14 +368,15 @@
     if (self.callbackId != nil) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"exit"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        self.callbackId = nil;
     }
+    // Set navigationDelegate to nil to ensure no callbacks are received from it.
+    self.inAppBrowserViewController.navigationDelegate = nil;
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
-    
+
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
