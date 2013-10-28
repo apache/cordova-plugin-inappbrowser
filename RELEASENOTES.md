@@ -36,3 +36,15 @@
 ### 0.2.3 (Oct 9, 2013)
 * [CB-4915] Incremented plugin version on dev branch.
 * [CB-4926] Fixes inappbrowser plugin loading for windows8
+
+### 0.2.4 (Oct 28, 2013)
+* CB-5128: added repo + issue tag to plugin.xml for inappbrowser plugin
+* CB-4995 Fix crash when WebView is quickly opened then closed.
+* CB-4930 - iOS - InAppBrowser should take into account the status bar
+* [CB-5010] Incremented plugin version on dev branch.
+* [CB-5010] Updated version and RELEASENOTES.md for release 0.2.3
+* CB-4858 - Run IAB methods on the UI thread.
+* CB-4858 Convert relative URLs to absolute URLs in JS
+* CB-3747 Fix back button having different dismiss logic from the close button.
+* CB-5021 Expose closeDialog() as a public function and make it safe to call multiple times.
+* CB-5021 Make it safe to call close() multiple times
