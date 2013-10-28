@@ -32,6 +32,11 @@
 
 #pragma mark CDVInAppBrowser
 
+@interface CDVInAppBrowser () {
+    UIStatusBarStyle _previousStatusBarStyle;
+}
+@end
+
 @implementation CDVInAppBrowser
 
 - (CDVInAppBrowser*)initWithWebView:(UIWebView*)theWebView
@@ -51,12 +56,8 @@
 
 - (void)close:(CDVInvokedUrlCommand*)command
 {
-    if (self.inAppBrowserViewController != nil) {
-        [self.inAppBrowserViewController close];
-        self.inAppBrowserViewController = nil;
-    }
-
-    self.callbackId = nil;
+    // Things are cleaned up in browserExit.
+    [self.inAppBrowserViewController close];
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
@@ -115,6 +116,7 @@
         }
     }
 
+    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
 
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
@@ -155,8 +157,13 @@
     }
   
     if (! browserOptions.hidden) {
+        
+        UINavigationController* nav = [[UINavigationController alloc]
+                                       initWithRootViewController:self.inAppBrowserViewController];
+        nav.navigationBarHidden = YES;
+        
       if (self.viewController.modalViewController != self.inAppBrowserViewController) {
-        [self.viewController presentModalViewController:self.inAppBrowserViewController animated:YES];
+          [self.viewController presentModalViewController:nav animated:YES];
       }
     }
     [self.inAppBrowserViewController navigateTo:url];
@@ -166,7 +173,13 @@
 {
     if ([self.inAppBrowserViewController isViewLoaded] && self.inAppBrowserViewController.view.window)
         return;
-    [self.viewController presentModalViewController:self.inAppBrowserViewController animated:YES];
+    
+    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
+    
+    UINavigationController* nav = [[UINavigationController alloc]
+                                   initWithRootViewController:self.inAppBrowserViewController];
+    nav.navigationBarHidden = YES;
+    [self.viewController presentModalViewController:nav animated:YES];
 }
 
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
@@ -355,13 +368,18 @@
     if (self.callbackId != nil) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"exit"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        self.callbackId = nil;
     }
+    // Set navigationDelegate to nil to ensure no callbacks are received from it.
+    self.inAppBrowserViewController.navigationDelegate = nil;
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
+
+    if (IsAtLeastiOSVersion(@"7.0")) {
+        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
+    }
 }
 
 @end
@@ -632,6 +650,11 @@
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     [super viewDidUnload];
 }
+    
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleDefault;
+}
 
 - (void)close
 {
@@ -673,6 +696,15 @@
 - (void)goForward:(id)sender
 {
     [self.webView goForward];
+}
+    
+- (void)viewWillAppear:(BOOL)animated
+{
+    if (IsAtLeastiOSVersion(@"7.0")) {
+        [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
+    }
+    
+    [super viewWillAppear:animated];
 }
 
 #pragma mark UIWebViewDelegate
