@@ -487,17 +487,17 @@
     self.addressLabel.numberOfLines = 1;
     self.addressLabel.opaque = NO;
     self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
-    self.addressLabel.text = @"Loading...";
+    self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.addressLabel.textAlignment = UITextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
 
-    NSString* frontArrowString = @"►"; // create arrow from Unicode char
+    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
     self.forwardButton.enabled = YES;
     self.forwardButton.imageInsets = UIEdgeInsetsZero;
 
-    NSString* backArrowString = @"◄"; // create arrow from Unicode char
+    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
@@ -713,7 +713,7 @@
 {
     // loading url, start spinner, update back/forward
 
-    self.addressLabel.text = @"Loading...";
+    self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
 
@@ -770,7 +770,7 @@
     self.forwardButton.enabled = theWebView.canGoForward;
     [self.spinner stopAnimating];
 
-    self.addressLabel.text = @"Load Error";
+    self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
 
     [self.navigationDelegate webView:theWebView didFailLoadWithError:error];
 }
