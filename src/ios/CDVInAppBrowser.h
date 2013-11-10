@@ -83,6 +83,7 @@
 @property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
 @property (nonatomic, assign) BOOL suppressesincrementalrendering;
 @property (nonatomic, assign) BOOL hidden;
+@property (nonatomic, assign) BOOL disallowOverscroll;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
