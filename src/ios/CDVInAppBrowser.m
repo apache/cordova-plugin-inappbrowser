@@ -146,6 +146,18 @@
     }
     self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
 
+    // prevent webView from bouncing
+    if (!browserOptions.disallowOverscroll) {
+        if ([self.inAppBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
+            ((UIScrollView*)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
+        } else {
+            for (id subview in self.inAppBrowserViewController.webView.subviews) {
+                if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
+                    ((UIScrollView*)subview).bounces = NO;
+                }
+            }
+        }
+    }
   
     // UIWebView options
     self.inAppBrowserViewController.webView.scalesPageToFit = browserOptions.enableviewportscale;
@@ -821,6 +833,7 @@
         self.keyboarddisplayrequiresuseraction = YES;
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
+        self.disallowOverscroll = YES;
     }
 
     return self;
