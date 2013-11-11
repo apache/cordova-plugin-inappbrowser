@@ -38,20 +38,7 @@ public class InAppChromeClient extends WebChromeClient {
             long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
     {
         LOG.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
-
-        if (estimatedSize < MAX_QUOTA)
-        {
-            //increase for 1Mb
-            long newQuota = estimatedSize;
-            LOG.d(LOG_TAG, "calling quotaUpdater.updateQuota newQuota: %d", newQuota);
-            quotaUpdater.updateQuota(newQuota);
-        }
-        else
-        {
-            // Set the quota to whatever it is and force an error
-            // TODO: get docs on how to handle this properly
-            quotaUpdater.updateQuota(currentQuota);
-        }
+        quotaUpdater.updateQuota(MAX_QUOTA);
     }
 
     /**
