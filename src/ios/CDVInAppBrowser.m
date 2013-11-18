@@ -463,7 +463,7 @@
     self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
-    self.toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
     self.toolbar.barStyle = UIBarStyleBlackOpaque;
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
@@ -719,12 +719,21 @@
     [super viewWillAppear:animated];
 }
 
+//
+// On iOS 7 the status bar is part of the view's dimensions, therefore it's height has to be taken into account.
+// The height of it could be hardcoded as 20 pixels, but that would assume that the upcoming releases of iOS won't
+// change that value.
+//
+- (float) getStatusBarOffset {
+    CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
+    float statusBarOffset = IsAtLeastiOSVersion(@"7.0") ? MIN(statusBarFrame.size.width, statusBarFrame.size.height) : 0.0;
+    return statusBarOffset;
+}
+
 - (void) rePositionViews {
     if ([_browserOptions.toolbarbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
-        
-        float offsetForStatusBar = IsAtLeastiOSVersion(@"7.0") ? 21.0 : 0.0;
-        [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, self.toolbar.frame.origin.y + offsetForStatusBar, self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
+        [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
 }
 
