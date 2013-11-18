@@ -38,11 +38,33 @@
 
 @end
 
+@interface CDVInAppBrowserOptions : NSObject {}
+
+@property (nonatomic, assign) BOOL location;
+@property (nonatomic, assign) BOOL toolbar;
+@property (nonatomic, copy) NSString* closebuttoncaption;
+@property (nonatomic, copy) NSString* toolbarbarposition;
+
+@property (nonatomic, copy) NSString* presentationstyle;
+@property (nonatomic, copy) NSString* transitionstyle;
+
+@property (nonatomic, assign) BOOL enableviewportscale;
+@property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
+@property (nonatomic, assign) BOOL allowinlinemediaplayback;
+@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
+@property (nonatomic, assign) BOOL suppressesincrementalrendering;
+@property (nonatomic, assign) BOOL hidden;
+
++ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
+
+@end
+
 @interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
+    CDVInAppBrowserOptions *_browserOptions;
     CDVWebViewDelegate* _webViewDelegate;
 }
 
@@ -61,29 +83,9 @@
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show;
+- (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent;
-
-@end
-
-@interface CDVInAppBrowserOptions : NSObject {}
-
-@property (nonatomic, assign) BOOL location;
-@property (nonatomic, assign) BOOL toolbar;
-@property (nonatomic, copy) NSString* closebuttoncaption;
-
-@property (nonatomic, copy) NSString* presentationstyle;
-@property (nonatomic, copy) NSString* transitionstyle;
-
-@property (nonatomic, assign) BOOL enableviewportscale;
-@property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
-@property (nonatomic, assign) BOOL allowinlinemediaplayback;
-@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
-@property (nonatomic, assign) BOOL suppressesincrementalrendering;
-@property (nonatomic, assign) BOOL hidden;
-
-+ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
 @end
