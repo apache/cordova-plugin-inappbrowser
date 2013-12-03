@@ -30,7 +30,6 @@
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
     </platform>
-<<<<<<< HEAD
     
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
