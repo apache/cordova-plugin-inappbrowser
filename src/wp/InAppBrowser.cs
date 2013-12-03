@@ -218,7 +218,7 @@ namespace WPCordovaClassLib.Cordova.Commands
 
         private void ShowInAppBrowser(string url)
         {
-            Uri loc = new Uri(url);
+            Uri loc = new Uri(url, UriKind.RelativeOrAbsolute);
 
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
@@ -382,7 +382,7 @@ namespace WPCordovaClassLib.Cordova.Commands
 
             }
 #endif
-            string message = "{\"type\":\"loadstop\", \"url\":\"" + e.Uri.AbsoluteUri + "\"}";
+            string message = "{\"type\":\"loadstop\", \"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
             this.DispatchCommandResult(result);
@@ -390,7 +390,7 @@ namespace WPCordovaClassLib.Cordova.Commands
 
         void browser_NavigationFailed(object sender, System.Windows.Navigation.NavigationFailedEventArgs e)
         {
-            string message = "{\"type\":\"error\",\"url\":\"" + e.Uri.AbsoluteUri + "\"}";
+            string message = "{\"type\":\"error\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, message);
             result.KeepCallback = true;
             this.DispatchCommandResult(result);
@@ -398,7 +398,7 @@ namespace WPCordovaClassLib.Cordova.Commands
 
         void browser_Navigating(object sender, NavigatingEventArgs e)
         {
-            string message = "{\"type\":\"loadstart\",\"url\":\"" + e.Uri.AbsoluteUri + "\"}";
+            string message = "{\"type\":\"loadstart\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
             this.DispatchCommandResult(result);
