@@ -29,6 +29,23 @@
 
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
+
+        <!-- android drawable resources -->
+        <source-file src="res/android/drawable-hdpi/ic_action_next_item.png" target-dir="res/drawable-hdpi" />
+        <source-file src="res/android/drawable-mdpi/ic_action_next_item.png" target-dir="res/drawable-mdpi" />
+        <source-file src="res/android/drawable-xhdpi/ic_action_next_item.png" target-dir="res/drawable-xhdpi" />
+        <source-file src="res/android/drawable-xxhdpi/ic_action_next_item.png" target-dir="res/drawable-xxhdpi" />
+
+        <source-file src="res/android/drawable-hdpi/ic_action_previous_item.png" target-dir="res/drawable-hdpi" />
+        <source-file src="res/android/drawable-mdpi/ic_action_previous_item.png" target-dir="res/drawable-mdpi" />
+        <source-file src="res/android/drawable-xhdpi/ic_action_previous_item.png" target-dir="res/drawable-xhdpi" />
+        <source-file src="res/android/drawable-xxhdpi/ic_action_previous_item.png" target-dir="res/drawable-xxhdpi" />
+
+        <source-file src="res/android/drawable-hdpi/ic_action_remove.png" target-dir="res/drawable-hdpi" />
+        <source-file src="res/android/drawable-mdpi/ic_action_remove.png" target-dir="res/drawable-mdpi" />
+        <source-file src="res/android/drawable-xhdpi/ic_action_remove.png" target-dir="res/drawable-xhdpi" />
+        <source-file src="res/android/drawable-xxhdpi/ic_action_remove.png" target-dir="res/drawable-xxhdpi" />
+
     </platform>
     
     <!-- amazon-fireos -->
