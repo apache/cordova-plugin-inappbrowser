@@ -36,12 +36,45 @@ namespace WPCordovaClassLib.Cordova.Commands
         private static ApplicationBarIconButton backButton;
         private static ApplicationBarIconButton fwdButton;
 
+        protected ApplicationBar AppBar;
+
+        protected bool ShowLocation {get;set;}
+        protected bool StartHidden  {get;set;}
+
         public void open(string options)
         {
+            // reset defaults on ShowLocation + StartHidden features 
+            ShowLocation = true;
+            StartHidden = false;
+
             string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
             //BrowserOptions opts = JSON.JsonHelper.Deserialize<BrowserOptions>(options);
             string urlLoc = args[0];
             string target = args[1];
+            string featString = args[2];
+
+            string[] features = featString.Split(',');
+            foreach (string str in features)
+            {
+                try
+                {
+                    string[] split = str.Split('=');
+                    switch (split[0])
+                    {
+                        case "location":
+                            ShowLocation = split[1].ToLower().StartsWith("yes");
+                            break;
+                        case "hidden":
+                            StartHidden = split[1].ToLower().StartsWith("yes");
+                            break;
+                    }
+                }
+                catch(Exception)
+                {
+                    // some sort of invalid param was passed, moving on ...
+                }
+                
+            }
             /*
                 _self - opens in the Cordova WebView if url is in the white-list, else it opens in the InAppBrowser 
                 _blank - always open in the InAppBrowser 
@@ -59,9 +92,98 @@ namespace WPCordovaClassLib.Cordova.Commands
                     ShowSystemBrowser(urlLoc);
                     break;
             }
-
-
         }
+
+        public void show(string options)
+        {
+            string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
+
+
+            if (browser != null)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    browser.Visibility = Visibility.Visible;
+                    AppBar.IsVisible = true;
+                });
+            }
+        }
+
+        public void injectScriptCode(string options)
+        {
+            string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
+
+            bool bCallback = false;
+            if (bool.TryParse(args[1], out bCallback)) { };
+
+            string callbackId = args[2];
+
+            if (browser != null)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    var res = browser.InvokeScript("eval", new string[] { args[0] });
+
+                    if (bCallback)
+                    {
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, res.ToString());
+                        result.KeepCallback = false;
+                        this.DispatchCommandResult(result);
+                    }
+
+                });
+            }
+        }
+
+        public void injectScriptFile(string options)
+        {
+            Debug.WriteLine("Error : Windows Phone org.apache.cordova.inappbrowser does not currently support executeScript");
+            string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
+            // throw new NotImplementedException("Windows Phone does not currently support 'executeScript'");
+        }
+
+        public void injectStyleCode(string options)
+        {
+            Debug.WriteLine("Error : Windows Phone org.apache.cordova.inappbrowser does not currently support insertCSS");
+            return;
+
+            //string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
+            //bool bCallback = false;
+            //if (bool.TryParse(args[1], out bCallback)) { };
+
+            //string callbackId = args[2];
+
+            //if (browser != null)
+            //{
+                //Deployment.Current.Dispatcher.BeginInvoke(() =>
+                //{
+                //    if (bCallback)
+                //    {
+                //        string cssInsertString = "try{(function(doc){var c = '<style>body{background-color:#ffff00;}</style>'; doc.head.innerHTML += c;})(document);}catch(ex){alert('oops : ' + ex.message);}";
+                //        //cssInsertString = cssInsertString.Replace("_VALUE_", args[0]);
+                //        Debug.WriteLine("cssInsertString = " + cssInsertString);
+                //        var res = browser.InvokeScript("eval", new string[] { cssInsertString });
+                //        if (bCallback)
+                //        {
+                //            PluginResult result = new PluginResult(PluginResult.Status.OK, res.ToString());
+                //            result.KeepCallback = false;
+                //            this.DispatchCommandResult(result);
+                //        }
+                //    }
+
+                //});
+            //}
+        }
+
+        public void injectStyleFile(string options)
+        {
+            Debug.WriteLine("Error : Windows Phone org.apache.cordova.inappbrowser does not currently support insertCSS");
+            return;
+
+            //string[] args = JSON.JsonHelper.Deserialize<string[]>(options);
+            //throw new NotImplementedException("Windows Phone does not currently support 'insertCSS'");
+        }
+
 
         private void ShowCordovaBrowser(string url)
         {
@@ -127,6 +249,12 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 browser.NavigationFailed += new System.Windows.Navigation.NavigationFailedEventHandler(browser_NavigationFailed);
                                 browser.Navigated += new EventHandler<System.Windows.Navigation.NavigationEventArgs>(browser_Navigated);
                                 browser.Navigate(loc);
+
+                                if (StartHidden)
+                                {
+                                    browser.Visibility = Visibility.Collapsed;
+                                }
+
                                 //browser.IsGeolocationEnabled = opts.isGeolocationEnabled;
                                 grid.Children.Add(browser);
                             }
@@ -156,6 +284,9 @@ namespace WPCordovaClassLib.Cordova.Commands
                             bar.Buttons.Add(closeBtn);
 
                             page.ApplicationBar = bar;
+                            bar.IsVisible = !StartHidden;
+                            AppBar = bar;
+
                         }
 
                     }
