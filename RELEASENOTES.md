@@ -48,4 +48,10 @@
 * CB-3747 Fix back button having different dismiss logic from the close button.
 * CB-5021 Expose closeDialog() as a public function and make it safe to call multiple times.
 * CB-5021 Make it safe to call close() multiple times
->>>>>>> dev
+
+### 0.2.5 (Dec 4, 2013)
+* Remove merge conflict tag
+* [CB-4724] fixed UriFormatException
+* add ubuntu platform
+* CB-3420 WP feature hidden=yes implemented
+* Added amazon-fireos platform. Change to use amazon-fireos as the platform if user agent string contains 'cordova-amazon-fireos'
