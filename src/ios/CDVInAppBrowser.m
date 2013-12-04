@@ -147,7 +147,7 @@
     self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
 
     // prevent webView from bouncing
-    if (browserOptions.disallowOverscroll) {
+    if (browserOptions.disallowoverscroll) {
         if ([self.inAppBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
             ((UIScrollView*)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
         } else {
