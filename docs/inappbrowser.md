@@ -133,8 +133,7 @@ removeEventListener
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
 
-- __callback__: the function to execute when the event fires.
-The function is passed an `InAppBrowserEvent` object.
+- __callback__: the function to be removed, which was previously registered for this event by addEventListener.
 
 Supported Platforms
 -------------------
@@ -195,7 +194,7 @@ Full Example
              iabRef = window.open('http://apache.org', '_blank', 'location=yes');
              iabRef.addEventListener('loadstart', iabLoadStart);
              iabRef.addEventListener('loadstop', iabLoadStop);
-             iabRef.removeEventListener('loaderror', iabLoadError);
+             iabRef.addEventListener('loaderror', iabLoadError);
              iabRef.addEventListener('exit', iabClose);
         }
 
