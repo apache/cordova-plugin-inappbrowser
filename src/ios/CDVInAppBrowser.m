@@ -123,7 +123,7 @@
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
-    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarbarposition];
+    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil) {
         [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
     }
@@ -412,7 +412,7 @@
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
 
     CGRect webViewBounds = self.view.bounds;
-    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
     
@@ -731,7 +731,7 @@
 }
 
 - (void) rePositionViews {
-    if ([_browserOptions.toolbarbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
+    if ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
@@ -844,7 +844,7 @@
         self.location = YES;
         self.toolbar = YES;
         self.closebuttoncaption = nil;
-        self.toolbarbarposition = kInAppBrowserToolbarBarPositionBottom;
+        self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
