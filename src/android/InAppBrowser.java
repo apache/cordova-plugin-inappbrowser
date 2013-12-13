@@ -301,7 +301,7 @@ public class InAppBrowser extends CordovaPlugin {
             intent = new Intent(Intent.ACTION_VIEW);
             Uri uri = Uri.parse(url);
             if ("file".equals(uri.getScheme())) {
-                intent.setDataAndType(uri, guessMimeType(uri));
+		intent.setDataAndType(uri, webView.getResourceApi().getMimeType(uri));
             } else {
                 intent.setData(uri);
             }
@@ -311,21 +311,6 @@ public class InAppBrowser extends CordovaPlugin {
             Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
             return e.toString();
         }
-    }
-
-    /**
-     * Only a few types supported as a start...
-     */
-    private String guessMimeType(Uri uri) {
-        String path = uri.getPath();
-        if (path.endsWith(".pdf")) {
-            return "application/pdf";
-        } else if (path.endsWith(".htm") || path.endsWith(".html")) {
-            return "text/html";
-        } else if (path.endsWith(".txt")) {
-            return "text/plain";
-        }
-        return "text/html";
     }
 
     /**
