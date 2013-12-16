@@ -177,9 +177,11 @@
                                        initWithRootViewController:self.inAppBrowserViewController];
         nav.navigationBarHidden = YES;
         
-      if (self.viewController.modalViewController != self.inAppBrowserViewController) {
-          [self.viewController presentModalViewController:nav animated:YES];
-      }
+
+
+        if (self.viewController.presentedViewController != self.inAppBrowserViewController) {
+            [self.viewController  presentViewController:nav animated:YES completion:nil];
+        }
     }
     [self.inAppBrowserViewController navigateTo:url];
 }
@@ -194,7 +196,7 @@
     UINavigationController* nav = [[UINavigationController alloc]
                                    initWithRootViewController:self.inAppBrowserViewController];
     nav.navigationBarHidden = YES;
-    [self.viewController presentModalViewController:nav animated:YES];
+    [self.viewController  presentViewController:nav animated:YES completion:nil];
 }
 
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
@@ -502,14 +504,14 @@
     self.addressLabel.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.addressLabel.enabled = YES;
     self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = UILineBreakModeTailTruncation;
-    self.addressLabel.minimumFontSize = 10.000;
+    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.addressLabel.minimumScaleFactor = 10.000;
     self.addressLabel.multipleTouchEnabled = NO;
     self.addressLabel.numberOfLines = 1;
     self.addressLabel.opaque = NO;
     self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.addressLabel.textAlignment = UITextAlignmentLeft;
+    self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
 
@@ -683,11 +685,7 @@
 {
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
 
-    if ([self respondsToSelector:@selector(presentingViewController)]) {
-        [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
-    } else {
-        [[self parentViewController] dismissModalViewControllerAnimated:YES];
-    }
+    [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
 
     self.currentURL = nil;
 
