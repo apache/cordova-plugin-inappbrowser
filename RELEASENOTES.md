@@ -55,3 +55,12 @@
 * add ubuntu platform
 * CB-3420 WP feature hidden=yes implemented
 * Added amazon-fireos platform. Change to use amazon-fireos as the platform if user agent string contains 'cordova-amazon-fireos'
+
+### 0.3.0 (Jan 02, 2014)
+* CB-5592 Android: Add MIME type to Intent when opening file:/// URLs
+* CB-5594 iOS: Add disallowoverscroll option.
+* CB-5658 Add doc/index.md for InAppBrowser plugin
+* CB-5595 Add toolbarposition=top option.
+* Apply CB-5193 to InAppBrowser (Fix DB quota exception)
+* CB-5593 iOS: Make InAppBrowser localizable
+* CB-5591 Change window.escape to encodeURIComponent
