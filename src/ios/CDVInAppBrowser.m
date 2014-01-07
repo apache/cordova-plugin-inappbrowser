@@ -36,7 +36,7 @@
 #pragma mark CDVInAppBrowser
 
 @interface CDVInAppBrowser () {
-    UIStatusBarStyle _previousStatusBarStyle;
+    NSInteger _previousStatusBarStyle;
 }
 @end
 
@@ -46,7 +46,7 @@
 {
     self = [super initWithWebView:theWebView];
     if (self != nil) {
-        // your initialization here
+        _previousStatusBarStyle = -1;
     }
 
     return self;
@@ -59,6 +59,10 @@
 
 - (void)close:(CDVInvokedUrlCommand*)command
 {
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"IAB.close() called but it was already closed.");
+        return;
+    }
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -120,8 +124,6 @@
         }
     }
 
-    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
-
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil) {
@@ -171,30 +173,34 @@
         self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
   
-    if (! browserOptions.hidden) {
-        
-        UINavigationController* nav = [[UINavigationController alloc]
-                                       initWithRootViewController:self.inAppBrowserViewController];
-        nav.navigationBarHidden = YES;
-        
-      if (self.viewController.modalViewController != self.inAppBrowserViewController) {
-          [self.viewController presentModalViewController:nav animated:YES];
-      }
-    }
     [self.inAppBrowserViewController navigateTo:url];
+    if (!browserOptions.hidden) {
+        [self show:nil];
+    }
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command
 {
-    if ([self.inAppBrowserViewController isViewLoaded] && self.inAppBrowserViewController.view.window)
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to show IAB after it was closed.");
         return;
+    }
+    if (_previousStatusBarStyle != -1) {
+        NSLog(@"Tried to show IAB while already shown");
+        return;
+    }
     
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     
     UINavigationController* nav = [[UINavigationController alloc]
                                    initWithRootViewController:self.inAppBrowserViewController];
     nav.navigationBarHidden = YES;
-    [self.viewController presentModalViewController:nav animated:YES];
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.inAppBrowserViewController != nil) {
+            [self.viewController presentModalViewController:nav animated:YES];
+        }
+    });
 }
 
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
@@ -391,6 +397,8 @@
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
+        
+    _previousStatusBarStyle = -1;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
@@ -682,18 +690,20 @@
 - (void)close
 {
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
-
-    if ([self respondsToSelector:@selector(presentingViewController)]) {
-        [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
-    } else {
-        [[self parentViewController] dismissModalViewControllerAnimated:YES];
-    }
-
     self.currentURL = nil;
-
+    
     if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(browserExit)]) {
         [self.navigationDelegate browserExit];
     }
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self respondsToSelector:@selector(presentingViewController)]) {
+            [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+        } else {
+            [[self parentViewController] dismissModalViewControllerAnimated:YES];
+        }
+    });
 }
 
 - (void)navigateTo:(NSURL*)url
