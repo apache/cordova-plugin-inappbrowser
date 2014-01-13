@@ -253,11 +253,16 @@ public class InAppBrowser extends CordovaPlugin {
             scriptToInject = source;
         }
         final String finalScriptToInject = scriptToInject;
-        // This action will have the side-effect of blurring the currently focused element
         this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @SuppressLint("NewApi")
             @Override
             public void run() {
-                inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                    // This action will have the side-effect of blurring the currently focused element
+                    inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+                } else {
+                    inAppWebView.evaluateJavascript(finalScriptToInject, null);
+                }
             }
         });
     }
