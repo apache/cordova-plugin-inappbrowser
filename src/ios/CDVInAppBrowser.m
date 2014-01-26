@@ -510,14 +510,14 @@
     self.addressLabel.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.addressLabel.enabled = YES;
     self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = UILineBreakModeTailTruncation;
-    self.addressLabel.minimumFontSize = 10.000;
+    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.addressLabel.minimumScaleFactor = 10.000;
     self.addressLabel.multipleTouchEnabled = NO;
     self.addressLabel.numberOfLines = 1;
     self.addressLabel.opaque = NO;
     self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.addressLabel.textAlignment = UITextAlignmentLeft;
+    self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
 
