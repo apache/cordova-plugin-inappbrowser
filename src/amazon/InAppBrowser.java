@@ -472,7 +472,7 @@ public class InAppBrowser extends CordovaPlugin {
                 back.setLayoutParams(backLayoutParams);
                 back.setContentDescription("Back Button");
                 back.setId(2);
-                back.setText("<");
+                back.setText("\u25C0");
                 back.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         goBack();
@@ -486,7 +486,7 @@ public class InAppBrowser extends CordovaPlugin {
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
                 forward.setId(3);
-                forward.setText(">");
+                forward.setText("\u25B6");
                 forward.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         goForward();
