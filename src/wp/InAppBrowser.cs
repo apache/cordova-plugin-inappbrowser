@@ -80,17 +80,23 @@ namespace WPCordovaClassLib.Cordova.Commands
                 _blank - always open in the InAppBrowser 
                 _system - always open in the system web browser 
             */
-            switch (target)
+
+            if (null == target || target.Equals("_self"))
             {
-                case "_blank":
-                    ShowInAppBrowser(urlLoc);
-                    break;
-                case "_self":
-                    ShowCordovaBrowser(urlLoc);
-                    break;
-                case "_system":
-                    ShowSystemBrowser(urlLoc);
-                    break;
+                ShowCordovaBrowser(urlLoc);
+            }
+            else if (target.Equals("_system"))
+            {
+                ShowSystemBrowser(urlLoc);
+            }
+            else// new AppBrowser or anything else;
+            {
+                ShowInAppBrowser(urlLoc);
+                if (!target.Equals("_blank"))
+                {
+                    //anything else
+                    System.Diagnostics.Debug.WriteLine("InAppBrowser open unkonw target: " + target + " ,with url： " + urlLoc);
+                }
             }
         }
 
