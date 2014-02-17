@@ -53,7 +53,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string target = args[1];
             string featString = args[2];
 
-            string[] features = featString.Split(',');
+            string[] features = (featString != null) ? featString.Split(',') : new string[0];
             foreach (string str in features)
             {
                 try
