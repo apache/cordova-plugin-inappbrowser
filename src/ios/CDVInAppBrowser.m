@@ -47,6 +47,7 @@
     self = [super initWithWebView:theWebView];
     if (self != nil) {
         _previousStatusBarStyle = -1;
+        _callbackIdPattern = nil;
     }
 
     return self;
@@ -297,6 +298,23 @@
     [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 }
 
+- (BOOL)isValidCallbackId:(NSString *)callbackId
+{
+    NSError *err = nil;
+    // Initialize on first use
+    if (self.callbackIdPattern == nil) {
+        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^InAppBrowser[0-9]{1,10}$" options:0 error:&err];
+        if (err != nil) {
+            // Couldn't initialize Regex; No is safer than Yes.
+            return NO;
+        }
+    }
+    if ([self.callbackIdPattern firstMatchInString:callbackId options:0 range:NSMakeRange(0, [callbackId length])]) {
+        return YES;
+    }
+    return NO;
+}
+
 /**
  * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -323,7 +341,7 @@
         NSString* scriptCallbackId = [url host];
         CDVPluginResult* pluginResult = nil;
 
-        if ([scriptCallbackId hasPrefix:@"InAppBrowser"]) {
+        if ([self isValidCallbackId:scriptCallbackId]) {
             NSString* scriptResult = [url path];
             NSError* __autoreleasing error = nil;
 
