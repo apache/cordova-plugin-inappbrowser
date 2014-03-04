@@ -73,3 +73,8 @@
 * CB-5756: Android: Use WebView.evaluateJavascript for script injection on Android 4.4+
 * Remove alive from InAppBrowser.js since it didn't catch the case where the browser is closed by the user.
 * CB-5733 Fix IAB.close() not working if called before show() animation is done
+
+### 0.3.2 (Feb 26, 2014)
+* Validate that callbackId is correctly formed
+* CB-6035 Move js-module so it is not loaded on unsupported platforms
+* Removed some iOS6 Deprecations

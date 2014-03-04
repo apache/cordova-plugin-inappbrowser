@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="org.apache.cordova.inappbrowser"
-      version="0.3.1">
+      version="0.3.2">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -14,13 +14,12 @@
     <engines>
       <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
     </engines>
-
-    <js-module src="www/InAppBrowser.js" name="InAppBrowser">
-        <clobbers target="window.open" />
-    </js-module>
     
-    <!--  -->
+    <!-- android -->
     <platform name="android">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser"> 
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
@@ -50,6 +49,9 @@
     
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser"> 
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
@@ -62,6 +64,9 @@
 
     <!-- ubuntu -->
     <platform name="ubuntu">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <header-file src="src/ubuntu/inappbrowser.h" />
         <source-file src="src/ubuntu/inappbrowser.cpp" />
         <resource-file src="src/ubuntu/InAppBrowser.qml" />
@@ -69,7 +74,10 @@
     </platform>
 
     <!-- ios -->
-    <platform name="ios">    
+    <platform name="ios">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>  
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
                 <param name="ios-package" value="CDVInAppBrowser" /> 
@@ -82,15 +90,11 @@
 	    <framework src="CoreGraphics.framework" />
     </platform>
 
-    <!-- blackberry10 -->
-<!--    <platform name="blackberry10">
-        <config-file target="www/config.xml" parent="/widget">
-            <feature name="InAppBrowser" value="InAppBrowser"/>
-        </config-file>
-    </platform>
--->
     <!-- wp7 -->
     <platform name="wp7">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
                 <param name="wp-package" value="InAppBrowser"/>
@@ -102,6 +106,9 @@
 
     <!-- wp8 -->
     <platform name="wp8">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
                 <param name="wp-package" value="InAppBrowser"/>
@@ -113,6 +120,9 @@
 
     <!-- windows8 -->
     <platform name="windows8">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
         <js-module src="www/windows8/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <merges target="" />
         </js-module>
