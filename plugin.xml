@@ -17,7 +17,7 @@
     
     <!-- android -->
     <platform name="android">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
@@ -50,7 +50,7 @@
     
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
@@ -65,7 +65,7 @@
 
     <!-- ubuntu -->
     <platform name="ubuntu">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <header-file src="src/ubuntu/inappbrowser.h" />
@@ -76,7 +76,7 @@
 
     <!-- ios -->
     <platform name="ios">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>  
         <config-file target="config.xml" parent="/*">
@@ -93,7 +93,7 @@
 
     <!-- wp7 -->
     <platform name="wp7">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
@@ -107,7 +107,7 @@
 
     <!-- wp8 -->
     <platform name="wp8">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
@@ -121,7 +121,7 @@
 
     <!-- windows8 -->
     <platform name="windows8">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/InAppBrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
         <js-module src="www/windows8/InAppBrowserProxy.js" name="InAppBrowserProxy">
