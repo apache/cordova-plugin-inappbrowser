@@ -78,3 +78,7 @@
 * Validate that callbackId is correctly formed
 * CB-6035 Move js-module so it is not loaded on unsupported platforms
 * Removed some iOS6 Deprecations
+
+### 0.3.3 (Mar 5, 2014)
+* CB-6172 Fix broken install on case-sensitive file-systems
+
