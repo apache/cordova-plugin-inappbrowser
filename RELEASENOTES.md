@@ -80,5 +80,6 @@
 * Removed some iOS6 Deprecations
 
 ### 0.3.3 (Mar 5, 2014)
+* CB-5534 Fix video/audio does not stop playing when browser is closed
 * CB-6172 Fix broken install on case-sensitive file-systems
 
