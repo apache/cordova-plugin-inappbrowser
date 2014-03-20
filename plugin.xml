@@ -93,6 +93,10 @@
 
     <!-- wp7 -->
     <platform name="wp7">
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_NETWORKING"/>
+        </config-file>
+
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
@@ -107,6 +111,10 @@
 
     <!-- wp8 -->
     <platform name="wp8">
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_NETWORKING"/>
+        </config-file>
+                
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
