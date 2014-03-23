@@ -19,6 +19,13 @@
  *
 */
 
+// If we are on Ripple emulator
+if (window.tinyHippos) { // https://gist.github.com/triceam/4658021
+    console.log('InAppBrowser plugin is not supported under Ripple emulator');
+    module.exports = window.open; // we have to specify default browser functionality here
+    return;
+}
+
 var exec = require('cordova/exec');
 var channel = require('cordova/channel');
 var modulemapper = require('cordova/modulemapper');
