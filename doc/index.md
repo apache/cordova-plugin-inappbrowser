@@ -133,7 +133,6 @@ The object returned from a call to `window.open`.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
@@ -164,7 +163,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
@@ -187,7 +185,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
@@ -208,7 +205,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
@@ -240,7 +236,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
@@ -268,7 +263,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
