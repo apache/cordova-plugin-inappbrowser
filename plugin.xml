@@ -102,6 +102,10 @@
             </feature>
         </config-file>
 
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_NETWORKING" />
+        </config-file>
+
         <source-file src="src/wp/InAppBrowser.cs" />
     </platform>
 
@@ -114,6 +118,10 @@
             <feature name="InAppBrowser">
                 <param name="wp-package" value="InAppBrowser"/>
             </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_NETWORKING" />
         </config-file>
 
         <source-file src="src/wp/InAppBrowser.cs" />
