@@ -116,12 +116,23 @@
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
 
-    if (browserOptions.clearsessioncache) {
+    if (browserOptions.clearcache) {
         NSHTTPCookie *cookie;
         NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
         for (cookie in [storage cookies])
         {
             if (![cookie.domain isEqual: @".^filecookies^"]) {
+                [storage deleteCookie:cookie];
+            }
+        }
+    }
+
+    if (browserOptions.clearsessioncache) {
+        NSHTTPCookie *cookie;
+        NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+        for (cookie in [storage cookies])
+        {
+            if (![cookie.domain isEqual: @".^filecookies^"] && cookie.isSessionOnly) {
                 [storage deleteCookie:cookie];
             }
         }
@@ -897,6 +908,7 @@
         self.toolbar = YES;
         self.closebuttoncaption = nil;
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
+        self.clearcache = NO;
         self.clearsessioncache = NO;
 
         self.enableviewportscale = NO;
