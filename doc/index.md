@@ -139,7 +139,7 @@ The object returned from a call to `window.open`.
 ### Quick Example
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    ref.addEventListener('loadstart', function() { alert(event.url); });
+    ref.addEventListener('loadstart', function(event) { alert(event.url); });
 
 ## removeEventListener
 
@@ -169,7 +169,7 @@ The function is passed an `InAppBrowserEvent` object.
 ### Quick Example
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var myCallback = function() { alert(event.url); }
+    var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
 
