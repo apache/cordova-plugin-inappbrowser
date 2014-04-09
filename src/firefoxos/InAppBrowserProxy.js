@@ -77,7 +77,7 @@ var IABExecs = {
 
             browserWrap.addEventListener('click', function () {
                 setTimeout(function () {
-                    IAB.close();
+                    IABExecs.close();
                 }, 0);
             }, false);
             var p = document.createElement('p');
