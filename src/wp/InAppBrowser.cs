@@ -1,21 +1,24 @@
 ﻿using System;
-using System.Net;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
-using System.Diagnostics;
-using System.Runtime.Serialization;
-using WPCordovaClassLib.Cordova;
-using WPCordovaClassLib.Cordova.Commands;
-using WPCordovaClassLib.Cordova.JSON;
 using Microsoft.Phone.Shell;
+
+#if WP8
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.Storage;
+using Windows.System;
+
+//Use alias in case Cordova File Plugin is enabled. Then the File class will be declared in both and error will occur.
+using IOFile = System.IO.File;
+#else
 using Microsoft.Phone.Tasks;
+#endif
 
 namespace WPCordovaClassLib.Cordova.Commands
 {
@@ -53,27 +56,29 @@ namespace WPCordovaClassLib.Cordova.Commands
             string target = args[1];
             string featString = args[2];
 
-            string[] features = featString.Split(',');
-            foreach (string str in features)
+            if (!string.IsNullOrEmpty(featString))
             {
-                try
+                string[] features = featString.Split(',');
+                foreach (string str in features)
                 {
-                    string[] split = str.Split('=');
-                    switch (split[0])
+                    try
                     {
-                        case "location":
-                            ShowLocation = split[1].ToLower().StartsWith("yes");
-                            break;
-                        case "hidden":
-                            StartHidden = split[1].ToLower().StartsWith("yes");
-                            break;
+                        string[] split = str.Split('=');
+                        switch (split[0])
+                        {
+                            case "location":
+                                ShowLocation = split[1].StartsWith("yes", StringComparison.OrdinalIgnoreCase);
+                                break;
+                            case "hidden":
+                                StartHidden = split[1].StartsWith("yes", StringComparison.OrdinalIgnoreCase);
+                                break;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // some sort of invalid param was passed, moving on ...
                     }
                 }
-                catch(Exception)
-                {
-                    // some sort of invalid param was passed, moving on ...
-                }
-                
             }
             /*
                 _self - opens in the Cordova WebView if url is in the white-list, else it opens in the InAppBrowser 
@@ -184,7 +189,6 @@ namespace WPCordovaClassLib.Cordova.Commands
             //throw new NotImplementedException("Windows Phone does not currently support 'insertCSS'");
         }
 
-
         private void ShowCordovaBrowser(string url)
         {
             Uri loc = new Uri(url, UriKind.RelativeOrAbsolute);
@@ -208,13 +212,53 @@ namespace WPCordovaClassLib.Cordova.Commands
             });
         }
 
+#if WP8
+        private async void ShowSystemBrowser(string url)
+        {
+            var pathUri = new Uri(url, UriKind.Absolute);
+            if (pathUri.Scheme == Uri.UriSchemeHttp || pathUri.Scheme == Uri.UriSchemeHttps)
+            {
+                Launcher.LaunchUriAsync(pathUri);
+                return;
+            }
+
+            var file = await GetFile(pathUri.AbsolutePath.Replace('/', Path.DirectorySeparatorChar));
+            if (file != null)
+            {
+                Launcher.LaunchFileAsync(file);
+            }
+            else
+            {
+                Debug.WriteLine("File not found.");
+            }
+        }
+
+        private async Task<StorageFile> GetFile(string fileName)
+        {
+            //first try to get the file from the isolated storage
+            var localFolder = ApplicationData.Current.LocalFolder;
+            if (IOFile.Exists(Path.Combine(localFolder.Path, fileName)))
+            {
+                return await localFolder.GetFileAsync(fileName);
+            }
+
+            //if file is not found try to get it from the xap
+            var filePath = Path.Combine(Package.Current.InstalledLocation.Path, fileName);
+            if (IOFile.Exists(filePath))
+            {
+                return await StorageFile.GetFileFromPathAsync(filePath);
+            }
+
+            return null;
+        }
+#else
         private void ShowSystemBrowser(string url)
         {
             WebBrowserTask webBrowserTask = new WebBrowserTask();
             webBrowserTask.Uri = new Uri(url, UriKind.Absolute);
             webBrowserTask.Show();
         }
-
+#endif
 
         private void ShowInAppBrowser(string url)
         {
@@ -326,7 +370,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 {
 #if WP8
                     browser.GoBack();
-#else           
+#else
                     browser.InvokeScript("execScript", "history.back();");
 #endif
                 }
