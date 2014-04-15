@@ -218,14 +218,14 @@ namespace WPCordovaClassLib.Cordova.Commands
             var pathUri = new Uri(url, UriKind.Absolute);
             if (pathUri.Scheme == Uri.UriSchemeHttp || pathUri.Scheme == Uri.UriSchemeHttps)
             {
-                Launcher.LaunchUriAsync(pathUri);
+                await Launcher.LaunchUriAsync(pathUri);
                 return;
             }
 
             var file = await GetFile(pathUri.AbsolutePath.Replace('/', Path.DirectorySeparatorChar));
             if (file != null)
             {
-                Launcher.LaunchFileAsync(file);
+                await Launcher.LaunchFileAsync(file);
             }
             else
             {
