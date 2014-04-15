@@ -331,11 +331,30 @@ namespace WPCordovaClassLib.Cordova.Commands
                             bar.IsVisible = !StartHidden;
                             AppBar = bar;
 
+                            page.BackKeyPress += page_BackKeyPress;
+
                         }
 
                     }
                 }
             });
+        }
+
+        void page_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+#if WP8
+            if (browser.CanGoBack)
+            {
+                browser.GoBack();
+            }
+            else
+            {
+                close();
+            }
+            e.Cancel = true;
+#else
+                    browser.InvokeScript("execScript", "history.back();");
+#endif
         }
 
         void browser_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
@@ -405,8 +424,10 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 grid.Children.Remove(browser);
                             }
                             page.ApplicationBar = null;
+                            page.BackKeyPress -= page_BackKeyPress;
                         }
                     }
+                   
                     browser = null;
                     string message = "{\"type\":\"exit\"}";
                     PluginResult result = new PluginResult(PluginResult.Status.OK, message);
