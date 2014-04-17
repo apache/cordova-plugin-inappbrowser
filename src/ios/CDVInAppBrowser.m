@@ -216,8 +216,9 @@
     
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     
-    UINavigationController* nav = [[UINavigationController alloc]
+    CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
                                    initWithRootViewController:self.inAppBrowserViewController];
+    nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -963,5 +964,38 @@
 
     return obj;
 }
+
+@end
+
+@implementation CDVInAppBrowserNavigationController : UINavigationController
+
+#pragma mark CDVScreenOrientationDelegate
+
+- (BOOL)shouldAutorotate
+{
+    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(shouldAutorotate)]) {
+        return [self.orientationDelegate shouldAutorotate];
+    }
+    return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)]) {
+        return [self.orientationDelegate supportedInterfaceOrientations];
+    }
+    
+    return 1 << UIInterfaceOrientationPortrait;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(shouldAutorotateToInterfaceOrientation:)]) {
+        return [self.orientationDelegate shouldAutorotateToInterfaceOrientation:interfaceOrientation];
+    }
+    
+    return YES;
+}
+
 
 @end

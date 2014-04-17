@@ -63,7 +63,7 @@
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate>{
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
@@ -91,5 +91,11 @@
 - (void)setCloseButtonTitle:(NSString*)title;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
+
+@end
+
+@interface CDVInAppBrowserNavigationController : UINavigationController
+
+@property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
