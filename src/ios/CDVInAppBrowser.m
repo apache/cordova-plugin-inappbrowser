@@ -553,11 +553,14 @@
     self.addressLabel.enabled = YES;
     self.addressLabel.hidden = NO;
     self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    if (IsAtLeastiOSVersion(@"6.0")) {
-        self.addressLabel.minimumScaleFactor = 10.0/[UIFont labelFontSize];
-    } else {
-        self.addressLabel.minimumFontSize = 10.000;
+    
+    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
+        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
+    } else
+        if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
+        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
     }
+    
     self.addressLabel.multipleTouchEnabled = NO;
     self.addressLabel.numberOfLines = 1;
     self.addressLabel.opaque = NO;
