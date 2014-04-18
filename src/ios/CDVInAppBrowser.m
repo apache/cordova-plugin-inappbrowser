@@ -223,7 +223,7 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
-            [self.viewController presentModalViewController:nav animated:YES];
+            [self.viewController presentViewController:nav animated:YES completion:nil];
         }
     });
 }
@@ -489,7 +489,6 @@
     self.webView.clearsContextBeforeDrawing = YES;
     self.webView.clipsToBounds = YES;
     self.webView.contentMode = UIViewContentModeScaleToFill;
-    self.webView.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.webView.multipleTouchEnabled = YES;
     self.webView.opaque = YES;
     self.webView.scalesPageToFit = NO;
@@ -502,7 +501,6 @@
     self.spinner.clearsContextBeforeDrawing = NO;
     self.spinner.clipsToBounds = NO;
     self.spinner.contentMode = UIViewContentModeScaleToFill;
-    self.spinner.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.spinner.frame = CGRectMake(454.0, 231.0, 20.0, 20.0);
     self.spinner.hidden = YES;
     self.spinner.hidesWhenStopped = YES;
@@ -530,7 +528,6 @@
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
-    self.toolbar.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.toolbar.hidden = NO;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
@@ -549,15 +546,13 @@
     self.addressLabel.clearsContextBeforeDrawing = YES;
     self.addressLabel.clipsToBounds = YES;
     self.addressLabel.contentMode = UIViewContentModeScaleToFill;
-    self.addressLabel.contentStretch = CGRectFromString(@"{{0, 0}, {1, 1}}");
     self.addressLabel.enabled = YES;
     self.addressLabel.hidden = NO;
     self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     
     if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
         [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
-    } else
-        if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
+    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
         [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
     }
     
@@ -750,7 +745,7 @@
         if ([self respondsToSelector:@selector(presentingViewController)]) {
             [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         } else {
-            [[self parentViewController] dismissModalViewControllerAnimated:YES];
+            [[self parentViewController] dismissViewControllerAnimated:YES completion:nil];
         }
     });
 }
