@@ -58,6 +58,8 @@ namespace WPCordovaClassLib.Cordova.Commands
         protected bool ShowLocation {get;set;}
         protected bool StartHidden  {get;set;}
 
+        protected string NavigationCallbackId { get; set; }
+
         public void open(string options)
         {
             // reset defaults on ShowLocation + StartHidden features 
@@ -69,6 +71,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string urlLoc = args[0];
             string target = args[1];
             string featString = args[2];
+            this.NavigationCallbackId = args[3];
 
             if (!string.IsNullOrEmpty(featString))
             {
@@ -446,7 +449,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                     string message = "{\"type\":\"exit\"}";
                     PluginResult result = new PluginResult(PluginResult.Status.OK, message);
                     result.KeepCallback = false;
-                    this.DispatchCommandResult(result);
+                    this.DispatchCommandResult(result, NavigationCallbackId);
                 });
             }
         }
@@ -464,7 +467,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"loadstop\", \"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
         void browser_NavigationFailed(object sender, System.Windows.Navigation.NavigationFailedEventArgs e)
@@ -472,7 +475,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"error\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
         void browser_Navigating(object sender, NavigatingEventArgs e)
@@ -480,7 +483,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"loadstart\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
     }
