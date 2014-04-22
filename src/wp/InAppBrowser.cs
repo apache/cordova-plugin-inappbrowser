@@ -221,7 +221,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                         if (cView != null)
                         {
                             WebBrowser br = cView.Browser;
-                            br.Navigate(loc);
+                            br.Navigate2(loc);
                         }
                     }
 
@@ -286,7 +286,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 if (browser != null)
                 {
                     //browser.IsGeolocationEnabled = opts.isGeolocationEnabled;
-                    browser.Navigate(loc);
+                    browser.Navigate2(loc);
                 }
                 else
                 {
@@ -309,7 +309,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 browser.Navigating += new EventHandler<NavigatingEventArgs>(browser_Navigating);
                                 browser.NavigationFailed += new System.Windows.Navigation.NavigationFailedEventHandler(browser_NavigationFailed);
                                 browser.Navigated += new EventHandler<System.Windows.Navigation.NavigationEventArgs>(browser_Navigated);
-                                browser.Navigate(loc);
+                                browser.Navigate2(loc);
 
                                 if (StartHidden)
                                 {
@@ -486,5 +486,30 @@ namespace WPCordovaClassLib.Cordova.Commands
             this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
+    }
+
+    internal static class WebBrowserExtensions
+    {
+        /// <summary>
+        /// Improved method to initiate request to the provided URI. Supports 'data:text/html' urls. 
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="uri">The requested uri</param>
+        internal static void Navigate2(this WebBrowser browser, Uri uri)
+        {
+            // IE10 does not support data uri so we use NavigateToString method instead
+            if (uri.Scheme == "data")
+            {
+                // we should remove the scheme identifier and unescape the uri
+                string uriString = Uri.UnescapeDataString(uri.AbsoluteUri);
+                // format is 'data:text/html, ...'
+                string html = new System.Text.RegularExpressions.Regex("^data:text/html,").Replace(uriString, "");
+                browser.NavigateToString(html);
+            }
+            else 
+            {
+                browser.Navigate(uri);
+            }
+        }
     }
 }
