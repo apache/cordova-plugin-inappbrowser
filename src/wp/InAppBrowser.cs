@@ -1,21 +1,38 @@
-﻿using System;
-using System.Net;
+﻿/*
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
-using System.Diagnostics;
-using System.Runtime.Serialization;
-using WPCordovaClassLib.Cordova;
-using WPCordovaClassLib.Cordova.Commands;
-using WPCordovaClassLib.Cordova.JSON;
 using Microsoft.Phone.Shell;
+
+#if WP8
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.Storage;
+using Windows.System;
+
+//Use alias in case Cordova File Plugin is enabled. Then the File class will be declared in both and error will occur.
+using IOFile = System.IO.File;
+#else
 using Microsoft.Phone.Tasks;
+#endif
 
 namespace WPCordovaClassLib.Cordova.Commands
 {
@@ -41,6 +58,8 @@ namespace WPCordovaClassLib.Cordova.Commands
         protected bool ShowLocation {get;set;}
         protected bool StartHidden  {get;set;}
 
+        protected string NavigationCallbackId { get; set; }
+
         public void open(string options)
         {
             // reset defaults on ShowLocation + StartHidden features 
@@ -52,28 +71,31 @@ namespace WPCordovaClassLib.Cordova.Commands
             string urlLoc = args[0];
             string target = args[1];
             string featString = args[2];
+            this.NavigationCallbackId = args[3];
 
-            string[] features = featString.Split(',');
-            foreach (string str in features)
+            if (!string.IsNullOrEmpty(featString))
             {
-                try
+                string[] features = featString.Split(',');
+                foreach (string str in features)
                 {
-                    string[] split = str.Split('=');
-                    switch (split[0])
+                    try
                     {
-                        case "location":
-                            ShowLocation = split[1].ToLower().StartsWith("yes");
-                            break;
-                        case "hidden":
-                            StartHidden = split[1].ToLower().StartsWith("yes");
-                            break;
+                        string[] split = str.Split('=');
+                        switch (split[0])
+                        {
+                            case "location":
+                                ShowLocation = split[1].StartsWith("yes", StringComparison.OrdinalIgnoreCase);
+                                break;
+                            case "hidden":
+                                StartHidden = split[1].StartsWith("yes", StringComparison.OrdinalIgnoreCase);
+                                break;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // some sort of invalid param was passed, moving on ...
                     }
                 }
-                catch(Exception)
-                {
-                    // some sort of invalid param was passed, moving on ...
-                }
-                
             }
             /*
                 _self - opens in the Cordova WebView if url is in the white-list, else it opens in the InAppBrowser 
@@ -184,7 +206,6 @@ namespace WPCordovaClassLib.Cordova.Commands
             //throw new NotImplementedException("Windows Phone does not currently support 'insertCSS'");
         }
 
-
         private void ShowCordovaBrowser(string url)
         {
             Uri loc = new Uri(url, UriKind.RelativeOrAbsolute);
@@ -200,7 +221,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                         if (cView != null)
                         {
                             WebBrowser br = cView.Browser;
-                            br.Navigate(loc);
+                            br.Navigate2(loc);
                         }
                     }
 
@@ -208,13 +229,53 @@ namespace WPCordovaClassLib.Cordova.Commands
             });
         }
 
+#if WP8
+        private async void ShowSystemBrowser(string url)
+        {
+            var pathUri = new Uri(url, UriKind.Absolute);
+            if (pathUri.Scheme == Uri.UriSchemeHttp || pathUri.Scheme == Uri.UriSchemeHttps)
+            {
+                await Launcher.LaunchUriAsync(pathUri);
+                return;
+            }
+
+            var file = await GetFile(pathUri.AbsolutePath.Replace('/', Path.DirectorySeparatorChar));
+            if (file != null)
+            {
+                await Launcher.LaunchFileAsync(file);
+            }
+            else
+            {
+                Debug.WriteLine("File not found.");
+            }
+        }
+
+        private async Task<StorageFile> GetFile(string fileName)
+        {
+            //first try to get the file from the isolated storage
+            var localFolder = ApplicationData.Current.LocalFolder;
+            if (IOFile.Exists(Path.Combine(localFolder.Path, fileName)))
+            {
+                return await localFolder.GetFileAsync(fileName);
+            }
+
+            //if file is not found try to get it from the xap
+            var filePath = Path.Combine(Package.Current.InstalledLocation.Path, fileName);
+            if (IOFile.Exists(filePath))
+            {
+                return await StorageFile.GetFileFromPathAsync(filePath);
+            }
+
+            return null;
+        }
+#else
         private void ShowSystemBrowser(string url)
         {
             WebBrowserTask webBrowserTask = new WebBrowserTask();
             webBrowserTask.Uri = new Uri(url, UriKind.Absolute);
             webBrowserTask.Show();
         }
-
+#endif
 
         private void ShowInAppBrowser(string url)
         {
@@ -225,7 +286,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 if (browser != null)
                 {
                     //browser.IsGeolocationEnabled = opts.isGeolocationEnabled;
-                    browser.Navigate(loc);
+                    browser.Navigate2(loc);
                 }
                 else
                 {
@@ -248,7 +309,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 browser.Navigating += new EventHandler<NavigatingEventArgs>(browser_Navigating);
                                 browser.NavigationFailed += new System.Windows.Navigation.NavigationFailedEventHandler(browser_NavigationFailed);
                                 browser.Navigated += new EventHandler<System.Windows.Navigation.NavigationEventArgs>(browser_Navigated);
-                                browser.Navigate(loc);
+                                browser.Navigate2(loc);
 
                                 if (StartHidden)
                                 {
@@ -287,11 +348,30 @@ namespace WPCordovaClassLib.Cordova.Commands
                             bar.IsVisible = !StartHidden;
                             AppBar = bar;
 
+                            page.BackKeyPress += page_BackKeyPress;
+
                         }
 
                     }
                 }
             });
+        }
+
+        void page_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+#if WP8
+            if (browser.CanGoBack)
+            {
+                browser.GoBack();
+            }
+            else
+            {
+                close();
+            }
+            e.Cancel = true;
+#else
+                    browser.InvokeScript("execScript", "history.back();");
+#endif
         }
 
         void browser_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
@@ -326,7 +406,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 {
 #if WP8
                     browser.GoBack();
-#else           
+#else
                     browser.InvokeScript("execScript", "history.back();");
 #endif
                 }
@@ -361,13 +441,15 @@ namespace WPCordovaClassLib.Cordova.Commands
                                 grid.Children.Remove(browser);
                             }
                             page.ApplicationBar = null;
+                            page.BackKeyPress -= page_BackKeyPress;
                         }
                     }
+                   
                     browser = null;
                     string message = "{\"type\":\"exit\"}";
                     PluginResult result = new PluginResult(PluginResult.Status.OK, message);
                     result.KeepCallback = false;
-                    this.DispatchCommandResult(result);
+                    this.DispatchCommandResult(result, NavigationCallbackId);
                 });
             }
         }
@@ -385,7 +467,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"loadstop\", \"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
         void browser_NavigationFailed(object sender, System.Windows.Navigation.NavigationFailedEventArgs e)
@@ -393,7 +475,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"error\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.ERROR, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
         void browser_Navigating(object sender, NavigatingEventArgs e)
@@ -401,8 +483,33 @@ namespace WPCordovaClassLib.Cordova.Commands
             string message = "{\"type\":\"loadstart\",\"url\":\"" + e.Uri.OriginalString + "\"}";
             PluginResult result = new PluginResult(PluginResult.Status.OK, message);
             result.KeepCallback = true;
-            this.DispatchCommandResult(result);
+            this.DispatchCommandResult(result, NavigationCallbackId);
         }
 
+    }
+
+    internal static class WebBrowserExtensions
+    {
+        /// <summary>
+        /// Improved method to initiate request to the provided URI. Supports 'data:text/html' urls. 
+        /// </summary>
+        /// <param name="browser">The browser instance</param>
+        /// <param name="uri">The requested uri</param>
+        internal static void Navigate2(this WebBrowser browser, Uri uri)
+        {
+            // IE10 does not support data uri so we use NavigateToString method instead
+            if (uri.Scheme == "data")
+            {
+                // we should remove the scheme identifier and unescape the uri
+                string uriString = Uri.UnescapeDataString(uri.AbsoluteUri);
+                // format is 'data:text/html, ...'
+                string html = new System.Text.RegularExpressions.Regex("^data:text/html,").Replace(uriString, "");
+                browser.NavigateToString(html);
+            }
+            else 
+            {
+                browser.Navigate(uri);
+            }
+        }
     }
 }
