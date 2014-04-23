@@ -163,5 +163,14 @@
         </js-module>
     </platform>
         
+    <!-- firefoxos -->
+    <platform name="firefoxos">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
+        <js-module src="src/firefoxos/InAppBrowserProxy.js" name="InAppBrowserProxy">
+            <merges target="" />
+        </js-module>
+    </platform>    
 
 </plugin>
