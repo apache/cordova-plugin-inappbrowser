@@ -106,13 +106,29 @@ As plugin doesn't enforce any design there is a need to add some CSS rules if
 opened with `target` `'_blank'`. The rules might look like these
 
 ``` css
-.inappbrowser-wrap {
-	background-color: rgba(0,0,0,0.75);
-	color: rgba(235,235,235,1.0);
+.inAppBrowserWrap {
+  background-color: rgba(0,0,0,0.75);
+  color: rgba(235,235,235,1.0);
 }
-.inappbrowser-wrap p {
-	padding-top: 10px;
-	text-align: center;
+.inAppBrowserWrap menu {
+  overflow: auto;
+  list-style-type: none;
+  padding-left: 0;
+}
+.inAppBrowserWrap menu li {
+  font-size: 25px;
+  height: 25px;
+  float: left;
+  margin-right: 0px;
+  margin: 0 10px;
+  padding: 3px 10px;
+  text-decoration: none;
+  color: #ccc;
+  display: block;
+  background: rgba(30,30,30,0.50);
+}
+.inAppBrowserWrap menu li.disabled {
+	color: #777;
 }
 ```
 
