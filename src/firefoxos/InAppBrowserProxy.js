@@ -69,7 +69,6 @@ var IABExecs = {
         });
 
         function updateIframeSizeNoLocation() {
-            console.log('hey');
             browserWrap.style.width = window.innerWidth + 'px';
             browserWrap.style.height = window.innerHeight + 'px';
             browserWrap.browser.style.height = (window.innerHeight - 60) + 'px';
