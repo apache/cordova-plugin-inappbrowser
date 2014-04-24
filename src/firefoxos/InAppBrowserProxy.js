@@ -63,9 +63,8 @@ var IABExecs = {
                 document.body.removeChild(browserWrap);
             }
             browserWrap = document.createElement('div');
+            browserWrap.classList.add('inappbrowser-wrap');
             browserWrap.style.position = 'absolute';
-            browserWrap.style.backgroundColor = 'rgba(0,0,0,0.75)';
-            browserWrap.style.color = 'rgba(235,235,235,1.0)';
             browserWrap.style.width = window.innerWidth + 'px';
             browserWrap.style.height = window.innerHeight + 'px';
             browserWrap.style.padding = '10px,0,0,0';
@@ -83,8 +82,6 @@ var IABExecs = {
             var p = document.createElement('p');
             p.appendChild(document.createTextNode('close'));
             // TODO: make all buttons - ← → ×
-            p.style.paddingTop = '10px';
-            p.style.textAlign = 'center';
             browserWrap.appendChild(p);
             browserWrap.appendChild(browserElem);
             document.body.appendChild(browserWrap);

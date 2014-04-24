@@ -91,6 +91,7 @@ instance, or the system browser.
 - Amazon Fire OS
 - Android
 - BlackBerry 10
+- Firefox OS
 - iOS
 - Windows Phone 7 and 8
 
@@ -98,6 +99,23 @@ instance, or the system browser.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+
+### Firefox OS Quirks
+
+As plugin doesn't enforce any design there is a need to add some CSS rules if 
+opened with `target` `'_blank'`. The rules might look like these
+
+``` css
+.inappbrowser-wrap {
+	background-color: rgba(0,0,0,0.75);
+	color: rgba(235,235,235,1.0);
+}
+.inappbrowser-wrap p {
+	padding-top: 10px;
+	text-align: center;
+}
+```
+
 
 ## InAppBrowser
 
@@ -196,6 +214,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Firefox OS
 - iOS
 - Windows Phone 7 and 8
 
