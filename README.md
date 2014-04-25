@@ -20,3 +20,5 @@
 # org.apache.cordova.inappbrowser
 
 Plugin documentation: [doc/index.md](doc/index.md)
+
+This is `dev` - the deprecated development branch of this plugin; development of this plugin has moved to the `master` branch
