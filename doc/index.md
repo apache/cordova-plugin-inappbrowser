@@ -30,6 +30,17 @@ and can't access Cordova APIs.
 
     cordova plugin add org.apache.cordova.inappbrowser
 
+### Firefox OS 
+
+Create __www/manifest.webapp__ as described in 
+[Manifest Docs](https://developer.mozilla.org/en-US/Apps/Developing/Manifest).
+Add relevant permisions.
+
+	"permissions": {
+		"browser": {}
+    }
+    
+
 ## window.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
@@ -56,7 +67,7 @@ instance, or the system browser.
     Android only:
 
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption.
-    - __hidden__: set to `yes` to create the browser and load the page, but not show it. The load event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
 
@@ -64,7 +75,9 @@ instance, or the system browser.
 
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
     - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
-    - __hidden__: set to `yes` to create the browser and load the page, but not show it. The load event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
+    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __toolbar__:  set to `yes` or `no` to turn the toolbar on or off for the InAppBrowser (defaults to `yes`)
     - __enableViewportScale__:  Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`).
     - __mediaPlaybackRequiresUserAction__: Set to `yes` or `no` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
@@ -133,14 +146,13 @@ The object returned from a call to `window.open`.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
 ### Quick Example
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    ref.addEventListener('loadstart', function() { alert(event.url); });
+    ref.addEventListener('loadstart', function(event) { alert(event.url); });
 
 ## removeEventListener
 
@@ -164,14 +176,13 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
 ### Quick Example
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var myCallback = function() { alert(event.url); }
+    var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
 
@@ -187,7 +198,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 - Windows Phone 7 and 8
 
@@ -208,7 +218,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
@@ -240,7 +249,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
@@ -268,7 +276,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
-- BlackBerry 10
 - iOS
 
 ### Quick Example
