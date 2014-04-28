@@ -197,13 +197,25 @@
         self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
   
-    [self.inAppBrowserViewController navigateTo:url];
-    if (!browserOptions.hidden) {
-        [self show:nil];
+    // If we're not hidden then we need to navigate *after* the initial render
+    // or the load/error events may trigger prior to the initial display animation completing
+    // which stops us from being able to do a .close() during a start event :/
+    if (browserOptions.hidden) {
+        [self.inAppBrowserViewController navigateTo:url];
+    }
+    else {
+        [self showWithCompletion:^{
+            [self.inAppBrowserViewController navigateTo:url];
+        }];
     }
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command
+{
+    [self showWithCompletion:nil];
+}
+
+- (void)showWithCompletion: completion
 {
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
@@ -223,7 +235,7 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
-            [self.viewController presentViewController:nav animated:YES completion:nil];
+            [self.viewController presentViewController:nav animated:YES completion:completion];
         }
     });
 }
