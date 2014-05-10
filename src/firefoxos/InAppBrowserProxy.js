@@ -69,6 +69,7 @@ var IABExecs = {
             browserWrap.style.width = window.innerWidth + 'px';
             browserWrap.style.height = window.innerHeight + 'px';
             browserWrap.style.padding = '10px,0,0,0';
+            browserWrap.style.zIndex = '999999999';
             browserElem.style.position = 'absolute';
             browserElem.style.top = '60px';
             browserElem.style.left = '0px';
