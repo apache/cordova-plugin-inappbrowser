@@ -440,11 +440,12 @@
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
         
-    _previousStatusBarStyle = -1;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
+
+    _previousStatusBarStyle = -1;
 }
 
 @end
