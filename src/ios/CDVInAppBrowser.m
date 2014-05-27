@@ -439,12 +439,12 @@
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
-        
-    _previousStatusBarStyle = -1;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
+
+    _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
 @end
