@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-This plugin provides a web browser view that displays when calling `window.open()`, or when opening a link formed as `<a target="_blank">`.
+このプラグインを呼び出すときに表示される web ブラウザーのビューを提供します `window.open()` 、または時として形成されたリンクを開く`<a target="_blank">`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     
@@ -75,19 +75,19 @@ This plugin provides a web browser view that displays when calling `window.open(
     iOS のみ:
     
     *   **closebuttoncaption**: [**完了**] ボタンのキャプションとして使用する文字列に設定します。自分でこの値をローカライズする必要があることに注意してください。
-    *   **disallowoverscroll**: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
-    *   **非表示**: 設定 `yes` ブラウザーを作成して、ページの読み込みが表示されません。 Loadstop イベントは、読み込みが完了すると発生します。 省略するか設定 `no` (既定値) を開くし、通常負荷ブラウザーを持っています。
+    *   **disallowoverscroll**： に設定されている `yes` または `no` (既定値は `no` )。/UIWebViewBounce プロパティをオフにします。
+    *   **非表示**: 設定 `yes` ブラウザーを作成して、ページの読み込みが表示されません。 Loadstop イベントは、読み込みが完了すると発生します。 省略するか設定 `no` (既定値) を開くし、通常読み込みブラウザーを持っています。
     *   **clearcache**: に設定されている `yes` 、ブラウザーのクッキー キャッシュ クリア新しいウィンドウが開く前に
-    *   **clearsessioncache**： に設定されている `yes` はセッション cookie のキャッシュをオフに新しいウィンドウを開く前に
-    *   **toolbar**: set to `yes` or `no` to turn the toolbar on or off for the InAppBrowser (defaults to `yes`)
-    *   **enableViewportScale**: Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`).
-    *   **mediaPlaybackRequiresUserAction**: Set to `yes` or `no` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
-    *   **allowInlineMediaPlayback**: Set to `yes` or `no` to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML's `video` element must also include the `webkit-playsinline` attribute (defaults to `no`)
-    *   **keyboardDisplayRequiresUserAction**: Set to `yes` or `no` to open the keyboard when form elements receive focus via JavaScript's `focus()` call (defaults to `yes`).
-    *   **suppressesIncrementalRendering**: Set to `yes` or `no` to wait until all new view content is received before being rendered (defaults to `no`).
-    *   **presentationstyle**: Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style][2] (defaults to `fullscreen`).
-    *   **transitionstyle**: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style][3] (defaults to `coververtical`).
-    *   **toolbarposition**: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
+    *   **clearsessioncache**： に設定されている `yes` はセッション cookie のキャッシュをオフにすると、新しいウィンドウが開く前に
+    *   **ツールバー**: に設定されている `yes` または `no` InAppBrowser (デフォルトのツールバーのオンまたはオフを有効にするには`yes`)
+    *   **enableViewportScale**： に設定されている `yes` または `no` を (デフォルトではメタタグを介してスケーリング ビューポートを防ぐために`no`).
+    *   **mediaPlaybackRequiresUserAction**： に設定されている `yes` または `no` を HTML5 オーディオまたはビデオを自動再生 （初期設定から防ぐために`no`).
+    *   **allowInlineMediaPlayback**： に設定されている `yes` または `no` ラインで HTML5 メディア再生には、デバイス固有再生インターフェイスではなく、ブラウザー ウィンドウ内に表示するようにします。 HTML の `video` 要素を含める必要がありますまた、 `webkit-playsinline` 属性 (デフォルトは`no`)
+    *   **keyboardDisplayRequiresUserAction**： に設定されている `yes` または `no` をフォーム要素の JavaScript を介してフォーカスを受け取るときに、キーボードを開く `focus()` コール （デフォルトは`yes`).
+    *   **suppressesIncrementalRendering**： に設定されている `yes` または `no` (デフォルトでは表示される前にビューのすべての新しいコンテンツを受信するまで待機するには`no`).
+    *   **presentationstyle**： に設定されている `pagesheet` 、 `formsheet` または `fullscreen` (デフォルトでは、[プレゼンテーション スタイル][2]を設定するには`fullscreen`).
+    *   **transitionstyle**： に設定されている `fliphorizontal` 、 `crossdissolve` または `coververtical` (デフォルトでは、[トランジションのスタイル][3]を設定するには`coververtical`).
+    *   **toolbarposition**： に設定されている `top` または `bottom` (既定値は `bottom` )。上部またはウィンドウの下部にツールバーが発生します。
 
  [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
  [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
@@ -108,7 +108,7 @@ This plugin provides a web browser view that displays when calling `window.open(
 
 ## InAppBrowser
 
-The object returned from a call to `window.open`.
+呼び出しから返されるオブジェクト`window.open`.
 
 ### メソッド
 
@@ -137,7 +137,7 @@ The object returned from a call to `window.open`.
 
 *   **コールバック**: イベントが発生したときに実行される関数。関数に渡されますが、 `InAppBrowserEvent` オブジェクトをパラメーターとして。
 
-### InAppBrowserEvent Properties
+### InAppBrowserEvent プロパティ
 
 *   **タイプ**: eventname どちらか `loadstart` 、 `loadstop` 、 `loaderror` 、または `exit` 。*(文字列)*
 
