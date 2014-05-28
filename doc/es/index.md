@@ -31,11 +31,22 @@ Este plugin proporciona una vista de navegador web que se muestra cuando se llam
     cordova plugin add org.apache.cordova.inappbrowser
     
 
+### Firefox OS
+
+Crear **www/manifest.webapp** como se describe en [Manifestar Docs][1]. Agregar permisos pertinentes.
+
+ [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+
+    "permissions": {
+        "browser": {}
+    }
+    
+
 ## window.open
 
 Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia actual del navegador o el navegador del sistema.
 
-    var ref = window.open(url, target, options);
+    var ref = window.open (url, target, opciones);
     
 
 *   **ref**: referencia a la `InAppBrowser` ventana. *(InAppBrowser)*
@@ -57,7 +68,7 @@ Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia act
     Android sólo:
     
     *   **closebuttoncaption**: establecer una cadena para usar como título del botón **hecho** .
-    *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento load se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
+    *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento loadstop se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
     *   **clearcache**: a `yes` para que el navegador es caché de galleta despejado antes de que se abra la nueva ventana
     *   **clearsessioncache**: a `yes` que la caché de cookie de sesión despejado antes de que se abra la nueva ventana
     
@@ -65,19 +76,21 @@ Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia act
     
     *   **closebuttoncaption**: establecer una cadena para usar como título del botón **hecho** . Tenga en cuenta que necesitas localizar este valor por sí mismo.
     *   **disallowoverscroll**: A `yes` o `no` (valor por defecto es `no` ). Activa/desactiva la propiedad UIWebViewBounce.
-    *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento load se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
+    *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento loadstop se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
+    *   **clearcache**: a `yes` para que el navegador es caché de galleta despejado antes de que se abra la nueva ventana
+    *   **clearsessioncache**: a `yes` que la caché de cookie de sesión despejado antes de que se abra la nueva ventana
     *   **barra de herramientas**: a `yes` o `no` para activar la barra de herramientas on u off para el InAppBrowser (por defecto`yes`)
     *   **enableViewportScale**: A `yes` o `no` para evitar la vista escala a través de una etiqueta meta (por defecto`no`).
     *   **mediaPlaybackRequiresUserAction**: A `yes` o `no` para evitar HTML5 audio o vídeo de reproducción automática (por defecto`no`).
     *   **allowInlineMediaPlayback**: A `yes` o `no` para permitir la reproducción de los medios de comunicación en línea HTML5, mostrando en la ventana del navegador en lugar de una interfaz específica del dispositivo de reproducción. El código de HTML `video` elemento también debe incluir la `webkit-playsinline` atributo (por defecto`no`)
     *   **keyboardDisplayRequiresUserAction**: A `yes` o `no` para abrir el teclado cuando elementos de formulario reciben el foco mediante JavaScript `focus()` llamada (por defecto`yes`).
     *   **suppressesIncrementalRendering**: A `yes` o `no` que esperar a que todo el contenido nuevo vista es recibido antes de ser prestados (por defecto`no`).
-    *   **presentationstyle**: A `pagesheet` , `formsheet` o `fullscreen` para establecer el [estilo de la presentación][1] (por defecto`fullscreen`).
-    *   **transitionstyle**: A `fliphorizontal` , `crossdissolve` o `coververtical` para establecer el [estilo de transición][2] (por defecto`coververtical`).
+    *   **presentationstyle**: A `pagesheet` , `formsheet` o `fullscreen` para establecer el [estilo de la presentación][2] (por defecto`fullscreen`).
+    *   **transitionstyle**: A `fliphorizontal` , `crossdissolve` o `coververtical` para establecer el [estilo de transición][3] (por defecto`coververtical`).
     *   **toolbarposition**: A `top` o `bottom` (valor por defecto es `bottom` ). Hace que la barra de herramientas en la parte superior o inferior de la ventana.
 
- [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### Plataformas soportadas
 
@@ -124,7 +137,7 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   **devolución de llamada**: la función que se ejecuta cuando se desencadene el evento. La función se pasa un `InAppBrowserEvent` objeto como parámetro.
 
-### InAppBrowserEvent Properties
+### InAppBrowserEvent propiedades
 
 *   **tipo**: eventname, ya sea `loadstart` , `loadstop` , `loaderror` , o `exit` . *(String)*
 
@@ -138,14 +151,13 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 y 8
 
 ### Ejemplo rápido
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    ref.addEventListener('loadstart', function() { alert(event.url); });
+    ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
 ## removeEventListener
@@ -170,14 +182,13 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 y 8
 
 ### Ejemplo rápido
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var myCallback = function() { alert(event.url); }
+    var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
     
@@ -195,7 +206,6 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 y 8
 
@@ -209,7 +219,7 @@ El objeto devuelto desde una llamada a`window.open`.
 
 > Muestra una ventana InAppBrowser que abrió sus puertas ocultada. Esto no tiene efecto si el InAppBrowser ya era visible.
 
-    ref.show();
+    Ref.Show();
     
 
 *   **ref**: referencia a la (ventana) InAppBrowser`InAppBrowser`)
@@ -218,7 +228,6 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Ejemplo rápido
@@ -250,7 +259,6 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Ejemplo rápido
@@ -281,7 +289,6 @@ El objeto devuelto desde una llamada a`window.open`.
 
 *   Amazon fuego OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Ejemplo rápido

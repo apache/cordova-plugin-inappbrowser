@@ -31,11 +31,22 @@ Ce plugin vous offre une vue de navigateur web qui s'affiche lorsque vous appele
     cordova plugin add org.apache.cordova.inappbrowser
     
 
+### Firefox OS
+
+Créez **www/manifest.webapp** comme décrit dans [Les Docs manifeste][1]. Ajouter permisions pertinentes.
+
+ [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+
+    "permissions": {
+        "browser": {}
+    }
+    
+
 ## window.open
 
-Ouvre une URL dans une nouvelle instance de la classe `InAppBrowser`, une instance déjà existante ou dans le navigateur système.
+Ouvre une URL dans une nouvelle `InAppBrowser` instance, l'instance de navigateur actuelle ou dans l'Explorateur du système.
 
-    var ref = window.open(url, target, options);
+    var Réf = window.open (url, cible, options) ;
     
 
 *   **ref** : référence à la fenêtre `InAppBrowser`. *(InAppBrowser)*
@@ -57,7 +68,7 @@ Ouvre une URL dans une nouvelle instance de la classe `InAppBrowser`, une instan
     Android uniquement :
     
     *   **closebuttoncaption**: affectez une chaîne à utiliser comme la **fait** légende du bouton.
-    *   **caché**: la valeur `yes` pour créer le navigateur et charger la page, mais ne pas le montrer. L'événement load est déclenché lorsque le chargement est terminé. Omettre ou la valeur `no` (par défaut) pour que le navigateur ouvrir et charger normalement.
+    *   **caché**: la valeur `yes` pour créer le navigateur et charger la page, mais ne pas le montrer. L'événement loadstop est déclenché lorsque le chargement est terminé. Omettre ou la valeur `no` (par défaut) pour que le navigateur ouvrir et charger normalement.
     *   **ClearCache**: la valeur `yes` pour que le navigateur du cache de cookie effacé, avant l'ouverture de la nouvelle fenêtre
     *   **clearsessioncache**: la valeur `yes` pour avoir le cache de cookie de session autorisé avant l'ouverture de la nouvelle fenêtre
     
@@ -65,19 +76,21 @@ Ouvre une URL dans une nouvelle instance de la classe `InAppBrowser`, une instan
     
     *   **closebuttoncaption**: affectez une chaîne à utiliser comme la **fait** légende du bouton. Notez que vous devrez localiser cette valeur vous-même.
     *   **disallowoverscroll**: la valeur `yes` ou `no` (valeur par défaut est `no` ). Active/désactive la propriété UIWebViewBounce.
-    *   **caché**: la valeur `yes` pour créer le navigateur et charger la page, mais ne pas le montrer. L'événement load est déclenché lorsque le chargement est terminé. Omettre ou la valeur `no` (par défaut) pour que le navigateur ouvrir et charger normalement.
+    *   **caché**: la valeur `yes` pour créer le navigateur et charger la page, mais ne pas le montrer. L'événement loadstop est déclenché lorsque le chargement est terminé. Omettre ou la valeur `no` (par défaut) pour que le navigateur ouvrir et charger normalement.
+    *   **ClearCache**: la valeur `yes` pour que le navigateur du cache de cookie effacé, avant l'ouverture de la nouvelle fenêtre
+    *   **clearsessioncache**: la valeur `yes` pour avoir le cache de cookie de session autorisé avant l'ouverture de la nouvelle fenêtre
     *   **barre d'outils**: la valeur `yes` ou `no` pour activer la barre d'outils ou désactiver pour le InAppBrowser (par défaut,`yes`)
-    *   **enableViewportScale** : selon si la valeur est `yes` ou `no`, une balise meta est injectée avec pour but de permettre ou empêcher l'utilisateur de zoomer dans le viewport (`no` par défaut).
-    *   **mediaPlaybackRequiresUserAction** : selon si la valeur est `yes` ou `no`, la lecture automatique de contenus HTML5 audio ou vidéo (c'est à dire sans action préalable de l'utilisateur) est désactivée ou activée (`no` par défaut).
-    *   **allowInlineMediaPlayback**: la valeur `yes` ou `no` pour permettre la lecture du média en ligne HTML5, affichage dans la fenêtre du navigateur plutôt que d'une interface de lecture spécifique au périphérique. L'élément HTML `video` doit également comporter l'attribut `webkit-playsinline` (`no` par défaut)
-    *   **keyboardDisplayRequiresUserAction** : régler sur `yes` ou `no` pour interdire ou autoriser l'ouverture du clavier lorsque des éléments de formulaire reçoivent le focus par l'intermédiaire d'un appel à la méthode JavaScript `focus()` (`yes` par défaut).
-    *   **suppressesIncrementalRendering** : selon si la valeur est `yes` ou `no`, le rendu de la vue attendra ou non que tout nouveau contenu soit reçu (`no` par défaut).
-    *   **presentationstyle** : régler sur `pagesheet`, `formsheet` ou `fullscreen` afin d'obtenir le [style de présentation][1] de fenêtre souhaité (`fullscreen` par défaut).
-    *   **transitionstyle**: régler la valeur à `fliphorizontal`, `crossdissolve` ou `coververtical` afin de définir le [style de transition][2] de fenêtre souhaité (`coververtical` par défaut).
+    *   **enableViewportScale**: la valeur `yes` ou `no` pour empêcher la fenêtre de mise à l'échelle par une balise meta (par défaut,`no`).
+    *   **mediaPlaybackRequiresUserAction**: la valeur `yes` ou `no` pour empêcher le HTML5 audio ou vidéo de la lecture automatique (par défaut,`no`).
+    *   **allowInlineMediaPlayback**: la valeur `yes` ou `no` pour permettre la lecture du média en ligne HTML5, affichage dans la fenêtre du navigateur plutôt que d'une interface de lecture spécifique au périphérique. L'HTML `video` élément doit également inclure la `webkit-playsinline` attribut (par défaut,`no`)
+    *   **keyboardDisplayRequiresUserAction**: la valeur `yes` ou `no` pour ouvrir le clavier lorsque les éléments reçoivent le focus par l'intermédiaire de JavaScript `focus()` appel (par défaut,`yes`).
+    *   **suppressesIncrementalRendering**: la valeur `yes` ou `no` d'attendre que toutes les nouveautés de vue sont reçue avant d'être restitué (par défaut,`no`).
+    *   **presentationstyle**: la valeur `pagesheet` , `formsheet` ou `fullscreen` pour définir le [style de présentation][2] (par défaut,`fullscreen`).
+    *   **transitionstyle**: la valeur `fliphorizontal` , `crossdissolve` ou `coververtical` pour définir le [style de transition][3] (par défaut,`coververtical`).
     *   **toolbarposition**: la valeur `top` ou `bottom` (valeur par défaut est `bottom` ). Causes de la barre d'outils être en haut ou en bas de la fenêtre.
 
- [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### Plates-formes prises en charge
 
@@ -95,7 +108,7 @@ Ouvre une URL dans une nouvelle instance de la classe `InAppBrowser`, une instan
 
 ## InAppBrowser
 
-L'objet retourné par un appel à `window.open`.
+L'objet retourné par un appel à`window.open`.
 
 ### Méthodes
 
@@ -124,7 +137,7 @@ L'objet retourné par un appel à `window.open`.
 
 *   **callback** : la fonction à exécuter lorsque l'évènement se déclenche. Un objet `InAppBrowserEvent` lui est transmis comme paramètre.
 
-### InAppBrowserEvent Properties
+### Propriétés de InAppBrowserEvent
 
 *   **type** : le nom de l'évènement, soit `loadstart`, `loadstop`, `loaderror` ou `exit`. *(String)*
 
@@ -138,14 +151,13 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 et 8
 
 ### Petit exemple
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    ref.addEventListener('loadstart', function() { alert(event.url); });
+    ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
 ## removeEventListener
@@ -170,14 +182,13 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 et 8
 
 ### Petit exemple
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var myCallback = function() { alert(event.url); }
+    var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
     
@@ -186,7 +197,7 @@ L'objet retourné par un appel à `window.open`.
 
 > Ferme la fenêtre `InAppBrowser`.
 
-    ref.close();
+    Ref.Close() ;
     
 
 *   **Réf**: référence à la `InAppBrowser` fenêtre *(InAppBrowser)*
@@ -195,7 +206,6 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 *   Windows Phone 7 et 8
 
@@ -209,7 +219,7 @@ L'objet retourné par un appel à `window.open`.
 
 > Affiche une fenêtre InAppBrowser qui a été ouverte cachée. Appeler cette méthode n'a aucun effet si la fenêtre en question est déjà visible.
 
-    ref.show();
+    Ref.Show() ;
     
 
 *   **Réf**: référence à la fenêtre () InAppBrowser`InAppBrowser`)
@@ -218,7 +228,6 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Petit exemple
@@ -250,7 +259,6 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Petit exemple
@@ -281,7 +289,6 @@ L'objet retourné par un appel à `window.open`.
 
 *   Amazon Fire OS
 *   Android
-*   BlackBerry 10
 *   iOS
 
 ### Petit exemple
