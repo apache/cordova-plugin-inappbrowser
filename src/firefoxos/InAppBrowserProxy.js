@@ -47,7 +47,7 @@ var IABExecs = {
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
-            features_string = args[2],
+            features_string = args[2] || "location=yes", //location=yes is default
             features = {},
             url,
             elem;
