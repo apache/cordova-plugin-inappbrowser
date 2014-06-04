@@ -165,6 +165,9 @@
         
     <!-- firefoxos -->
     <platform name="firefoxos">
+        <config-file target="config.xml" parent="/*">
+            <permission name="browser" description="Enables the app to implement a browser in an iframe." />
+        </config-file>
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>

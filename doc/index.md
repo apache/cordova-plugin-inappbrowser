@@ -30,17 +30,6 @@ and can't access Cordova APIs.
 
     cordova plugin add org.apache.cordova.inappbrowser
 
-### Firefox OS 
-
-Create __www/manifest.webapp__ as described in 
-[Manifest Docs](https://developer.mozilla.org/en-US/Apps/Developing/Manifest).
-Add relevant permisions.
-
-	"permissions": {
-		"browser": {}
-    }
-    
-
 ## window.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
