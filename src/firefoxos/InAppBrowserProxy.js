@@ -47,9 +47,33 @@ var IABExecs = {
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
-            features = args[2],
+            features_string = args[2] || "location=yes", //location=yes is default
+            features = {},
             url,
             elem;
+
+        var features_list = features_string.split(',');
+        features_list.forEach(function(feature) {
+            var tup = feature.split('=');
+            if (tup[1] == 'yes') {
+                tup[1] = true;
+            } else if (tup[1] == 'no') {
+                tup[1] = false;
+            } else {
+                var number = parseInt(tup[1]);    
+                if (!isNaN(number)) {
+                    tup[1] = number;
+                }
+            }
+            features[tup[0]] = tup[1];
+        });
+
+        function updateIframeSizeNoLocation() {
+            browserWrap.style.width = window.innerWidth + 'px';
+            browserWrap.style.height = window.innerHeight + 'px';
+            browserWrap.browser.style.height = (window.innerHeight - 60) + 'px';
+            browserWrap.browser.style.width = browserWrap.style.width;
+        }
 
         if (target === '_system') {
             origOpenFunc.apply(window, [strUrl, '_blank']);
@@ -63,34 +87,73 @@ var IABExecs = {
                 document.body.removeChild(browserWrap);
             }
             browserWrap = document.createElement('div');
+            // assign browser element to browserWrap for future reference
+            browserWrap.browser = browserElem;
+
+            browserWrap.classList.add('inAppBrowserWrap');
             browserWrap.style.position = 'absolute';
-            browserWrap.style.backgroundColor = 'rgba(0,0,0,0.75)';
-            browserWrap.style.color = 'rgba(235,235,235,1.0)';
-            browserWrap.style.width = window.innerWidth + 'px';
-            browserWrap.style.height = window.innerHeight + 'px';
-            browserWrap.style.padding = '10px,0,0,0';
             browserElem.style.position = 'absolute';
+            browserElem.style.border = 0;
             browserElem.style.top = '60px';
             browserElem.style.left = '0px';
-            browserElem.style.height = (window.innerHeight - 60) + 'px';
-            browserElem.style.width = browserWrap.style.width;
+            updateIframeSizeNoLocation();
 
-            browserWrap.addEventListener('click', function () {
+            var menu = document.createElement('menu');
+            menu.setAttribute('type', 'toolbar');
+            var close = document.createElement('li');
+            var back = document.createElement('li');
+            var forward = document.createElement('li');
+
+            close.appendChild(document.createTextNode('×'));
+            back.appendChild(document.createTextNode('<'));
+            forward.appendChild(document.createTextNode('>'));
+
+            close.classList.add('inAppBrowserClose');
+            back.classList.add('inAppBrowserBack');
+            forward.classList.add('inAppBrowserForward');
+
+            function checkForwardBackward() {
+                var backReq = browserElem.getCanGoBack();
+                backReq.onsuccess = function() {
+                    if (this.result) {
+                        back.classList.remove('disabled');
+                    } else {
+                        back.classList.add('disabled');
+                    }
+                }
+                var forwardReq = browserElem.getCanGoForward();
+                forwardReq.onsuccess = function() {
+                    if (this.result) {
+                        forward.classList.remove('disabled');
+                    } else {
+                        forward.classList.add('disabled');
+                    }
+                }
+            };
+
+            browserElem.addEventListener('mozbrowserloadend', checkForwardBackward);
+
+            close.addEventListener('click', function () {
                 setTimeout(function () {
                     IABExecs.close();
                 }, 0);
             }, false);
-            var p = document.createElement('p');
-            p.appendChild(document.createTextNode('close'));
-            // TODO: make all buttons - ← → ×
-            p.style.paddingTop = '10px';
-            p.style.textAlign = 'center';
-            browserWrap.appendChild(p);
+
+            back.addEventListener('click', function () {
+                browserElem.goBack();
+            }, false);
+
+            forward.addEventListener('click', function () {
+                browserElem.goForward();
+            }, false);
+
+            menu.appendChild(back);
+            menu.appendChild(forward);
+            menu.appendChild(close);
+
+            browserWrap.appendChild(menu);
             browserWrap.appendChild(browserElem);
             document.body.appendChild(browserWrap);
-            // assign browser element to browserWrap for future
-            // reference
-            browserWrap.browser = browserElem;
         } else {
             window.location = strUrl;
         }
