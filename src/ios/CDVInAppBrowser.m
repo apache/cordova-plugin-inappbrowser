@@ -440,11 +440,14 @@
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
 
-    _previousStatusBarStyle = -1;
+    // 2014-06-15 - Moved to line 449
+    //_previousStatusBarStyle = -1;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
+    // 2014-06-15 - This is placed here since otherwise - The StatusBar disappears on iOS7 after opening the in-app-browser.
+    _previousStatusBarStyle = -1;
 }
 
 @end
