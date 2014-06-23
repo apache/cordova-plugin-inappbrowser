@@ -30,17 +30,6 @@ and can't access Cordova APIs.
 
     cordova plugin add org.apache.cordova.inappbrowser
 
-### Firefox OS 
-
-Create __www/manifest.webapp__ as described in 
-[Manifest Docs](https://developer.mozilla.org/en-US/Apps/Developing/Manifest).
-Add relevant permisions.
-
-	"permissions": {
-		"browser": {}
-    }
-    
-
 ## window.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
@@ -93,6 +82,7 @@ instance, or the system browser.
 - Amazon Fire OS
 - Android
 - BlackBerry 10
+- Firefox OS
 - iOS
 - Windows Phone 7 and 8
 
@@ -100,6 +90,38 @@ instance, or the system browser.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+
+### Firefox OS Quirks
+
+As plugin doesn't enforce any design there is a need to add some CSS rules if 
+opened with `target='_blank'`. The rules might look like these
+
+``` css
+.inAppBrowserWrap {
+  background-color: rgba(0,0,0,0.75);
+  color: rgba(235,235,235,1.0);
+}
+.inAppBrowserWrap menu {
+  overflow: auto;
+  list-style-type: none;
+  padding-left: 0;
+}
+.inAppBrowserWrap menu li {
+  font-size: 25px;
+  height: 25px;
+  float: left;
+  margin: 0 10px;
+  padding: 3px 10px;
+  text-decoration: none;
+  color: #ccc;
+  display: block;
+  background: rgba(30,30,30,0.50);
+}
+.inAppBrowserWrap menu li.disabled {
+	color: #777;
+}
+```
+
 
 ## InAppBrowser
 
@@ -198,6 +220,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Firefox OS
 - iOS
 - Windows Phone 7 and 8
 

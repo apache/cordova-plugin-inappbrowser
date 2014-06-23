@@ -97,3 +97,18 @@
 * CB-6212: [iOS] fix warnings compiled under arm64 64-bit
 * CB-6218: Update docs for BB10
 * CB-6460: Update license headers
+
+### 0.5.0 (Jun 05, 2014)
+* CB-6127 Spanish and rench Translations added. Github close #23
+* Clean up whitespace (mainly due to no newline at eof warning)
+* Adding permission info
+* CB-6806 Add license
+* CB-6491 add CONTRIBUTING.md
+* Add necessary capability so the plugin works on its own
+* CB-6474 InAppBrowser. Add data urls support to WP8
+* CB-6482 InAppBrowser calls incorrect callback on WP8
+* Fixed use of iOS 6 deprecated methods
+* CB-6360 - improvement: feature detection instead of iOS version detection
+* CB-5649 - InAppBrowser overrides App's orientation
+* refactoring fixed
+* CB-6396 [Firefox OS] Adding basic support
