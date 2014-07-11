@@ -31,6 +31,16 @@ var browserWrap,
     popup,
     cb;
 
+function onResize() {
+    if (browserWrap && popup) {
+        browserWrap.style.width = (window.innerWidth - 80) + "px";
+        browserWrap.style.height = (window.innerHeight - 80) + "px";
+
+        popup.style.width = (window.innerWidth - 80) + "px";
+        popup.style.height = (window.innerHeight - 80) + "px";
+    }
+}
+
 var IAB = {
     close: function (win, lose) {
         if (browserWrap) {
@@ -40,6 +50,8 @@ var IAB = {
             browserWrap = null;
             popup = null;
             cb = null;
+
+            window.removeEventListener("resize", onResize);
         }
     },
     show: function (win, lose) {
@@ -51,6 +63,7 @@ var IAB = {
         var strUrl = args[0],
             target = args[1],
             features = args[2],
+            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule,
             url;
 
         if (target === "_system") {
@@ -81,35 +94,45 @@ var IAB = {
                 browserWrap.style.display = "none";
             }
 
-            popup = document.createElement("x-ms-webview");
+            popup = document.createElement(isWinJS2 ? "x-ms-webview" : "iframe");
             popup.style.width = (window.innerWidth - 80) + "px";
             popup.style.height = (window.innerHeight - 80) + "px";
+            popup.style.borderWidth = "0px";
             popup.src = strUrl;
 
-            popup.addEventListener("MSWebViewNavigationStarting", function (e) {
-                win({ type: "loadstart", url: e.uri });
-            });
-            popup.addEventListener("MSWebViewNavigationCompleted", function (e) {
-                if (e.isSuccess) {
-                    win({ type: "loadstop", url: e.uri });
-                }
-                else {
+            if (isWinJS2) {
+                popup.addEventListener("MSWebViewNavigationStarting", function (e) {
+                    win({ type: "loadstart", url: e.uri });
+                });
+                popup.addEventListener("MSWebViewNavigationCompleted", function (e) {
+                    if (e.isSuccess) {
+                        win({ type: "loadstop", url: e.uri });
+                    }
+                    else {
+                        win({ type: "loaderror", url: e.uri });
+                    }
+                });
+                popup.addEventListener("MSWebViewUnviewableContentIdentified", function (e) {
                     win({ type: "loaderror", url: e.uri });
-                }
-            });
-            popup.addEventListener("MSWebViewUnviewableContentIdentified", function (e) {
-                win({ type: "loaderror", url: e.uri });
-            });
+                });
+            }
+            else {
+                var onError = function () {
+                    win({ type: "loaderror", url: this.contentWindow.location });
+                };
 
-            window.addEventListener("resize", function () {
-                if (browserWrap && popup) {
-                    browserWrap.style.width = (window.innerWidth - 80) + "px";
-                    browserWrap.style.height = (window.innerHeight - 80) + "px";
+                popup.addEventListener("unload", function () {
+                    win({ type: "loadstart", url: this.contentWindow.location });
+                });
+                popup.addEventListener("load", function () {
+                    win({ type: "loadstop", url: this.contentWindow.location });
+                });
 
-                    popup.style.width = (window.innerWidth - 80) + "px";
-                    popup.style.height = (window.innerHeight - 80) + "px";
-                }
-            });
+                popup.addEventListener("error", onError);
+                popup.addEventListener("abort", onError);
+            }
+
+            window.addEventListener("resize", onResize);
 
             browserWrap.appendChild(popup);
         }
@@ -120,21 +143,22 @@ var IAB = {
 
     injectScriptCode: function (win, fail, args) {
         var code = args[0],
-            hasCallback = args[1];
+            hasCallback = args[1],
+            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule;
 
-        if (browserWrap && popup) {
+        if (isWinJS2 && browserWrap && popup) {
             var op = popup.invokeScriptAsync("eval", code);
             op.oncomplete = function () { hasCallback && win([]); };
             op.onerror = function () { };
             op.start();
         }
-        // "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document)"
     },
     injectScriptFile: function (win, fail, args) {
         var file = args[0],
-            hasCallback = args[1];
+            hasCallback = args[1],
+            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule;
 
-        if (browserWrap && popup) {
+        if (isWinJS2 && browserWrap && popup) {
             Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
                 var op = popup.invokeScriptAsync("eval", code);
                 op.oncomplete = function () { hasCallback && win([]); };
@@ -147,5 +171,4 @@ var IAB = {
 
 module.exports = IAB;
 
-
-require("cordova/windows8/commandProxy").add("InAppBrowser", module.exports);
+require("cordova/exec/proxy").add("InAppBrowser", module.exports);
