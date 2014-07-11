@@ -36,8 +36,8 @@
     <!-- android -->
     <platform name="android">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
-        <clobbers target="window.open" />
-    </js-module>
+            <clobbers target="window.open" />
+        </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser"> 
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
@@ -65,7 +65,7 @@
         <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
 
     </platform>
-    
+
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
@@ -93,7 +93,7 @@
     </platform>
 
     <!-- ios -->
-    <platform name="ios">    
+    <platform name="ios">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>  
@@ -185,6 +185,5 @@
             <merges target="" />
         </js-module>
     </platform>
-
 
 </plugin>
