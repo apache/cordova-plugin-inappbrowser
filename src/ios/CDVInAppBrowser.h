@@ -30,6 +30,7 @@
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
+@property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
 
 - (void)open:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
@@ -38,11 +39,36 @@
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate>{
+@interface CDVInAppBrowserOptions : NSObject {}
+
+@property (nonatomic, assign) BOOL location;
+@property (nonatomic, assign) BOOL toolbar;
+@property (nonatomic, copy) NSString* closebuttoncaption;
+@property (nonatomic, copy) NSString* toolbarposition;
+@property (nonatomic, assign) BOOL clearcache;
+@property (nonatomic, assign) BOOL clearsessioncache;
+
+@property (nonatomic, copy) NSString* presentationstyle;
+@property (nonatomic, copy) NSString* transitionstyle;
+
+@property (nonatomic, assign) BOOL enableviewportscale;
+@property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
+@property (nonatomic, assign) BOOL allowinlinemediaplayback;
+@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
+@property (nonatomic, assign) BOOL suppressesincrementalrendering;
+@property (nonatomic, assign) BOOL hidden;
+@property (nonatomic, assign) BOOL disallowoverscroll;
+
++ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
+
+@end
+
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
+    CDVInAppBrowserOptions *_browserOptions;
     CDVWebViewDelegate* _webViewDelegate;
 }
 
@@ -61,29 +87,16 @@
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show;
+- (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent;
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
 @end
 
-@interface CDVInAppBrowserOptions : NSObject {}
+@interface CDVInAppBrowserNavigationController : UINavigationController
 
-@property (nonatomic, assign) BOOL location;
-@property (nonatomic, assign) BOOL toolbar;
-@property (nonatomic, copy) NSString* closebuttoncaption;
-
-@property (nonatomic, copy) NSString* presentationstyle;
-@property (nonatomic, copy) NSString* transitionstyle;
-
-@property (nonatomic, assign) BOOL enableviewportscale;
-@property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
-@property (nonatomic, assign) BOOL allowinlinemediaplayback;
-@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
-@property (nonatomic, assign) BOOL suppressesincrementalrendering;
-@property (nonatomic, assign) BOOL hidden;
-
-+ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
+@property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
+

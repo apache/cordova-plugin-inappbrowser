@@ -108,4 +108,4 @@ var IAB = {
 module.exports = IAB;
 
 
-require("cordova/windows8/commandProxy").add("InAppBrowser", module.exports);
+require("cordova/exec/proxy").add("InAppBrowser", module.exports);

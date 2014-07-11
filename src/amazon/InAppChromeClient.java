@@ -24,14 +24,14 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.webkit.JsPromptResult;
-import android.webkit.WebChromeClient;
-import android.webkit.WebStorage;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.webkit.GeolocationPermissions.Callback;
+import com.amazon.android.webkit.AmazonWebChromeClient;
+import com.amazon.android.webkit.AmazonGeolocationPermissions.Callback;
+import com.amazon.android.webkit.AmazonJsPromptResult;
+import com.amazon.android.webkit.AmazonWebStorage;
+import com.amazon.android.webkit.AmazonWebView;
+import com.amazon.android.webkit.AmazonWebViewClient;
 
-public class InAppChromeClient extends WebChromeClient {
+public class InAppChromeClient extends AmazonWebChromeClient {
 
     private CordovaWebView webView;
     private String LOG_TAG = "InAppChromeClient";
@@ -53,10 +53,23 @@ public class InAppChromeClient extends WebChromeClient {
      */
     @Override
     public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota, long estimatedSize,
-            long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
+            long totalUsedQuota, AmazonWebStorage.QuotaUpdater quotaUpdater)
     {
         LOG.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
-        quotaUpdater.updateQuota(MAX_QUOTA);
+
+        if (estimatedSize < MAX_QUOTA)
+        {
+            //increase for 1Mb
+            long newQuota = estimatedSize;
+            LOG.d(LOG_TAG, "calling quotaUpdater.updateQuota newQuota: %d", newQuota);
+            quotaUpdater.updateQuota(newQuota);
+        }
+        else
+        {
+            // Set the quota to whatever it is and force an error
+            // TODO: get docs on how to handle this properly
+            quotaUpdater.updateQuota(currentQuota);
+        }
     }
 
     /**
@@ -98,7 +111,7 @@ public class InAppChromeClient extends WebChromeClient {
      * @param result
      */
     @Override
-    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+    public boolean onJsPrompt(AmazonWebView view, String url, String message, String defaultValue, AmazonJsPromptResult result) {
         // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
         if (defaultValue != null && defaultValue.startsWith("gap")) {
             if(defaultValue.startsWith("gap-iab://")) {
