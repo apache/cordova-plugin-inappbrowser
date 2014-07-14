@@ -158,7 +158,17 @@
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="window.open" />
         </js-module>
-        <js-module src="www/windows8/InAppBrowserProxy.js" name="InAppBrowserProxy">
+        <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
+            <merges target="" />
+        </js-module>
+    </platform>
+
+    <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
+    <platform name="windows">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="window.open" />
+        </js-module>
+        <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <merges target="" />
         </js-module>
     </platform>
