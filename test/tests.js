@@ -23,6 +23,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     function doOpen(url, target, params, numExpectedRedirects) {
         numExpectedRedirects = numExpectedRedirects || 0;
+        console.log("Opening " + url);
         var iab = window.open(url, target, params);
         if (!iab) {
             alert('window.open returned ' + iab);
@@ -287,30 +288,39 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
         css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
 
+    var basePath = '/www/resources/';
+    var localhtml = basePath + 'local.html',
+        localpdf = basePath + 'local.pdf',
+        injecthtml = basePath + 'inject.html',
+        injectjs = basePath + 'inject.js',
+        injectcss = basePath + 'inject.css',
+        videohtml = basePath + 'video.html';
+
     //Local
     createActionButton('target=Default', function () {
-        doOpen('local.html');
+        console.log(localhtml);
+        //doOpen(localhtml);
     }, 'openLocal');
     createActionButton('target=_self', function () {
-        doOpen('local.html', '_self');
+        doOpen(localhtml, '_self');
     }, 'openLocalSelf');
     createActionButton('target=_system', function () {
-        doOpen('local.html', '_system');
+        doOpen(localhtml, '_system');
     }, 'openLocalSystem');
     createActionButton('target=_blank', function () {
-        doOpen('local.html', '_blank');
+        doOpen(localhtml, '_blank');
     }, 'openLocalBlank');
     createActionButton('target=Random, location=no, disallowoverscroll=yes', function () {
-        doOpen('local.html', 'random_string', 'location=no, disallowoverscroll=yes');
+        doOpen(localhtml, 'random_string', 'location=no, disallowoverscroll=yes');
     }, 'openLocalRandomNoLocation');
     createActionButton('target=Random, toolbarposition=bottom', function () {
-        doOpen('local.html', 'random_string', 'toolbarposition=bottom');
+        doOpen(localhtml, 'random_string', 'toolbarposition=bottom');
     }, 'openLocalRandomToolBarBottom');
     createActionButton('target=Random, toolbarposition=top', function () {
-        doOpen('local.html', 'random_string', 'toolbarposition=top');
+        doOpen(localhtml, 'random_string', 'toolbarposition=top');
     }, 'openLocalRandomToolBarTop');
     createActionButton('target=Random, toolbarposition=top, location=no', function () {
-        doOpen('local.html', 'random_string', 'toolbarposition=top,location=no');
+        doOpen(localhtml, 'random_string', 'toolbarposition=top,location=no');
     }, 'openLocalRandomToolBarTopNoLocation');
 
     //White Listed
@@ -349,9 +359,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('target=Random', function () {
         doOpen('http://www.apple.com', 'random_string');
     }, 'openNonWhiteListedRandom');
-    createActionButton('target=Random, no location bar', function () {
+    createActionButton('* target=Random, no location bar', function () {
         doOpen('http://www.apple.com', 'random_string', 'location=no');
-    }, '* openNonWhiteListedRandomNoLocation');
+    }, 'openNonWhiteListedRandomNoLocation');
 
     //Page with redirect
     createActionButton('http://google.com', function () {
@@ -366,7 +376,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         doOpen('http://www.stluciadance.com/prospectus_file/sample.pdf');
     }, 'openPDF');
     createActionButton('Local URL', function () {
-        doOpen('local.pdf', '_blank');
+        doOpen(localpdf, '_blank');
     }, 'openPDFBlank');
 
     //Invalid URL
@@ -382,31 +392,31 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //CSS / JS injection
     createActionButton('Original Document', function () {
-        doOpen('inject.html', '_blank');
+        doOpen(injecthtml, '_blank');
     }, 'openOriginalDocument');
     createActionButton('CSS File Injection', function () {
-        openWithStyle('inject.html', 'inject.css');
+        openWithStyle(injecthtml, injectcss);
     }, 'openCSSInjection');
     createActionButton('CSS File Injection (callback)', function () {
-        openWithStyle('inject.html', 'inject.css', true);
+        openWithStyle(injecthtml, injectcss, true);
     }, 'openCSSInjectionCallback');
     createActionButton('CSS Literal Injection', function () {
-        openWithStyle('inject.html');
+        openWithStyle(injecthtml);
     }, 'openCSSLiteralInjection');
     createActionButton('CSS Literal Injection (callback)', function () {
-        openWithStyle('inject.html', null, true);
+        openWithStyle(injecthtml, null, true);
     }, 'openCSSLiteralInjectionCallback');
     createActionButton('Script File Injection', function () {
-        openWithScript('inject.html', 'inject.js');
+        openWithScript(injecthtml, injectjs);
     }, 'openScriptInjection');
     createActionButton('Script File Injection (callback)', function () {
-        openWithScript('inject.html', 'inject.js', true);
+        openWithScript(injecthtml, injectjs, true);
     }, 'openScriptInjectionCallback');
     createActionButton('Script Literal Injection', function () {
-        openWithScript('inject.html');
+        openWithScript(injecthtml);
     }, 'openScriptLiteralInjection');
     createActionButton('Script Literal Injection (callback)', function () {
-        openWithScript('inject.html', null, true);
+        openWithScript(injecthtml, null, true);
     }, 'openScriptLiteralInjectionCallback');
 
     //Open hidden
@@ -433,14 +443,15 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //Video tag
     createActionButton('Remote Video', function () {
-        doOpen('video.html', '_blank');
+        doOpen(videohtml, '_blank');
     }, 'openRemoteVideo');
 
     //Local With Anchor Tag
     createActionButton('Anchor1', function () {
-        doOpen('local.html#anchor1', '_blank');
+        doOpen(localhtml + '#anchor1', '_blank');
     }, 'openAnchor1');
     createActionButton('Anchor2', function () {
-        doOpen('local.html#anchor2', '_blank');
+        doOpen(localhtml + '#anchor2', '_blank');
     }, 'openAnchor2');
 };
+
