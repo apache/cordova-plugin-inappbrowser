@@ -91,6 +91,11 @@
         NSURL* baseUrl = [self.webView.request URL];
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
 
+        // Note: allows option to specify url as null on javascript call
+        if ([url length] == 0) {
+            absoluteUrl = nil;
+        }
+
         if ([self isSystemUrl:absoluteUrl]) {
             target = kInAppBrowserTargetSystem;
         }
@@ -426,7 +431,30 @@
     }
 }
 
+// Note: closes the IAB retaining where the user last left off
 - (void)browserExit
+{
+    if (self.callbackId != nil) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"exit"}];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        self.callbackId = nil;
+    }
+    // Set navigationDelegate to nil to ensure no callbacks are received from it.
+    //self.inAppBrowserViewController.navigationDelegate = nil;
+    // Don't recycle the ViewController since it may be consuming a lot of memory.
+    // Also - this is required for the PDF/User-Agent bug work-around.
+    //self.inAppBrowserViewController = nil;
+
+    _previousStatusBarStyle = -1;
+
+    if (IsAtLeastiOSVersion(@"7.0")) {
+        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
+    }
+}
+
+//Note: does same as 'browserExit' but clears the navigation and view
+- (void)browserDone
 {
     if (self.callbackId != nil) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
@@ -440,11 +468,11 @@
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
 
+    _previousStatusBarStyle = -1;
+
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
-
-    _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
 @end
@@ -509,7 +537,7 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(closeBrowser)];
     self.closeButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -746,6 +774,24 @@
             [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         } else {
             [[self parentViewController] dismissViewControllerAnimated:YES completion:nil];
+        }
+    });
+}
+
+//Note: copied from 'close' but calls 'browserDone' method
+- (void)closeBrowser
+{
+    [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
+    self.currentURL = nil;
+
+    if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(browserExit)]) {
+        [self.navigationDelegate browserDone];
+    }
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self respondsToSelector:@selector(presentingViewController)]) {
+            [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         }
     });
 }
