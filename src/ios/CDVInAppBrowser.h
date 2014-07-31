@@ -82,9 +82,11 @@
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
+@property (nonatomic, weak) CDVInAppBrowser* tempNavigationDelegate;
 @property (nonatomic) NSURL* currentURL;
 
 - (void)close;
+- (void)minimize;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
