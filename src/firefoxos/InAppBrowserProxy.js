@@ -91,7 +91,8 @@ var IABExecs = {
             browserWrap.browser = browserElem;
 
             browserWrap.classList.add('inAppBrowserWrap');
-            browserWrap.style.position = 'absolute';
+            // position fixed so that it works even when page is scrolled
+            browserWrap.style.position = 'fixed';
             browserElem.style.position = 'absolute';
             browserElem.style.border = 0;
             browserElem.style.top = '60px';
