@@ -34,6 +34,7 @@ var IABExecs = {
         if (browserWrap) {
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
+            if (typeof(win) == "function") win({type:'exit'});
         }
     },
 
@@ -135,7 +136,7 @@ var IABExecs = {
 
             close.addEventListener('click', function () {
                 setTimeout(function () {
-                    IABExecs.close();
+                    IABExecs.close(win, lose);
                 }, 0);
             }, false);
 
@@ -154,6 +155,23 @@ var IABExecs = {
             browserWrap.appendChild(menu);
             browserWrap.appendChild(browserElem);
             document.body.appendChild(browserWrap);
+
+            //we use mozbrowserlocationchange instead of mozbrowserloadstart to get the url
+            browserElem.addEventListener('mozbrowserlocationchange', function(e){
+                win({
+                    type:'loadstart',
+                    url : e.detail
+                })
+            }, false);
+            browserElem.addEventListener('mozbrowserloadend', function(e){
+                win({type:'loadstop'})
+            }, false);
+            browserElem.addEventListener('mozbrowsererror', function(e){
+                win({type:'loaderror'})
+            }, false);
+            browserElem.addEventListener('mozbrowserclose', function(e){
+                win({type:'exit'})
+            }, false);
         } else {
             window.location = strUrl;
         }
