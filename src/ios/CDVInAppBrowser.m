@@ -723,6 +723,10 @@
     [super viewDidLoad];
 }
 
+- (BOOL)prefersStatusBarHidden{
+    return _browserOptions.hidestatusbar;
+}
+
 - (void)viewDidUnload
 {
     [self.webView loadHTMLString:nil baseURL:nil];
