@@ -77,6 +77,10 @@
 	return NO;
 }
 
+- (BOOL)prefersStatusBarHidden{
+    return YES;
+}
+
 - (void)open:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult;
