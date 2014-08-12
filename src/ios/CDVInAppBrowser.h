@@ -21,6 +21,7 @@
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
 #import <Cordova/CDVWebViewDelegate.h>
+#import <Cordova/CDVWebViewOperationsDelegate.h>
 
 @class CDVInAppBrowserViewController;
 
@@ -58,6 +59,7 @@
 @property (nonatomic, assign) BOOL suppressesincrementalrendering;
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
+@property (nonatomic, assign) BOOL usewkwebview;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
@@ -72,7 +74,7 @@
     CDVWebViewDelegate* _webViewDelegate;
 }
 
-@property (nonatomic, strong) IBOutlet UIWebView* webView;
+@property (nonatomic, strong) IBOutlet UIView* webView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* closeButton;
 @property (nonatomic, strong) IBOutlet UILabel* addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* backButton;
@@ -80,6 +82,7 @@
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView* spinner;
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 
+@property (nonatomic, strong) CDVWebViewOperationsDelegate* operationsDelegate;
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;

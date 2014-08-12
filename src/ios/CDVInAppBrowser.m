@@ -21,6 +21,8 @@
 #import <Cordova/CDVPluginResult.h>
 #import <Cordova/CDVUserAgentUtil.h>
 #import <Cordova/CDVJSON.h>
+#import <Cordova/CDVWebViewUIDelegate.h>
+#import <Cordova/CDVWebViewPreferences.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
 #define    kInAppBrowserTargetSystem @"_system"
@@ -88,7 +90,8 @@
     self.callbackId = command.callbackId;
 
     if (url != nil) {
-        NSURL* baseUrl = [self.webView.request URL];
+        CDVWebViewOperationsDelegate* opDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
+        NSURL* baseUrl = [opDelegate requestURL];
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
 
         if ([self isSystemUrl:absoluteUrl]) {
@@ -178,7 +181,7 @@
     // prevent webView from bouncing
     if (browserOptions.disallowoverscroll) {
         if ([self.inAppBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
-            ((UIScrollView*)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
+            ((UIScrollView*)[self.inAppBrowserViewController.operationsDelegate scrollView]).bounces = NO;
         } else {
             for (id subview in self.inAppBrowserViewController.webView.subviews) {
                 if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
@@ -187,15 +190,15 @@
             }
         }
     }
-
-    // UIWebView options
-    self.inAppBrowserViewController.webView.scalesPageToFit = browserOptions.enableviewportscale;
-    self.inAppBrowserViewController.webView.mediaPlaybackRequiresUserAction = browserOptions.mediaplaybackrequiresuseraction;
-    self.inAppBrowserViewController.webView.allowsInlineMediaPlayback = browserOptions.allowinlinemediaplayback;
-    if (IsAtLeastiOSVersion(@"6.0")) {
-        self.inAppBrowserViewController.webView.keyboardDisplayRequiresUserAction = browserOptions.keyboarddisplayrequiresuseraction;
-        self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
-    }
+    
+    CDVWebViewPreferences* prefs = [[CDVWebViewPreferences alloc] initWithWebView:self.inAppBrowserViewController.webView];
+    [prefs updateSettings: @{
+        @"EnableViewportScale" : @(browserOptions.enableviewportscale),
+        @"MediaPlaybackRequiresUserAction" : @(browserOptions.mediaplaybackrequiresuseraction),
+        @"AllowInlineMediaPlayback" : @(browserOptions.allowinlinemediaplayback),
+        @"KeyboardDisplayRequiresUserAction" : @(browserOptions.keyboarddisplayrequiresuseraction),
+        @"SuppressesIncrementalRendering" : @(browserOptions.suppressesincrementalrendering)
+    }];
 
     [self.inAppBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
@@ -232,7 +235,8 @@
 {
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
-        [self.webView loadRequest:request];
+        CDVWebViewOperationsDelegate* opDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
+        [opDelegate loadRequest:request];
     } else { // this assumes the InAppBrowser can be excepted from the white-list
         [self openInInAppBrowser:url withOptions:options];
     }
@@ -261,7 +265,7 @@
     if (!_injectedIframeBridge) {
         _injectedIframeBridge = YES;
         // Create an iframe bridge in the new document to communicate with the CDVInAppBrowserViewController
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){var e = _cdvIframeBridge = d.createElement('iframe');e.style.display='none';d.body.appendChild(e);})(document)"];
+        [self.inAppBrowserViewController.operationsDelegate evaluateJavaScript:@"(function(d){var e = _cdvIframeBridge = d.createElement('iframe');e.style.display='none';d.body.appendChild(e);})(document)" completionHandler:nil];
     }
 
     if (jsWrapper != nil) {
@@ -269,10 +273,10 @@
         if (sourceArrayString) {
             NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
             NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
-            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
+            [self.inAppBrowserViewController.operationsDelegate evaluateJavaScript:jsToInject completionHandler:nil];
         }
     } else {
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+        [self.inAppBrowserViewController.operationsDelegate evaluateJavaScript:source completionHandler:nil];
     }
 }
 
@@ -476,22 +480,47 @@
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
-    self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
+    
+    if (NSClassFromString(@"WKWebView") && _browserOptions.usewkwebview) {
+#ifdef __IPHONE_8_0
+        WKUserContentController* userContentController = [[WKUserContentController alloc] init];
+        
+        // scriptMessageHandler is the object that conforms to the WKScriptMessageHandler protocol
+        // see https://developer.apple.com/library/prerelease/ios/documentation/WebKit/Reference/WKScriptMessageHandler_Ref/index.html#//apple_ref/swift/intf/WKScriptMessageHandler
+//        if ([_commandDelegate conformsToProtocol:@protocol(WKScriptMessageHandler)]) {
+//            [userContentController addScriptMessageHandler:self name:@"cordova"];
+//        }
+        
+        WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+        configuration.userContentController = userContentController;
+        
+        self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
+        CDVWebViewUIDelegate* webViewUIDelegate = [[CDVWebViewUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
+        ((WKWebView*)self.webView).UIDelegate = webViewUIDelegate;
+#endif
+    } else {
+        self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
+    }
+    
+    self.operationsDelegate = [[CDVWebViewOperationsDelegate alloc] initWithWebView:self.webView];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
 
-    self.webView.delegate = _webViewDelegate;
+    [self.operationsDelegate setNavigationDelegate:_webViewDelegate]; // TODO: WKWebView navigationDelegate here as well
     self.webView.backgroundColor = [UIColor whiteColor];
+    
+    
+    CDVWebViewPreferences* prefs = [[CDVWebViewPreferences alloc] initWithWebView:self.webView];
+    [prefs updateSettings:@{ @"EnableViewportScale" : @NO }];
 
     self.webView.clearsContextBeforeDrawing = YES;
     self.webView.clipsToBounds = YES;
     self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.multipleTouchEnabled = YES;
     self.webView.opaque = YES;
-    self.webView.scalesPageToFit = NO;
     self.webView.userInteractionEnabled = YES;
 
     self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -721,7 +750,7 @@
 
 - (void)viewDidUnload
 {
-    [self.webView loadHTMLString:nil baseURL:nil];
+    [self.operationsDelegate loadHTMLString:nil baseURL:nil];
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     [super viewDidUnload];
 }
@@ -755,24 +784,24 @@
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
 
     if (_userAgentLockToken != 0) {
-        [self.webView loadRequest:request];
+        [self.operationsDelegate loadRequest:request];
     } else {
         [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
             _userAgentLockToken = lockToken;
             [CDVUserAgentUtil setUserAgent:_userAgent lockToken:lockToken];
-            [self.webView loadRequest:request];
+            [self.operationsDelegate loadRequest:request];
         }];
     }
 }
 
 - (void)goBack:(id)sender
 {
-    [self.webView goBack];
+    [self.operationsDelegate goBack];
 }
 
 - (void)goForward:(id)sender
 {
-    [self.webView goForward];
+    [self.operationsDelegate goForward];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -921,6 +950,7 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
+        self.usewkwebview = NO;
     }
 
     return self;
