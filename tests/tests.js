@@ -281,7 +281,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     var local_with_anchor_tag_tests = '<h1>Local with anchor tag</h1>' +
         '<div id="openAnchor1"></div>' +
-        'Expected result: open successfully in InAppBrowser to the local page, scrolled to the top.' +
+        'Expected result: open successfully in InAppBrowser to the local page, scrolled to the top as normal.' +
         '<p/> <div id="openAnchor2"></div>' +
         'Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.';
 
@@ -450,7 +450,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //Local With Anchor Tag
     createActionButton('Anchor1', function () {
-        doOpen(localhtml + '#anchor1', '_blank');
+        doOpen(localhtml + '#bogusanchor', '_blank');
     }, 'openAnchor1');
     createActionButton('Anchor2', function () {
         doOpen(localhtml + '#anchor2', '_blank');
