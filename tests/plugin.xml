@@ -27,5 +27,5 @@
     <js-module src="tests.js" name="tests">
     </js-module>
 
-    <asset src="resources" target="resources" />
+    <asset src="resources" target="cdvtests/iab-resources" />
 </plugin>

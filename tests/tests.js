@@ -167,7 +167,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     var info_div = '<h1>InAppBrowser</h1>' +
         '<div id="info">' +
-        'Make sure http://wwww.google.com is white listed. </br>' +
+        'Make sure http://www.google.com and https://www.google.com are white listed. </br>' +
         'Make sure http://www.apple.com is not in the white list.</br>' +
         'In iOS, starred <span style="vertical-align:super">*</span> tests will put the app in a state with no way to return. </br>' +
         '<h4>User-Agent: <span id="user-agent"> </span></hr>' +
@@ -288,7 +288,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
         css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
 
-    var basePath = '/www/resources/';
+    document.getElementById("user-agent").textContent = navigator.userAgent;
+
+    // we are already in cdvtests directory
+    var basePath = 'iab-resources/';
     var localhtml = basePath + 'local.html',
         localpdf = basePath + 'local.pdf',
         injecthtml = basePath + 'inject.html',
@@ -298,8 +301,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //Local
     createActionButton('target=Default', function () {
-        console.log(localhtml);
-        //doOpen(localhtml);
+        doOpen(localhtml);
     }, 'openLocal');
     createActionButton('target=_self', function () {
         doOpen(localhtml, '_self');
@@ -325,22 +327,22 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //White Listed
     createActionButton('* target=Default', function () {
-        doOpen('http://www.google.com');
+        doOpen('https://www.google.com');
     }, 'openWhiteListed');
     createActionButton('* target=_self', function () {
-        doOpen('http://www.google.com', '_self');
+        doOpen('https://www.google.com', '_self');
     }, 'openWhiteListedSelf');
     createActionButton('target=_system', function () {
-        doOpen('http://www.google.com', '_system');
+        doOpen('https://www.google.com', '_system');
     }, 'openWhiteListedSystem');
     createActionButton('target=_blank', function () {
-        doOpen('http://www.google.com', '_blank');
+        doOpen('https://www.google.com', '_blank');
     }, 'openWhiteListedBlank');
     createActionButton('target=Random', function () {
-        doOpen('http://www.google.com', 'random_string');
+        doOpen('https://www.google.com', 'random_string');
     }, 'openWhiteListedRandom');
     createActionButton('* target=Random, no location bar', function () {
-        doOpen('http://www.google.com', 'random_string', 'location=no');
+        doOpen('https://www.google.com', 'random_string', 'location=no');
     }, 'openWhiteListedRandomNoLocation');
 
     //Non White Listed

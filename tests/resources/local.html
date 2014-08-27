@@ -26,13 +26,16 @@
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
     <title>IAB test page</title>
-    <script type="text/javascript" charset="utf-8" src="../cordova-incl.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../../cordova-incl.js"></script>
     <script type="text/javascript" charset="utf-8">
       function onDeviceReady() {
           document.getElementById("hint").textContent = "Running CordovaWebView, deviceVersion=" + device.version + ", no toolbar should be present, Back link should work, logcat should NOT have failed 'gap:' calls.";
       }
       document.addEventListener("deviceready", onDeviceReady, false);
     </script>
+    <style>
+        body {background-color: #ffffff;}
+    </style>
   </head>
   <body id="stage" class="theme">
     <h1>Local URL</h1>
