@@ -295,8 +295,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var localhtml = basePath + 'local.html',
         localpdf = basePath + 'local.pdf',
         injecthtml = basePath + 'inject.html',
-        injectjs = basePath + 'inject.js',
-        injectcss = basePath + 'inject.css',
+        injectjs = 'inject.js',
+        injectcss = 'inject.css',
         videohtml = basePath + 'video.html';
 
     //Local
@@ -423,7 +423,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     //Open hidden
     createActionButton('Create Hidden', function () {
-        openHidden('http://google.com', true);
+        openHidden('https://www.google.com', true);
     }, 'openHidden');
     createActionButton('Show Hidden', function () {
         showHidden();
@@ -432,15 +432,15 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         closeHidden();
     }, 'closeHidden');
     createActionButton('google.com Not Hidden', function () {
-        openHidden('http://google.com', false);
+        openHidden('https://www.google.com', false);
     }, 'openHiddenShow');
 
     //Clearing cache
     createActionButton('Clear Browser Cache', function () {
-        doOpen('http://www.google.com', '_blank', 'clearcache=yes');
+        doOpen('https://www.google.com', '_blank', 'clearcache=yes');
     }, 'openClearCache');
     createActionButton('Clear Session Cache', function () {
-        doOpen('http://www.google.com', '_blank', 'clearsessioncache=yes');
+        doOpen('https://www.google.com', '_blank', 'clearsessioncache=yes');
     }, 'openClearSessionCache');
 
     //Video tag
