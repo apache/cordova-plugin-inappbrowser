@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-このプラグインを呼び出すときに表示される web ブラウザーのビューを提供します `window.open()` 、または時として形成されたリンクを開く`<a target="_blank">`.
+このプラグインを呼び出すときに表示される web ブラウザーのビューを提供します`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     

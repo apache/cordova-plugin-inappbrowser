@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-這個外掛程式提供了一個 web 瀏覽器視圖，顯示時調用 `window.open()` ，或當打開連結形成的作為`<a target="_blank">`.
+這個外掛程式提供了一個 web 瀏覽器視圖，顯示在調用時`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     

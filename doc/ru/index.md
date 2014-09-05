@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-Этот плагин дает представление веб-браузера, что показывает при вызове `window.open()` , или когда открытие ссылки формируется как`<a target="_blank">`.
+Этот плагин обеспечивает представление веб-браузера, что показывает при вызове`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     

@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-호출할 때 표시 하는 웹 브라우저 보기를 제공 하는이 플러그인 `window.open()` , 또는 때로 형성 된 링크 열기`<a target="_blank">`.
+이 플러그인은를 호출할 때 표시 하는 웹 브라우저 보기를 제공 합니다.`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     

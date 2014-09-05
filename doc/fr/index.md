@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-Ce plugin vous offre une vue de navigateur web qui s'affiche lorsque vous appelez `window.open()` , ou quand un lien d'ouverture formé comme`<a target="_blank">`.
+Ce plugin vous offre une vue de navigateur web qui s'affiche lors de l'appel`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     

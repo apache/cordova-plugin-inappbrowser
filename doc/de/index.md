@@ -19,12 +19,12 @@
 
 # org.apache.cordova.inappbrowser
 
-Dieses Plugin bietet eine Web-Browser-Ansicht, die anzeigt, beim Aufrufen von `window.open()` , oder als als bildeten einen Link öffnen`<a target="_blank">`.
+Dieses Plugin bietet eine Web-Browser-Ansicht, die beim Aufruf angezeigt`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     
 
-**Hinweis**: die InAppBrowser Fenster verhält sich wie einen standard-Webbrowser und Cordova APIs kann nicht zugegriffen werden kann.
+**Hinweis**: Das InAppBrowser Fenster verhält sich wie ein Standard-Webbrowser. Auf die Cordova-API kann in diesem Moment nicht zugegriffen werden!
 
 ## Installation
 
@@ -33,16 +33,16 @@ Dieses Plugin bietet eine Web-Browser-Ansicht, die anzeigt, beim Aufrufen von `w
 
 ## window.open
 
-Öffnet eine URL in einem neuen `InAppBrowser` Instanz, die aktuelle Browserinstanz oder der Systembrowser.
+Öffnet eine URL in einer neuen `InAppBrowser` Instanz, der aktuelle Browserinstanz oder der Systembrowser.
 
     var ref = window.open(url, target, options);
     
 
-*   **Ref**: Bezugnahme auf die `InAppBrowser` Fenster. *(InAppBrowser)*
+*   **Ref**: Bezugnahme auf das `InAppBrowser` Fenster. *(InAppBrowser)*
 
-*   **URL**: die URL *(String)*zu laden. Rufen Sie `encodeURI()` auf diese Option, wenn die URL enthält Unicode-Zeichen.
+*   **URL**: die URL um den *(String)* zu laden. Rufen Sie `encodeURI()` auf, wenn die URL Unicode-Zeichen enthält.
 
-*   **Ziel**: das Ziel in der URL, einen optionalen Parameter geladen, die standardmäßig auf `_self` . *(String)*
+*   **Ziel**: das Ziel in welchem die URL geladen werden soll. Standardmäßig entspricht dieser Wert `_self` . *(String)*
     
     *   `_self`: Öffnet sich in der Cordova WebView wenn der URL in der Whitelist ist, andernfalls es öffnet sich in der`InAppBrowser`.
     *   `_blank`: Öffnet den`InAppBrowser`.
