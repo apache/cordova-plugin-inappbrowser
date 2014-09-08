@@ -285,8 +285,17 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openAnchor2"></div>' +
         'Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.';
 
-    contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
-        css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
+    // CB-7490 We need to wrap this code due to Windows security restrictions
+    // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
+    if (window.MSApp && window.MSApp.execUnsafeLocalFunction) {
+        MSApp.execUnsafeLocalFunction(function() {
+            contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
+                css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
+        });
+    } else {
+        contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
+            css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
+    }
 
     document.getElementById("user-agent").textContent = navigator.userAgent;
 
