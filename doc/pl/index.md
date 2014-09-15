@@ -19,7 +19,7 @@
 
 # org.apache.cordova.inappbrowser
 
-Plugin daje widok przeglądarki sieci web, które są wyświetlane podczas wywoływania `window.open()` , lub kiedy otwarcie łącza utworzone jako`<a target="_blank">`.
+Plugin daje widok przeglądarki sieci web, które są wyświetlane podczas wywoływania`window.open()`.
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     
