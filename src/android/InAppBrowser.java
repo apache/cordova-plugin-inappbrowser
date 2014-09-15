@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import org.apache.cordova.inappbrowser.InAppBrowserDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -318,6 +319,7 @@ public class InAppBrowser extends CordovaPlugin {
             } else {
                 intent.setData(uri);
             }
+			intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
             this.cordova.getActivity().startActivity(intent);
             return "";
         } catch (android.content.ActivityNotFoundException e) {
