@@ -132,7 +132,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 intent.setData(Uri.parse(url));
                                 cordova.getActivity().startActivity(intent);
                             } catch (android.content.ActivityNotFoundException e) {
-                                LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                                sendException(url, e);
                             }
                         }
                         // load in InAppBrowser
@@ -321,7 +321,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().startActivity(intent);
             return "";
         } catch (android.content.ActivityNotFoundException e) {
-            Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
+            sendException(url, e);
             return e.toString();
         }
     }
@@ -683,6 +683,27 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
     }
+    /**
+     * Create a new error plugin result with the exception and send it back to Javascript
+     *
+     * @param url Url that cause the exception 
+     * @param e The exception
+     */
+    private void sendException(String url, Exception e) {
+        LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("type", LOAD_ERROR_EVENT);
+            obj.put("url", url);
+            obj.put("code", 500);
+            obj.put("message", e.getMessage());
+
+            sendUpdate(obj, true, PluginResult.Status.ERROR);
+        } catch(JSONException ex) {
+            LOG.e(LOG_TAG, ex.toString());
+        }
+        
+    }
 
 
     
@@ -724,7 +745,7 @@ public class InAppBrowser extends CordovaPlugin {
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                    sendException(url, e);
                 }
             }
 
@@ -734,7 +755,7 @@ public class InAppBrowser extends CordovaPlugin {
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+                    sendException(url, e);
                 }
             }
             // If sms:5551212?body=This is the message
@@ -765,7 +786,7 @@ public class InAppBrowser extends CordovaPlugin {
                     intent.setType("vnd.android-dir/mms-sms");
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
+                    sendException(url, e);
                 }
             }
             else {
