@@ -119,3 +119,17 @@
 * **FFOS** app needs to be privileged
 * CB-6127 Updated translations for docs
 * CB-6769 ios: Fix statusbar color reset wasn't working on iOS7+
+
+### 0.5.2 (Sep 17, 2014)
+* CB-7471 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
+* CB-7490 Fixes InAppBrowser manual tests crash on windows platform
+* CB-7249 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
+* CB-7424 Wrong docs: anchor tags are not supported by the InAppBrowser
+* CB-7133 clarify that anchor1 doesn't exist
+* CB-7133 more fixup of tests on Android
+* CB-7133 fix up the tests for Android
+* Add just a bit more logging
+* CB-7133 port inappbrowser to plugin-test-framework
+* phonegap events supported for _blank target
+* inappbrowser _blank target position is fixed
+* amazon-fireos related changes.
