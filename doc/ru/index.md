@@ -77,6 +77,10 @@
     *   **presentationstyle**: набор `pagesheet` , `formsheet` или `fullscreen` чтобы задать [стиль презентации][1] (по умолчанию`fullscreen`).
     *   **transitionstyle**: набор `fliphorizontal` , `crossdissolve` или `coververtical` чтобы задать [стиль перехода][2] (по умолчанию`coververtical`).
     *   **toolbarposition**: значение `top` или `bottom` (по умолчанию `bottom` ). Вызывает панели инструментов, чтобы быть в верхней или нижней части окна.
+    
+    Windows только:
+    
+    *   **скрытые**: значение `yes` для создания браузера и загрузки страницы, но не показать его. Событие loadstop возникает, когда загрузка завершена. Опустить или набор `no` (по умолчанию), чтобы браузер открыть и загрузить нормально.
 
  [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
  [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
@@ -88,6 +92,7 @@
 *   BlackBerry 10
 *   Firefox OS
 *   iOS
+*   Windows 8 и 8.1
 *   Windows Phone 7 и 8
 
 ### Пример
@@ -172,6 +177,7 @@
 *   Amazon Fire ОС
 *   Android
 *   iOS
+*   Windows 8 и 8.1
 *   Windows Phone 7 и 8
 
 ### Быстрый пример
@@ -203,6 +209,7 @@
 *   Amazon Fire ОС
 *   Android
 *   iOS
+*   Windows 8 и 8.1
 *   Windows Phone 7 и 8
 
 ### Быстрый пример
@@ -228,6 +235,7 @@
 *   Android
 *   Firefox OS
 *   iOS
+*   Windows 8 и 8.1
 *   Windows Phone 7 и 8
 
 ### Быстрый пример
@@ -250,6 +258,7 @@
 *   Amazon Fire ОС
 *   Android
 *   iOS
+*   Windows 8 и 8.1
 
 ### Быстрый пример
 
@@ -281,6 +290,7 @@
 *   Amazon Fire ОС
 *   Android
 *   iOS
+*   Windows 8 и 8.1
 
 ### Быстрый пример
 

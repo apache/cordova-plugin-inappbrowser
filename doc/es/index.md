@@ -54,7 +54,7 @@ Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia act
     
     *   **Ubicación**: A `yes` o `no` para activar el `InAppBrowser` de barra de ubicación activado o desactivado.
     
-    Android sólo:
+    Sólo Android:
     
     *   **closebuttoncaption**: establecer una cadena para usar como título del botón **hecho** .
     *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento loadstop se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
@@ -77,6 +77,10 @@ Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia act
     *   **presentationstyle**: A `pagesheet` , `formsheet` o `fullscreen` para establecer el [estilo de la presentación][1] (por defecto`fullscreen`).
     *   **transitionstyle**: A `fliphorizontal` , `crossdissolve` o `coververtical` para establecer el [estilo de transición][2] (por defecto`coververtical`).
     *   **toolbarposition**: A `top` o `bottom` (valor por defecto es `bottom` ). Hace que la barra de herramientas en la parte superior o inferior de la ventana.
+    
+    Sólo Windows:
+    
+    *   **oculta**: a `yes` para crear el navegador y cargar la página, pero no lo demuestra. El evento loadstop se desencadena cuando termine la carga. Omitir o a `no` (por defecto) para que el navegador abra y carga normalmente.
 
  [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
  [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
@@ -88,6 +92,7 @@ Se abre una dirección URL en una nueva `InAppBrowser` ejemplo, la instancia act
 *   BlackBerry 10
 *   Firefox OS
 *   iOS
+*   Windows 8 y 8.1
 *   Windows Phone 7 y 8
 
 ### Ejemplo
@@ -172,6 +177,7 @@ El objeto devuelto desde una llamada a`window.open`.
 *   Amazon fuego OS
 *   Android
 *   iOS
+*   Windows 8 y 8.1
 *   Windows Phone 7 y 8
 
 ### Ejemplo rápido
@@ -203,6 +209,7 @@ El objeto devuelto desde una llamada a`window.open`.
 *   Amazon fuego OS
 *   Android
 *   iOS
+*   Windows 8 y 8.1
 *   Windows Phone 7 y 8
 
 ### Ejemplo rápido
@@ -228,6 +235,7 @@ El objeto devuelto desde una llamada a`window.open`.
 *   Android
 *   Firefox OS
 *   iOS
+*   Windows 8 y 8.1
 *   Windows Phone 7 y 8
 
 ### Ejemplo rápido
@@ -250,6 +258,7 @@ El objeto devuelto desde una llamada a`window.open`.
 *   Amazon fuego OS
 *   Android
 *   iOS
+*   Windows 8 y 8.1
 
 ### Ejemplo rápido
 
@@ -281,6 +290,7 @@ El objeto devuelto desde una llamada a`window.open`.
 *   Amazon fuego OS
 *   Android
 *   iOS
+*   Windows 8 y 8.1
 
 ### Ejemplo rápido
 
