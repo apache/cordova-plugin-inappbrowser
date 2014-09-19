@@ -77,6 +77,10 @@ Otwiera URL w nowym `InAppBrowser` wystąpienie, bieżące wystąpienie przeglą
     *   **presentationstyle**: zestaw `pagesheet` , `formsheet` lub `fullscreen` Aby ustawić [styl prezentacji][1] (domyślnie`fullscreen`).
     *   **transitionstyle**: zestaw `fliphorizontal` , `crossdissolve` lub `coververtical` Aby ustawić [styl przejścia][2] (domyślnie`coververtical`).
     *   **toolbarposition**: zestaw `top` lub `bottom` (domyślnie `bottom` ). Powoduje, że pasek ma być na górze lub na dole okna.
+    
+    Windows tylko:
+    
+    *   **ukryte**: zestaw `yes` do stworzenia przeglądarki i ładowania strony, ale nie pokazuje go. Loadstop zdarzenie fires po zakończeniu ładowania. Pominąć lub zestaw `no` (domyślnie) do przeglądarki otworzyć i załadować normalnie.
 
  [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
  [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
@@ -88,6 +92,7 @@ Otwiera URL w nowym `InAppBrowser` wystąpienie, bieżące wystąpienie przeglą
 *   Jeżyna 10
 *   Firefox OS
 *   iOS
+*   Windows 8 i 8.1
 *   Windows Phone 7 i 8
 
 ### Przykład
@@ -172,6 +177,7 @@ Obiekt zwrócony z wywołania`window.open`.
 *   Amazon ogień OS
 *   Android
 *   iOS
+*   Windows 8 i 8.1
 *   Windows Phone 7 i 8
 
 ### Szybki przykład
@@ -203,6 +209,7 @@ Obiekt zwrócony z wywołania`window.open`.
 *   Amazon ogień OS
 *   Android
 *   iOS
+*   Windows 8 i 8.1
 *   Windows Phone 7 i 8
 
 ### Szybki przykład
@@ -228,6 +235,7 @@ Obiekt zwrócony z wywołania`window.open`.
 *   Android
 *   Firefox OS
 *   iOS
+*   Windows 8 i 8.1
 *   Windows Phone 7 i 8
 
 ### Szybki przykład
@@ -250,6 +258,7 @@ Obiekt zwrócony z wywołania`window.open`.
 *   Amazon ogień OS
 *   Android
 *   iOS
+*   Windows 8 i 8.1
 
 ### Szybki przykład
 
@@ -281,6 +290,7 @@ Obiekt zwrócony z wywołania`window.open`.
 *   Amazon ogień OS
 *   Android
 *   iOS
+*   Windows 8 i 8.1
 
 ### Szybki przykład
 
