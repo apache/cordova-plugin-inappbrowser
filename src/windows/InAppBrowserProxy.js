@@ -28,30 +28,50 @@ var cordova = require('cordova'),
     channel = require('cordova/channel');
 
 var browserWrap,
-    popup,
-    cb;
+    popup;
 
-function onResize() {
-    if (browserWrap && popup) {
-        browserWrap.style.width = (window.innerWidth - 80) + "px";
-        browserWrap.style.height = (window.innerHeight - 80) + "px";
+// x-ms-webview is available starting from Windows 8.1 (platformId is 'windows')
+// http://msdn.microsoft.com/en-us/library/windows/apps/dn301831.aspx
+var isWebViewAvailable = cordova.platformId == 'windows';
 
-        popup.style.width = (window.innerWidth - 80) + "px";
-        popup.style.height = (window.innerHeight - 80) + "px";
+function attachNavigationEvents(element, callback) {
+    if (isWebViewAvailable) {
+        element.addEventListener("MSWebViewNavigationStarting", function (e) {
+            callback({ type: "loadstart", url: e.uri}, {keepCallback: true} );
+        });
+        element.addEventListener("MSWebViewNavigationCompleted", function (e) {
+            callback({ type: e.isSuccess ? "loadstop" : "loaderror", url: e.uri}, {keepCallback: true});
+        });
+        element.addEventListener("MSWebViewUnviewableContentIdentified", function (e) {
+            // WebView found the content to be not HTML.
+            // http://msdn.microsoft.com/en-us/library/windows/apps/dn609716.aspx
+            callback({ type: "loaderror", url: e.uri}, {keepCallback: true});
+        });
+    } else {
+        var onError = function () {
+            callback({ type: "loaderror", url: this.contentWindow.location}, {keepCallback: true});
+        };
+
+        element.addEventListener("unload", function () {
+            callback({ type: "loadstart", url: this.contentWindow.location}, {keepCallback: true});
+        });
+        element.addEventListener("load", function () {
+            callback({ type: "loadstop", url: this.contentWindow.location}, {keepCallback: true});
+        });
+
+        element.addEventListener("error", onError);
+        element.addEventListener("abort", onError);
     }
 }
 
 var IAB = {
     close: function (win, lose) {
         if (browserWrap) {
-            if (cb) cb({ type: "exit" });
+            if (win) win({ type: "exit" });
 
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
             popup = null;
-            cb = null;
-
-            window.removeEventListener("resize", onResize);
         }
     },
     show: function (win, lose) {
@@ -63,21 +83,18 @@ var IAB = {
         var strUrl = args[0],
             target = args[1],
             features = args[2],
-            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule,
             url;
 
         if (target === "_system") {
             url = new Windows.Foundation.Uri(strUrl);
             Windows.System.Launcher.launchUriAsync(url);
-        }
-        else if (target === "_blank") {
-            cb = win;
+        } else if (target === "_blank") {
             if (!browserWrap) {
                 browserWrap = document.createElement("div");
                 browserWrap.style.position = "absolute";
-                browserWrap.style.width = (window.innerWidth - 80) + "px";
-                browserWrap.style.height = (window.innerHeight - 80) + "px";
                 browserWrap.style.borderWidth = "40px";
+                browserWrap.style.width = "calc(100% - 80px)";
+                browserWrap.style.height = "calc(100% - 80px)";
                 browserWrap.style.borderStyle = "solid";
                 browserWrap.style.borderColor = "rgba(0,0,0,0.25)";
 
@@ -94,59 +111,27 @@ var IAB = {
                 browserWrap.style.display = "none";
             }
 
-            popup = document.createElement(isWinJS2 ? "x-ms-webview" : "iframe");
-            popup.style.width = (window.innerWidth - 80) + "px";
-            popup.style.height = (window.innerHeight - 80) + "px";
+            popup = document.createElement(isWebViewAvailable ? "x-ms-webview" : "iframe");
             popup.style.borderWidth = "0px";
+            popup.style.width = "100%";
+            popup.style.height = "100%";
             popup.src = strUrl;
 
-            if (isWinJS2) {
-                popup.addEventListener("MSWebViewNavigationStarting", function (e) {
-                    win({ type: "loadstart", url: e.uri });
-                });
-                popup.addEventListener("MSWebViewNavigationCompleted", function (e) {
-                    if (e.isSuccess) {
-                        win({ type: "loadstop", url: e.uri });
-                    }
-                    else {
-                        win({ type: "loaderror", url: e.uri });
-                    }
-                });
-                popup.addEventListener("MSWebViewUnviewableContentIdentified", function (e) {
-                    win({ type: "loaderror", url: e.uri });
-                });
-            }
-            else {
-                var onError = function () {
-                    win({ type: "loaderror", url: this.contentWindow.location });
-                };
-
-                popup.addEventListener("unload", function () {
-                    win({ type: "loadstart", url: this.contentWindow.location });
-                });
-                popup.addEventListener("load", function () {
-                    win({ type: "loadstop", url: this.contentWindow.location });
-                });
-
-                popup.addEventListener("error", onError);
-                popup.addEventListener("abort", onError);
-            }
-
-            window.addEventListener("resize", onResize);
+            // start listening for navigation events
+            attachNavigationEvents(popup, win);
 
             browserWrap.appendChild(popup);
-        }
-        else {
+            
+        } else {
             window.location = strUrl;
         }
     },
 
     injectScriptCode: function (win, fail, args) {
         var code = args[0],
-            hasCallback = args[1],
-            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule;
+            hasCallback = args[1];
 
-        if (isWinJS2 && browserWrap && popup) {
+        if (isWebViewAvailable && browserWrap && popup) {
             var op = popup.invokeScriptAsync("eval", code);
             op.oncomplete = function () { hasCallback && win([]); };
             op.onerror = function () { };
@@ -155,10 +140,9 @@ var IAB = {
     },
     injectScriptFile: function (win, fail, args) {
         var file = args[0],
-            hasCallback = args[1],
-            isWinJS2 = !!WinJS.Utilities.Scheduler && !!WinJS.Utilities.Scheduler.schedule;
+            hasCallback = args[1];
 
-        if (isWinJS2 && browserWrap && popup) {
+        if (isWebViewAvailable && browserWrap && popup) {
             Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
                 var op = popup.invokeScriptAsync("eval", code);
                 op.oncomplete = function () { hasCallback && win([]); };
