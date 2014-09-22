@@ -88,6 +88,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
+    private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -101,6 +102,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    private boolean useWideViewPort = true;
 
     /**
      * Executes the request and returns PluginResult.
@@ -558,6 +560,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (shouldPause != null) {
                 shouldPauseInAppBrowser = shouldPause.booleanValue();
             }
+            Boolean wideViewPort = features.get(USER_WIDE_VIEW_PORT);
+            if (wideViewPort != null ) {
+		            useWideViewPort = wideViewPort.booleanValue();
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -758,7 +764,7 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
-                inAppWebView.getSettings().setUseWideViewPort(true);
+                inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
