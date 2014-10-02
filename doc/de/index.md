@@ -180,7 +180,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
@@ -212,7 +212,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
@@ -238,7 +238,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
@@ -260,7 +260,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   iOS
 *   Windows 8 und 8.1
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
@@ -292,7 +292,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   iOS
 *   Windows 8 und 8.1
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
@@ -322,7 +322,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Android
 *   iOS
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {

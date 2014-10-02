@@ -26,7 +26,7 @@ Plugin daje widok przeglądarki sieci web, które są wyświetlane podczas wywo�
 
 **Uwaga**: The InAppBrowser okno zachowuje się jak standardowe przeglądarki, a nie ma dostępu do API Cordova.
 
-## Instalacji
+## Instalacja
 
     cordova plugin add org.apache.cordova.inappbrowser
     
@@ -87,9 +87,9 @@ Otwiera URL w nowym `InAppBrowser` wystąpienie, bieżące wystąpienie przeglą
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
-*   Jeżyna 10
+*   BlackBerry 10
 *   Firefox OS
 *   iOS
 *   Windows 8 i 8.1
@@ -174,7 +174,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   iOS
 *   Windows 8 i 8.1
@@ -206,7 +206,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   iOS
 *   Windows 8 i 8.1
@@ -231,7 +231,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   Firefox OS
 *   iOS
@@ -255,7 +255,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   iOS
 *   Windows 8 i 8.1
@@ -287,7 +287,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   iOS
 *   Windows 8 i 8.1
@@ -318,7 +318,7 @@ Obiekt zwrócony z wywołania`window.open`.
 
 ### Obsługiwane platformy
 
-*   Amazon ogień OS
+*   Amazon Fire OS
 *   Android
 *   iOS
 
