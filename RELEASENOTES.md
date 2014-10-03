@@ -130,6 +130,17 @@
 * CB-7133 fix up the tests for Android
 * Add just a bit more logging
 * CB-7133 port inappbrowser to plugin-test-framework
-* phonegap events supported for _blank target
-* inappbrowser _blank target position is fixed
+* phonegap events supported for \_blank target
+* inappbrowser \_blank target position is fixed
 * amazon-fireos related changes.
+
+### 0.5.3 (Oct 03, 2014)
+* Windows implementation fixes and improvements
+* zIndex fixed
+* renamed InAppBrowser back to inappbrowser for case sensitive operating systems
+* Update french translation
+* Update doc to add Windows 8
+* Update windows proxy to be both compatible with windows 8 and 8.1
+* Rename windows81 by windows8 in src directory
+* Append Windows 8.1 platform configuration in plugin.xml
+* Append Windows 8.1 proxy using x-ms-webview
