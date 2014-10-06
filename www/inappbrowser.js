@@ -35,7 +35,7 @@ function InAppBrowser() {
 
 InAppBrowser.prototype = {
     _eventHandler: function (event) {
-        if (event.type in this.channels) {
+        if (event && (event.type in this.channels)) {
             this.channels[event.type].fire(event);
         }
     },
