@@ -19,6 +19,8 @@
  *
 */
 
+window.alert = window.alert || navigator.notification.alert;
+
 exports.defineManualTests = function (contentEl, createActionButton) {
 
     function doOpen(url, target, params, numExpectedRedirects) {
