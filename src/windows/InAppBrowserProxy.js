@@ -119,7 +119,7 @@ var IAB = {
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
-                        IAB.close();
+                        IAB.close(win);
                     }, 0);
                 };
 
@@ -191,7 +191,7 @@ var IAB = {
                 closeButton.innerText = "x";
                 closeButton.addEventListener("click", function (e) {
                     setTimeout(function () {
-                        IAB.close();
+                        IAB.close(win);
                     }, 0);
                 });
                
