@@ -25,7 +25,8 @@
 
 
 var cordova = require('cordova'),
-    channel = require('cordova/channel');
+    channel = require('cordova/channel'),
+    urlutil = require('cordova/urlutil');
 
 var browserWrap,
     popup;
@@ -142,16 +143,24 @@ var IAB = {
             op.start();
         }
     },
+
     injectScriptFile: function (win, fail, args) {
-        var file = args[0],
+        var filePath = args[0],
             hasCallback = args[1];
 
+        if (!!filePath) {
+            filePath = urlutil.makeAbsolute(filePath);
+        }
+
         if (isWebViewAvailable && browserWrap && popup) {
-            Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
-                var op = popup.invokeScriptAsync("eval", code);
-                op.oncomplete = function () { hasCallback && win([]); };
-                op.onerror = function () { };
-                op.start();
+            var uri = new Windows.Foundation.Uri(filePath);
+            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).done(function (file) {
+                Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
+                    var op = popup.invokeScriptAsync("eval", code);
+                    op.oncomplete = function () { hasCallback && win([]); };
+                    op.onerror = function () { };
+                    op.start();
+                });
             });
         }
     }

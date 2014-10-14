@@ -19,6 +19,9 @@
  *
 */
 
+var cordova = require('cordova');
+var isWindows = cordova.platformId == 'windows';
+
 window.alert = window.alert || navigator.notification.alert;
 
 exports.defineManualTests = function (contentEl, createActionButton) {
@@ -306,8 +309,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var localhtml = basePath + 'local.html',
         localpdf = basePath + 'local.pdf',
         injecthtml = basePath + 'inject.html',
-        injectjs = 'inject.js',
-        injectcss = 'inject.css',
+        injectjs = isWindows ? basePath + 'inject.js' : 'inject.js',
+        injectcss = isWindows ? basePath + 'inject.css' : 'inject.css',
         videohtml = basePath + 'video.html';
 
     //Local
