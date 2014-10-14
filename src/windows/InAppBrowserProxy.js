@@ -88,7 +88,10 @@ var IAB = {
         if (target === "_system") {
             url = new Windows.Foundation.Uri(strUrl);
             Windows.System.Launcher.launchUriAsync(url);
-        } else if (target === "_blank") {
+        } else if (target === "_self" || !target) {
+            window.location = strUrl;
+        } else {
+            // "_blank" or anything else
             if (!browserWrap) {
                 browserWrap = document.createElement("div");
                 browserWrap.style.position = "absolute";
@@ -115,15 +118,16 @@ var IAB = {
             popup.style.borderWidth = "0px";
             popup.style.width = "100%";
             popup.style.height = "100%";
+
+            if (isWebViewAvailable) {
+                strUrl = strUrl.replace("ms-appx://", "ms-appx-web://");
+            }
             popup.src = strUrl;
 
             // start listening for navigation events
             attachNavigationEvents(popup, win);
 
             browserWrap.appendChild(popup);
-            
-        } else {
-            window.location = strUrl;
         }
     },
 
