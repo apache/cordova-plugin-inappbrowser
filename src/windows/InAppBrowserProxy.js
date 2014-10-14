@@ -120,13 +120,13 @@ var IAB = {
             popup.style.width = "100%";
             popup.style.height = "100%";
 
+            // start listening for navigation events
+            attachNavigationEvents(popup, win);
+
             if (isWebViewAvailable) {
                 strUrl = strUrl.replace("ms-appx://", "ms-appx-web://");
             }
             popup.src = strUrl;
-
-            // start listening for navigation events
-            attachNavigationEvents(popup, win);
 
             browserWrap.appendChild(popup);
         }
