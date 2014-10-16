@@ -91,14 +91,10 @@ void Inappbrowser::injectScriptCode(int, int, const QString&, bool) {
     qCritical() << "unimplemented " << __PRETTY_FUNCTION__;
 }
 
-void Inappbrowser::loadFinished(int status) {
-    if (status == 2) {
-        this->callbackWithoutRemove(_eventCb, LOADERROR_EVENT);
-    }
-    if (status == 0) {
-        this->callbackWithoutRemove(_eventCb, LOADSTART_EVENT);
-    }
-    if (status == 3) {
+void Inappbrowser::loadFinished(bool status) {
+    if (status) {
         this->callbackWithoutRemove(_eventCb, LOADSTOP_EVENT);
+    } else {
+        this->callbackWithoutRemove(_eventCb, LOADSTART_EVENT);
     }
 }
