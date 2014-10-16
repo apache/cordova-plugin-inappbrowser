@@ -21,9 +21,9 @@
  *
 */
 import QtQuick 2.0
-import QtWebKit 3.0
 import Ubuntu.Components.Popups 0.1
 import Ubuntu.Components 0.1
+import com.canonical.Oxide 1.0
 
 Rectangle {
     anchors.fill: parent
@@ -60,10 +60,9 @@ Rectangle {
         y: urlEntry.height
         height: parent.height - y
         url: url1
-        onLoadingChanged: {
-            if (loadRequest.status) {
-                root.exec("InAppBrowser", "loadFinished", [loadRequest.status])
-            }
+        id: _view
+        onLoadingStateChanged: {
+            root.exec("InAppBrowser", "loadFinished", [_view.loading])
         }
     }
 }
