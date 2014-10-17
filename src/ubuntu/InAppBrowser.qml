@@ -55,6 +55,19 @@ Rectangle {
         }
     }
 
+    property string usContext: "oxide://main-world/2"
+
+    function executeJS(scId, code) {
+        var req = _view.rootFrame.sendMessage(usContext, "EXECUTE", {code: code});
+
+        req.onreply = function(response) {
+            var code = 'cordova.callback(' + scId + ', JSON.parse(\'' + JSON.stringify(response.result) + '\'))';
+            console.warn(code);
+            cordova.javaScriptExecNeeded(code);
+        console.warn("RESP:" + JSON.stringify(response));
+        };
+    }
+
     WebView {
         width: parent.width
         y: urlEntry.height
@@ -63,6 +76,17 @@ Rectangle {
         id: _view
         onLoadingStateChanged: {
             root.exec("InAppBrowser", "loadFinished", [_view.loading])
+        }
+        context: WebContext {
+            id: webcontext
+
+            userScripts: [
+                UserScript {
+                    context: usContext
+                    emulateGreasemonkey: true
+                    url: "InAppBrowser_escapeScript.js"
+                }
+            ]
         }
     }
 }
