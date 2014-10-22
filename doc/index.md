@@ -23,8 +23,14 @@ This plugin provides a web browser view that displays when calling `window.open(
 
     var ref = window.open('http://apache.org', '_blank', 'location=yes');
 
-__NOTE__: The InAppBrowser window behaves like a standard web browser,
-and can't access Cordova APIs.
+The InAppBrowser window behaves like a standard web browser,
+and can't access Cordova APIs. For this reason, the InAppBrowser is recommended
+if you need to load third-party (untrusted) content, instead of loading that
+into the main Cordova webview. The InAppBrowser is not subject to the
+whitelist, nor is opening links in the system browser.
+
+The InAppBrowser provides by default its own GUI controls for the user (back,
+forward, done).
 
 ## Installation
 
