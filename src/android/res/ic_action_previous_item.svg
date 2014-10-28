@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Capa_1"
+   x="0px"
+   y="0px"
+   width="64"
+   height="64"
+   viewBox="0 0 63.999997 64"
+   enable-background="new 0 0 36.101 24.99"
+   xml:space="preserve"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="ic_action_previous_item.svg"
+   inkscape:export-filename="/home/INTERNA/rromerogar/Devel/CVAPP/plugins/org.apache.cordova.inappbrowser/src/android/res/drawable-xxhdpi/ic_action_previous_item.png"
+   inkscape:export-xdpi="135"
+   inkscape:export-ydpi="135"><metadata
+     id="metadata3039"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs3037" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1280"
+     inkscape:window-height="958"
+     id="namedview3035"
+     showgrid="false"
+     inkscape:zoom="7.520567"
+     inkscape:cx="22.367451"
+     inkscape:cy="41.206942"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Capa_1" /><path
+     d="m 36.070936,49.435188 c 0.816,0.82 2.146,0.82 2.964,0 l 4.848,-4.842 c 0.816,-0.82 0.816,-2.146 0,-2.965 l -9.63,-9.627 -0.003,-10e-4 9.632,-9.629 c 0.815,-0.817 0.816,-2.145001 0,-2.963001 l -4.848,-4.845 c -0.815,-0.818 -2.145,-0.818 -2.961,0.001 l -15.957,15.956001 c -0.814,0.816 -0.814,2.14 -0.003,2.956 10e-4,0.002 0.003,0.006 0.004,0.006 l 15.954,15.953 z"
+     id="path3033"
+     inkscape:connector-curvature="0"
+     style="fill:#ffffff"
+     inkscape:export-filename="/home/INTERNA/rromerogar/Devel/CVAPP/plugins/org.apache.cordova.inappbrowser/src/android/res/drawable-xxhdpi/ic_action_next_item.png"
+     inkscape:export-xdpi="239.33269"
+     inkscape:export-ydpi="239.33269" /></svg>
