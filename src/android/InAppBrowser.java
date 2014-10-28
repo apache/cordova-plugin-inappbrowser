@@ -71,6 +71,7 @@ public class InAppBrowser extends CordovaPlugin {
     // private static final String BLANK = "_blank";
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
+    private static final String TOOLBAR = "toolbar";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
@@ -78,12 +79,14 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+    
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
     private CallbackContext callbackContext;
-    private boolean showLocationBar = true;
+    private boolean showLocation = true;
+    private boolean showToolbar = true;
     private boolean openWindowHidden = false;
     private String buttonLabel = "Done";
     private boolean clearAllCache= false;
@@ -404,8 +407,17 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @return boolean
      */
-    private boolean getShowLocationBar() {
-        return this.showLocationBar;
+    private boolean getShowLocation() {
+        return this.showLocation;
+    }
+    
+    /**
+     * Should we show the URL In Location bar?
+     *
+     * @return boolean
+     */
+    private boolean getShowToolbar() {
+        return this.showToolbar;
     }
 
     private InAppBrowser getInAppBrowser(){
@@ -420,12 +432,17 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public String showWebPage(final String url, HashMap<String, Boolean> features) {
         // Determine if we should hide the location bar.
-        showLocationBar = true;
+        showLocation = true;
+        showToolbar = true;
         openWindowHidden = false;
         if (features != null) {
             Boolean show = features.get(LOCATION);
             if (show != null) {
-                showLocationBar = show.booleanValue();
+                showLocation = show.booleanValue();
+            }
+            show = features.get(TOOLBAR);
+            if (show != null) {
+                showToolbar = show.booleanValue();
             }
             Boolean hidden = features.get(HIDDEN);
             if (hidden != null) {
@@ -627,11 +644,13 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Add the views to our toolbar
                 toolbar.addView(actionButtonContainer);
-                toolbar.addView(edittext);
+                if(getShowLocation()) {
+                	toolbar.addView(edittext);
+                }
                 toolbar.addView(close);
 
                 // Don't add the toolbar if its been disabled
-                if (getShowLocationBar()) {
+                if (getShowToolbar()) {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
                 }
