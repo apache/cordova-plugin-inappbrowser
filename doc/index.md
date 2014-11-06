@@ -103,7 +103,7 @@ instance, or the system browser.
 
 ### Firefox OS Quirks
 
-As plugin doesn't enforce any design there is a need to add some CSS rules if 
+As plugin doesn't enforce any design there is a need to add some CSS rules if
 opened with `target='_blank'`. The rules might look like these
 
 ``` css
