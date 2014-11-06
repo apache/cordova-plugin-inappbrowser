@@ -32,6 +32,15 @@ whitelist, nor is opening links in the system browser.
 The InAppBrowser provides by default its own GUI controls for the user (back,
 forward, done).
 
+This plugin hooks `window.open`.
+
+Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("window.open works well");
+    }
+
 ## Installation
 
     cordova plugin add org.apache.cordova.inappbrowser
