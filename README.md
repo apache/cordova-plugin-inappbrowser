@@ -101,6 +101,7 @@ instance, or the system browser.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
+    - __editablelocation__: set to `yes` to allow the user to change the current url
     - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
 
