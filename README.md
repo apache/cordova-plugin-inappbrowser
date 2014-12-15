@@ -129,6 +129,7 @@ instance, or the system browser.
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
+- Browser
 
 ### Example
 
@@ -166,6 +167,11 @@ opened with `target='_blank'`. The rules might look like these
 }
 ```
 
+### Browser Quirks
+
+- Plugin is implemented via iframe,
+
+- Navigation history (`back` and `forward` buttons in LocationBar) is not implemented.
 
 ## InAppBrowser
 
@@ -215,6 +221,11 @@ The object returned from a call to `cordova.InAppBrowser.open`.
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
+- Browser
+
+### Browser Quirks
+
+`loadstart` and `loaderror` events are not being fired.
 
 ### Quick Example
 
@@ -246,6 +257,7 @@ The function is passed an `InAppBrowserEvent` object.
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
+- Browser
 
 ### Quick Example
 
@@ -270,6 +282,7 @@ The function is passed an `InAppBrowserEvent` object.
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
+- Browser
 
 ### Quick Example
 
@@ -290,6 +303,7 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - iOS
 - Windows 8 and 8.1
+- Browser
 
 ### Quick Example
 
@@ -322,6 +336,7 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - iOS
 - Windows 8 and 8.1
+- Browser
 
 ### Quick Example
 
@@ -329,6 +344,10 @@ The function is passed an `InAppBrowserEvent` object.
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
+
+### Browser Quirks
+
+- only __code__ key is supported.
 
 ## insertCSS
 
