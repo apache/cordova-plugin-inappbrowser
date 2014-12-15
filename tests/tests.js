@@ -19,16 +19,17 @@
  *
 */
 
+var cordova = require('cordova');
+var isWindows = cordova.platformId == 'windows';
+
+window.alert = window.alert || navigator.notification.alert;
+
 exports.defineManualTests = function (contentEl, createActionButton) {
 
     function doOpen(url, target, params, numExpectedRedirects) {
         numExpectedRedirects = numExpectedRedirects || 0;
         console.log("Opening " + url);
-        var iab = window.open(url, target, params);
-        if (!iab) {
-            alert('window.open returned ' + iab);
-            return;
-        }
+
         var counts;
         var lastLoadStartURL;
         var wasReset = false;
@@ -43,6 +44,17 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
         reset();
 
+        var iab = window.open(url, target, params, {
+            loaderror: logEvent,
+            loadstart: logEvent,
+            loadstop: logEvent,
+            exit: logEvent
+        });
+        if (!iab) {
+            alert('window.open returned ' + iab);
+            return;
+        }
+        
         function logEvent(e) {
             console.log('IAB event=' + JSON.stringify(e));
             counts[e.type]++;
@@ -80,10 +92,6 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                 }
             }
         }
-        iab.addEventListener('loaderror', logEvent);
-        iab.addEventListener('loadstart', logEvent);
-        iab.addEventListener('loadstop', logEvent);
-        iab.addEventListener('exit', logEvent);
 
         return iab;
     }
@@ -304,8 +312,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var localhtml = basePath + 'local.html',
         localpdf = basePath + 'local.pdf',
         injecthtml = basePath + 'inject.html',
-        injectjs = 'inject.js',
-        injectcss = 'inject.css',
+        injectjs = isWindows ? basePath + 'inject.js' : 'inject.js',
+        injectcss = isWindows ? basePath + 'inject.css' : 'inject.css',
         videohtml = basePath + 'video.html';
 
     //Local
