@@ -106,6 +106,7 @@
         <header-file src="src/ubuntu/inappbrowser.h" />
         <source-file src="src/ubuntu/inappbrowser.cpp" />
         <resource-file src="src/ubuntu/InAppBrowser.qml" />
+        <resource-file src="src/ubuntu/InAppBrowser_escapeScript.js" />
         <resource-file src="src/ubuntu/close.png" />
     </platform>
 
