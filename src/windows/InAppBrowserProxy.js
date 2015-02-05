@@ -110,20 +110,30 @@ var IAB = {
             // "_blank" or anything else
             if (!browserWrap) {
                 browserWrap = document.createElement("div");
-                browserWrap.style.position = "absolute";
-                browserWrap.style.borderWidth = "40px";
-                browserWrap.style.width = "calc(100% - 80px)";
-                browserWrap.style.height = "calc(100% - 80px)";
-                browserWrap.style.borderStyle = "solid";
-                browserWrap.style.borderColor = "rgba(0,0,0,0.25)";
+                // First reset all styles for inappbrowser wrapper element
+                browserWrap.style.cssText = "margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background: 0 0;";
+                browserWrap.style.position = "fixed";
+                browserWrap.style.top = "0px";
+                browserWrap.style.left = "0px";
+                browserWrap.style.width = "100%";
+                browserWrap.style.height = "100%";
+                browserWrap.style.zIndex = 9999;
+                browserWrap.style.border = "40px solid rgba(0,0,0,0.25)";
+
+                // Save body overflow style to be able to reset it back later
+                var bodyOverflow = document.body.style.msOverflowStyle;
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
+                        // Reset body overflow style to initial value
+                        document.body.style.msOverflowStyle = bodyOverflow;
                         IAB.close(win);
                     }, 0);
                 };
 
                 document.body.appendChild(browserWrap);
+                // Hide scrollbars for the whole body while inappbrowser's window is open
+                document.body.style.msOverflowStyle = "none";
             }
 
             if (features.indexOf("hidden=yes") !== -1) {
@@ -131,6 +141,11 @@ var IAB = {
             }
 
             popup = document.createElement(isWebViewAvailable ? "x-ms-webview" : "iframe");
+            if (popup instanceof HTMLIFrameElement) {
+                // For iframe we need to override bacground color of parent element here
+                // otherwise pages without background color set will have transparent background
+                popup.style.backgroundColor = "white";
+            }
             popup.style.borderWidth = "0px";
             popup.style.width = "100%";
 
