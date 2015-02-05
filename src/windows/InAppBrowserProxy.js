@@ -95,6 +95,11 @@ var IAB = {
             browserWrap.style.display = "block";
         }
     },
+    hide: function (win, lose) {
+        if (browserWrap) {
+            browserWrap.style.display = "none";
+        }
+    },
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
