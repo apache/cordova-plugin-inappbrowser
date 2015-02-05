@@ -158,3 +158,9 @@
 * CB-7850 clarify role of whitelist
 * CB-7720 check if event is null since OK string from success callback was removed
 * CB-7471 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
+
+### 0.6.0 (Feb 04, 2015)
+* CB-8270 ios: Remove usage of `[arr JSONString]`, since it's been renamed to `cdv_JSONString`
+* ubuntu: implement inject* functions
+* ubuntu: port to oxide
+* CB-7897 ios, android: Update to work with whilelist plugins in Cordova 4.x
