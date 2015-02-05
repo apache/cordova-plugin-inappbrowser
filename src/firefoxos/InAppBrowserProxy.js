@@ -43,6 +43,10 @@ var IABExecs = {
         console.error('[FirefoxOS] show not implemented');
     },
 
+    hide: function (win, lose) {
+        console.error('[FirefoxOS] hide not implemented');
+    },
+
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
