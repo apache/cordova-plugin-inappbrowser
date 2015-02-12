@@ -19,9 +19,15 @@
 
 # org.apache.cordova.inappbrowser
 
-This plugin provides a web browser view that displays when calling `window.open()`.
+This plugin provides a web browser view that displays when calling `cordova.InAppBrowser.open()`.
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+
+The `cordova.InAppBrowser.open()` function is defined to be a drop-in replacement
+for the `window.open()` function.  Existing `window.open()` calls can use the
+InAppBrowser window, by replacing window.open:
+
+    window.open = cordova.InAppBrowser.open;
 
 The InAppBrowser window behaves like a standard web browser,
 and can't access Cordova APIs. For this reason, the InAppBrowser is recommended
@@ -32,7 +38,10 @@ whitelist, nor is opening links in the system browser.
 The InAppBrowser provides by default its own GUI controls for the user (back,
 forward, done).
 
-This plugin hooks `window.open`.
+For backwards compatibility, this plugin also hooks `window.open`.
+However, the plugin-installed hook of `window.open` can have unintended side
+effects (especially if this plugin is included only as a dependency of another
+plugin).  The hook of `window.open` will be removed in a future major release.
 
 Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
 
@@ -45,12 +54,20 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 
     cordova plugin add org.apache.cordova.inappbrowser
 
-## window.open
+If you want all page loads in your app to go through the InAppBrowser, you can
+simply hook `window.open` during initialization.  For example:
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        window.open = cordova.InAppBrowser.open;
+    }
+
+## cordova.InAppBrowser.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
 instance, or the system browser.
 
-    var ref = window.open(url, target, options);
+    var ref = cordova.InAppBrowser.open(url, target, options);
 
 - __ref__: Reference to the `InAppBrowser` window. _(InAppBrowser)_
 
@@ -107,8 +124,8 @@ instance, or the system browser.
 
 ### Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
 
 ### Firefox OS Quirks
 
@@ -144,7 +161,7 @@ opened with `target='_blank'`. The rules might look like these
 
 ## InAppBrowser
 
-The object returned from a call to `window.open`.
+The object returned from a call to `cordova.InAppBrowser.open`.
 
 ### Methods
 
@@ -193,7 +210,7 @@ The object returned from a call to `window.open`.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
 
 ## removeEventListener
@@ -224,7 +241,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -248,7 +265,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
 
 ## show
@@ -268,7 +285,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
 
@@ -300,7 +317,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -327,7 +344,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });

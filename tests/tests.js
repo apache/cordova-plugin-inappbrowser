@@ -26,8 +26,9 @@ window.alert = window.alert || navigator.notification.alert;
 
 exports.defineManualTests = function (contentEl, createActionButton) {
 
-    function doOpen(url, target, params, numExpectedRedirects) {
+    function doOpen(url, target, params, numExpectedRedirects, useWindowOpen) {
         numExpectedRedirects = numExpectedRedirects || 0;
+        useWindowOpen = useWindowOpen || false;
         console.log("Opening " + url);
 
         var counts;
@@ -44,17 +45,25 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
         reset();
 
-        var iab = window.open(url, target, params, {
+        var iab;
+        var callbacks = {
             loaderror: logEvent,
             loadstart: logEvent,
             loadstop: logEvent,
             exit: logEvent
-        });
+        };
+        if (useWindowOpen) {
+            console.log('Use window.open() for url');
+            iab = window.open(url, target, params, callbacks);
+        }
+        else {
+            iab = cordova.InAppBrowser.open(url, target, params, callbacks);
+        }
         if (!iab) {
-            alert('window.open returned ' + iab);
+            alert('open returned ' + iab);
             return;
         }
-        
+
         function logEvent(e) {
             console.log('IAB event=' + JSON.stringify(e));
             counts[e.type]++;
@@ -86,7 +95,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             if (e.type == 'exit') {
                 var numStopEvents = counts['loadstop'] + counts['loaderror'];
                 if (numStopEvents === 0 && !wasReset) {
-                    alert('Unexpected: browser closed without a loadstop or loaderror.')
+                    alert('Unexpected: browser closed without a loadstop or loaderror.');
                 } else if (numStopEvents > 1) {
                     alert('Unexpected: got multiple loadstop/loaderror events.');
                 }
@@ -94,6 +103,25 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
 
         return iab;
+    }
+
+    function doHookOpen(url, target, params, numExpectedRedirects) {
+        var originalFunc = window.open;
+        var wasClobbered = window.hasOwnProperty('open');
+        window.open = cordova.InAppBrowser.open;
+
+        try {
+            doOpen(url, target, params, numExpectedRedirects, true);
+        }
+        finally {
+            if (wasClobbered) {
+                window.open = originalFunc;
+            }
+            else {
+              console.log('just delete, to restore open from prototype');
+                delete window.open;
+            }
+        }
     }
 
     function openWithStyle(url, cssUrl, useCallback) {
@@ -153,9 +181,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var loadlistener = function (event) { alert('background window loaded '); };
     function openHidden(url, startHidden) {
         var shopt = (startHidden) ? 'hidden=yes' : '';
-        hiddenwnd = window.open(url, 'random_string', shopt);
+        hiddenwnd = cordova.InAppBrowser.open(url, 'random_string', shopt);
         if (!hiddenwnd) {
-            alert('window.open returned ' + hiddenwnd);
+            alert('cordova.InAppBrowser.open returned ' + hiddenwnd);
             return;
         }
         if (startHidden) hiddenwnd.addEventListener('loadstop', loadlistener);
@@ -184,6 +212,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var local_tests = '<h1>Local URL</h1>' +
         '<div id="openLocal"></div>' +
         'Expected result: opens successfully in CordovaWebView.' +
+        '<p/> <div id="openLocalHook"></div>' +
+        'Expected result: opens successfully in CordovaWebView (using hook of window.open()).' +
         '<p/> <div id="openLocalSelf"></div>' +
         'Expected result: opens successfully in CordovaWebView.' +
         '<p/> <div id="openLocalSystem"></div>' +
@@ -202,6 +232,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var white_listed_tests = '<h1>White Listed URL</h1>' +
         '<div id="openWhiteListed"></div>' +
         'Expected result: open successfully in CordovaWebView to cordova.apache.org' +
+        '<p/> <div id="openWhiteListedHook"></div>' +
+        'Expected result: open successfully in CordovaWebView to cordova.apache.org (using hook of window.open())' +
         '<p/> <div id="openWhiteListedSelf"></div>' +
         'Expected result: open successfully in CordovaWebView to cordova.apache.org' +
         '<p/> <div id="openWhiteListedSystem"></div>' +
@@ -215,7 +247,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     var non_white_listed_tests = '<h1>Non White Listed URL</h1>' +
         '<div id="openNonWhiteListed"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com (_self enforces whitelist).' +
+        'Expected result: open successfully in InAppBrowser to apple.com.' +
+        '<p/> <div id="openNonWhiteListedHook"></div>' +
+        'Expected result: open successfully in InAppBrowser to apple.com (using hook of window.open()).' +
         '<p/> <div id="openNonWhiteListedSelf"></div>' +
         'Expected result: open successfully in InAppBrowser to apple.com (_self enforces whitelist).' +
         '<p/> <div id="openNonWhiteListedSystem"></div>' +
@@ -320,6 +354,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('target=Default', function () {
         doOpen(localhtml);
     }, 'openLocal');
+    createActionButton('target=Default (window.open)', function () {
+        doHookOpen(localhtml);
+    }, 'openLocalHook');
     createActionButton('target=_self', function () {
         doOpen(localhtml, '_self');
     }, 'openLocalSelf');
@@ -346,6 +383,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('* target=Default', function () {
         doOpen('http://cordova.apache.org');
     }, 'openWhiteListed');
+    createActionButton('* target=Default (window.open)', function () {
+        doHookOpen('http://cordova.apache.org');
+    }, 'openWhiteListedHook');
     createActionButton('* target=_self', function () {
         doOpen('http://cordova.apache.org', '_self');
     }, 'openWhiteListedSelf');
@@ -366,6 +406,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('target=Default', function () {
         doOpen('http://www.apple.com');
     }, 'openNonWhiteListed');
+    createActionButton('target=Default (window.open)', function () {
+        doHookOpen('http://www.apple.com');
+    }, 'openNonWhiteListedHook');
     createActionButton('target=_self', function () {
         doOpen('http://www.apple.com', '_self');
     }, 'openNonWhiteListedSelf');
