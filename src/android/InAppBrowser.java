@@ -63,6 +63,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -854,6 +855,15 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (NoSuchMethodException e) {
             } catch (IllegalAccessException e) {
             } catch (InvocationTargetException e) {
+            }
+            
+            if (pluginManager == null) {
+                try {
+                    Field pmf = webView.getClass().getField("pluginManager");
+                    pluginManager = (PluginManager)pmf.get(webView);
+                } catch (NoSuchFieldException e) {
+                } catch (IllegalAccessException e) {
+                }
             }
             
             if (pluginManager != null && pluginManager.onReceivedHttpAuthRequest(webView, new CordovaHttpAuthHandler(handler), host, realm)) {
