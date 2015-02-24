@@ -41,6 +41,7 @@ import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
+import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -52,6 +53,7 @@ import android.widget.RelativeLayout;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
+import org.apache.cordova.CordovaHttpAuthHandler;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
@@ -61,6 +63,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -863,6 +866,39 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
             }
+        }
+        
+        /**
+         * On received http auth request.
+         */
+        @Override
+        public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+
+            // Check if there is some plugin which can resolve this auth challenge
+            PluginManager pluginManager = null;
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                pluginManager = (PluginManager)gpm.invoke(webView);
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+            
+            if (pluginManager == null) {
+                try {
+                    Field pmf = webView.getClass().getField("pluginManager");
+                    pluginManager = (PluginManager)pmf.get(webView);
+                } catch (NoSuchFieldException e) {
+                } catch (IllegalAccessException e) {
+                }
+            }
+            
+            if (pluginManager != null && pluginManager.onReceivedHttpAuthRequest(webView, new CordovaHttpAuthHandler(handler), host, realm)) {
+                return;
+            }
+            
+            // By default handle 401 like we'd normally do!
+            super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
     }
 }
