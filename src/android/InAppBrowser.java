@@ -20,7 +20,9 @@ package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -66,6 +68,7 @@ import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaHttpAuthHandler;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.inappbrowser.InAppBrowserDialog;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
@@ -1085,6 +1088,7 @@ public class InAppBrowser extends CordovaPlugin {
     public class InAppBrowserClient extends WebViewClient {
         EditText edittext;
         CordovaWebView webView;
+        ProgressDialog progressDialog;
 
         /**
          * Constructor.
@@ -1095,6 +1099,17 @@ public class InAppBrowser extends CordovaPlugin {
         public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
             this.edittext = mEditText;
+
+            progressDialog = new ProgressDialog(webView.getContext());
+            progressDialog.setCancelable(true);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+                @Override
+                public void onCancel(DialogInterface dialog){
+                    inAppWebView.stopLoading();
+                }
+            });
         }
 
         /**
@@ -1221,6 +1236,8 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
+
+            progressDialog.show();
         }
 
 
@@ -1248,6 +1265,8 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+
+            progressDialog.dismiss();
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -1264,6 +1283,8 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+
+            progressDialog.dismiss();
         }
 
         /**
