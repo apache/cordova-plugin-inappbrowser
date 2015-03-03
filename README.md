@@ -19,4 +19,6 @@
 
 # org.apache.cordova.inappbrowser
 
+[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)
+
 Plugin documentation: [doc/index.md](doc/index.md)
