@@ -441,7 +441,9 @@
     self.inAppBrowserViewController = nil;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
-        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
+    	if(_previousStatusBarStyle != -1){
+    	    [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
+    	}
     }
 
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
