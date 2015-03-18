@@ -33,9 +33,7 @@
 #define    kThemedBrowserMenuEvent @"event"
 #define    kThemedBrowserMenuLabel @"label"
 
-#define    TOOLBAR_HEIGHT 44.0
 #define    LOCATIONBAR_HEIGHT 21.0
-#define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
 #pragma mark CDVThemeableBrowser
 
@@ -501,7 +499,7 @@
 
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop];
-    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
+    webViewBounds.size.height -= _browserOptions.toolbarHeight;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -549,8 +547,8 @@
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
-    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
-    CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
+    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - _browserOptions.toolbarHeight : 0.0;
+    CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, _browserOptions.toolbarHeight);
 
     self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
     self.toolbar.alpha = 1.000;
@@ -582,7 +580,7 @@
     }
 
     CGFloat labelInset = 5.0;
-    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
+    float locationBarY = self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
 
     self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
     self.addressLabel.adjustsFontSizeToFitWidth = NO;
@@ -751,7 +749,7 @@
     self.titleOffset = fmaxf(leftWidth, rightWidth);
     // The correct positioning of title is not that important right now, since
     // rePositionViews will take care of it a bit later.
-    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 10, TOOLBAR_HEIGHT)];
+    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 10, _browserOptions.toolbarHeight)];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.numberOfLines = 1;
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -815,7 +813,7 @@
             // put locationBar on top of the toolBar
 
             CGRect webViewBounds = self.view.bounds;
-            webViewBounds.size.height -= FOOTER_HEIGHT;
+            webViewBounds.size.height -= _browserOptions.toolbarHeight;
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -838,7 +836,7 @@
 
             // webView take up whole height less toolBar height
             CGRect webViewBounds = self.view.bounds;
-            webViewBounds.size.height -= TOOLBAR_HEIGHT;
+            webViewBounds.size.height -= _browserOptions.toolbarHeight;
             [self setWebViewFrame:webViewBounds];
         } else {
             // no toolBar, expand webView to screen dimensions
@@ -866,14 +864,12 @@
         if (locationbarVisible) {
             // locationBar at the bottom, move locationBar up
             // put toolBar at the bottom
-            webViewBounds.size.height -= FOOTER_HEIGHT;
+            webViewBounds.size.height -= _browserOptions.toolbarHeight;
             locationbarFrame.origin.y = webViewBounds.size.height;
             self.addressLabel.frame = locationbarFrame;
             self.toolbar.frame = toolbarFrame;
         } else {
             // no locationBar, so put toolBar at the bottom
-            CGRect webViewBounds = self.view.bounds;
-            webViewBounds.size.height -= TOOLBAR_HEIGHT;
             self.toolbar.frame = toolbarFrame;
         }
 
@@ -1061,13 +1057,13 @@
 
 - (void) rePositionViews {
     if ([_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop]) {
-        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
+        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, _browserOptions.toolbarHeight, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
     
     CGFloat screenWidth = CGRectGetWidth(self.view.frame);
     NSInteger width = floorf(screenWidth - self.titleOffset * 2.0f);
-    self.titleLabel.frame = CGRectMake(floorf((screenWidth - width) / 2.0f), 0, width, TOOLBAR_HEIGHT);
+    self.titleLabel.frame = CGRectMake(floorf((screenWidth - width) / 2.0f), 0, width, _browserOptions.toolbarHeight);
 }
 
 #pragma mark UIWebViewDelegate
@@ -1224,6 +1220,7 @@
         self.disallowoverscroll = NO;
         
         self.statusbarColor = @"#FFFFFFFF";
+        self.toolbarHeight = 44.0;
         self.toolbarColor = @"#FFFFFFFF";
         self.toolbarImage = nil;
         self.toolbarImagePortrait = nil;

@@ -60,6 +60,7 @@
 @property (nonatomic) BOOL disallowoverscroll;
 
 @property (nonatomic) NSString* statusbarColor;
+@property (nonatomic) CGFloat toolbarHeight;
 @property (nonatomic) NSString* toolbarColor;
 @property (nonatomic) NSString* toolbarImage;
 @property (nonatomic) NSString* toolbarImagePortrait;
