@@ -762,7 +762,7 @@
         self.titleLabel.text = _browserOptions.titleStaticText;
     }
 
-    self.view.backgroundColor = [CDVThemeableBrowserViewController colorFromRGBA:_browserOptions.statusBarColor];
+    self.view.backgroundColor = [CDVThemeableBrowserViewController colorFromRGBA:_browserOptions.statusbarColor];
     [self.view addSubview:self.toolbar];
     [self.toolbar addSubview:self.titleLabel];
     [self.view addSubview:self.addressLabel];
@@ -1223,7 +1223,7 @@
         self.hidden = NO;
         self.disallowoverscroll = NO;
         
-        self.statusBarColor = @"#FFFFFFFF";
+        self.statusbarColor = @"#FFFFFFFF";
         self.toolbarColor = @"#FFFFFFFF";
         self.toolbarImage = nil;
         self.toolbarImagePortrait = nil;

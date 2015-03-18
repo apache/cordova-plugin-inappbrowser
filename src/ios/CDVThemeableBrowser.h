@@ -59,7 +59,7 @@
 @property (nonatomic) BOOL hidden;
 @property (nonatomic) BOOL disallowoverscroll;
 
-@property (nonatomic) NSString* statusBarColor;
+@property (nonatomic) NSString* statusbarColor;
 @property (nonatomic) NSString* toolbarColor;
 @property (nonatomic) NSString* toolbarImage;
 @property (nonatomic) NSString* toolbarImagePortrait;
