@@ -17,16 +17,16 @@
  under the License.
  */
 
-#import "CDVInAppBrowser.h"
+#import "CDVThemeableBrowser.h"
 #import <Cordova/CDVPluginResult.h>
 #import <Cordova/CDVUserAgentUtil.h>
 
-#define    kInAppBrowserTargetSelf @"_self"
-#define    kInAppBrowserTargetSystem @"_system"
-#define    kInAppBrowserTargetBlank @"_blank"
+#define    kThemeableBrowserTargetSelf @"_self"
+#define    kThemeableBrowserTargetSystem @"_system"
+#define    kThemeableBrowserTargetBlank @"_blank"
 
-#define    kInAppBrowserToolbarBarPositionBottom @"bottom"
-#define    kInAppBrowserToolbarBarPositionTop @"top"
+#define    kThemeableBrowserToolbarBarPositionBottom @"bottom"
+#define    kThemeableBrowserToolbarBarPositionTop @"top"
 
 #define    kThemedBrowserAlignLeft @"left"
 #define    kThemedBrowserAlignRight @"right"
@@ -37,16 +37,16 @@
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
-#pragma mark CDVInAppBrowser
+#pragma mark CDVThemeableBrowser
 
-@interface CDVInAppBrowser () {
+@interface CDVThemeableBrowser () {
     NSInteger _previousStatusBarStyle;
 }
 @end
 
-@implementation CDVInAppBrowser
+@implementation CDVThemeableBrowser
 
-- (CDVInAppBrowser*)initWithWebView:(UIWebView*)theWebView
+- (CDVThemeableBrowser*)initWithWebView:(UIWebView*)theWebView
 {
     self = [super initWithWebView:theWebView];
     if (self != nil) {
@@ -64,12 +64,12 @@
 
 - (void)close:(CDVInvokedUrlCommand*)command
 {
-    if (self.inAppBrowserViewController == nil) {
+    if (self.themeableBrowserViewController == nil) {
         NSLog(@"IAB.close() called but it was already closed.");
         return;
     }
     // Things are cleaned up in browserExit.
-    [self.inAppBrowserViewController close];
+    [self.themeableBrowserViewController close];
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
@@ -86,7 +86,7 @@
     CDVPluginResult* pluginResult;
 
     NSString* url = [command argumentAtIndex:0];
-    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* target = [command argumentAtIndex:1 withDefault:kThemeableBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
 
     self.callbackId = command.callbackId;
@@ -96,15 +96,15 @@
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
 
         if ([self isSystemUrl:absoluteUrl]) {
-            target = kInAppBrowserTargetSystem;
+            target = kThemeableBrowserTargetSystem;
         }
 
-        if ([target isEqualToString:kInAppBrowserTargetSelf]) {
+        if ([target isEqualToString:kThemeableBrowserTargetSelf]) {
             [self openInCordovaWebView:absoluteUrl withOptions:options];
-        } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
+        } else if ([target isEqualToString:kThemeableBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
         } else { // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
+            [self openInThemeableBrowser:absoluteUrl withOptions:options];
         }
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -116,17 +116,17 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
+- (void)openInThemeableBrowser:(NSURL*)url withOptions:(NSString*)options
 {
-    CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    CDVThemeableBrowserOptions* browserOptions = [CDVThemeableBrowserOptions parseOptions:options];
     
     // Among all the options, there are a few that ThemedBrowser would like to
     // disable, since ThemedBrowser's purpose is to provide an integrated look
     // and feel that is consistent across platforms. We'd do this hack to
-    // minimize changes from the original InAppBrowser so when merge from the
-    // InAppBrowser is needed, it wouldn't be super pain in the ass.
+    // minimize changes from the original ThemeableBrowser so when merge from the
+    // ThemeableBrowser is needed, it wouldn't be super pain in the ass.
     browserOptions.location = NO;
-    browserOptions.toolbarposition = kInAppBrowserToolbarBarPositionTop;
+    browserOptions.toolbarposition = kThemeableBrowserToolbarBarPositionTop;
 
     if (browserOptions.clearcache) {
         NSHTTPCookie *cookie;
@@ -150,20 +150,20 @@
         }
     }
 
-    if (self.inAppBrowserViewController == nil) {
+    if (self.themeableBrowserViewController == nil) {
         NSString* originalUA = [CDVUserAgentUtil originalUserAgent];
-        self.inAppBrowserViewController = [[CDVInAppBrowserViewController alloc] initWithUserAgent:originalUA prevUserAgent:[self.commandDelegate userAgent] browserOptions: browserOptions];
-        self.inAppBrowserViewController.navigationDelegate = self;
+        self.themeableBrowserViewController = [[CDVThemeableBrowserViewController alloc] initWithUserAgent:originalUA prevUserAgent:[self.commandDelegate userAgent] browserOptions: browserOptions];
+        self.themeableBrowserViewController.navigationDelegate = self;
 
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
-            self.inAppBrowserViewController.orientationDelegate = (UIViewController <CDVScreenOrientationDelegate>*)self.viewController;
+            self.themeableBrowserViewController.orientationDelegate = (UIViewController <CDVScreenOrientationDelegate>*)self.viewController;
         }
     }
 
-    [self.inAppBrowserViewController showLocationBar:browserOptions.location];
-    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
+    [self.themeableBrowserViewController showLocationBar:browserOptions.location];
+    [self.themeableBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil) {
-        // [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
+        // [self.themeableBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -174,7 +174,7 @@
             presentationStyle = UIModalPresentationFormSheet;
         }
     }
-    self.inAppBrowserViewController.modalPresentationStyle = presentationStyle;
+    self.themeableBrowserViewController.modalPresentationStyle = presentationStyle;
 
     // Set Transition Style
     UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
@@ -185,14 +185,14 @@
             transitionStyle = UIModalTransitionStyleCrossDissolve;
         }
     }
-    self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
+    self.themeableBrowserViewController.modalTransitionStyle = transitionStyle;
 
     // prevent webView from bouncing
     if (browserOptions.disallowoverscroll) {
-        if ([self.inAppBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
-            ((UIScrollView*)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
+        if ([self.themeableBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
+            ((UIScrollView*)[self.themeableBrowserViewController.webView scrollView]).bounces = NO;
         } else {
-            for (id subview in self.inAppBrowserViewController.webView.subviews) {
+            for (id subview in self.themeableBrowserViewController.webView.subviews) {
                 if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
                     ((UIScrollView*)subview).bounces = NO;
                 }
@@ -201,15 +201,15 @@
     }
 
     // UIWebView options
-    self.inAppBrowserViewController.webView.scalesPageToFit = browserOptions.enableviewportscale;
-    self.inAppBrowserViewController.webView.mediaPlaybackRequiresUserAction = browserOptions.mediaplaybackrequiresuseraction;
-    self.inAppBrowserViewController.webView.allowsInlineMediaPlayback = browserOptions.allowinlinemediaplayback;
+    self.themeableBrowserViewController.webView.scalesPageToFit = browserOptions.enableviewportscale;
+    self.themeableBrowserViewController.webView.mediaPlaybackRequiresUserAction = browserOptions.mediaplaybackrequiresuseraction;
+    self.themeableBrowserViewController.webView.allowsInlineMediaPlayback = browserOptions.allowinlinemediaplayback;
     if (IsAtLeastiOSVersion(@"6.0")) {
-        self.inAppBrowserViewController.webView.keyboardDisplayRequiresUserAction = browserOptions.keyboarddisplayrequiresuseraction;
-        self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
+        self.themeableBrowserViewController.webView.keyboardDisplayRequiresUserAction = browserOptions.keyboarddisplayrequiresuseraction;
+        self.themeableBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
 
-    [self.inAppBrowserViewController navigateTo:url];
+    [self.themeableBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
         [self show:nil];
     }
@@ -217,7 +217,7 @@
 
 - (void)show:(CDVInvokedUrlCommand*)command
 {
-    if (self.inAppBrowserViewController == nil) {
+    if (self.themeableBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
         return;
     }
@@ -228,13 +228,13 @@
 
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
 
-    CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
-                                   initWithRootViewController:self.inAppBrowserViewController];
-    nav.orientationDelegate = self.inAppBrowserViewController;
+    CDVThemeableBrowserNavigationController* nav = [[CDVThemeableBrowserNavigationController alloc]
+                                   initWithRootViewController:self.themeableBrowserViewController];
+    nav.orientationDelegate = self.themeableBrowserViewController;
     nav.navigationBarHidden = YES;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.inAppBrowserViewController != nil) {
+        if (self.themeableBrowserViewController != nil) {
             [self.viewController presentViewController:nav animated:YES completion:nil];
         }
     });
@@ -245,8 +245,8 @@
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
         [self.webView loadRequest:request];
-    } else { // this assumes the InAppBrowser can be excepted from the white-list
-        [self openInInAppBrowser:url withOptions:options];
+    } else { // this assumes the ThemeableBrowser can be excepted from the white-list
+        [self openInThemeableBrowser:url withOptions:options];
     }
 }
 
@@ -272,8 +272,8 @@
 {
     if (!_injectedIframeBridge) {
         _injectedIframeBridge = YES;
-        // Create an iframe bridge in the new document to communicate with the CDVInAppBrowserViewController
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){var e = _cdvIframeBridge = d.createElement('iframe');e.style.display='none';d.body.appendChild(e);})(document)"];
+        // Create an iframe bridge in the new document to communicate with the CDVThemeableBrowserViewController
+        [self.themeableBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){var e = _cdvIframeBridge = d.createElement('iframe');e.style.display='none';d.body.appendChild(e);})(document)"];
     }
 
     if (jsWrapper != nil) {
@@ -282,10 +282,10 @@
         if (sourceArrayString) {
             NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
             NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
-            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
+            [self.themeableBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
         }
     } else {
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+        [self.themeableBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
     }
 }
 
@@ -340,7 +340,7 @@
     NSError *err = nil;
     // Initialize on first use
     if (self.callbackIdPattern == nil) {
-        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^InAppBrowser[0-9]{1,10}$" options:0 error:&err];
+        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^ThemeableBrowser[0-9]{1,10}$" options:0 error:&err];
         if (err != nil) {
             // Couldn't initialize Regex; No is safer than Yes.
             return NO;
@@ -353,15 +353,15 @@
 }
 
 /**
- * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
- * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
+ * The iframe bridge provided for the ThemeableBrowser is capable of executing any oustanding callback belonging
+ * to the ThemeableBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
  * other code execution is possible.
  *
  * To trigger the bridge, the iframe (or any other resource) should attempt to load a url of the form:
  *
  * gap-iab://<callbackId>/<arguments>
  *
- * where <callbackId> is the string id of the callback to trigger (something like "InAppBrowser0123456789")
+ * where <callbackId> is the string id of the callback to trigger (something like "ThemeableBrowser0123456789")
  *
  * If present, the path component of the special gap-iab:// url is expected to be a URL-escaped JSON-encoded
  * value to pass to the callback. [NSURL path] should take care of the URL-unescaping, and a JSON_EXCEPTION
@@ -418,7 +418,7 @@
 {
     if (self.callbackId != nil) {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
-        NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
+        NSString* url = [self.themeableBrowserViewController.currentURL absoluteString];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -430,7 +430,7 @@
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
 {
     if (self.callbackId != nil) {
-        NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
+        NSString* url = [self.themeableBrowserViewController.currentURL absoluteString];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                                       messageAsDictionary:@{@"type":@"loaderror", @"url":url, @"code": [NSNumber numberWithInteger:error.code], @"message": error.localizedDescription}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -448,10 +448,10 @@
         self.callbackId = nil;
     }
     // Set navigationDelegate to nil to ensure no callbacks are received from it.
-    self.inAppBrowserViewController.navigationDelegate = nil;
+    self.themeableBrowserViewController.navigationDelegate = nil;
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
-    self.inAppBrowserViewController = nil;
+    self.themeableBrowserViewController = nil;
 
     /*
     if (IsAtLeastiOSVersion(@"7.0")) {
@@ -475,13 +475,13 @@
 
 @end
 
-#pragma mark CDVInAppBrowserViewController
+#pragma mark CDVThemeableBrowserViewController
 
-@implementation CDVInAppBrowserViewController
+@implementation CDVThemeableBrowserViewController
 
 @synthesize currentURL;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions
 {
     self = [super init];
     if (self != nil) {
@@ -500,7 +500,7 @@
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
 
     CGRect webViewBounds = self.view.bounds;
-    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop];
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
@@ -564,7 +564,7 @@
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
-    self.toolbar.barTintColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.toolbarColor];
+    self.toolbar.barTintColor = [CDVThemeableBrowserViewController colorFromRGBA:_browserOptions.toolbarColor];
     
     if (_browserOptions.toolbarImage) {
         UIImage *image = [UIImage imageNamed:_browserOptions.toolbarImage];
@@ -755,14 +755,14 @@
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.numberOfLines = 1;
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.titleLabel.textColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.titleColor];
+    self.titleLabel.textColor = [CDVThemeableBrowserViewController colorFromRGBA:_browserOptions.titleColor];
     self.titleLabel.hidden = _browserOptions.hideTitle;
     
     if (_browserOptions.titleStaticText) {
         self.titleLabel.text = _browserOptions.titleStaticText;
     }
 
-    self.view.backgroundColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.statusBarColor];
+    self.view.backgroundColor = [CDVThemeableBrowserViewController colorFromRGBA:_browserOptions.statusBarColor];
     [self.view addSubview:self.toolbar];
     [self.toolbar addSubview:self.titleLabel];
     [self.view addSubview:self.addressLabel];
@@ -877,7 +877,7 @@
             self.toolbar.frame = toolbarFrame;
         }
 
-        if ([toolbarPosition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
+        if ([toolbarPosition isEqualToString:kThemeableBrowserToolbarBarPositionTop]) {
             toolbarFrame.origin.y = 0;
             webViewBounds.origin.y += toolbarFrame.size.height;
             [self setWebViewFrame:webViewBounds];
@@ -1025,7 +1025,7 @@
     if (index < _browserOptions.menuItems.count) {
         [self.navigationDelegate emitEvent:@{
             @"type": _browserOptions.menuItems[index][kThemedBrowserMenuEvent],
-            @"url": [self.navigationDelegate.inAppBrowserViewController.currentURL absoluteString],
+            @"url": [self.navigationDelegate.themeableBrowserViewController.currentURL absoluteString],
             @"menuIndex": [NSNumber numberWithLong:index]
         }];
     }
@@ -1060,7 +1060,7 @@
 }
 
 - (void) rePositionViews {
-    if ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
+    if ([_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop]) {
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
@@ -1202,7 +1202,7 @@
 
 @end
 
-@implementation CDVInAppBrowserOptions
+@implementation CDVThemeableBrowserOptions
 
 - (id)init
 {
@@ -1211,7 +1211,7 @@
         self.location = YES;
         self.toolbar = YES;
         self.closebuttoncaption = nil;
-        self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
+        self.toolbarposition = kThemeableBrowserToolbarBarPositionBottom;
         self.clearcache = NO;
         self.clearsessioncache = NO;
 
@@ -1258,9 +1258,9 @@
     return self;
 }
 
-+ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options
++ (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options
 {
-    CDVInAppBrowserOptions* obj = [[CDVInAppBrowserOptions alloc] init];
+    CDVThemeableBrowserOptions* obj = [[CDVThemeableBrowserOptions alloc] init];
     
     // Min support, iOS 5. We will use the JSON parser that comes with iOS 5.
     NSError *error = nil;
@@ -1281,12 +1281,12 @@
         }
     }
     
-    [CDVInAppBrowserOptions validateOptions:obj];
+    [CDVThemeableBrowserOptions validateOptions:obj];
 
     return obj;
 }
 
-+ (void)validateOptions:(CDVInAppBrowserOptions*)options
++ (void)validateOptions:(CDVThemeableBrowserOptions*)options
 {
     // Validate menuItems format, which is somewhat complex and make sure that
     // it's valid. Throw exception immediately so that user knows what's up.
@@ -1324,7 +1324,7 @@
 
 #pragma mark CDVScreenOrientationDelegate
 
-@implementation CDVInAppBrowserNavigationController : UINavigationController
+@implementation CDVThemeableBrowserNavigationController : UINavigationController
 
 - (BOOL)shouldAutorotate
 {

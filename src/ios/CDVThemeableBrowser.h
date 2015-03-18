@@ -22,13 +22,13 @@
 #import <Cordova/CDVScreenOrientationDelegate.h>
 #import <Cordova/CDVWebViewDelegate.h>
 
-@class CDVInAppBrowserViewController;
+@class CDVThemeableBrowserViewController;
 
-@interface CDVInAppBrowser : CDVPlugin {
+@interface CDVThemeableBrowser : CDVPlugin {
     BOOL _injectedIframeBridge;
 }
 
-@property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
+@property (nonatomic, retain) CDVThemeableBrowserViewController* themeableBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
 @property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
 
@@ -39,7 +39,7 @@
 
 @end
 
-@interface CDVInAppBrowserOptions : NSObject {}
+@interface CDVThemeableBrowserOptions : NSObject {}
 
 @property (nonatomic) BOOL location;
 @property (nonatomic) BOOL toolbar;
@@ -90,18 +90,18 @@
 @property (nonatomic) BOOL hideBackButton;
 @property (nonatomic) BOOL hideForwardButton;
 
-+ (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
++ (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
 
-+ (void)validateOptions:(CDVInAppBrowserOptions*)options;
++ (void)validateOptions:(CDVThemeableBrowserOptions*)options;
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIActionSheetDelegate>{
+@interface CDVThemeableBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIActionSheetDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
-    CDVInAppBrowserOptions *_browserOptions;
+    CDVThemeableBrowserOptions *_browserOptions;
     CDVWebViewDelegate* _webViewDelegate;
 }
 
@@ -116,7 +116,7 @@
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
-@property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
+@property (nonatomic, weak) CDVThemeableBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
 @property (nonatomic) CGFloat titleOffset;
 
@@ -126,13 +126,13 @@
 - (void)showToolBar:(BOOL)show : (NSString*) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions;
 
 + (UIColor *)colorFromRGBA:(NSString *)rgba;
 
 @end
 
-@interface CDVInAppBrowserNavigationController : UINavigationController
+@interface CDVThemeableBrowserNavigationController : UINavigationController
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 

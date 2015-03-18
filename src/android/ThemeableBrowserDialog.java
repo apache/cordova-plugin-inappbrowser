@@ -16,7 +16,7 @@
        specific language governing permissions and limitations
        under the License.
 */
-package org.apache.cordova.inappbrowser;
+package com.initialxy.cordova.themeablebrowser;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,26 +29,26 @@ import org.json.JSONObject;
 /**
  * Created by Oliver on 22/11/2013.
  */
-public class InAppBrowserDialog extends Dialog {
+public class ThemeableBrowserDialog extends Dialog {
     Context context;
-    InAppBrowser inAppBrowser = null;
+    ThemeableBrowser themeableBrowser = null;
 
-    public InAppBrowserDialog(Context context, int theme) {
+    public ThemeableBrowserDialog(Context context, int theme) {
         super(context, theme);
         this.context = context;
     }
 
-    public void setInAppBroswer(InAppBrowser browser) {
-        this.inAppBrowser = browser;
+    public void setInAppBroswer(ThemeableBrowser browser) {
+        this.themeableBrowser = browser;
     }
 
     public void onBackPressed () {
-        if (this.inAppBrowser == null) {
+        if (this.themeableBrowser == null) {
             this.dismiss();
         } else {
-            // better to go through the in inAppBrowser
+            // better to go through the in themeableBrowser
             // because it does a clean up
-            this.inAppBrowser.closeDialog();
+            this.themeableBrowser.closeDialog();
         }
     }
 }
