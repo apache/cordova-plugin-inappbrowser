@@ -19,9 +19,9 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="org.apache.cordova.inappbrowser.tests"
+    id="org.apache.cordova.themeablebrowser.tests"
     version="0.6.1-dev">
-    <name>Cordova InAppBrowser Plugin Tests</name>
+    <name>Cordova ThemeableBrowser Plugin Tests</name>
     <license>Apache 2.0</license>
 
     <js-module src="tests.js" name="tests">
