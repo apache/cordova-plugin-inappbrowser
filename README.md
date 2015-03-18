@@ -68,6 +68,7 @@ Additional Properties
 In addition to InAppBrowser's properties, following properties were added to fulfill this plugin's purpose.
 
 + Toolbar and status bar
+    + `statusbarHeight` sets height of status bar.
     + `statusbarColor` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable only to iOS 7+.
     + `toolbarColor` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `toolbarImage`.
     + `toolbarImage` sets an image as browser toolbar background in titled mode. This property references to a **native** image resource, therefore it is platform dependent.
