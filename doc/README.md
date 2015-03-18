@@ -1,0 +1,1 @@
+This directory is deprecated. It contains legacy files from [InAppBrowser](https://github.com/apache/cordova-plugin-inappbrowser). They are kept here to make potential merge and/or pull easier and keep better track of file histories.
