@@ -1194,9 +1194,9 @@
     [scanner setScanLocation:0];
     [scanner scanHexLongLong:&rgbaVal];
     
-    return [UIColor colorWithRed:((rgbaVal & 0xFF000000) >> 24) / 255.0f
-        green:((rgbaVal & 0xFF0000) >>16) / 255.0f
-        blue:(rgbaVal & 0xFF00 >> 8) / 255.0f
+    return [UIColor colorWithRed:(rgbaVal >> 24 & 0xFF) / 255.0f
+        green:(rgbaVal >> 16 & 0xFF) / 255.0f
+        blue:(rgbaVal >> 8 & 0xFF) / 255.0f
         alpha:(rgbaVal & 0xFF) / 255.0f];
 }
 
