@@ -28,6 +28,11 @@
 #define    kInAppBrowserToolbarBarPositionBottom @"bottom"
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
+#define    kThemedBrowserAlignLeft @"left"
+#define    kThemedBrowserAlignRight @"right"
+#define    kThemedBrowserMenuEvent @"event"
+#define    kThemedBrowserMenuLabel @"label"
+
 #define    TOOLBAR_HEIGHT 44.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
@@ -114,6 +119,14 @@
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    
+    // Among all the options, there are a few that ThemedBrowser would like to
+    // disable, since ThemedBrowser's purpose is to provide an integrated look
+    // and feel that is consistent across platforms. We'd do this hack to
+    // minimize changes from the original InAppBrowser so when merge from the
+    // InAppBrowser is needed, it wouldn't be super pain in the ass.
+    browserOptions.location = NO;
+    browserOptions.toolbarposition = kInAppBrowserToolbarBarPositionTop;
 
     if (browserOptions.clearcache) {
         NSHTTPCookie *cookie;
@@ -150,7 +163,7 @@
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil) {
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
+        // [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -440,11 +453,24 @@
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
 
+    /*
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
     }
+    */
 
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
+}
+
+- (void)emitEvent:(NSDictionary*)event
+{
+    if (self.callbackId != nil) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:event];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
 }
 
 @end
@@ -509,13 +535,19 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
+    UIImage *buttonImage = [UIImage imageNamed:_browserOptions.closeButtonImage];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
+    CGFloat closeButtonWidth = buttonImage.size.width;
+    
+    [button setImage:[UIImage imageNamed:_browserOptions.closeButtonPressedImage] forState:UIControlStateHighlighted];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(close) forControlEvents:UIControlEventTouchUpInside];
+    button.hidden = _browserOptions.hideCloseButton;
+    
+    self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:button];
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-
-    UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    fixedSpaceButton.width = 20;
 
     float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
@@ -532,6 +564,22 @@
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
+    self.toolbar.barTintColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.toolbarColor];
+    
+    if (_browserOptions.toolbarImage) {
+        UIImage *image = [UIImage imageNamed:_browserOptions.toolbarImage];
+        [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+        [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+    } else if (_browserOptions.toolbarImagePortrait || _browserOptions.toolbarImageLandscape) {
+        if (_browserOptions.toolbarImagePortrait) {
+            UIImage *image = [UIImage imageNamed:_browserOptions.toolbarImagePortrait];
+            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+        }
+        if (_browserOptions.toolbarImageLandscape) {
+            UIImage *image = [UIImage imageNamed:_browserOptions.toolbarImageLandscape];
+            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+        }
+    }
 
     CGFloat labelInset = 5.0;
     float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
@@ -564,23 +612,169 @@
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
+    
+    buttonImage = [UIImage imageNamed:_browserOptions.forwardButtonImage];
+    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
+    CGFloat forwardButtonWidth = buttonImage.size.width;
+    
+    [button setImage:[UIImage imageNamed:_browserOptions.forwardButtonPressedImage] forState:UIControlStateHighlighted];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(goForward:) forControlEvents:UIControlEventTouchUpInside];
+    button.hidden = _browserOptions.hideForwardButton;
 
-    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
-    self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
-    self.forwardButton.enabled = YES;
-    self.forwardButton.imageInsets = UIEdgeInsetsZero;
+    self.forwardButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    
+    buttonImage = [UIImage imageNamed:_browserOptions.backButtonImage];
+    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
+    CGFloat backButtonWidth = buttonImage.size.width;
+    
+    [button setImage:[UIImage imageNamed:_browserOptions.backButtonPressedImage] forState:UIControlStateHighlighted];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
+    button.hidden = _browserOptions.hideBackButton;
 
-    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
-    self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
-    self.backButton.enabled = YES;
-    self.backButton.imageInsets = UIEdgeInsetsZero;
+    self.backButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    
+    buttonImage = [UIImage imageNamed:_browserOptions.menuButtonImage];
+    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
+    CGFloat menuButtonWidth = buttonImage.size.width;
+    
+    [button setImage:[UIImage imageNamed:_browserOptions.menuButtonPressedImage] forState:UIControlStateHighlighted];
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(goMenu:) forControlEvents:UIControlEventTouchUpInside];
+    if (_browserOptions.menuItems) {
+        button.hidden = NO;
+    } else {
+        button.hidden = YES;
+    }
+    
+    self.menuButton = [[UIBarButtonItem alloc] initWithCustomView:button];
+    
+    // This is a hack to remove the mandatory padding from toolbar using a
+    // negative width. Note that width is different depending on iPad or iPhone.
+    UIBarButtonItem *paddingRemover = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        paddingRemover.width = -20;
+    } else {
+        paddingRemover.width = -16;
+    }
+    
+    UIBarButtonItem *divider = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    divider.width = -10;
+    
+    // Arramge toolbar buttons with respect to user configuration.
+    CGFloat leftWidth = 0;
+    CGFloat rightWidth = 0;
+    BOOL isLeftPrestine = YES;
+    BOOL isRightPrestine = YES;
+    NSMutableArray *toolbarItems = [NSMutableArray new];
+    [toolbarItems addObject:flexibleSpaceButton];
+    if ([kThemedBrowserAlignLeft isEqualToString:_browserOptions.navButtonAlign]) {
+        if (!_browserOptions.hideForwardButton) {
+            [toolbarItems insertObject:self.forwardButton atIndex:0];
+            leftWidth += forwardButtonWidth;
+            isLeftPrestine = NO;
+        }
+        if (!_browserOptions.hideBackButton) {
+            if (!isLeftPrestine) {
+                [toolbarItems insertObject:divider atIndex:0];
+            }
+            [toolbarItems insertObject:self.backButton atIndex:0];
+            leftWidth += backButtonWidth;
+            isLeftPrestine = NO;
+        }
+    } else {
+        if (!_browserOptions.hideBackButton) {
+            [toolbarItems addObject:self.backButton];
+            rightWidth += backButtonWidth;
+            isRightPrestine = NO;
+        }
+        if (!_browserOptions.hideForwardButton) {
+            if (!isRightPrestine) {
+                [toolbarItems addObject:divider];
+            }
+            [toolbarItems addObject:self.forwardButton];
+            rightWidth += forwardButtonWidth;
+            isRightPrestine = NO;
+        }
+    }
+    
+    if (_browserOptions.menuItems) {
+        if ([kThemedBrowserAlignLeft isEqualToString:_browserOptions.menuButtonAlign]) {
+            if (!isLeftPrestine) {
+                [toolbarItems insertObject:divider atIndex:0];
+            }
+            [toolbarItems insertObject:self.menuButton atIndex:0];
+            leftWidth += menuButtonWidth;
+            isLeftPrestine = NO;
+        } else {
+            if (!isRightPrestine) {
+                [toolbarItems addObject:divider];
+            }
+            [toolbarItems addObject:self.menuButton];
+            rightWidth += menuButtonWidth;
+            isRightPrestine = NO;
+        }
+    }
+    
+    if (!_browserOptions.hideCloseButton) {
+        if ([kThemedBrowserAlignLeft isEqualToString:_browserOptions.closeButtonAlign]) {
+            if (!isLeftPrestine) {
+                [toolbarItems insertObject:divider atIndex:0];
+            }
+            [toolbarItems insertObject:self.closeButton atIndex:0];
+            leftWidth += closeButtonWidth;
+            isLeftPrestine = NO;
+        } else {
+            if (!isRightPrestine) {
+                [toolbarItems addObject:divider];
+            }
+            [toolbarItems addObject:self.closeButton];
+            rightWidth += closeButtonWidth;
+            isRightPrestine = NO;
+        }
+    }
+    
+    if (!isLeftPrestine) {
+        [toolbarItems insertObject:paddingRemover atIndex:0];
+    }
+    
+    if (!isRightPrestine) {
+        [toolbarItems addObject:paddingRemover];
+    }
+    
+    [self.toolbar setItems:toolbarItems];
+    
+    self.titleOffset = fmaxf(leftWidth, rightWidth);
+    // The correct positioning of title is not that important right now, since
+    // rePositionViews will take care of it a bit later.
+    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, 10, TOOLBAR_HEIGHT)];
+    self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.titleLabel.numberOfLines = 1;
+    self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.titleLabel.textColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.titleColor];
+    self.titleLabel.hidden = _browserOptions.hideTitle;
+    
+    if (_browserOptions.titleStaticText) {
+        self.titleLabel.text = _browserOptions.titleStaticText;
+    }
 
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
-
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [CDVInAppBrowserViewController colorFromRGBA:_browserOptions.statusBarColor];
     [self.view addSubview:self.toolbar];
+    [self.toolbar addSubview:self.titleLabel];
     [self.view addSubview:self.addressLabel];
-    [self.view addSubview:self.spinner];
+    // [self.view addSubview:self.spinner];
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+
+    // Reposition views.
+    [self rePositionViews];
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
@@ -595,7 +789,7 @@
     self.closeButton = nil;
     self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     self.closeButton.enabled = YES;
-    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
+    // self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:0 withObject:self.closeButton];
@@ -767,7 +961,74 @@
 
 - (void)goBack:(id)sender
 {
-    [self.webView goBack];
+    if (self.webView.canGoBack) {
+        [self.webView goBack];
+    } else if (_browserOptions.backButtonCanClose) {
+        [self close];
+    }
+}
+
+- (void)goMenu:(id)sender
+{
+    if (IsAtLeastiOSVersion(@"8.0")) {
+        // iOS > 8 implementation using UIAlertController, which is the new way
+        // to do this going forward.
+        UIAlertController *alertController = [UIAlertController
+                                              alertControllerWithTitle:_browserOptions.menuTitle
+                                              message:nil
+                                              preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        for (NSInteger i = 0; i < _browserOptions.menuItems.count; i++) {
+            NSInteger index = i;
+            NSDictionary *item = _browserOptions.menuItems[index];
+            
+            UIAlertAction *a = [UIAlertAction
+                                 actionWithTitle:item[@"label"]
+                                 style:UIAlertActionStyleDefault
+                                 handler:^(UIAlertAction *action) {
+                                     [self menuSelected:index];
+                                 }];
+            [alertController addAction:a];
+        }
+        
+        if (_browserOptions.menuCancel) {
+            UIAlertAction *cancelAction = [UIAlertAction
+                                           actionWithTitle:@"Cancel"
+                                           style:UIAlertActionStyleCancel
+                                           handler:nil];
+            [alertController addAction:cancelAction];
+        }
+
+        [self presentViewController:alertController animated:YES completion:nil];
+    } else {
+        // iOS < 8 implementation using UIActionSheet, which is deprecated.
+        UIActionSheet *popup = [[UIActionSheet alloc] initWithTitle:_browserOptions.menuTitle delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:
+                                nil];
+        for (NSDictionary *item in _browserOptions.menuItems) {
+            [popup addButtonWithTitle:item[@"label"]];
+        }
+        if (_browserOptions.menuCancel) {
+            [popup addButtonWithTitle:_browserOptions.menuCancel];
+            popup.cancelButtonIndex = _browserOptions.menuItems.count;
+        }
+        [popup showInView:[UIApplication sharedApplication].keyWindow];
+    }
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    [self menuSelected:buttonIndex];
+}
+
+- (void) menuSelected:(NSInteger)index
+{
+    if (index < _browserOptions.menuItems.count) {
+        [self.navigationDelegate emitEvent:@{
+            @"type": _browserOptions.menuItems[index][kThemedBrowserMenuEvent],
+            @"url": [self.navigationDelegate.inAppBrowserViewController.currentURL absoluteString],
+            @"menuIndex": [NSNumber numberWithLong:index]
+        }];
+    }
 }
 
 - (void)goForward:(id)sender
@@ -777,9 +1038,11 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    /*
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
     }
+    */
     [self rePositionViews];
 
     [super viewWillAppear:animated];
@@ -801,6 +1064,10 @@
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
+    
+    CGFloat screenWidth = CGRectGetWidth(self.view.frame);
+    NSInteger width = floorf(screenWidth - self.titleOffset * 2.0f);
+    self.titleLabel.frame = CGRectMake(floorf((screenWidth - width) / 2.0f), 0, width, TOOLBAR_HEIGHT);
 }
 
 #pragma mark UIWebViewDelegate
@@ -810,7 +1077,9 @@
     // loading url, start spinner, update back/forward
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.backButton.enabled = theWebView.canGoBack;
+    if (!_browserOptions.backButtonCanClose) {
+        self.backButton.enabled = theWebView.canGoBack;
+    }
     self.forwardButton.enabled = theWebView.canGoForward;
 
     [self.spinner startAnimating];
@@ -833,8 +1102,15 @@
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
-    self.backButton.enabled = theWebView.canGoBack;
+    if (!_browserOptions.backButtonCanClose) {
+        self.backButton.enabled = theWebView.canGoBack;
+    }
     self.forwardButton.enabled = theWebView.canGoForward;
+    if (!_browserOptions.hideTitle && !_browserOptions.titleStaticText) {
+        // Update title text to page title when title is shown and we are not
+        // required to show a static text.
+        self.titleLabel.text = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    }
 
     [self.spinner stopAnimating];
 
@@ -862,7 +1138,9 @@
     // log fail message, stop spinner, update back/forward
     NSLog(@"webView:didFailLoadWithError - %ld: %@", (long)error.code, [error localizedDescription]);
 
-    self.backButton.enabled = theWebView.canGoBack;
+    if (!_browserOptions.backButtonCanClose) {
+        self.backButton.enabled = theWebView.canGoBack;
+    }
     self.forwardButton.enabled = theWebView.canGoForward;
     [self.spinner stopAnimating];
 
@@ -899,6 +1177,29 @@
     return YES;
 }
 
++ (UIColor *)colorFromRGBA:(NSString *)rgba {
+    unsigned long long rgbaVal = 0;
+    
+    if ([[rgba substringWithRange:NSMakeRange(0, 1)] isEqualToString:@"#"]) {
+        // First char is #, get rid of that.
+        rgba = [rgba substringFromIndex:1];
+    }
+    
+    if (rgba.length < 8) {
+        // If alpha is not given, just append ff.
+        rgba = [NSString stringWithFormat:@"%@ff", rgba];
+    }
+    
+    NSScanner *scanner = [NSScanner scannerWithString:rgba];
+    [scanner setScanLocation:0];
+    [scanner scanHexLongLong:&rgbaVal];
+    
+    return [UIColor colorWithRed:((rgbaVal & 0xFF000000) >> 24) / 255.0f
+        green:((rgbaVal & 0xFF0000) >>16) / 255.0f
+        blue:(rgbaVal & 0xFF00 >> 8) / 255.0f
+        alpha:(rgbaVal & 0xFF) / 255.0f];
+}
+
 @end
 
 @implementation CDVInAppBrowserOptions
@@ -921,6 +1222,37 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
+        
+        self.statusBarColor = @"#FFFFFFFF";
+        self.toolbarColor = @"#FFFFFFFF";
+        self.toolbarImage = nil;
+        self.toolbarImagePortrait = nil;
+        self.toolbarImageLandscape = nil;
+        self.titleColor = @"#000000FF";
+        self.backButtonImage = @"themedbrowser_stub_back";
+        self.backButtonPressedImage = @"themedbrowser_stub_back_highlight";
+        self.forwardButtonImage = @"themedbrowser_stub_forward";
+        self.forwardButtonPressedImage = @"themedbrowser_stub_forward_highlight";
+        self.closeButtonImage = @"themedbrowser_stub_close";
+        self.closeButtonPressedImage = @"themedbrowser_stub_close_highlight";
+        self.menuButtonImage = @"themedbrowser_stub_menu";
+        self.menuButtonPressedImage = @"themedbrowser_stub_menu_highlight";
+        
+        self.closeButtonAlign = kThemedBrowserAlignLeft;
+        self.navButtonAlign = kThemedBrowserAlignLeft;
+        self.menuButtonAlign = kThemedBrowserAlignRight;
+        
+        self.titleStaticText = nil;
+        self.menuItems = nil;
+        self.menuTitle = nil;
+        self.menuCancel = nil;
+        
+        self.backButtonCanClose = NO;
+        
+        self.hideTitle = NO;
+        self.hideCloseButton = NO;
+        self.hideBackButton = NO;
+        self.hideForwardButton = NO;
     }
 
     return self;
@@ -929,45 +1261,70 @@
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options
 {
     CDVInAppBrowserOptions* obj = [[CDVInAppBrowserOptions alloc] init];
-
-    // NOTE: this parsing does not handle quotes within values
-    NSArray* pairs = [options componentsSeparatedByString:@","];
-
-    // parse keys and values, set the properties
-    for (NSString* pair in pairs) {
-        NSArray* keyvalue = [pair componentsSeparatedByString:@"="];
-
-        if ([keyvalue count] == 2) {
-            NSString* key = [[keyvalue objectAtIndex:0] lowercaseString];
-            NSString* value = [keyvalue objectAtIndex:1];
-            NSString* value_lc = [value lowercaseString];
-
-            BOOL isBoolean = [value_lc isEqualToString:@"yes"] || [value_lc isEqualToString:@"no"];
-            NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
-            [numberFormatter setAllowsFloats:YES];
-            BOOL isNumber = [numberFormatter numberFromString:value_lc] != nil;
-
-            // set the property according to the key name
+    
+    // Min support, iOS 5. We will use the JSON parser that comes with iOS 5.
+    NSError *error = nil;
+    NSData *data = [options dataUsingEncoding:NSUTF8StringEncoding];
+    id jsonObj = [NSJSONSerialization
+                 JSONObjectWithData:data
+                 options:0
+                 error:&error];
+    
+    if(error) {
+        NSLog(@"Invalid JSON %@", error);
+    } else if([jsonObj isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *dict = jsonObj;
+        for (NSString *key in dict) {
             if ([obj respondsToSelector:NSSelectorFromString(key)]) {
-                if (isNumber) {
-                    [obj setValue:[numberFormatter numberFromString:value_lc] forKey:key];
-                } else if (isBoolean) {
-                    [obj setValue:[NSNumber numberWithBool:[value_lc isEqualToString:@"yes"]] forKey:key];
-                } else {
-                    [obj setValue:value forKey:key];
-                }
+                [obj setValue:dict[key] forKey:key];
             }
         }
     }
+    
+    [CDVInAppBrowserOptions validateOptions:obj];
 
     return obj;
 }
 
++ (void)validateOptions:(CDVInAppBrowserOptions*)options
+{
+    // Validate menuItems format, which is somewhat complex and make sure that
+    // it's valid. Throw exception immediately so that user knows what's up.
+    if (options.menuItems) {
+        if (![options.menuItems isKindOfClass:[NSArray class]]) {
+            @throw([NSException exceptionWithName:@"Invalid format" reason:@"menuItems must a list." userInfo:nil]);
+        }
+        
+        for (id i in options.menuItems) {
+            if (![i isKindOfClass:[NSDictionary class]]) {
+                @throw([NSException exceptionWithName:@"Invalid format" reason:@"menuItems must be a list of dict." userInfo:nil]);
+            }
+            
+            NSDictionary *dict = i;
+            if (![dict objectForKey:kThemedBrowserMenuEvent]) {
+                @throw([NSException exceptionWithName:@"Invalid format"
+                                               reason:[NSString stringWithFormat:@"menuItems item must contain a key named %@.", kThemedBrowserMenuEvent] userInfo:nil]);
+            } else if (![[dict objectForKey:kThemedBrowserMenuEvent] isKindOfClass:[NSString class]]) {
+                @throw([NSException exceptionWithName:@"Invalid format"
+                                               reason:[NSString stringWithFormat:@"menuItems %@ must be a string", kThemedBrowserMenuEvent] userInfo:nil]);
+            }
+            
+            if (![dict objectForKey:kThemedBrowserMenuLabel]) {
+                @throw([NSException exceptionWithName:@"Invalid format"
+                                               reason:[NSString stringWithFormat:@"menuItems item must contain a key named %@.", kThemedBrowserMenuLabel] userInfo:nil]);
+            } else if (![[dict objectForKey:kThemedBrowserMenuLabel] isKindOfClass:[NSString class]]) {
+                @throw([NSException exceptionWithName:@"Invalid format"
+                                               reason:[NSString stringWithFormat:@"menuItems %@ must be a string", kThemedBrowserMenuLabel] userInfo:nil]);
+            }
+        }
+    }
+}
+
 @end
 
-@implementation CDVInAppBrowserNavigationController : UINavigationController
-
 #pragma mark CDVScreenOrientationDelegate
+
+@implementation CDVInAppBrowserNavigationController : UINavigationController
 
 - (BOOL)shouldAutorotate
 {
@@ -997,4 +1354,3 @@
 
 
 @end
-

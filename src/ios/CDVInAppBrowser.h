@@ -41,29 +41,62 @@
 
 @interface CDVInAppBrowserOptions : NSObject {}
 
-@property (nonatomic, assign) BOOL location;
-@property (nonatomic, assign) BOOL toolbar;
-@property (nonatomic, copy) NSString* closebuttoncaption;
-@property (nonatomic, copy) NSString* toolbarposition;
-@property (nonatomic, assign) BOOL clearcache;
-@property (nonatomic, assign) BOOL clearsessioncache;
+@property (nonatomic) BOOL location;
+@property (nonatomic) BOOL toolbar;
+@property (nonatomic) NSString* closebuttoncaption;
+@property (nonatomic) NSString* toolbarposition;
+@property (nonatomic) BOOL clearcache;
+@property (nonatomic) BOOL clearsessioncache;
 
-@property (nonatomic, copy) NSString* presentationstyle;
-@property (nonatomic, copy) NSString* transitionstyle;
+@property (nonatomic) NSString* presentationstyle;
+@property (nonatomic) NSString* transitionstyle;
 
-@property (nonatomic, assign) BOOL enableviewportscale;
-@property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
-@property (nonatomic, assign) BOOL allowinlinemediaplayback;
-@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
-@property (nonatomic, assign) BOOL suppressesincrementalrendering;
-@property (nonatomic, assign) BOOL hidden;
-@property (nonatomic, assign) BOOL disallowoverscroll;
+@property (nonatomic) BOOL enableviewportscale;
+@property (nonatomic) BOOL mediaplaybackrequiresuseraction;
+@property (nonatomic) BOOL allowinlinemediaplayback;
+@property (nonatomic) BOOL keyboarddisplayrequiresuseraction;
+@property (nonatomic) BOOL suppressesincrementalrendering;
+@property (nonatomic) BOOL hidden;
+@property (nonatomic) BOOL disallowoverscroll;
+
+@property (nonatomic) NSString* statusBarColor;
+@property (nonatomic) NSString* toolbarColor;
+@property (nonatomic) NSString* toolbarImage;
+@property (nonatomic) NSString* toolbarImagePortrait;
+@property (nonatomic) NSString* toolbarImageLandscape;
+@property (nonatomic) NSString* titleColor;
+@property (nonatomic) NSString* backButtonImage;
+@property (nonatomic) NSString* backButtonPressedImage;
+@property (nonatomic) NSString* forwardButtonImage;
+@property (nonatomic) NSString* forwardButtonPressedImage;
+@property (nonatomic) NSString* closeButtonImage;
+@property (nonatomic) NSString* closeButtonPressedImage;
+@property (nonatomic) NSString* menuButtonImage;
+@property (nonatomic) NSString* menuButtonPressedImage;
+
+@property (nonatomic) NSString* closeButtonAlign;
+@property (nonatomic) NSString* navButtonAlign;
+@property (nonatomic) NSString* menuButtonAlign;
+
+@property (nonatomic) NSString* titleStaticText;
+@property (nonatomic) NSArray* menuItems;
+@property (nonatomic) NSString* menuTitle;
+@property (nonatomic) NSString* menuCancel;
+
+@property (nonatomic) BOOL backButtonCanClose;
+
+@property (nonatomic) BOOL hideTitle;
+@property (nonatomic) BOOL hideCloseButton;
+@property (nonatomic) BOOL hideBackButton;
+@property (nonatomic) BOOL hideForwardButton;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
++ (void)validateOptions:(CDVInAppBrowserOptions*)options;
+
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIActionSheetDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
@@ -75,22 +108,27 @@
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* closeButton;
 @property (nonatomic, strong) IBOutlet UILabel* addressLabel;
+@property (nonatomic, strong) IBOutlet UILabel* titleLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* backButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* forwardButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* menuButton;
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView* spinner;
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
+@property (nonatomic) CGFloat titleOffset;
 
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
+- (void)showToolBar:(BOOL)show : (NSString*) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
+
++ (UIColor *)colorFromRGBA:(NSString *)rgba;
 
 @end
 

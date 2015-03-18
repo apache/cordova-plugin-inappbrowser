@@ -41,19 +41,24 @@ InAppBrowser.prototype = {
     },
     close: function (eventname) {
         exec(null, null, "InAppBrowser", "close", []);
+        return this;
     },
     show: function (eventname) {
-      exec(null, null, "InAppBrowser", "show", []);
+        exec(null, null, "InAppBrowser", "show", []);
+        return this;
     },
     addEventListener: function (eventname,f) {
-        if (eventname in this.channels) {
-            this.channels[eventname].subscribe(f);
+        if (!(eventname in this.channels)) {
+            this.channels[eventname] = channel.create(eventname);
         }
+        this.channels[eventname].subscribe(f);
+        return this;
     },
     removeEventListener: function(eventname, f) {
         if (eventname in this.channels) {
             this.channels[eventname].unsubscribe(f);
         }
+        return this;
     },
 
     executeScript: function(injectDetails, cb) {
@@ -64,6 +69,7 @@ InAppBrowser.prototype = {
         } else {
             throw new Error('executeScript requires exactly one of code or file to be specified');
         }
+        return this;
     },
 
     insertCSS: function(injectDetails, cb) {
@@ -74,6 +80,7 @@ InAppBrowser.prototype = {
         } else {
             throw new Error('insertCSS requires exactly one of code or file to be specified');
         }
+        return this;
     }
 };
 
@@ -98,7 +105,7 @@ module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
 
     strWindowFeatures = strWindowFeatures || "";
 
-    exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+    exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, JSON.stringify(strWindowFeatures)]);
     return iab;
 };
 

@@ -129,6 +129,16 @@
 	    <source-file src="src/ios/CDVInAppBrowser.m" />
 	    
 	    <framework src="CoreGraphics.framework" />
+
+        <!--  drawable resources -->
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_close@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_close@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_close_highlight@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_close_highlight@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_menu@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_menu@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_menu_highlight@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_menu_highlight@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_back@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_back@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_back_highlight@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_back_highlight@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_forward@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_forward@2x.png" />
+        <resource-file src="src/ios/Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_forward_highlight@2x.png" target="Resources/themedbrowser/drawable-hdpi/themedbrowser_stub_forward_highlight@2x.png" />
     </platform>
 
     <!-- wp7 -->
