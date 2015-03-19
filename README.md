@@ -87,7 +87,7 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `titleColor` sets title text color in RGBA web hex format. eg. `#fff0f0ff`
     + `titleStaticText` sets static text for title. Note that by default title shows the title of the currently shown web page. Also see `hideTitle`.
 + Menu
-    + `menuItems` creates a list of menu items for user to choose when menu button is clicked. It must follow the following format `[{event: 'e', label: 'l'}]`. When an menu item is pressed, you will get a custom event specified by the `event` property of the item. Within the received event object, you will also be given the following properties: `url`, which is the current URL in the web view, and `menuIndex`, which is an integer that references to the index of menu item in the given list.
+    + `menuItems` creates a list of menu items for user to choose when menu button is clicked. It must follow the following format `[{event: 'e', label: 'l'}]`. When a menu item is pressed, you will get a custom event specified by the `event` property of the item. Within the received event object, you will also be given the following properties: `url`, which is the current URL in the web view, and `menuIndex`, which is an integer that references to the index of menu item in the given list.
     + `menuTitle` sets menu title when menu button is clicked.
     + `menuCancel` sets menu cancel button text.
 + Alignment
@@ -102,7 +102,7 @@ In addition to InAppBrowser's properties, following properties were added to ful
 + Others
     + `backButtonCanClose` allows back button to close browser when there's no more to go back. Otherwise, back button will be disabled.
 
-One thing to note is that all image resources reference to **native** resource bundle. So all images need to be imported to native project first. Furthermore, the way to reference images may be different dependeing on platform. In which case, it is your responsibility to perform device detection. In cse of Android, the image name will be looked up under `R.drawable`. eg. If image name is `hello_world`, `R.drawable.hello_world` will be referenced.
+One thing to note is that all image resources reference to **native** resource bundle. So all images need to be imported to native project first. In case of Android, the image name will be looked up under `R.drawable`. eg. If image name is `hello_world`, `R.drawable.hello_world` will be referenced.
 
 You may have noticed that one of the major features that ThemedBrowser added is an optional menu, which you can use to prompt user to make a simple choice from a list of items.
 
@@ -154,6 +154,6 @@ Furthermore, the object returned by `open` always returns its own instance allow
         alert(event.url);
     });
 
-Two InAppBrowser's properties are disabled:
+Two properties from InAppBrowser are disabled
 + `location` is always `false` because address bar is not needed for an immersive experience of an integrated browser.
 + `toolbarposition` is always `top` to remain consistent across platforms.
