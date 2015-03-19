@@ -154,6 +154,11 @@ Furthermore, the object returned by `open` always returns its own instance allow
         alert(event.url);
     });
 
-Two properties from InAppBrowser are disabled
+Two properties from InAppBrowser are disabled.
 + `location` is always `false` because address bar is not needed for an immersive experience of an integrated browser.
 + `toolbarposition` is always `top` to remain consistent across platforms.
+
+License
+-------
+
+This project is licensed under Aapache License 2.0. See [LICENSE](LICENSE) file.
