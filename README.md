@@ -68,13 +68,13 @@ Additional Properties
 In addition to InAppBrowser's properties, following properties were added to fulfill this plugin's purpose.
 
 + Toolbar and status bar
-    + `statusbarHeight` sets height of status bar.
     + `statusbarColor` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable only to iOS 7+.
+    + `toolbarHeight` sets height of toolbar.
     + `toolbarColor` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `toolbarImage`.
     + `toolbarImage` sets an image as browser toolbar background in titled mode. This property references to a **native** image resource, therefore it is platform dependent.
     + `toolbarImagePortrait` sets an image for browser toolbar background but only in portrait mode. This property will be overridden by `toolbarImage` if given. This is an iOS only property and references to **native** image resource.
     + `toolbarImageLandscape` sets an image for browser toolbar background but only in landscape mode. This property will be overridden by `toolbarImage` if given. This is an iOS only property and references to **native** image resource.
-+ Button images
++ Buttons
     + `backButtonImage` sets image for back button. This property references to a **native** image resource, therefore it is platform dependent.
     + `backButtonPressedImage` sets image for back button in its pressed state. This property references to a **native** image resource, therefore it is platform dependent.
     + `forwardButtonImage` sets image for forward button. This property references to a **native** image resource, therefore it is platform dependent.
@@ -86,6 +86,10 @@ In addition to InAppBrowser's properties, following properties were added to ful
 + Title
     + `titleColor` sets title text color in RGBA web hex format. eg. `#fff0f0ff`
     + `titleStaticText` sets static text for title. Note that by default title shows the title of the currently shown web page. Also see `hideTitle`.
++ Menu
+    + `menuItems` creates a list of menu items for user to choose when menu button is clicked. It must follow the following format `[{event: 'e', label: 'l'}]`. When an menu item is pressed, you will get a custom event specified by the `event` property of the item. Within the received event object, you will also be given the following properties: `url`, which is the current URL in the web view, and `menuIndex`, which is an integer that references to the index of menu item in the given list.
+    + `menuTitle` sets menu title when menu button is clicked.
+    + `menuCancel` sets menu cancel button text.
 + Alignment
     + `closeButtonAlign` aligns close button to either `left` or `right`. Default to `left`.
     + `navButtonAlign` aligns back and forward buttons to either `left` or `right`. Default to `left`.
@@ -95,10 +99,6 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `hideCloseButton` hides close button when set to `true`.
     + `hideBackButton` hides back button when set to `true`.
     + `hideForwardButton` hides forward when set to `true`.
-+ Menu
-    + `menuItems` creates a list of menu items for user to choose when menu button is clicked. It must follow the following format `[{event: 'e', label: 'l'}]`. When an menu item is pressed, you will get a custom event specified by the `event` property of the item. Within the received event object, you will also be given the following properties: `url`, which is the current URL in the web view, and `menuIndex`, which is an integer that references to the index of menu item in the given list.
-    + `menuTitle` sets menu title when menu button is clicked.
-    + `menuCancel` sets menu cancel button text.
 + Others
     + `backButtonCanClose` allows back button to close browser when there's no more to go back. Otherwise, back button will be disabled.
 
