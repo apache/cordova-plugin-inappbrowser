@@ -47,23 +47,17 @@
         <source-file src="src/android/ThemeableBrowser.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/ThemeableBrowserDialog.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
+        <source-file src="src/android/ThemeableBrowserUnmarshaller.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
 
         <!--  drawable src/android/resources -->
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_next_item.png" target="res/drawable-mdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_next_item.png" target="res/drawable-xhdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_next_item.png" target="res/drawable-xxhdpi/ic_action_next_item.png" />
-
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_previous_item.png" target="res/drawable-hdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_previous_item.png" target="res/drawable-mdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_previous_item.png" target="res/drawable-xhdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_previous_item.png" target="res/drawable-xxhdpi/ic_action_previous_item.png" />
-
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_remove.png" target="res/drawable-hdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_remove.png" target="res/drawable-mdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
-
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_close.png" target="res/drawable-xhdpi/themeablebrowser_stub_close.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_close_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_close_highlight.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_menu.png" target="res/drawable-xhdpi/themeablebrowser_stub_menu.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_menu_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_menu_highlight.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_back.png" target="res/drawable-xhdpi/themeablebrowser_stub_back.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_back_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_back_highlight.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_forward.png" target="res/drawable-xhdpi/themeablebrowser_stub_forward.png" />
+        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_forward_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_forward_highlight.png" />
     </platform>
 
     <!-- ios -->

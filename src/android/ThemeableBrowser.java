@@ -19,16 +19,15 @@
 package com.initialxy.cordova.themeablebrowser;
 
 import android.annotation.SuppressLint;
-import com.initialxy.cordova.themeablebrowser.ThemeableBrowserDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Browser;
 import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
@@ -57,13 +56,19 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class ThemeableBrowser extends CordovaPlugin {
@@ -82,6 +87,9 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
 
+    private static final String ALIGN_LEFT = "left";
+    private static final String ALIGN_RIGHT = "right";
+
     private ThemeableBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
@@ -94,10 +102,11 @@ public class ThemeableBrowser extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
      *
-     * @param action        The action to execute.
-     * @param args          JSONArry of arguments for the plugin.
-     * @param callbackId    The callback id used when calling back into JavaScript.
-     * @return              A PluginResult object with a status and message.
+     * @param action          The action to execute.
+     * @param args            The exec() arguments, wrapped with some Cordova helpers.
+     * @param callbackContext The callback context used when calling back into JavaScript.
+     * @return
+     * @throws JSONException
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
@@ -108,7 +117,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 t = SELF;
             }
             final String target = t;
-            final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+            final Options features = parseFeature(args.optString(2));
             
             Log.d(LOG_TAG, "target = " + target);
             
@@ -306,31 +315,22 @@ public class ThemeableBrowser extends CordovaPlugin {
      * @param optString
      * @return
      */
-    private HashMap<String, Boolean> parseFeature(String optString) {
-        if (optString.equals(NULL)) {
-            return null;
-        } else {
-            HashMap<String, Boolean> map = new HashMap<String, Boolean>();
-            StringTokenizer features = new StringTokenizer(optString, ",");
-            StringTokenizer option;
-            while(features.hasMoreElements()) {
-                option = new StringTokenizer(features.nextToken(), "=");
-                if (option.hasMoreElements()) {
-                    String key = option.nextToken();
-                    Boolean value = option.nextToken().equals("no") ? Boolean.FALSE : Boolean.TRUE;
-                    map.put(key, value);
-                }
-            }
-            return map;
+    private Options parseFeature(String optString) {
+        Options result = ThemeableBrowserUnmarshaller.JSONToObj(
+                optString, Options.class);
+
+        if (result == null) {
+            result = new Options();
         }
+
+        return result;
     }
 
     /**
      * Display a new browser with the specified URL.
      *
-     * @param url           The url to load.
-     * @param usePhoneGap   Load url in PhoneGap webview
-     * @return              "" if ok, or error message.
+     * @param url
+     * @return
      */
     public String openExternal(String url) {
         try {
@@ -442,30 +442,22 @@ public class ThemeableBrowser extends CordovaPlugin {
     /**
      * Display a new browser with the specified URL.
      *
-     * @param url           The url to load.
-     * @param jsonObject
+     * @param url
+     * @param features
+     * @return
      */
-    public String showWebPage(final String url, HashMap<String, Boolean> features) {
+    public String showWebPage(final String url, Options features) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
         openWindowHidden = false;
         if (features != null) {
-            Boolean show = features.get(LOCATION);
-            if (show != null) {
-                showLocationBar = show.booleanValue();
-            }
-            Boolean hidden = features.get(HIDDEN);
-            if (hidden != null) {
-                openWindowHidden = hidden.booleanValue();
-            }
-            Boolean cache = features.get(CLEAR_ALL_CACHE);
-            if (cache != null) {
-                clearAllCache = cache.booleanValue();
-            } else {
-                cache = features.get(CLEAR_SESSION_CACHE);
-                if (cache != null) {
-                    clearSessionCache = cache.booleanValue();
-                }
+            // Force location bar to hide.
+            showLocationBar = false;
+            openWindowHidden = features.hidden;
+            clearAllCache = features.clearcache;
+
+            if (!clearAllCache) {
+                clearSessionCache = features.clearsessioncache;
             }
         }
         
@@ -524,7 +516,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 back.setContentDescription("Back Button");
                 back.setId(2);
                 Resources activityRes = cordova.getActivity().getResources();
-                int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
+                int backResId = activityRes.getIdentifier("themeablebrowser_stub_back", "drawable", cordova.getActivity().getPackageName());
                 Drawable backIcon = activityRes.getDrawable(backResId);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
                 {
@@ -547,7 +539,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
                 forward.setId(3);
-                int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
+                int fwdResId = activityRes.getIdentifier("themeablebrowser_stub_forward", "drawable", cordova.getActivity().getPackageName());
                 Drawable fwdIcon = activityRes.getDrawable(fwdResId);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
                 {
@@ -593,7 +585,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 close.setLayoutParams(closeLayoutParams);
                 forward.setContentDescription("Close Button");
                 close.setId(5);
-                int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
+                int closeResId = activityRes.getIdentifier("themeablebrowser_stub_close", "drawable", cordova.getActivity().getPackageName());
                 Drawable closeIcon = activityRes.getDrawable(closeResId);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
                 {
@@ -618,7 +610,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
-                settings.setBuiltInZoomControls(true);
+                // settings.setBuiltInZoomControls(true);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
 
                 //Toggle whether this is enabled or not!
@@ -717,8 +709,8 @@ public class ThemeableBrowser extends CordovaPlugin {
         /**
          * Constructor.
          *
-         * @param mContext
-         * @param edittext
+         * @param webView
+         * @param mEditText
          */
         public ThemeableBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
@@ -837,5 +829,54 @@ public class ThemeableBrowser extends CordovaPlugin {
                 Log.d(LOG_TAG, "Should never happen");
             }
         }
+    }
+
+    /**
+     * A class to hold parsed option properties. Note that our parser up there
+     * isn't a full blown JSON unmarshaller, and it would be impractical to
+     * import any more advanced third-party unmarshallers like Jackson. So array
+     * and HashMap/HashTable are not supported. Instead of array, use List with
+     * generic type. Instead of HashMap/HashTable, more class definitions with
+     * public properties shall be created.
+     */
+    private static class Options {
+        public boolean location = true;
+        public boolean hidden = false;
+        public boolean clearcache = false;
+        public boolean clearsessioncache = false;
+
+        public String statusbarColor = "#ffffffff";
+        public int toolbarHeight = 44;
+        public String toolbarColor = "#ffffffff";
+        public String toolbarImage = null;
+        public String toolbarImagePortrait = null;
+        public String toolbarImageLandscape = null;
+        public String backButtonImage = "themeablebrowser_stub_back";
+        public String backButtonPressedImage = "themeablebrowser_stub_back_highlight";
+        public String forwardButtonImage = "themeablebrowser_stub_forward";
+        public String forwardButtonPressedImage = "themeablebrowser_stub_forward_highlight";
+        public String closeButtonImage = "themeablebrowser_stub_close";
+        public String closeButtonPressedImage = "themeablebrowser_stub_close_highlight";
+        public String menuButtonImage = "themeablebrowser_stub_menu";
+        public String menuButtonPressedImage = "themeablebrowser_stub_menu_highlight";
+        public String titleColor = "#000000ff";
+        public String titleStaticText = null;
+        public List<EventLabelPair> menuItems = null;
+        public String menuTitle = null;
+        public String menuCancel = null;
+        public String closeButtonAlign = ALIGN_LEFT;
+        public String navButtonAlign = ALIGN_LEFT;
+        public String menuButtonAlign = ALIGN_RIGHT;
+        public boolean hideTitle = false;
+        public boolean hideCloseButton = false;
+        public boolean hideBackButton = false;
+        public boolean hideForwardButton = false;
+        public boolean backButtonCanClose = false;
+
+    }
+
+    private class EventLabelPair {
+        public String event;
+        public String label;
     }
 }
