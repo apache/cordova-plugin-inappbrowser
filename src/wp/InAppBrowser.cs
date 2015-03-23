@@ -233,7 +233,7 @@ namespace WPCordovaClassLib.Cordova.Commands
         private async void ShowSystemBrowser(string url)
         {
             var pathUri = new Uri(url, UriKind.Absolute);
-            if (pathUri.Scheme == Uri.UriSchemeHttp || pathUri.Scheme == Uri.UriSchemeHttps || pathUri.Scheme == Uri.UriSchemeMailto || pathUri.Scheme == "tel")
+            if (pathUri.Scheme == Uri.UriSchemeHttp || pathUri.Scheme == Uri.UriSchemeHttps)
             {
                 await Launcher.LaunchUriAsync(pathUri);
                 return;
