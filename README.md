@@ -349,6 +349,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 - only __code__ key is supported.
 
+### Windows Quirks
+
+Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.controls.webview.invokescriptasync.aspx) the invoked script can return only string values, otherwise the parameter, passed to __callback__ will be `[null]`.
+
 ## insertCSS
 
 > Injects CSS into the `InAppBrowser` window.

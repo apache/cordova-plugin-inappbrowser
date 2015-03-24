@@ -242,7 +242,10 @@ var IAB = {
 
         if (isWebViewAvailable && browserWrap && popup) {
             var op = popup.invokeScriptAsync("eval", code);
-            op.oncomplete = function () { hasCallback && win([]); };
+            op.oncomplete = function (e) {
+                var result = [e.target.result];
+                hasCallback && win(result);
+            };
             op.onerror = function () { };
             op.start();
         }
@@ -261,7 +264,10 @@ var IAB = {
             Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).done(function (file) {
                 Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
                     var op = popup.invokeScriptAsync("eval", code);
-                    op.oncomplete = function () { hasCallback && win([]); };
+                    op.oncomplete = function(e) {
+                        var result = [e.target.result];
+                        hasCallback && win(result);
+                    };
                     op.onerror = function () { };
                     op.start();
                 });
