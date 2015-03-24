@@ -49,7 +49,7 @@ public class ThemeableBrowserUnmarshaller {
      */
     public static class TypeMismatchException extends RuntimeException {
         public TypeMismatchException(Type expected, Type got) {
-            super(String.format("Expected: %s but got %s.", expected, got));
+            super(String.format("Expected %s but got %s.", expected, got));
         }
 
         public TypeMismatchException(String message) {
@@ -112,7 +112,7 @@ public class ThemeableBrowserUnmarshaller {
                             field.set(result, null);
                         } else {
                             throw new TypeMismatchException(String.format(
-                                    "Type: %s cannot be set to null.",
+                                    "Type %s cannot be set to null.",
                                     field.getType()));
                         }
                     } else {
@@ -141,14 +141,23 @@ public class ThemeableBrowserUnmarshaller {
                             field.set(result, converted);
                         }
                     }
-                } catch (NoSuchFieldException | IllegalAccessException
-                        | IllegalArgumentException e) {
+                } catch (NoSuchFieldException e) {
+                    // Ignore.
+                } catch (IllegalAccessException e) {
+                    // Ignore.
+                } catch (IllegalArgumentException e) {
                     // Ignore.
                 }
             }
-        } catch (JSONException | NoSuchMethodException
-                | InstantiationException | IllegalAccessException
-                | InvocationTargetException e) {
+        } catch (JSONException e) {
+            // Ignore.
+        } catch (NoSuchMethodException e) {
+            // Ignore.
+        } catch (InstantiationException e) {
+            // Ignore.
+        } catch (IllegalAccessException e) {
+            // Ignore.
+        } catch (InvocationTargetException e) {
             // Ignore.
         }
 
@@ -258,7 +267,7 @@ public class ThemeableBrowserUnmarshaller {
      * @return
      */
     private static List<?> JSONToList(JSONArray jsonArr, Type itemType) {
-        List<Object> result = new ArrayList<>();
+        List<Object> result = new ArrayList<Object>();
 
         Class<?> rawType = null;
         ParameterizedType pType = null;
@@ -368,8 +377,16 @@ public class ThemeableBrowserUnmarshaller {
             if (getter != null) {
                 result = getter.invoke(val);
             }
-        } catch (NoSuchMethodException | SecurityException
-                | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+            throw new TypeMismatchException(String.format(
+                    "Cannot convert to %s from %s.", cls, val.getClass()));
+        } catch (SecurityException e) {
+            throw new TypeMismatchException(String.format(
+                    "Cannot convert to %s from %s.", cls, val.getClass()));
+        } catch (IllegalAccessException e) {
+            throw new TypeMismatchException(String.format(
+                    "Cannot convert to %s from %s.", cls, val.getClass()));
+        } catch (InvocationTargetException e) {
             throw new TypeMismatchException(String.format(
                     "Cannot convert to %s from %s.", cls, val.getClass()));
         }

@@ -23,7 +23,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,6 +49,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -79,8 +84,6 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final String SYSTEM = "_system";
     // private static final String BLANK = "_blank";
     private static final String EXIT_EVENT = "exit";
-    private static final String LOCATION = "location";
-    private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -90,14 +93,12 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final String ALIGN_LEFT = "left";
     private static final String ALIGN_RIGHT = "right";
 
+    private static final int DISABLED_ALPHA = 127;  // 50% AKA 127/255.
+
     private ThemeableBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
     private CallbackContext callbackContext;
-    private boolean showLocationBar = true;
-    private boolean openWindowHidden = false;
-    private boolean clearAllCache= false;
-    private boolean clearSessionCache=false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -118,9 +119,9 @@ public class ThemeableBrowser extends CordovaPlugin {
             }
             final String target = t;
             final Options features = parseFeature(args.optString(2));
-            
+
             Log.d(LOG_TAG, "target = " + target);
-            
+
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -190,7 +191,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         Log.d(LOG_TAG, "in blank");
                         result = showWebPage(url, features);
                     }
-    
+
                     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
                     pluginResult.setKeepCallback(true);
                     callbackContext.sendPluginResult(pluginResult);
@@ -256,9 +257,9 @@ public class ThemeableBrowser extends CordovaPlugin {
      */
     @Override
     public void onReset() {
-        closeDialog();        
+        closeDialog();
     }
-    
+
     /**
      * Called by AccelBroker when listener is to be shut down.
      * Stop listener.
@@ -266,7 +267,7 @@ public class ThemeableBrowser extends CordovaPlugin {
     public void onDestroy() {
         closeDialog();
     }
-    
+
     /**
      * Inject an object (script or style) into the ThemeableBrowser WebView.
      *
@@ -311,7 +312,7 @@ public class ThemeableBrowser extends CordovaPlugin {
 
     /**
      * Put the list of features into a hash map
-     * 
+     *
      * @param optString
      * @return
      */
@@ -322,6 +323,9 @@ public class ThemeableBrowser extends CordovaPlugin {
         if (result == null) {
             result = new Options();
         }
+
+        // Always show location, this property is overwritten.
+        result.location = true;
 
         return result;
     }
@@ -374,7 +378,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 }
             }
         });
-                // NB: From SDK 19: "If you call methods on WebView from any thread 
+                // NB: From SDK 19: "If you call methods on WebView from any thread
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl("about:blank");
@@ -425,16 +429,6 @@ public class ThemeableBrowser extends CordovaPlugin {
         this.inAppWebView.requestFocus();
     }
 
-
-    /**
-     * Should we show the location bar?
-     *
-     * @return boolean
-     */
-    private boolean getShowLocationBar() {
-        return this.showLocationBar;
-    }
-
     private ThemeableBrowser getThemeableBrowser(){
         return this;
     }
@@ -446,43 +440,15 @@ public class ThemeableBrowser extends CordovaPlugin {
      * @param features
      * @return
      */
-    public String showWebPage(final String url, Options features) {
-        // Determine if we should hide the location bar.
-        showLocationBar = true;
-        openWindowHidden = false;
-        if (features != null) {
-            // Force location bar to hide.
-            showLocationBar = false;
-            openWindowHidden = features.hidden;
-            clearAllCache = features.clearcache;
-
-            if (!clearAllCache) {
-                clearSessionCache = features.clearsessioncache;
-            }
-        }
-        
+    public String showWebPage(final String url, final Options features) {
         final CordovaWebView thatWebView = this.webView;
 
         // Create dialog in new thread
         Runnable runnable = new Runnable() {
-            /**
-             * Convert our DIP units to Pixels
-             *
-             * @return int
-             */
-            private int dpToPixels(int dipValue) {
-                int value = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
-                                                            (float) dipValue,
-                                                            cordova.getActivity().getResources().getDisplayMetrics()
-                );
-
-                return value;
-            }
-
             @SuppressLint("NewApi")
             public void run() {
                 // Let's create the main dialog
-                dialog = new ThemeableBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
+                dialog = new ThemeableBrowserDialog(cordova.getActivity(), android.R.style.Theme_Holo_Light_NoActionBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
@@ -493,39 +459,29 @@ public class ThemeableBrowser extends CordovaPlugin {
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
-                RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
-                //Please, no more black! 
+                FrameLayout toolbar = new FrameLayout(cordova.getActivity());
                 toolbar.setBackgroundColor(android.graphics.Color.LTGRAY);
-                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
-                toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
-                toolbar.setHorizontalGravity(Gravity.LEFT);
-                toolbar.setVerticalGravity(Gravity.TOP);
+                toolbar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, dpToPixels(features.toolbarHeight)));
 
-                // Action Button Container layout
-                RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
-                actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
-                actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
-                actionButtonContainer.setId(1);
+                // Left Button Container layout
+                LinearLayout leftButtonContainer = new LinearLayout(cordova.getActivity());
+                FrameLayout.LayoutParams leftButtonContainerParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                leftButtonContainerParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+                leftButtonContainer.setLayoutParams(leftButtonContainerParams);
+                leftButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
+
+                // Right Button Container layout
+                LinearLayout rightButtonContainer = new LinearLayout(cordova.getActivity());
+                FrameLayout.LayoutParams rightButtonContainerParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                rightButtonContainerParams.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+                rightButtonContainer.setLayoutParams(rightButtonContainerParams);
+                rightButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
 
                 // Back button
                 Button back = new Button(cordova.getActivity());
-                RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                backLayoutParams.addRule(RelativeLayout.ALIGN_LEFT);
-                back.setLayoutParams(backLayoutParams);
+                back.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 back.setContentDescription("Back Button");
-                back.setId(2);
-                Resources activityRes = cordova.getActivity().getResources();
-                int backResId = activityRes.getIdentifier("themeablebrowser_stub_back", "drawable", cordova.getActivity().getPackageName());
-                Drawable backIcon = activityRes.getDrawable(backResId);
-                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
-                {
-                    back.setBackgroundDrawable(backIcon);
-                }
-                else
-                {
-                    back.setBackground(backIcon);
-                }
+                setStates(back, features.backButtonImage, features.backButtonPressedImage, DISABLED_ALPHA);
                 back.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         goBack();
@@ -534,26 +490,9 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // Forward button
                 Button forward = new Button(cordova.getActivity());
-                RelativeLayout.LayoutParams forwardLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                forwardLayoutParams.addRule(RelativeLayout.RIGHT_OF, 2);
-                forward.setLayoutParams(forwardLayoutParams);
+                forward.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 forward.setContentDescription("Forward Button");
-                forward.setId(3);
-                int fwdResId = activityRes.getIdentifier("themeablebrowser_stub_forward", "drawable", cordova.getActivity().getPackageName());
-                Drawable fwdIcon = activityRes.getDrawable(fwdResId);
-                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
-                {
-                    forward.setBackgroundDrawable(fwdIcon);
-                }
-                else
-                {
-                    forward.setBackground(fwdIcon);
-                }
-                forward.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        goForward();
-                    }
-                });
+                setStates(forward, features.forwardButtonImage, features.forwardButtonPressedImage, DISABLED_ALPHA);
 
                 // Edit Text Box
                 edittext = new EditText(cordova.getActivity());
@@ -561,7 +500,6 @@ public class ThemeableBrowser extends CordovaPlugin {
                 textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
                 textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
                 edittext.setLayoutParams(textLayoutParams);
-                edittext.setId(4);
                 edittext.setSingleLine(true);
                 edittext.setText(url);
                 edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
@@ -580,21 +518,9 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // Close/Done button
                 Button close = new Button(cordova.getActivity());
-                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                close.setLayoutParams(closeLayoutParams);
+                close.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 forward.setContentDescription("Close Button");
-                close.setId(5);
-                int closeResId = activityRes.getIdentifier("themeablebrowser_stub_close", "drawable", cordova.getActivity().getPackageName());
-                Drawable closeIcon = activityRes.getDrawable(closeResId);
-                if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
-                {
-                    close.setBackgroundDrawable(closeIcon);
-                }
-                else
-                {
-                    close.setBackground(closeIcon);
-                }
+                setStates(close, features.closeButtonImage, features.closeButtonPressedImage, DISABLED_ALPHA);
                 close.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         closeDialog();
@@ -603,7 +529,9 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
-                inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+                LinearLayout.LayoutParams inAppWebViewPrams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+                inAppWebViewPrams.weight = 1;
+                inAppWebView.setLayoutParams(inAppWebViewPrams);
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
@@ -615,7 +543,7 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
-                boolean enableDatabase = appSettings == null ? true : appSettings.getBoolean("ThemeableBrowserStorageEnabled", true);
+                boolean enableDatabase = appSettings == null || appSettings.getBoolean("ThemeableBrowserStorageEnabled", true);
                 if (enableDatabase) {
                     String databasePath = cordova.getActivity().getApplicationContext().getDir("themeableBrowserDB", Context.MODE_PRIVATE).getPath();
                     settings.setDatabasePath(databasePath);
@@ -623,30 +551,32 @@ public class ThemeableBrowser extends CordovaPlugin {
                 }
                 settings.setDomStorageEnabled(true);
 
-                if (clearAllCache) {
+                if (features.clearcache) {
                     CookieManager.getInstance().removeAllCookie();
-                } else if (clearSessionCache) {
+                } else if (features.clearsessioncache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
                 inAppWebView.loadUrl(url);
-                inAppWebView.setId(6);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(true);
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
                 // Add the back and forward buttons to our action button container layout
-                actionButtonContainer.addView(back);
-                actionButtonContainer.addView(forward);
+                leftButtonContainer.addView(back);
+                leftButtonContainer.addView(forward);
+
+                rightButtonContainer.addView(close);
 
                 // Add the views to our toolbar
-                toolbar.addView(actionButtonContainer);
-                toolbar.addView(edittext);
-                toolbar.addView(close);
+                toolbar.addView(leftButtonContainer);
+                // Don't show address bar.
+                // toolbar.addView(edittext);
+                toolbar.addView(rightButtonContainer);
 
                 // Don't add the toolbar if its been disabled
-                if (getShowLocationBar()) {
+                if (features.location) {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
                 }
@@ -664,13 +594,103 @@ public class ThemeableBrowser extends CordovaPlugin {
                 dialog.getWindow().setAttributes(lp);
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
-                if(openWindowHidden) {
+                if(features.hidden) {
                     dialog.hide();
                 }
             }
         };
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
+    }
+
+    /**
+     * Convert our DIP units to Pixels
+     *
+     * @return int
+     */
+    private int dpToPixels(int dipValue) {
+        int value = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                (float) dipValue,
+                cordova.getActivity().getResources().getDisplayMetrics()
+        );
+
+        return value;
+    }
+
+    private void setStates(View view, String normal, String pressed,
+            int disabledAlpha) {
+        Resources activityRes = cordova.getActivity().getResources();
+        Drawable normalDrawable = null;
+        Drawable disabledDrawable = null;
+        Drawable pressedDrawable = null;
+
+        try {
+            int normalId = activityRes.getIdentifier(
+                    normal, "drawable", cordova.getActivity().getPackageName());
+            normalDrawable = activityRes.getDrawable(normalId);
+        } catch (Resources.NotFoundException e) {
+            Log.e(LOG_TAG, String.format(
+                    "%s not found as a drawable", normal));
+        }
+
+        try {
+            int pressedId = activityRes.getIdentifier(
+                    pressed, "drawable", cordova.getActivity().getPackageName());
+            pressedDrawable = activityRes.getDrawable(pressedId);
+        } catch (Resources.NotFoundException e) {
+            Log.e(LOG_TAG, String.format(
+                    "%s not found as a drawable", pressed));
+        }
+
+        if (normalDrawable != null) {
+            // Create the disabled state drawable by fading the normal state
+            // drawable. Drawable.setAlpha() stopped working above Android 4.4
+            // so we gotta bring out some bitmap magic. Credit goes to:
+            // http://stackoverflow.com/a/7477572
+            Bitmap enabledBitmap = ((BitmapDrawable) normalDrawable).getBitmap();
+            Bitmap disabledBitmap = Bitmap.createBitmap(
+                    normalDrawable.getIntrinsicWidth(),
+                    normalDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(disabledBitmap);
+
+            Paint paint = new Paint();
+            paint.setAlpha(disabledAlpha);
+            canvas.drawBitmap(enabledBitmap, 0, 0, paint);
+
+            disabledDrawable = new BitmapDrawable(activityRes, disabledBitmap);
+        }
+
+        StateListDrawable states = new StateListDrawable();
+        if (pressedDrawable != null) {
+            states.addState(
+                    new int[]{
+                            android.R.attr.state_pressed
+                    },
+                    pressedDrawable);
+        }
+        if (normalDrawable != null) {
+            states.addState(
+                    new int[]{
+                            android.R.attr.state_enabled
+                    },
+                    normalDrawable);
+        }
+        if (disabledDrawable != null) {
+            states.addState(
+                    new int[]{},
+                    disabledDrawable);
+        }
+
+        setBackground(view, states);
+    }
+
+    private void setBackground(View view, Drawable drawable) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            view.setBackgroundDrawable(drawable);
+        } else {
+            view.setBackground(drawable);
+        }
     }
 
     /**
@@ -687,7 +707,7 @@ public class ThemeableBrowser extends CordovaPlugin {
      *
      * @param obj a JSONObject contain event payload information
      * @param status the status code to return to the JavaScript environment
-     */    
+     */
     private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
         if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
@@ -698,7 +718,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             }
         }
     }
-    
+
     /**
      * The webview client receives notifications about appView
      */
@@ -729,7 +749,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
-            } 
+            }
             // If dialing phone (tel:5551212)
             else if (url.startsWith(WebView.SCHEME_TEL)) {
                 try {
@@ -793,37 +813,37 @@ public class ThemeableBrowser extends CordovaPlugin {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_START_EVENT);
                 obj.put("url", newloc);
-    
+
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
             }
         }
-        
+
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_STOP_EVENT);
                 obj.put("url", url);
-    
+
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
             }
         }
-        
+
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_ERROR_EVENT);
                 obj.put("url", failingUrl);
                 obj.put("code", errorCode);
                 obj.put("message", description);
-    
+
                 sendUpdate(obj, true, PluginResult.Status.ERROR);
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
@@ -832,12 +852,7 @@ public class ThemeableBrowser extends CordovaPlugin {
     }
 
     /**
-     * A class to hold parsed option properties. Note that our parser up there
-     * isn't a full blown JSON unmarshaller, and it would be impractical to
-     * import any more advanced third-party unmarshallers like Jackson. So array
-     * and HashMap/HashTable are not supported. Instead of array, use List with
-     * generic type. Instead of HashMap/HashTable, more class definitions with
-     * public properties shall be created.
+     * A class to hold parsed option properties.
      */
     private static class Options {
         public boolean location = true;
@@ -861,7 +876,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         public String menuButtonPressedImage = "themeablebrowser_stub_menu_highlight";
         public String titleColor = "#000000ff";
         public String titleStaticText = null;
-        public List<EventLabelPair> menuItems = null;
+        public EventLabelPair[] menuItems = null;
         public String menuTitle = null;
         public String menuCancel = null;
         public String closeButtonAlign = ALIGN_LEFT;
