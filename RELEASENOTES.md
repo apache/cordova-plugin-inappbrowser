@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.1.1
+===
+
+No code change was made. Doc was updated. Version number was updated because plugman wouldn't publish the 1.0.
+
 0.1
 ===
 
