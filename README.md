@@ -57,6 +57,10 @@ This plugin launches an in-app web view on top the existing [CordovaWebView](htt
 
 ![iOS Menu Sample](doc/images/ios_menu_sample_01.png)
 
+![Android Sample](doc/images/android_sample_01.png)
+
+![Android Menu Sample](doc/images/android_menu_sample_01.png)
+
 Installation
 ------------
 
@@ -68,7 +72,7 @@ Additional Properties
 In addition to InAppBrowser's properties, following properties were added to fulfill this plugin's purpose.
 
 + Toolbar and status bar
-    + `statusbarColor` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable only to iOS 7+.
+    + `statusbarColor` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable only to iOS 7+. iOS only.
     + `toolbarHeight` sets height of toolbar.
     + `toolbarColor` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `toolbarImage`.
     + `toolbarImage` sets an image as browser toolbar background in titled mode. This property references to a **native** image resource, therefore it is platform dependent.
@@ -88,8 +92,8 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `titleStaticText` sets static text for title. Note that by default title shows the title of the currently shown web page. Also see `hideTitle`.
 + Menu
     + `menuItems` creates a list of menu items for user to choose when menu button is clicked. It must follow the following format `[{event: 'e', label: 'l'}]`. When a menu item is pressed, you will get a custom event specified by the `event` property of the item. Within the received event object, you will also be given the following properties: `url`, which is the current URL in the web view, and `menuIndex`, which is an integer that references to the index of menu item in the given list.
-    + `menuTitle` sets menu title when menu button is clicked.
-    + `menuCancel` sets menu cancel button text.
+    + `menuTitle` sets menu title when menu button is clicked. iOS only.
+    + `menuCancel` sets menu cancel button text. iOS only.
 + Alignment
     + `closeButtonAlign` aligns close button to either `left` or `right`. Default to `left`.
     + `navButtonAlign` aligns back and forward buttons to either `left` or `right`. Default to `left`.
@@ -106,11 +110,30 @@ One thing to note is that all image resources reference to **native** resource b
 
 You may have noticed that one of the major features that ThemedBrowser added is an optional menu, which you can use to prompt user to make a simple choice from a list of items.
 
+FAQ
+---
+
+### Why does my menu on Android look ugly?
+
+Android menu is simply a [Spinner](http://developer.android.com/guide/topics/ui/controls/spinner.html), which picks up its style from your Activity's theme. By default Cordova uses the very old [Theme.Black.NoTitleBar](http://developer.android.com/reference/android/R.style.html#Theme_Black_NoTitleBar), which is ugly. Open your AndroidManifest.xml and change your `android:theme` attribute to something more morden, such as [Theme.Holo](http://developer.android.com/reference/android/R.style.html#Theme_Holo) or [Base.Theme.AppCompat](http://developer.android.com/reference/android/support/v7/appcompat/R.style.html#Base_Theme_AppCompat) from [support library](https://developer.android.com/tools/support-library/features.html#v7-appcompat).
+
+### How do I style Android menu?
+
+Android menu is simply a [Spinner](http://developer.android.com/guide/topics/ui/controls/spinner.html) with default layout resources, which picks up its style from your Activity's theme. You can style it by making a theme of your app and apply it to your activity. See `android:dropDownListViewStyle`.
+
+### How do I add margings and paddings?
+
+There is no margins or paddings. However notice that you can assign images to each of the buttons. So take advantage of PNG's transparency to create margins/paddings around your buttons.
+
+### How do I add shadow to the toolbar?
+
+First, notice that you can use an image as well as color for toolbar background. Use PNG for background image and create shadow inside this image. Next, you will probably be concerned about how buttons will slightly misaligned due since they always middle align. Again create some transparent borders in your button images to offset the misalignment. eg. Say your shadow is 5px tall, which causes buttons to allear lower than they shoud. Create a 10px transparent bottom border for each of your button icons and you are set.
+
 Supported Platforms
 -------------------
 
 + iOS 5.0+
-+ Android 4.0+ (Under development)
++ Android 2.0+
 
 Currently there is no plan to support other platforms, though source code from InAppBrowser is kept for merge purposes, they are inactive, since they are removed from `plugin.xml`.
 
