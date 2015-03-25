@@ -34,7 +34,8 @@ var browserWrap,
     navigationButtonsDivInner,
     backButton,
     forwardButton,
-    closeButton;
+    closeButton,
+    bodyOverflowStyle;
 
 // x-ms-webview is available starting from Windows 8.1 (platformId is 'windows')
 // http://msdn.microsoft.com/en-us/library/windows/apps/dn301831.aspx
@@ -86,6 +87,8 @@ var IAB = {
             if (win) win({ type: "exit" });
 
             browserWrap.parentNode.removeChild(browserWrap);
+            // Reset body overflow style to initial value
+            document.body.style.msOverflowStyle = bodyOverflowStyle;
             browserWrap = null;
             popup = null;
         }
@@ -109,24 +112,25 @@ var IAB = {
         } else {
             // "_blank" or anything else
             if (!browserWrap) {
+                var browserWrapStyle = document.createElement('link');
+                browserWrapStyle.rel = "stylesheet";
+                browserWrapStyle.type = "text/css";
+                browserWrapStyle.href = urlutil.makeAbsolute("/www/css/inappbrowser.css");
+
+                document.head.appendChild(browserWrapStyle);
+
                 browserWrap = document.createElement("div");
-                // First reset all styles for inappbrowser wrapper element
-                browserWrap.style.cssText = "margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background: 0 0;";
-                browserWrap.style.position = "fixed";
-                browserWrap.style.top = "0px";
-                browserWrap.style.left = "0px";
-                browserWrap.style.width = "100%";
-                browserWrap.style.height = "100%";
-                browserWrap.style.zIndex = 9999;
-                browserWrap.style.border = "40px solid rgba(0,0,0,0.25)";
+                browserWrap.className = "inAppBrowserWrap";
+
+                if (features.indexOf("fullscreen=yes") > -1) {
+                    browserWrap.classList.add("inAppBrowserWrapFullscreen");
+                }
 
                 // Save body overflow style to be able to reset it back later
-                var bodyOverflow = document.body.style.msOverflowStyle;
+                bodyOverflowStyle = document.body.style.msOverflowStyle;
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
-                        // Reset body overflow style to initial value
-                        document.body.style.msOverflowStyle = bodyOverflow;
                         IAB.close(win);
                     }, 0);
                 };

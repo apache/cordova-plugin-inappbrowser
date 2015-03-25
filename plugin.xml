@@ -197,6 +197,7 @@
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <merges target="" />
         </js-module>
+        <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
     </platform>
   
     <!-- firefoxos -->
