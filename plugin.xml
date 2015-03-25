@@ -26,7 +26,7 @@
     <description>Cordova ThemeableBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,themeablebrowser</keywords>
-    <repo>https://github.com/initialxy/cordova-plugin-themeablebrowser</repo>
+    <repo>https://github.com/initialxy/cordova-plugin-themeablebrowser.git</repo>
     <issue>https://github.com/initialxy/cordova-plugin-themeablebrowser/issues</issue>
 
     <engines>
