@@ -19,10 +19,8 @@
 package com.initialxy.cordova.themeablebrowser;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -87,8 +85,6 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
-    private static final String CLEAR_ALL_CACHE = "clearcache";
-    private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
 
     private static final String ALIGN_LEFT = "left";
     private static final String ALIGN_RIGHT = "right";
@@ -475,8 +471,12 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // Toolbar layout
                 FrameLayout toolbar = new FrameLayout(cordova.getActivity());
-                toolbar.setBackgroundColor(android.graphics.Color.LTGRAY);
+                toolbar.setBackgroundColor(hexStringToColor(features.toolbarColor));
                 toolbar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, dpToPixels(features.toolbarHeight)));
+
+                if (features.toolbarImage != null) {
+                    setBackground(toolbar, features.toolbarImage);
+                }
 
                 // Left Button Container layout
                 LinearLayout leftButtonContainer = new LinearLayout(cordova.getActivity());
@@ -494,12 +494,23 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // Back button
                 final Button back = new Button(cordova.getActivity());
-                back.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                back.setLayoutParams(new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 back.setContentDescription("Back Button");
-                setBackgroundStates(back, features.backButtonImage, features.backButtonPressedImage, DISABLED_ALPHA);
+                setBackgroundStates(back,
+                        features.backButtonImage,
+                        features.backButtonPressedImage, DISABLED_ALPHA);
+                back.setEnabled(features.backButtonCanClose);
+                back.setVisibility(
+                        features.hideBackButton ? View.GONE : View.VISIBLE);
                 back.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        goBack();
+                        if (features.backButtonCanClose
+                                && !inAppWebView.canGoBack()) {
+                            closeDialog();
+                        } else {
+                            goBack();
+                        }
                     }
                 });
 
@@ -508,6 +519,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                 forward.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 forward.setContentDescription("Forward Button");
                 setBackgroundStates(forward, features.forwardButtonImage, features.forwardButtonPressedImage, DISABLED_ALPHA);
+                forward.setEnabled(false);
+                forward.setVisibility(
+                        features.hideForwardButton ? View.GONE : View.VISIBLE);
                 forward.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         goForward();
@@ -538,65 +552,91 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // Close/Done button
                 Button close = new Button(cordova.getActivity());
-                close.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                forward.setContentDescription("Close Button");
-                setBackgroundStates(close, features.closeButtonImage, features.closeButtonPressedImage, DISABLED_ALPHA);
+                close.setLayoutParams(new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                close.setContentDescription("Close Button");
+                setBackgroundStates(close,
+                        features.closeButtonImage,
+                        features.closeButtonPressedImage, DISABLED_ALPHA);
+                close.setVisibility(
+                        features.hideCloseButton ? View.GONE : View.VISIBLE);
                 close.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         closeDialog();
                     }
                 });
 
-                TextView title = new TextView(cordova.getActivity());
+                final TextView title = new TextView(cordova.getActivity());
                 FrameLayout.LayoutParams titleParams
                         = new FrameLayout.LayoutParams(
                         LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
                 titleParams.gravity = Gravity.CENTER;
-                titleParams.setMargins(100, 0, 100, 0);
                 title.setLayoutParams(titleParams);
                 title.setSingleLine();
                 title.setGravity(Gravity.CENTER);
-                title.setText("Hello World!");
+                title.setTextColor(hexStringToColor(features.titleColor));
+                title.setVisibility(
+                        features.hideTitle ? View.GONE : View.VISIBLE);
+                if (features.titleStaticText != null) {
+                    title.setText(features.titleStaticText);
+                }
 
                 // Menu button
                 Spinner menu = new Spinner(cordova.getActivity());
-                menu.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                menu.setLayoutParams(new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 menu.setContentDescription("Menu Button");
-                setBackgroundStates(menu, features.menuButtonImage, features.menuButtonPressedImage, DISABLED_ALPHA);
-                HideSelectedAdapter<String> adapter = new HideSelectedAdapter<String>(cordova.getActivity(), android.R.layout.simple_spinner_item, new String[] {"Test 1", "Test 2", "Test 3"});
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                menu.setAdapter(adapter);
-                menu.setOnItemSelectedListener(
-                    new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView,
-                                View view, int i, long l) {
-                            if (features.menuItems != null
-                                    && i < features.menuItems.length) {
-                                menuSelected(
-                                        features.menuItems[i].event,
-                                        inAppWebView.getUrl(),
-                                        i);
-                            }
-                        }
+                setBackgroundStates(menu,
+                        features.menuButtonImage,
+                        features.menuButtonPressedImage, DISABLED_ALPHA);
+                menu.setVisibility(
+                        features.menuItems != null ? View.VISIBLE : View.GONE);
+                if (features.menuItems != null) {
+                    HideSelectedAdapter<EventLabelPair> adapter
+                            = new HideSelectedAdapter<EventLabelPair>(
+                            cordova.getActivity(),
+                            android.R.layout.simple_spinner_item,
+                            features.menuItems);
+                    adapter.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item);
+                    menu.setAdapter(adapter);
+                    menu.setOnItemSelectedListener(
+                            new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(
+                                        AdapterView<?> adapterView,
+                                        View view, int i, long l) {
+                                    if (features.menuItems != null
+                                            && i < features.menuItems.length) {
+                                        menuSelected(
+                                                features.menuItems[i].event,
+                                                inAppWebView.getUrl(), i);
+                                    }
+                                }
 
-                        @Override
-                        public void onNothingSelected(
-                                AdapterView<?> adapterView) {
-                        }
-                    }
-                );
+                                @Override
+                                public void onNothingSelected(
+                                        AdapterView<?> adapterView) {
+                                }
+                            }
+                    );
+                }
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
-                LinearLayout.LayoutParams inAppWebViewPrams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+                final LinearLayout.LayoutParams inAppWebViewPrams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
                 inAppWebViewPrams.weight = 1;
                 inAppWebView.setLayoutParams(inAppWebViewPrams);
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, new PageLoadListener() {
                     @Override
-                    public void pageLoaded(String url, boolean canGoBack, boolean canGoForward) {
+                    public void onPageFinished(String url, boolean canGoBack, boolean canGoForward) {
+                        if (features.titleStaticText == null && !features.hideTitle) {
+                            title.setText(inAppWebView.getTitle());
+                        }
 
+                        back.setEnabled(canGoBack || features.backButtonCanClose);
+                        forward.setEnabled(canGoForward);
                     }
                 });
                 inAppWebView.setWebViewClient(client);
@@ -628,12 +668,60 @@ public class ThemeableBrowser extends CordovaPlugin {
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
-                // Add the back and forward buttons to our action button container layout
-                leftButtonContainer.addView(back);
-                leftButtonContainer.addView(forward);
+                // Add buttons to either leftButtonsContainer or
+                // rightButtonsContainer according to user's alignment
+                // configuration.
+                int leftContainerWidth = 0;
+                int rightContainerWidth = 0;
 
-                rightButtonContainer.addView(menu);
-                rightButtonContainer.addView(close);
+                if (ALIGN_LEFT.equals(features.navButtonAlign)) {
+                    leftButtonContainer.addView(back);
+                    leftButtonContainer.addView(forward);
+                    leftContainerWidth
+                            += back.getVisibility() == View.VISIBLE
+                            ? back.getLayoutParams().width : 0;
+                    leftContainerWidth
+                            += forward.getVisibility() == View.VISIBLE
+                            ? forward.getLayoutParams().width : 0;
+                } else {
+                    rightButtonContainer.addView(forward);
+                    rightButtonContainer.addView(back);
+                    rightContainerWidth
+                            += back.getVisibility() == View.VISIBLE
+                            ? back.getLayoutParams().width : 0;
+                    rightContainerWidth
+                            += forward.getVisibility() == View.VISIBLE
+                            ? forward.getLayoutParams().width : 0;
+                }
+
+                if (ALIGN_LEFT.equals(features.menuButtonAlign)) {
+                    leftButtonContainer.addView(menu, 0);
+                    leftContainerWidth
+                            += menu.getVisibility() == View.VISIBLE
+                            ? menu.getLayoutParams().width : 0;
+                } else {
+                    rightButtonContainer.addView(menu);
+                    rightContainerWidth
+                            += menu.getVisibility() == View.VISIBLE
+                            ? menu.getLayoutParams().width : 0;
+                }
+
+                if (ALIGN_LEFT.equals(features.closeButtonAlign)) {
+                    leftButtonContainer.addView(close, 0);
+                    leftContainerWidth
+                            += close.getVisibility() == View.VISIBLE
+                            ? close.getLayoutParams().width : 0;
+                } else {
+                    rightButtonContainer.addView(close);
+                    rightContainerWidth
+                            += close.getVisibility() == View.VISIBLE
+                            ? close.getLayoutParams().width : 0;
+                }
+
+                int titleMargin = Math.max(
+                        leftContainerWidth, rightContainerWidth);
+
+                titleParams.setMargins(titleMargin, 0, titleMargin, 0);
 
                 // Add the views to our toolbar
                 toolbar.addView(leftButtonContainer);
@@ -693,7 +781,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 hex = hex.substring(1);
             }
 
-            result = Integer.parseInt(hex, 16);
+            result = (int) Long.parseLong(hex, 16);
 
             // Almost done, but Android color code is in form of ARGB instead of
             // RGBA, so we gotta shift it a bit.
@@ -774,6 +862,19 @@ public class ThemeableBrowser extends CordovaPlugin {
         setBackground(view, states);
     }
 
+    private void setBackground(View view, String image) {
+        Resources activityRes = cordova.getActivity().getResources();
+
+        try {
+            int imageId = activityRes.getIdentifier(
+                    image, "drawable", cordova.getActivity().getPackageName());
+            setBackground(view, activityRes.getDrawable(imageId));
+        } catch (Resources.NotFoundException e) {
+            Log.e(LOG_TAG, String.format(
+                    "%s not found as a drawable", image));
+        }
+    }
+
     private void setBackground(View view, Drawable drawable) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackgroundDrawable(drawable);
@@ -809,7 +910,7 @@ public class ThemeableBrowser extends CordovaPlugin {
     }
 
     public static interface PageLoadListener {
-        public void pageLoaded(String url, boolean canGoBack,
+        public void onPageFinished(String url, boolean canGoBack,
                 boolean canGoForward);
     }
 
@@ -926,7 +1027,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 sendUpdate(obj, true);
 
                 if (this.callback != null) {
-                    this.callback.pageLoaded(url, view.canGoBack(),
+                    this.callback.onPageFinished(url, view.canGoBack(),
                             view.canGoForward());
                 }
             } catch (JSONException ex) {
@@ -1001,12 +1102,9 @@ public class ThemeableBrowser extends CordovaPlugin {
         public boolean clearcache = false;
         public boolean clearsessioncache = false;
 
-        public String statusbarColor = "#ffffffff";
         public int toolbarHeight = 44;
         public String toolbarColor = "#ffffffff";
         public String toolbarImage = null;
-        public String toolbarImagePortrait = null;
-        public String toolbarImageLandscape = null;
         public String backButtonImage = "themeablebrowser_stub_back";
         public String backButtonPressedImage = "themeablebrowser_stub_back_highlight";
         public String forwardButtonImage = "themeablebrowser_stub_forward";
@@ -1018,8 +1116,6 @@ public class ThemeableBrowser extends CordovaPlugin {
         public String titleColor = "#000000ff";
         public String titleStaticText = null;
         public EventLabelPair[] menuItems = null;
-        public String menuTitle = null;
-        public String menuCancel = null;
         public String closeButtonAlign = ALIGN_LEFT;
         public String navButtonAlign = ALIGN_LEFT;
         public String menuButtonAlign = ALIGN_RIGHT;
