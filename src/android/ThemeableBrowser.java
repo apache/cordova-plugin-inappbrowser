@@ -1127,7 +1127,7 @@ public class ThemeableBrowser extends CordovaPlugin {
 
     }
 
-    private class EventLabelPair {
+    private static class EventLabelPair {
         public String event;
         public String label;
 

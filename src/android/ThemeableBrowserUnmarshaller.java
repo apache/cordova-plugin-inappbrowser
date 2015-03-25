@@ -58,10 +58,24 @@ public class ThemeableBrowserUnmarshaller {
     }
 
     /**
+     * Runtime exception to notify errors during class initialization.
+     */
+    public static class ClassInstantiationException extends RuntimeException {
+        public ClassInstantiationException(Class<?> cls) {
+            super(String.format("Failed to instantiate %s", cls));
+        }
+
+        public ClassInstantiationException(String message) {
+            super(message);
+        }
+    }
+
+    /**
      * Given a JSON string, unmarhalll it to an instance of the given class.
      *
      * @param json JSON string to unmarshall.
-     * @param cls Return an instance of this class.
+     * @param cls Return an instance of this class. Must be either public class
+     *            or private static class. Inner class will not work.
      * @param <T> Same type as cls.
      * @return An instance of class given by cls.
      * @throws com.initialxy.cordova.themeablebrowser.ThemeableBrowserUnmarshaller.TypeMismatchException
@@ -85,7 +99,8 @@ public class ThemeableBrowserUnmarshaller {
      * Given a JSONObject, unmarhalll it to an instance of the given class.
      *
      * @param jsonObj JSON string to unmarshall.
-     * @param cls Return an instance of this class.
+     * @param cls Return an instance of this class. Must be either public class
+     *            or private static class. Inner class will not work.
      * @param <T> Same type as cls.
      * @return An instance of class given by cls.
      * @throws com.initialxy.cordova.themeablebrowser.ThemeableBrowserUnmarshaller.TypeMismatchException
@@ -152,13 +167,15 @@ public class ThemeableBrowserUnmarshaller {
         } catch (JSONException e) {
             // Ignore.
         } catch (NoSuchMethodException e) {
-            // Ignore.
+            throw new ClassInstantiationException(
+                    "Failed to retrieve constructor for "
+                    + cls.toString() + ", make sure it's not an inner class.");
         } catch (InstantiationException e) {
-            // Ignore.
+            throw new ClassInstantiationException(cls);
         } catch (IllegalAccessException e) {
-            // Ignore.
+            throw new ClassInstantiationException(cls);
         } catch (InvocationTargetException e) {
-            // Ignore.
+            throw new ClassInstantiationException(cls);
         }
 
         return result;
