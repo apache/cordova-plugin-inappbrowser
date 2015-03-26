@@ -57,6 +57,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.apache.cordova.CordovaPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,6 +84,11 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
+
+    /*
+    Configuration property. Custom applicaiton scheme to be handeld in a _system.
+     */
+    private static final String CUSTOM_APPLICATION_SCHEME = "CustomAppScheme";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -113,7 +119,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
-            
+
             Log.d(LOG_TAG, "target = " + target);
             
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -772,6 +778,7 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onPageStarted(WebView view, String url,  Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            final CordovaPreferences preferences = Config.getPreferences();
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
@@ -826,6 +833,18 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
+            }
+            else if (url.startsWith(preferences.getString(CUSTOM_APPLICATION_SCHEME, "!@#$"))) {
+                try {
+                    final Intent intent = new Intent(Intent.ACTION_VIEW);
+                    final Uri uri = Uri.parse(url);
+                    intent.setData(uri);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    cordova.getActivity().startActivity(intent);
+                } catch (final android.content.ActivityNotFoundException e) {
+                    LOG.e(LOG_TAG, "Error during redirection " + url + ":" + e.toString());
+                }
+                newloc = "";
             }
             else {
                 newloc = "http://" + url;
