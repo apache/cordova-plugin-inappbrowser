@@ -777,8 +777,23 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public void onPageStarted(WebView view, String url,  Bitmap favicon) {
+          // handle back to application redirect without processing url by webView
+          final CordovaPreferences preferences = Config.getPreferences();
+            if (url.startsWith(preferences.getString(CUSTOM_APPLICATION_SCHEME, "!@#$"))) {
+                try {
+                    final Intent intent = new Intent(Intent.ACTION_VIEW);
+                    final Uri uri = Uri.parse(url);
+                    intent.setData(uri);
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    cordova.getActivity().startActivity(intent);
+                    closeDialog();
+                    return;
+                } catch (final android.content.ActivityNotFoundException e) {
+                    LOG.e(LOG_TAG, "Error during redirection " + url + ":" + e.toString());
+                }
+            }
+
             super.onPageStarted(view, url, favicon);
-            final CordovaPreferences preferences = Config.getPreferences();
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
@@ -833,18 +848,6 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
-            }
-            else if (url.startsWith(preferences.getString(CUSTOM_APPLICATION_SCHEME, "!@#$"))) {
-                try {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW);
-                    final Uri uri = Uri.parse(url);
-                    intent.setData(uri);
-                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    cordova.getActivity().startActivity(intent);
-                } catch (final android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error during redirection " + url + ":" + e.toString());
-                }
-                newloc = "";
             }
             else {
                 newloc = "http://" + url;
