@@ -48,16 +48,6 @@
         <source-file src="src/android/ThemeableBrowserDialog.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/ThemeableBrowserUnmarshaller.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
-
-        <!--  drawable src/android/resources -->
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_close.png" target="res/drawable-xhdpi/themeablebrowser_stub_close.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_close_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_close_highlight.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_menu.png" target="res/drawable-xhdpi/themeablebrowser_stub_menu.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_menu_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_menu_highlight.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_back.png" target="res/drawable-xhdpi/themeablebrowser_stub_back.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_back_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_back_highlight.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_forward.png" target="res/drawable-xhdpi/themeablebrowser_stub_forward.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/themeablebrowser_stub_forward_highlight.png" target="res/drawable-xhdpi/themeablebrowser_stub_forward_highlight.png" />
     </platform>
 
     <!-- ios -->
@@ -75,15 +65,5 @@
 	    <source-file src="src/ios/CDVThemeableBrowser.m" />
 	    
 	    <framework src="CoreGraphics.framework" />
-
-        <!--  Image resources -->
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_close@2x.png" target="Resources/themeablebrowser_stub_close@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_close_highlight@2x.png" target="Resources/themeablebrowser_stub_close_highlight@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_menu@2x.png" target="Resources/themeablebrowser_stub_menu@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_menu_highlight@2x.png" target="Resources/themeablebrowser_stub_menu_highlight@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_back@2x.png" target="Resources/themeablebrowser_stub_back@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_back_highlight@2x.png" target="Resources/themeablebrowser_stub_back_highlight@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_forward@2x.png" target="Resources/themeablebrowser_stub_forward@2x.png" />
-        <resource-file src="src/ios/Resources/themeablebrowser_stub_forward_highlight@2x.png" target="Resources/themeablebrowser_stub_forward_highlight@2x.png" />
     </platform>
 </plugin>
