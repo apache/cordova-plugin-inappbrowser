@@ -73,10 +73,10 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `color` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable to only iOS 7+.
 + `toolbar`
     + `height` sets height of toolbar.
-    + `color` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `toolbarImage`.
+    + `color` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `image`.
     + `image` sets an image as browser toolbar background in titled mode. This property references to a **native** image resource, therefore it is platform dependent.
-    + `imagePortrait` sets an image for browser toolbar background but only in portrait mode. This property will be overridden by `toolbarImage` if given. This is an iOS only property and references to **native** image resource.
-    + `imageLandscape` sets an image for browser toolbar background but only in landscape mode. This property will be overridden by `toolbarImage` if given. This is an iOS only property and references to **native** image resource.
+    + `imagePortrait` sets an image for browser toolbar background but only in portrait mode. This property will be overridden by `image` if given. This is an iOS only property and references to **native** image resource.
+    + `imageLandscape` sets an image for browser toolbar background but only in landscape mode. This property will be overridden by `image` if given. This is an iOS only property and references to **native** image resource.
 + `title`
     + `color` sets title text color in RGBA web hex format. Default to black. eg. `#fff0f0ff`
     + `staticText` sets static text for title. This property overrides `showCurrentTitle` (see below).
