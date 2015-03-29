@@ -26,31 +26,70 @@ The purpose of this plugin is to provide an in-app-browser that can also be conf
 
 This plugin launches an in-app web view on top the existing [CordovaWebView](https://github.com/apache/cordova-android/blob/master/framework/src/org/apache/cordova/CordovaWebView.java) by calling `cordova.ThemeableBrowser.open()`.
 
-    // Uses stub button image that's in fact, default. Just for example.
-    var ref = cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
-        backButtonCanClose: true,
-        hideForwardButton: true,
-        toolbarColor: '#e1e1e1ff',
-        titleColor: '#000000ff',
-        statusbarColor: '#ffffffff',
-        navButtonAlign: 'left',
-        closeButtonAlign: 'right',
-        menuButtonAlign: 'right',
-        titleStaticText: 'Hello World!',
-        backButtonImage: 'themeablebrowser_stub_back',
-        backButtonPressedImage: 'themeablebrowser_stub_back_highlight',
-        menuTitle: 'Test',
-        menuCancel: 'Cancel',
-        menuItems: [
+    // Keep in mind that you must add your own images to native resource.
+    // Images below are for sample only. They are not imported by this plugin.
+    cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
+        statusbar: {
+            color: '#ffffffff'
+        },
+        toolbar: {
+            height: 44,
+            color: '#f0f0f0ff'
+        },
+        title: {
+            color: '#003264ff',
+            showCurrentTitle: true
+        },
+        backButton: {
+            image: 'back',
+            imagePressed: 'back_pressed',
+            align: 'left',
+            event: 'backPressed'
+        },
+        forwardButton: {
+            image: 'forward',
+            imagePressed: 'forward_pressed',
+            align: 'left',
+            event: 'forwardPressed'
+        },
+        closeButton: {
+            image: 'close',
+            imagePressed: 'close_pressed',
+            align: 'left',
+            event: 'closePressed'
+        },
+        customButtons: [
             {
-                event: 'hello',
-                label: 'Hello World!'
-            },
-            {
-                event: 'test',
-                label: 'Test!'
+                image: 'share',
+                imagePressed: 'share_pressed',
+                align: 'right',
+                event: 'sharePressed'
             }
-        ]
+        ],
+        menu: {
+            image: 'menu',
+            imagePressed: 'menu_pressed',
+            title: 'Test',
+            cancel: 'Cancel',
+            align: 'right',
+            items: [
+                {
+                    event: 'helloPressed',
+                    label: 'Hello World!'
+                },
+                {
+                    event: 'testPressed',
+                    label: 'Test!'
+                }
+            ]
+        },
+        backButtonCanClose: true
+    }).addEventListener('backPressed', function(e) {
+        alert('back pressed');
+    }).addEventListener('helloPressed', function(e) {
+        alert('hello');
+    }).addEventListener('sharePressed', function(e) {
+        alert(e.url);
     });
 
 ![iOS Sample](doc/images/ios_sample_01.png)
@@ -104,13 +143,13 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `event` raises an custom event with given text as event name when menu button is pressed. Optional.
     + `align` aligns menu button to either `left` or `right`. Default to `left`.
     + `items` is a list of items to be shown when menu is open
-        + `event` defines the event name that will be raised when this menu item is clicked. The callbacks to menu events will receive an event object that contains the following properties: `url` is the current URL shown in browser and `menuIndex` is the list index of `items`.
+        + `event` defines the event name that will be raised when this menu item is clicked. The callbacks to menu events will receive an event object that contains the following properties: `url` is the current URL shown in browser and `index` is the index of the selected item in `items`.
         + `label` defines the menu item label text.
 + `customButtons` is a list of objects that will be inserted into toolbar when given.
     + `image` sets image for custom button. This property references to a **native** image resource, therefore it is platform dependent.
     + `imagePressed` sets image for custom button in its pressed state. This property references to a **native** image resource, therefore it is platform dependent.
     + `align` aligns custom button to either `left` or `right`. Default to `left`.
-    + `event` raises an custom event with given text as event name when custom button is pressed. Optional.
+    + `event` raises an custom event with given text as event name when custom button is pressed. The callbacks to custom button events will receive an event object that contains the following properties: `url` is the current URL shown in browser and `index` is the index of the selected button in `customButtons`.
 + `backButtonCanClose` allows back button to close browser when there's no more to go back. Otherwise, back button will be disabled.
 
 One thing to note is that all image resources reference to **native** resource bundle. So all images need to be imported to native project first. In case of Android, the image name will be looked up under `R.drawable`. eg. If image name is `hello_world`, `R.drawable.hello_world` will be referenced.
