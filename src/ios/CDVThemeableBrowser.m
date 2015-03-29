@@ -40,7 +40,7 @@
 #define    kThemeableBrowserPropImagePortrait @"imagePortrait"
 #define    kThemeableBrowserPropImageLandscape @"imageLandscape"
 #define    kThemeableBrowserPropStaticText @"staticText"
-#define    kThemeableBrowserPropShowCurrentTitle @"showCurrentTitle"
+#define    kThemeableBrowserPropShowPageTitle @"showPageTitle"
 #define    kThemeableBrowserPropAlign @"align"
 #define    kThemeableBrowserPropTitle @"title"
 #define    kThemeableBrowserPropCancel @"cancel"
@@ -1213,7 +1213,9 @@
         self.backButton.enabled = theWebView.canGoBack;
     }
     self.forwardButton.enabled = theWebView.canGoForward;
-    if (self.titleLabel && [self getBoolFromDict:_browserOptions.title withKey:kThemeableBrowserPropShowCurrentTitle]) {
+    if (self.titleLabel && _browserOptions.title
+            && !_browserOptions.title[kThemeableBrowserPropStaticText]
+            && [self getBoolFromDict:_browserOptions.title withKey:kThemeableBrowserPropShowPageTitle]) {
         // Update title text to page title when title is shown and we are not
         // required to show a static text.
         self.titleLabel.text = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
