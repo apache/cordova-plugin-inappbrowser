@@ -42,7 +42,6 @@
 @interface CDVThemeableBrowserOptions : NSObject {}
 
 @property (nonatomic) BOOL location;
-@property (nonatomic) BOOL toolbar;
 @property (nonatomic) NSString* closebuttoncaption;
 @property (nonatomic) NSString* toolbarposition;
 @property (nonatomic) BOOL clearcache;
@@ -59,41 +58,17 @@
 @property (nonatomic) BOOL hidden;
 @property (nonatomic) BOOL disallowoverscroll;
 
-@property (nonatomic) NSString* statusbarColor;
-@property (nonatomic) CGFloat toolbarHeight;
-@property (nonatomic) NSString* toolbarColor;
-@property (nonatomic) NSString* toolbarImage;
-@property (nonatomic) NSString* toolbarImagePortrait;
-@property (nonatomic) NSString* toolbarImageLandscape;
-@property (nonatomic) NSString* titleColor;
-@property (nonatomic) NSString* backButtonImage;
-@property (nonatomic) NSString* backButtonPressedImage;
-@property (nonatomic) NSString* forwardButtonImage;
-@property (nonatomic) NSString* forwardButtonPressedImage;
-@property (nonatomic) NSString* closeButtonImage;
-@property (nonatomic) NSString* closeButtonPressedImage;
-@property (nonatomic) NSString* menuButtonImage;
-@property (nonatomic) NSString* menuButtonPressedImage;
-
-@property (nonatomic) NSString* closeButtonAlign;
-@property (nonatomic) NSString* navButtonAlign;
-@property (nonatomic) NSString* menuButtonAlign;
-
-@property (nonatomic) NSString* titleStaticText;
-@property (nonatomic) NSArray* menuItems;
-@property (nonatomic) NSString* menuTitle;
-@property (nonatomic) NSString* menuCancel;
-
+@property (nonatomic) NSDictionary* statusbar;
+@property (nonatomic) NSDictionary* toolbar;
+@property (nonatomic) NSDictionary* title;
+@property (nonatomic) NSDictionary* backButton;
+@property (nonatomic) NSDictionary* forwardButton;
+@property (nonatomic) NSDictionary* closeButton;
+@property (nonatomic) NSDictionary* menu;
+@property (nonatomic) NSArray* customButtons;
 @property (nonatomic) BOOL backButtonCanClose;
 
-@property (nonatomic) BOOL hideTitle;
-@property (nonatomic) BOOL hideCloseButton;
-@property (nonatomic) BOOL hideBackButton;
-@property (nonatomic) BOOL hideForwardButton;
-
 + (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
-
-+ (void)validateOptions:(CDVThemeableBrowserOptions*)options;
 
 @end
 
