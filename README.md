@@ -38,7 +38,7 @@ This plugin launches an in-app web view on top the existing [CordovaWebView](htt
         },
         title: {
             color: '#003264ff',
-            showCurrentTitle: true
+            showPageTitle: true
         },
         backButton: {
             image: 'back',
@@ -118,8 +118,8 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `imageLandscape` sets an image for browser toolbar background but only in landscape mode. This property will be overridden by `image` if given. This is an iOS only property and references to **native** image resource.
 + `title`
     + `color` sets title text color in RGBA web hex format. Default to black. eg. `#fff0f0ff`
-    + `staticText` sets static text for title. This property overrides `showCurrentTitle` (see below).
-    + `showCurrentTitle` when set to true, title of the current web page will be shown.
+    + `staticText` sets static text for title. This property overrides `showPageTitle` (see below).
+    + `showPageTitle` when set to true, title of the current web page will be shown.
 + `backButton`
     + `image` sets image for back button. This property references to a **native** image resource, therefore it is platform dependent.
     + `imagePressed` sets image for back button in its pressed state. This property references to a **native** image resource, therefore it is platform dependent.
