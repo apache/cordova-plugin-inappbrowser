@@ -1184,10 +1184,14 @@
     // loading url, start spinner, update back/forward
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    if (!_browserOptions.backButtonCanClose && self.backButton) {
-        self.backButton.enabled = theWebView.canGoBack;
+    if (self.backButton) {
+        self.backButton.enabled
+        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
-    self.forwardButton.enabled = theWebView.canGoForward;
+
+    if (self.forwardButton) {
+	    self.forwardButton.enabled = theWebView.canGoForward;
+	}
 
     [self.spinner startAnimating];
 
@@ -1209,10 +1213,15 @@
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
-    if (!_browserOptions.backButtonCanClose && self.backButton) {
-        self.backButton.enabled = theWebView.canGoBack;
+    if (self.backButton) {
+        self.backButton.enabled
+        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
-    self.forwardButton.enabled = theWebView.canGoForward;
+
+    if (self.forwardButton) {
+	    self.forwardButton.enabled = theWebView.canGoForward;
+	}
+	
     if (self.titleLabel && _browserOptions.title
             && !_browserOptions.title[kThemeableBrowserPropStaticText]
             && [self getBoolFromDict:_browserOptions.title withKey:kThemeableBrowserPropShowPageTitle]) {
@@ -1247,10 +1256,15 @@
     // log fail message, stop spinner, update back/forward
     NSLog(@"webView:didFailLoadWithError - %ld: %@", (long)error.code, [error localizedDescription]);
 
-    if (!_browserOptions.backButtonCanClose && self.backButton) {
-        self.backButton.enabled = theWebView.canGoBack;
+    if (self.backButton) {
+        self.backButton.enabled
+        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
-    self.forwardButton.enabled = theWebView.canGoForward;
+
+    if (self.forwardButton) {
+	    self.forwardButton.enabled = theWebView.canGoForward;
+	}
+
     [self.spinner stopAnimating];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
