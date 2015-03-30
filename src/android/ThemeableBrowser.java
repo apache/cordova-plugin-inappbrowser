@@ -20,6 +20,7 @@ package com.initialxy.cordova.themeablebrowser;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -33,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Browser;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -56,6 +58,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.apache.cordova.CallbackContext;
@@ -89,6 +92,7 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final String ALIGN_LEFT = "left";
     private static final String ALIGN_RIGHT = "right";
 
+    private static final int TOOLBAR_DEF_HEIGHT = 44;
     private static final int DISABLED_ALPHA = 127;  // 50% AKA 127/255.
 
     private ThemeableBrowserDialog dialog;
@@ -390,13 +394,19 @@ public class ThemeableBrowser extends CordovaPlugin {
         }
     }
 
-    private void menuSelected(String event, String url, int menuIndex) {
-        if (event != null) {
+    private void emitButtonEvent(Event event, String url) {
+        emitButtonEvent(event, url, null);
+    }
+
+    private void emitButtonEvent(Event event, String url, Integer index) {
+        if (event != null && event.event != null) {
             try {
                 JSONObject obj = new JSONObject();
-                obj.put("type", event);
+                obj.put("type", event.event);
                 obj.put("url", url);
-                obj.put("menuIndex", menuIndex);
+                if (index != null) {
+                    obj.put("index", index.intValue());
+                }
                 sendUpdate(obj, true);
             } catch (JSONException e) {
                 // Ignore, should never happen.
@@ -470,12 +480,18 @@ public class ThemeableBrowser extends CordovaPlugin {
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
+                Toolbar toolbarDef = features.toolbar;
                 FrameLayout toolbar = new FrameLayout(cordova.getActivity());
-                toolbar.setBackgroundColor(hexStringToColor(features.toolbarColor));
-                toolbar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, dpToPixels(features.toolbarHeight)));
+                toolbar.setBackgroundColor(hexStringToColor(
+                        toolbarDef != null && toolbarDef.color != null
+                                ? toolbarDef.color : "#ffffffff"));
+                toolbar.setLayoutParams(new LinearLayout.LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        dpToPixels(toolbarDef != null
+                                ? toolbarDef.height : TOOLBAR_DEF_HEIGHT)));
 
-                if (features.toolbarImage != null) {
-                    setBackground(toolbar, features.toolbarImage);
+                if (toolbarDef != null && toolbarDef.image != null) {
+                    setBackground(toolbar, toolbarDef.image);
                 }
 
                 // Left Button Container layout
@@ -491,42 +507,6 @@ public class ThemeableBrowser extends CordovaPlugin {
                 rightButtonContainerParams.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
                 rightButtonContainer.setLayoutParams(rightButtonContainerParams);
                 rightButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
-
-                // Back button
-                final Button back = new Button(cordova.getActivity());
-                back.setLayoutParams(new LinearLayout.LayoutParams(
-                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                back.setContentDescription("Back Button");
-                setBackgroundStates(back,
-                        features.backButtonImage,
-                        features.backButtonPressedImage, DISABLED_ALPHA);
-                back.setEnabled(features.backButtonCanClose);
-                back.setVisibility(
-                        features.hideBackButton ? View.GONE : View.VISIBLE);
-                back.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        if (features.backButtonCanClose
-                                && !inAppWebView.canGoBack()) {
-                            closeDialog();
-                        } else {
-                            goBack();
-                        }
-                    }
-                });
-
-                // Forward button
-                final Button forward = new Button(cordova.getActivity());
-                forward.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                forward.setContentDescription("Forward Button");
-                setBackgroundStates(forward, features.forwardButtonImage, features.forwardButtonPressedImage, DISABLED_ALPHA);
-                forward.setEnabled(false);
-                forward.setVisibility(
-                        features.hideForwardButton ? View.GONE : View.VISIBLE);
-                forward.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        goForward();
-                    }
-                });
 
                 // Edit Text Box
                 edittext = new EditText(cordova.getActivity());
@@ -550,76 +530,105 @@ public class ThemeableBrowser extends CordovaPlugin {
                     }
                 });
 
-                // Close/Done button
-                Button close = new Button(cordova.getActivity());
-                close.setLayoutParams(new LinearLayout.LayoutParams(
-                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                close.setContentDescription("Close Button");
-                setBackgroundStates(close,
-                        features.closeButtonImage,
-                        features.closeButtonPressedImage, DISABLED_ALPHA);
-                close.setVisibility(
-                        features.hideCloseButton ? View.GONE : View.VISIBLE);
-                close.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        closeDialog();
+                // Back button
+                final Button back = createButton(
+                    features.backButton,
+                    new View.OnClickListener() {
+                        public void onClick(View v) {
+                            if (features.backButtonCanClose
+                                    && !inAppWebView.canGoBack()) {
+                                closeDialog();
+                            } else {
+                                goBack();
+                            }
+                        }
                     }
-                });
+                );
 
-                final TextView title = new TextView(cordova.getActivity());
-                FrameLayout.LayoutParams titleParams
-                        = new FrameLayout.LayoutParams(
-                        LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-                titleParams.gravity = Gravity.CENTER;
-                title.setLayoutParams(titleParams);
-                title.setSingleLine();
-                title.setGravity(Gravity.CENTER);
-                title.setTextColor(hexStringToColor(features.titleColor));
-                title.setVisibility(
-                        features.hideTitle ? View.GONE : View.VISIBLE);
-                if (features.titleStaticText != null) {
-                    title.setText(features.titleStaticText);
+                if (back != null) {
+                    back.setEnabled(features.backButtonCanClose);
                 }
 
+                // Forward button
+                final Button forward = createButton(
+                    features.forwardButton,
+                    new View.OnClickListener() {
+                        public void onClick(View v) {
+                            goForward();
+                        }
+                    }
+                );
+
+                // Close/Done button
+                Button close = createButton(
+                    features.closeButton,
+                    new View.OnClickListener() {
+                        public void onClick(View v) {
+                            closeDialog();
+                        }
+                    }
+                );
+
                 // Menu button
-                Spinner menu = new Spinner(cordova.getActivity());
-                menu.setLayoutParams(new LinearLayout.LayoutParams(
-                        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                menu.setContentDescription("Menu Button");
-                setBackgroundStates(menu,
-                        features.menuButtonImage,
-                        features.menuButtonPressedImage, DISABLED_ALPHA);
-                menu.setVisibility(
-                        features.menuItems != null ? View.VISIBLE : View.GONE);
-                if (features.menuItems != null) {
-                    HideSelectedAdapter<EventLabelPair> adapter
-                            = new HideSelectedAdapter<EventLabelPair>(
-                            cordova.getActivity(),
-                            android.R.layout.simple_spinner_item,
-                            features.menuItems);
-                    adapter.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item);
-                    menu.setAdapter(adapter);
-                    menu.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(
-                                        AdapterView<?> adapterView,
-                                        View view, int i, long l) {
-                                    if (features.menuItems != null
-                                            && i < features.menuItems.length) {
-                                        menuSelected(
-                                                features.menuItems[i].event,
-                                                inAppWebView.getUrl(), i);
+                Spinner menu = features.menu != null
+                        ? new MenuSpinner(cordova.getActivity()) : null;
+                if (menu != null) {
+                    menu.setLayoutParams(new LinearLayout.LayoutParams(
+                            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                    menu.setContentDescription("Menu Button");
+                    setBackgroundStates(menu,
+                            features.menu.image,
+                            features.menu.imagePressed, DISABLED_ALPHA);
+
+                    if (features.menu.items != null) {
+                        HideSelectedAdapter<EventLabel> adapter
+                                = new HideSelectedAdapter<EventLabel>(
+                                cordova.getActivity(),
+                                android.R.layout.simple_spinner_item,
+                                features.menu.items);
+                        adapter.setDropDownViewResource(
+                                android.R.layout.simple_spinner_dropdown_item);
+                        menu.setAdapter(adapter);
+                        menu.setOnItemSelectedListener(
+                                new AdapterView.OnItemSelectedListener() {
+                                    @Override
+                                    public void onItemSelected(
+                                            AdapterView<?> adapterView,
+                                            View view, int i, long l) {
+                                        if (i < features.menu.items.length) {
+                                            emitButtonEvent(
+                                                    features.menu.items[i],
+                                                    inAppWebView.getUrl(), i);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onNothingSelected(
+                                            AdapterView<?> adapterView) {
                                     }
                                 }
+                        );
+                    }
+                }
 
-                                @Override
-                                public void onNothingSelected(
-                                        AdapterView<?> adapterView) {
-                                }
-                            }
-                    );
+                // Title
+                final TextView title = features.title != null
+                        ? new TextView(cordova.getActivity()) : null;
+                if (title != null) {
+                    FrameLayout.LayoutParams titleParams
+                            = new FrameLayout.LayoutParams(
+                            LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                    titleParams.gravity = Gravity.CENTER;
+                    title.setLayoutParams(titleParams);
+                    title.setSingleLine();
+                    title.setEllipsize(TextUtils.TruncateAt.END);
+                    title.setGravity(Gravity.CENTER);
+                    title.setTextColor(hexStringToColor(
+                            features.title.color != null
+                                    ? features.title.color : "#000000ff"));
+                    if (features.title.staticText != null) {
+                        title.setText(features.title.staticText);
+                    }
                 }
 
                 // WebView
@@ -631,12 +640,19 @@ public class ThemeableBrowser extends CordovaPlugin {
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, new PageLoadListener() {
                     @Override
                     public void onPageFinished(String url, boolean canGoBack, boolean canGoForward) {
-                        if (features.titleStaticText == null && !features.hideTitle) {
+                        if (title != null && features.title != null
+                                && features.title.staticText == null
+                                && features.title.showPageTitle) {
                             title.setText(inAppWebView.getTitle());
                         }
 
-                        back.setEnabled(canGoBack || features.backButtonCanClose);
-                        forward.setEnabled(canGoForward);
+                        if (back != null) {
+                            back.setEnabled(canGoBack || features.backButtonCanClose);
+                        }
+
+                        if (forward != null) {
+                            forward.setEnabled(canGoForward);
+                        }
                     }
                 });
                 inAppWebView.setWebViewClient(client);
@@ -674,61 +690,105 @@ public class ThemeableBrowser extends CordovaPlugin {
                 int leftContainerWidth = 0;
                 int rightContainerWidth = 0;
 
-                if (ALIGN_LEFT.equals(features.navButtonAlign)) {
-                    leftButtonContainer.addView(back);
-                    leftButtonContainer.addView(forward);
+                if (features.customButtons != null) {
+                    for (int i = 0; i < features.customButtons.length; i++) {
+                        final BrowserButton buttonDef = features.customButtons[i];
+                        final int index = i;
+                        Button button = createButton(
+                            buttonDef,
+                            new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    emitButtonEvent(buttonDef,
+                                            inAppWebView.getUrl(), index);
+                                }
+                            }
+                        );
+
+                        if (ALIGN_RIGHT.equals(buttonDef.align)) {
+                            rightButtonContainer.addView(button);
+                            rightContainerWidth
+                                    += button.getLayoutParams().width;
+                        } else {
+                            leftButtonContainer.addView(button, 0);
+                            leftContainerWidth
+                                    += button.getLayoutParams().width;
+                        }
+                    }
+                }
+
+                // Back and forward buttons must be added with special ordering logic such
+                // that back button is always on the left of forward button if both buttons
+                // are on the same side.
+                if (forward != null && features.forwardButton != null
+                        && !ALIGN_RIGHT.equals(features.forwardButton.align)) {
+                    leftButtonContainer.addView(forward, 0);
                     leftContainerWidth
-                            += back.getVisibility() == View.VISIBLE
-                            ? back.getLayoutParams().width : 0;
-                    leftContainerWidth
-                            += forward.getVisibility() == View.VISIBLE
-                            ? forward.getLayoutParams().width : 0;
-                } else {
-                    rightButtonContainer.addView(forward);
+                            += forward.getLayoutParams().width;
+                }
+
+                if (back != null && features.backButton != null
+                        && ALIGN_RIGHT.equals(features.backButton.align)) {
                     rightButtonContainer.addView(back);
                     rightContainerWidth
-                            += back.getVisibility() == View.VISIBLE
-                            ? back.getLayoutParams().width : 0;
-                    rightContainerWidth
-                            += forward.getVisibility() == View.VISIBLE
-                            ? forward.getLayoutParams().width : 0;
+                            += back.getLayoutParams().width;
                 }
 
-                if (ALIGN_LEFT.equals(features.menuButtonAlign)) {
-                    leftButtonContainer.addView(menu, 0);
+                if (back != null && features.backButton != null
+                        && !ALIGN_RIGHT.equals(features.backButton.align)) {
+                    leftButtonContainer.addView(back, 0);
                     leftContainerWidth
-                            += menu.getVisibility() == View.VISIBLE
-                            ? menu.getLayoutParams().width : 0;
-                } else {
-                    rightButtonContainer.addView(menu);
-                    rightContainerWidth
-                            += menu.getVisibility() == View.VISIBLE
-                            ? menu.getLayoutParams().width : 0;
+                            += back.getLayoutParams().width;
                 }
 
-                if (ALIGN_LEFT.equals(features.closeButtonAlign)) {
-                    leftButtonContainer.addView(close, 0);
-                    leftContainerWidth
-                            += close.getVisibility() == View.VISIBLE
-                            ? close.getLayoutParams().width : 0;
-                } else {
-                    rightButtonContainer.addView(close);
+                if (forward != null && features.forwardButton != null
+                        && ALIGN_RIGHT.equals(features.forwardButton.align)) {
+                    rightButtonContainer.addView(forward);
                     rightContainerWidth
-                            += close.getVisibility() == View.VISIBLE
-                            ? close.getLayoutParams().width : 0;
+                            += forward.getLayoutParams().width;
                 }
 
-                int titleMargin = Math.max(
-                        leftContainerWidth, rightContainerWidth);
+                if (menu != null) {
+                    if (features.menu != null
+                            && ALIGN_RIGHT.equals(features.menu.align)) {
+                        rightButtonContainer.addView(menu);
+                        rightContainerWidth
+                                += menu.getLayoutParams().width;
+                    } else {
+                        leftButtonContainer.addView(menu, 0);
+                        leftContainerWidth
+                                += menu.getLayoutParams().width;
+                    }
+                }
 
-                titleParams.setMargins(titleMargin, 0, titleMargin, 0);
+                if (close != null) {
+                    if (features.closeButton != null
+                            && ALIGN_RIGHT.equals(features.closeButton.align)) {
+                        rightButtonContainer.addView(close);
+                        rightContainerWidth
+                                += close.getLayoutParams().width;
+                    } else {
+                        leftButtonContainer.addView(close, 0);
+                        leftContainerWidth
+                                += close.getLayoutParams().width;
+                    }
+                }
 
                 // Add the views to our toolbar
                 toolbar.addView(leftButtonContainer);
                 // Don't show address bar.
                 // toolbar.addView(edittext);
                 toolbar.addView(rightButtonContainer);
-                toolbar.addView(title);
+
+                if (title != null) {
+                    int titleMargin = Math.max(
+                            leftContainerWidth, rightContainerWidth);
+
+                    FrameLayout.LayoutParams titleParams
+                            = (FrameLayout.LayoutParams) title.getLayoutParams();
+                    titleParams.setMargins(titleMargin, 0, titleMargin, 0);
+                    toolbar.addView(title);
+                }
 
                 // Don't add the toolbar if its been disabled
                 if (features.location) {
@@ -799,25 +859,33 @@ public class ThemeableBrowser extends CordovaPlugin {
         Drawable disabledDrawable = null;
         Drawable pressedDrawable = null;
 
-        try {
-            int normalId = activityRes.getIdentifier(
-                    normal, "drawable", cordova.getActivity().getPackageName());
-            normalDrawable = activityRes.getDrawable(normalId);
-            ViewGroup.LayoutParams params = view.getLayoutParams();
-            params.width = normalDrawable.getIntrinsicWidth();
-            params.height = normalDrawable.getIntrinsicHeight();
-        } catch (Resources.NotFoundException e) {
-            Log.e(LOG_TAG, String.format(
-                    "%s not found as a drawable", normal));
+        if (normal != null) {
+            try {
+                int normalId = activityRes.getIdentifier(
+                        normal,
+                        "drawable",
+                        cordova.getActivity().getPackageName());
+                normalDrawable = activityRes.getDrawable(normalId);
+                ViewGroup.LayoutParams params = view.getLayoutParams();
+                params.width = normalDrawable.getIntrinsicWidth();
+                params.height = normalDrawable.getIntrinsicHeight();
+            } catch (Resources.NotFoundException e) {
+                Log.e(LOG_TAG, String.format(
+                        "%s not found as a drawable", normal));
+            }
         }
 
-        try {
-            int pressedId = activityRes.getIdentifier(
-                    pressed, "drawable", cordova.getActivity().getPackageName());
-            pressedDrawable = activityRes.getDrawable(pressedId);
-        } catch (Resources.NotFoundException e) {
-            Log.e(LOG_TAG, String.format(
-                    "%s not found as a drawable", pressed));
+        if (pressed != null) {
+            try {
+                int pressedId = activityRes.getIdentifier(
+                        pressed,
+                        "drawable",
+                        cordova.getActivity().getPackageName());
+                pressedDrawable = activityRes.getDrawable(pressedId);
+            } catch (Resources.NotFoundException e) {
+                Log.e(LOG_TAG, String.format(
+                        "%s not found as a drawable", pressed));
+            }
         }
 
         if (normalDrawable != null) {
@@ -841,22 +909,25 @@ public class ThemeableBrowser extends CordovaPlugin {
         StateListDrawable states = new StateListDrawable();
         if (pressedDrawable != null) {
             states.addState(
-                    new int[]{
-                            android.R.attr.state_pressed
-                    },
-                    pressedDrawable);
+                new int[] {
+                    android.R.attr.state_pressed
+                },
+                pressedDrawable
+            );
         }
         if (normalDrawable != null) {
             states.addState(
-                    new int[]{
-                            android.R.attr.state_enabled
-                    },
-                    normalDrawable);
+                new int[] {
+                    android.R.attr.state_enabled
+                },
+                normalDrawable
+            );
         }
         if (disabledDrawable != null) {
             states.addState(
-                    new int[]{},
-                    disabledDrawable);
+                new int[] {},
+                disabledDrawable
+            );
         }
 
         setBackground(view, states);
@@ -881,6 +952,23 @@ public class ThemeableBrowser extends CordovaPlugin {
         } else {
             view.setBackground(drawable);
         }
+    }
+
+    private Button createButton(BrowserButton buttonDef,
+            View.OnClickListener listener) {
+        Button result = null;
+        if (buttonDef != null) {
+            result = new Button(cordova.getActivity());
+            result.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+            setBackgroundStates(result,
+                    buttonDef.image,
+                    buttonDef.imagePressed, DISABLED_ALPHA);
+            if (listener != null) {
+                result.setOnClickListener(listener);
+            }
+        }
+        return result;
     }
 
     /**
@@ -1053,36 +1141,40 @@ public class ThemeableBrowser extends CordovaPlugin {
     }
 
     /**
+     * Like Spinner but will always trigger onItemSelected even if a selected
+     * item is selected, and always ignore default selection.
+     */
+    public class MenuSpinner extends Spinner {
+        private OnItemSelectedListener listener;
+
+        public MenuSpinner(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void setSelection(int position) {
+            super.setSelection(position);
+
+            if (listener != null) {
+                listener.onItemSelected(null, this, position, 0);
+            }
+        }
+
+        @Override
+        public void setOnItemSelectedListener(OnItemSelectedListener listener) {
+            this.listener = listener;
+        }
+    }
+
+    /**
      * Extension of ArrayAdapter. The only difference is that it hides the
      * selected text that's shown inside spinner.
      * @param <T>
      */
     private static class HideSelectedAdapter<T> extends ArrayAdapter {
-        public HideSelectedAdapter(Context context, int resource) {
-            super(context, resource);
-        }
-
-        public HideSelectedAdapter(Context context, int resource,
-                                   int textViewResourceId) {
-            super(context, resource, textViewResourceId);
-        }
 
         public HideSelectedAdapter(Context context, int resource, T[] objects) {
             super(context, resource, objects);
-        }
-
-        public HideSelectedAdapter(Context context, int resource,
-                                   int textViewResourceId, T[] objects) {
-            super(context, resource, textViewResourceId, objects);
-        }
-
-        public HideSelectedAdapter(Context context, int resource, List<T> objects) {
-            super(context, resource, objects);
-        }
-
-        public HideSelectedAdapter(Context context, int resource,
-                                   int textViewResourceId, List<T> objects) {
-            super(context, resource, textViewResourceId, objects);
         }
 
         public View getView (int position, View convertView, ViewGroup parent) {
@@ -1102,37 +1194,47 @@ public class ThemeableBrowser extends CordovaPlugin {
         public boolean clearcache = false;
         public boolean clearsessioncache = false;
 
-        public int toolbarHeight = 44;
-        public String toolbarColor = "#ffffffff";
-        public String toolbarImage = null;
-        public String backButtonImage = "themeablebrowser_stub_back";
-        public String backButtonPressedImage = "themeablebrowser_stub_back_highlight";
-        public String forwardButtonImage = "themeablebrowser_stub_forward";
-        public String forwardButtonPressedImage = "themeablebrowser_stub_forward_highlight";
-        public String closeButtonImage = "themeablebrowser_stub_close";
-        public String closeButtonPressedImage = "themeablebrowser_stub_close_highlight";
-        public String menuButtonImage = "themeablebrowser_stub_menu";
-        public String menuButtonPressedImage = "themeablebrowser_stub_menu_highlight";
-        public String titleColor = "#000000ff";
-        public String titleStaticText = null;
-        public EventLabelPair[] menuItems = null;
-        public String closeButtonAlign = ALIGN_LEFT;
-        public String navButtonAlign = ALIGN_LEFT;
-        public String menuButtonAlign = ALIGN_RIGHT;
-        public boolean hideTitle = false;
-        public boolean hideCloseButton = false;
-        public boolean hideBackButton = false;
-        public boolean hideForwardButton = false;
-        public boolean backButtonCanClose = false;
-
+        public Toolbar toolbar;
+        public Title title;
+        public BrowserButton backButton;
+        public BrowserButton forwardButton;
+        public BrowserButton closeButton;
+        public BrowserMenu menu;
+        public BrowserButton[] customButtons;
+        public boolean backButtonCanClose;
     }
 
-    private static class EventLabelPair {
+    private static class Event {
         public String event;
+    }
+
+    private static class EventLabel extends Event {
         public String label;
 
         public String toString() {
             return label;
         }
+    }
+
+    private static class BrowserButton extends Event {
+        public String image;
+        public String imagePressed;
+        public String align = ALIGN_LEFT;
+    }
+
+    private static class BrowserMenu extends BrowserButton {
+        public EventLabel[] items;
+    }
+
+    private static class Toolbar {
+        public int height = TOOLBAR_DEF_HEIGHT;
+        public String color;
+        public String image;
+    }
+
+    private static class Title {
+        public String color;
+        public String staticText;
+        public boolean showPageTitle;
     }
 }
