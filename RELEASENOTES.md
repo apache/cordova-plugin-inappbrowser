@@ -21,8 +21,18 @@
 Release Notes
 =============
 
+0.2.0
+=====
+
+Major improvement and resign of API to make it much more powerful and elegant.
+
+0.1.2
+=====
+
+No code change was made. Legacy doc was moved to prevent Cordova plugin registry from picking them up.
+
 0.1.1
-===
+=====
 
 No code change was made. Doc was updated. Version number was updated because plugman wouldn't publish the 1.0.
 
