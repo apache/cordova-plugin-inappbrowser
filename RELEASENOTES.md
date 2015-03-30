@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.1
+=====
+
+Debug and stablization.
+
 0.2.0
 =====
 
