@@ -348,7 +348,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             } else {
                 intent.setData(uri);
             }
-			intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
+            intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
             this.cordova.getActivity().startActivity(intent);
             return "";
         } catch (android.content.ActivityNotFoundException e) {

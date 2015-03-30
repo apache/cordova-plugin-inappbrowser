@@ -87,11 +87,11 @@
 
 - (BOOL) isSystemUrl:(NSURL*)url
 {
-	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
-		return YES;
-	}
+    if ([[url host] isEqualToString:@"itunes.apple.com"]) {
+        return YES;
+    }
 
-	return NO;
+    return NO;
 }
 
 - (void)open:(CDVInvokedUrlCommand*)command
@@ -1186,12 +1186,12 @@
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     if (self.backButton) {
         self.backButton.enabled
-        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
+                = _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
 
     if (self.forwardButton) {
-	    self.forwardButton.enabled = theWebView.canGoForward;
-	}
+        self.forwardButton.enabled = theWebView.canGoForward;
+    }
 
     [self.spinner startAnimating];
 
@@ -1215,13 +1215,13 @@
     self.addressLabel.text = [self.currentURL absoluteString];
     if (self.backButton) {
         self.backButton.enabled
-        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
+                = _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
 
     if (self.forwardButton) {
-	    self.forwardButton.enabled = theWebView.canGoForward;
-	}
-	
+        self.forwardButton.enabled = theWebView.canGoForward;
+    }
+    
     if (self.titleLabel && _browserOptions.title
             && !_browserOptions.title[kThemeableBrowserPropStaticText]
             && [self getBoolFromDict:_browserOptions.title withKey:kThemeableBrowserPropShowPageTitle]) {
@@ -1258,12 +1258,12 @@
 
     if (self.backButton) {
         self.backButton.enabled
-        		= _browserOptions.backButtonCanClose || theWebView.canGoBack;
+                = _browserOptions.backButtonCanClose || theWebView.canGoBack;
     }
 
     if (self.forwardButton) {
-	    self.forwardButton.enabled = theWebView.canGoForward;
-	}
+        self.forwardButton.enabled = theWebView.canGoForward;
+    }
 
     [self.spinner stopAnimating];
 
