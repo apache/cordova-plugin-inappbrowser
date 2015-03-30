@@ -109,15 +109,15 @@ Additional Properties
 In addition to InAppBrowser's properties, following properties were added to fulfill this plugin's purpose in a nested JSON object.
 
 + `statusbar` applicable to only iOS 7+.
-    + `color` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Applicable to only iOS 7+.
+    + `color` sets status bar color for iOS 7+ in RGBA web hex format. eg. `#fff0f0ff`. Default to white. Applicable to only iOS 7+.
 + `toolbar`
-    + `height` sets height of toolbar.
-    + `color` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Also see `image`.
+    + `height` sets height of toolbar. Default to 44.
+    + `color` sets browser toolbar color in RGBA web hex format. eg. `#fff0f0ff`. Default to white. Also see `image`.
     + `image` sets an image as browser toolbar background in titled mode. This property references to a **native** image resource, therefore it is platform dependent.
     + `imagePortrait` sets an image for browser toolbar background but only in portrait mode. This property will be overridden by `image` if given. This is an iOS only property and references to **native** image resource.
     + `imageLandscape` sets an image for browser toolbar background but only in landscape mode. This property will be overridden by `image` if given. This is an iOS only property and references to **native** image resource.
 + `title`
-    + `color` sets title text color in RGBA web hex format. Default to black. eg. `#fff0f0ff`
+    + `color` sets title text color in RGBA web hex format. eg. `#fff0f0ff`. Default to black.
     + `staticText` sets static text for title. This property overrides `showPageTitle` (see below).
     + `showPageTitle` when set to true, title of the current web page will be shown.
 + `backButton`
@@ -152,16 +152,18 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `event` raises an custom event with given text as event name when custom button is pressed. The callbacks to custom button events will receive an event object that contains the following properties: `url` is the current URL shown in browser and `index` is the index of the selected button in `customButtons`.
 + `backButtonCanClose` allows back button to close browser when there's no more to go back. Otherwise, back button will be disabled.
 
+All properties are optional with little default values. If a property is not given, its corresponding UI element will not be shown.
+
 One thing to note is that all image resources reference to **native** resource bundle. So all images need to be imported to native project first. In case of Android, the image name will be looked up under `R.drawable`. eg. If image name is `hello_world`, `R.drawable.hello_world` will be referenced.
 
-You may have noticed that ThemedBrowser added an optional menu as well as custom buttons, which you can utilize to respond to some simply user actions.
+You may have noticed that ThemedBrowser added an optional menu as well as custom buttons, which you can utilize to respond to some simple user actions.
 
 FAQ
 ---
 
 ### I just installed this plugin, how come it just shows a blank toolbar?
 
-The purpose of this plugin is to allow **you** style the in app browser the way you want. Isn't that that why you installed this plugin in the first place? Hence it does not come with any defaults. Every UI element needs to be styled by you. This also avoids polluting your resouce bundle with default images.
+The purpose of this plugin is to allow **you** to style the in app browser the way you want. Isn't that why you installed this plugin in the first place? Hence, it does not come with any defaults. Every UI element needs to be styled by you, otherwise it's hidden. This also avoids polluting your resouce bundle with default images.
 
 ### Why does my menu on Android look ugly?
 
@@ -254,8 +256,10 @@ Furthermore, the object returned by `open` always returns its own instance allow
 
 Two properties from InAppBrowser are disabled.
 + `location` is always `false` because address bar is not needed for an immersive experience of an integrated browser.
-+ `toolbar` is redefined to contain toolbar settings and toolbar is always shown, because the whole point why you are using this plugin is to style toolbar right?
 + `toolbarposition` is always `top` to remain consistent across platforms.
+
+One is redefined.
++ `toolbar` is redefined to contain toolbar settings and toolbar is always shown, because the whole point why you are using this plugin is to style toolbar right?
 
 License
 -------
