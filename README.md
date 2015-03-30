@@ -87,7 +87,7 @@ This plugin launches an in-app web view on top the existing [CordovaWebView](htt
     }).addEventListener('backPressed', function(e) {
         alert('back pressed');
     }).addEventListener('helloPressed', function(e) {
-        alert('hello');
+        alert('hello pressed');
     }).addEventListener('sharePressed', function(e) {
         alert(e.url);
     });
@@ -159,6 +159,10 @@ You may have noticed that ThemedBrowser added an optional menu as well as custom
 FAQ
 ---
 
+### I just installed this plugin, how come it just shows a blank toolbar?
+
+The purpose of this plugin is to allow **you** style the in app browser the way you want. Isn't that that why you installed this plugin in the first place? Hence it does not come with any defaults. Every UI element needs to be styled by you. This also avoids polluting your resouce bundle with default images.
+
 ### Why does my menu on Android look ugly?
 
 Android menu is simply a [Spinner](http://developer.android.com/guide/topics/ui/controls/spinner.html), which picks up its style from your Activity's theme. By default Cordova uses the very old [Theme.Black.NoTitleBar](http://developer.android.com/reference/android/R.style.html#Theme_Black_NoTitleBar), which is ugly. Open your AndroidManifest.xml and change your `android:theme` attribute to something more morden, such as [Theme.Holo](http://developer.android.com/reference/android/R.style.html#Theme_Holo) or [Base.Theme.AppCompat](http://developer.android.com/reference/android/support/v7/appcompat/R.style.html#Base_Theme_AppCompat) from [support library](https://developer.android.com/tools/support-library/features.html#v7-appcompat).
@@ -188,43 +192,69 @@ Migration
 
 This plugin is **not** a drop-in replacement for InAppBrowser. The biggest change that was made from InAppBrowser, which caused it to be no longer compatible with InAppBrowser's API is that `options` parameter now accepts a JavaScript object instead of string.
 
-    var ref = cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
-        titleStaticText: 'Hello World!',
-        menuItems: [
+    cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
+        customButtons: [
             {
-                event: 'hello',
-                label: 'Hello World!'
+                image: 'share',
+                imagePressed: 'share_pressed',
+                align: 'right',
+                event: 'sharePressed'
             }
-        ]
-    });
-    ref.addEventListener('hello', function(event) {
-        alert(event.url);
+        ],
+        menu: {
+            image: 'menu',
+            imagePressed: 'menu_pressed',
+            items: [
+                {
+                    event: 'helloPressed',
+                    label: 'Hello World!'
+                },
+                {
+                    event: 'testPressed',
+                    label: 'Test!'
+                }
+            ]
+        }
     });
 
-As you can see from above, this allows `menuItems` to have more robust and readable definition.
+As you can see from above, this allows `menu` to have more robust and readable definition.
 
 Furthermore, the object returned by `open` always returns its own instance allowing chaining of methods. Obviously, this breaks the immitation of the `window.open()`, however it's an optional feature that you can choose not to use if you want to stay loyal to the original.
 
     cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
-        titleStaticText: 'Hello World!',
-        menuItems: [
+        customButtons: [
             {
-                event: 'hello',
-                label: 'Hello World!'
-            },
-            {
-                event: 'test',
-                label: 'Test!'
+                image: 'share',
+                imagePressed: 'share_pressed',
+                align: 'right',
+                event: 'sharePressed'
             }
-        ]
-    }).addEventListener('hello', function(event) {
+        ],
+        menu: {
+            image: 'menu',
+            imagePressed: 'menu_pressed',
+            items: [
+                {
+                    event: 'helloPressed',
+                    label: 'Hello World!'
+                },
+                {
+                    event: 'testPressed',
+                    label: 'Test!'
+                }
+            ]
+        }
+    }).addEventListener('sharePressed', function(event) {
         alert(event.url);
-    }).addEventListener('test', function(event) {
+    }).addEventListener('helloPressed', function(event) {
+        alert(event.url);
+    }).addEventListener('testPressed', function(event) {
         alert(event.url);
     });
 
 Two properties from InAppBrowser are disabled.
 + `location` is always `false` because address bar is not needed for an immersive experience of an integrated browser.
++ `toolbar` is redefined to contain toolbar settings and toolbar is always shown, because the whole point why you are using this plugin is to style toolbar right?
 + `toolbarposition` is always `top` to remain consistent across platforms.
 
 License
