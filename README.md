@@ -377,6 +377,7 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
 - Amazon Fire OS
 - Android
 - iOS
+- Windows
 
 ### Quick Example
 

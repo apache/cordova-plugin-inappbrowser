@@ -213,7 +213,7 @@ var IAB = {
                         IAB.close(win);
                     }, 0);
                 });
-               
+
                 if (!isWebViewAvailable) {
                     // iframe navigation is not yet supported
                     backButton.disabled = true;
@@ -277,8 +277,49 @@ var IAB = {
                 });
             });
         }
+    },
+
+    injectStyleCode: function (win, fail, args) {
+        var code = args[0],
+            hasCallback = args[1];
+
+        if (isWebViewAvailable && browserWrap && popup) {
+            injectCSS(popup, code, hasCallback && win);
+        }
+    },
+
+    injectStyleFile: function (win, fail, args) {
+        var filePath = args[0],
+            hasCallback = args[1];
+
+        filePath = filePath && urlutil.makeAbsolute(filePath);
+
+        if (isWebViewAvailable && browserWrap && popup) {
+            var uri = new Windows.Foundation.Uri(filePath);
+            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
+                return Windows.Storage.FileIO.readTextAsync(file);
+            }).done(function (code) {
+                injectCSS(popup, code, hasCallback && win);
+            }, function () {
+                // no-op, just catch an error
+            });
+        }
     }
 };
+
+function injectCSS (webView, cssCode, callback) {
+    // This will automatically escape all thing that we need (quotes, slashes, etc.)
+    var escapedCode = JSON.stringify(cssCode);
+    var evalWrapper = "(function(d){var c=d.createElement('style');c.innerHTML=%s;d.head.appendChild(c);})(document)"
+        .replace('%s', escapedCode);
+
+    var op = webView.invokeScriptAsync("eval", evalWrapper);
+    op.oncomplete = function() {
+        callback && callback([]);
+    };
+    op.onerror = function () { };
+    op.start();
+}
 
 module.exports = IAB;
 
