@@ -151,6 +151,7 @@ In addition to InAppBrowser's properties, following properties were added to ful
     + `align` aligns custom button to either `left` or `right`. Default to `left`.
     + `event` raises an custom event with given text as event name when custom button is pressed. The callbacks to custom button events will receive an event object that contains the following properties: `url` is the current URL shown in browser and `index` is the index of the selected button in `customButtons`.
 + `backButtonCanClose` allows back button to close browser when there's no more to go back. Otherwise, back button will be disabled.
++ `disableAnimation` when set to true, disables browser show and close animations.
 
 All properties are optional with little default values. If a property is not given, its corresponding UI element will not be shown.
 
@@ -245,9 +246,9 @@ This plugin is **not** a drop-in replacement for InAppBrowser. The biggest chang
         }
     });
 
-As you can see from above, this allows `menu` to have more robust and readable definition.
+As you can see from above, this allows configurations to have more robust and readable definition.
 
-Furthermore, the object returned by `open` always returns its own instance allowing chaining of methods. Obviously, this breaks the immitation of the `window.open()`, however it's an optional feature that you can choose not to use if you want to stay loyal to the original.
+Furthermore, the object returned by `open` always returns its own instance allowing chaining of methods. Obviously, this breaks the immitation of `window.open()`, however it's an optional feature that you can choose not to use if you want to stay loyal to the original.
 
     cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
         customButtons: [
