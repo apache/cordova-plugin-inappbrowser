@@ -223,11 +223,11 @@
 
     [self.themeableBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
-        [self show:nil];
+        [self show:nil withAnimation:!browserOptions.disableAnimation];
     }
 }
 
-- (void)show:(CDVInvokedUrlCommand*)command
+- (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated
 {
     if (self.themeableBrowserViewController == nil) {
         NSLog(@"Tried to show IAB after it was closed.");
@@ -247,7 +247,7 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.themeableBrowserViewController != nil) {
-            [self.viewController presentViewController:nav animated:YES completion:nil];
+            [self.viewController presentViewController:nav animated:animated completion:nil];
         }
     });
 }
@@ -972,9 +972,9 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self respondsToSelector:@selector(presentingViewController)]) {
-            [[self presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[self presentingViewController] dismissViewControllerAnimated:!_browserOptions.disableAnimation completion:nil];
         } else {
-            [[self parentViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[self parentViewController] dismissViewControllerAnimated:!_browserOptions.disableAnimation completion:nil];
         }
     });
     
@@ -1353,6 +1353,7 @@
         self.closeButton = nil;
         self.menu = nil;
         self.backButtonCanClose = NO;
+        self.disableAnimation = NO;
     }
 
     return self;

@@ -35,7 +35,7 @@
 - (void)open:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
-- (void)show:(CDVInvokedUrlCommand*)command;
+- (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated;
 
 @end
 
@@ -67,6 +67,7 @@
 @property (nonatomic) NSDictionary* menu;
 @property (nonatomic) NSArray* customButtons;
 @property (nonatomic) BOOL backButtonCanClose;
+@property (nonatomic) BOOL disableAnimation;
 
 + (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
 
