@@ -198,19 +198,19 @@ var IAB = {
     },
 
     injectScriptFile: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectScriptFile is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectScriptFile is not yet implemented';
         console.warn(msg);
         fail && fail(msg);
     }, 
 
     injectStyleCode: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectStyleCode is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectStyleCode is not yet implemented';
         console.warn(msg);
         fail && fail(msg);
     },
 
     injectStyleFile: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectStyleFile is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectStyleFile is not yet implemented';
         console.warn(msg);
         fail && fail(msg);
     }
