@@ -469,11 +469,15 @@ public class ThemeableBrowser extends CordovaPlugin {
             @SuppressLint("NewApi")
             public void run() {
                 // Let's create the main dialog
-                dialog = new ThemeableBrowserDialog(cordova.getActivity(), android.R.style.Theme_Black_NoTitleBar);
-                dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+                dialog = new ThemeableBrowserDialog(cordova.getActivity(),
+                        android.R.style.Theme_Black_NoTitleBar);
+                if (!features.disableAnimation) {
+                    dialog.getWindow().getAttributes().windowAnimations
+                            = android.R.style.Animation_Dialog;
+                }
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
-                dialog.setInAppBroswer(getThemeableBrowser());
+                dialog.setThemeableBrowser(getThemeableBrowser());
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
@@ -1202,6 +1206,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         public BrowserMenu menu;
         public BrowserButton[] customButtons;
         public boolean backButtonCanClose;
+        public boolean disableAnimation;
     }
 
     private static class Event {

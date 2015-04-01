@@ -38,7 +38,7 @@ public class ThemeableBrowserDialog extends Dialog {
         this.context = context;
     }
 
-    public void setInAppBroswer(ThemeableBrowser browser) {
+    public void setThemeableBrowser(ThemeableBrowser browser) {
         this.themeableBrowser = browser;
     }
 
