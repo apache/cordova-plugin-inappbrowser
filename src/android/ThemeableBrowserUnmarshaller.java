@@ -34,13 +34,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This is a simple and half decent JSON to structured Java object unmarshaller
- * inspired by Jackson. It is only a unmarshaller without a marshaller. It is
- * intended to parse JSON passed to a plugin as options to a Java class object.
- * It is nowhere as powerful as Jackson is, but for most use cases, it will do a
- * pretty decent job since it is designed to be used for general purpose
- * unmarshalling. This avoid having to import Jackson or JAXB for merely a
- * Cordova plugin. ~350 lines isn't too big right?
+ * This is a simple and half decent JSON to POJO unmarshaller inspired by
+ * Jackson. It is only a unmarshaller without a marshaller. It is intended to
+ * parse JSON passed to a plugin as options to a POJO. It is nowhere as powerful
+ * as Jackson is, but for most use cases, it will do a pretty decent job since
+ * it is designed to be used for general purpose unmarshalling. This avoid
+ * having to import Jackson or JAXB for merely a Cordova plugin. ~350 lines
+ * isn't too big right?
  */
 public class ThemeableBrowserUnmarshaller {
     /**
@@ -71,7 +71,7 @@ public class ThemeableBrowserUnmarshaller {
     }
 
     /**
-     * Given a JSON string, unmarhalll it to an instance of the given class.
+     * Given a JSON string, unmarhall it to an instance of the given class.
      *
      * @param json JSON string to unmarshall.
      * @param cls Return an instance of this class. Must be either public class
@@ -96,7 +96,7 @@ public class ThemeableBrowserUnmarshaller {
     }
 
     /**
-     * Given a JSONObject, unmarhalll it to an instance of the given class.
+     * Given a JSONObject, unmarhall it to an instance of the given class.
      *
      * @param jsonObj JSON string to unmarshall.
      * @param cls Return an instance of this class. Must be either public class
@@ -183,10 +183,11 @@ public class ThemeableBrowserUnmarshaller {
 
     /**
      * Given an object extracted from JSONObject field, convert it to an
-     * appropriate object type for given type so that it can be assigned to an
-     * analogical field of the ummarshalled object. eg. JSONObject value from a
-     * JSONObject field probably needs to be unmarshalled to a class instance.
-     * Double from JSONObject may need to be converted to Float. etc.
+     * appropriate object with type appropriate for given type so that it can be
+     * assigned to the associated field of the ummarshalled object. eg.
+     * JSONObject value from a JSONObject field probably needs to be
+     * unmarshalled to a class instance. Double from JSONObject may need to be
+     * converted to Float. etc.
      *
      * @param val Value extracted from JSONObject field.
      * @param genericType Type to convert to. Must be generic type. ie. From
@@ -396,16 +397,16 @@ public class ThemeableBrowserUnmarshaller {
             }
         } catch (NoSuchMethodException e) {
             throw new TypeMismatchException(String.format(
-                    "Cannot convert to %s from %s.", cls, val.getClass()));
+                    "Cannot convert %s to %s.", val.getClass(), cls));
         } catch (SecurityException e) {
             throw new TypeMismatchException(String.format(
-                    "Cannot convert to %s from %s.", cls, val.getClass()));
+                    "Cannot convert %s to %s.", val.getClass(), cls));
         } catch (IllegalAccessException e) {
             throw new TypeMismatchException(String.format(
-                    "Cannot convert to %s from %s.", cls, val.getClass()));
+                    "Cannot convert %s to %s.", val.getClass(), cls));
         } catch (InvocationTargetException e) {
             throw new TypeMismatchException(String.format(
-                    "Cannot convert to %s from %s.", cls, val.getClass()));
+                    "Cannot convert %s to %s.", val.getClass(), cls));
         }
 
         return result;
