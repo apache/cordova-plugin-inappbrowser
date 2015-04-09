@@ -119,6 +119,7 @@ instance, or the system browser.
     Windows only:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __fullscreen__: set to `yes` to create the browser control without a border around it. Please note that if __location=no__ is also specified, there will be no control presented to user to close IAB window.
 
 ### Supported Platforms
 
@@ -166,6 +167,10 @@ opened with `target='_blank'`. The rules might look like these
 	color: #777;
 }
 ```
+
+### Windows Quirks
+
+Similar to Firefox OS IAB window visual behaviour can be overridden via `inAppBrowserWrap`/`inAppBrowserWrapFullscreen` CSS classes
 
 ### Browser Quirks
 
@@ -349,6 +354,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 - only __code__ key is supported.
 
+### Windows Quirks
+
+Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.controls.webview.invokescriptasync.aspx) the invoked script can return only string values, otherwise the parameter, passed to __callback__ will be `[null]`.
+
 ## insertCSS
 
 > Injects CSS into the `InAppBrowser` window.
@@ -368,6 +377,7 @@ The function is passed an `InAppBrowserEvent` object.
 - Amazon Fire OS
 - Android
 - iOS
+- Windows
 
 ### Quick Example
 
