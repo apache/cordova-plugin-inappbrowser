@@ -62,6 +62,7 @@ var IAB = {
                 browserWrap.style.borderWidth = "40px";
                 browserWrap.style.borderStyle = "solid";
                 browserWrap.style.borderColor = "rgba(0,0,0,0.25)";
+                browserWrap.style.zIndex = "9999999";
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
