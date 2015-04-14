@@ -22,23 +22,6 @@
 #import <Cordova/CDVScreenOrientationDelegate.h>
 #import <Cordova/CDVWebViewDelegate.h>
 
-@class CDVThemeableBrowserViewController;
-
-@interface CDVThemeableBrowser : CDVPlugin {
-    BOOL _injectedIframeBridge;
-}
-
-@property (nonatomic, retain) CDVThemeableBrowserViewController* themeableBrowserViewController;
-@property (nonatomic, copy) NSString* callbackId;
-@property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
-
-- (void)open:(CDVInvokedUrlCommand*)command;
-- (void)close:(CDVInvokedUrlCommand*)command;
-- (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
-- (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated;
-
-@end
-
 @interface CDVThemeableBrowserOptions : NSObject {}
 
 @property (nonatomic) BOOL location;
@@ -69,7 +52,23 @@
 @property (nonatomic) BOOL backButtonCanClose;
 @property (nonatomic) BOOL disableAnimation;
 
-+ (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
+@end
+
+@class CDVThemeableBrowserViewController;
+
+@interface CDVThemeableBrowser : CDVPlugin {
+    BOOL _injectedIframeBridge;
+}
+
+@property (nonatomic, retain) CDVThemeableBrowserViewController* themeableBrowserViewController;
+@property (nonatomic, copy) NSString* callbackId;
+@property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
+
+- (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
+- (void)open:(CDVInvokedUrlCommand*)command;
+- (void)close:(CDVInvokedUrlCommand*)command;
+- (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
+- (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated;
 
 @end
 
@@ -103,7 +102,7 @@
 - (void)showToolBar:(BOOL)show : (NSString*) toolbarPosition;
 - (void)setCloseButtonTitle:(NSString*)title;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions;
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions navigationDelete:(CDVThemeableBrowser*) navigationDelegate;
 
 + (UIColor *)colorFromRGBA:(NSString *)rgba;
 

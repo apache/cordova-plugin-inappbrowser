@@ -36,7 +36,7 @@
     <!-- android -->
     <platform name="android">
         <js-module src="www/themeablebrowser.js" name="themeablebrowser">
-            <clobbers target="cordova.ThemeableBrowser.open" />
+            <clobbers target="cordova.ThemeableBrowser" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="ThemeableBrowser"> 
@@ -53,7 +53,7 @@
     <!-- ios -->
     <platform name="ios">
         <js-module src="www/themeablebrowser.js" name="themeablebrowser">
-            <clobbers target="cordova.ThemeableBrowser.open" />
+            <clobbers target="cordova.ThemeableBrowser" />
         </js-module>  
         <config-file target="config.xml" parent="/*">
             <feature name="ThemeableBrowser">

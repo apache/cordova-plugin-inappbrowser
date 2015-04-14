@@ -25,12 +25,7 @@ var modulemapper = require('cordova/modulemapper');
 var urlutil = require('cordova/urlutil');
 
 function ThemeableBrowser() {
-   this.channels = {
-        'loadstart': channel.create('loadstart'),
-        'loadstop' : channel.create('loadstop'),
-        'loaderror' : channel.create('loaderror'),
-        'exit' : channel.create('exit')
-   };
+   this.channels = {};
 }
 
 ThemeableBrowser.prototype = {
@@ -84,7 +79,7 @@ ThemeableBrowser.prototype = {
     }
 };
 
-module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
+exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     // Don't catch calls that write to existing frames (e.g. named iframes).
     if (window.frames && window.frames[strWindowName]) {
         var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
@@ -104,8 +99,15 @@ module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     };
 
     strWindowFeatures = strWindowFeatures || "";
-
-    exec(cb, cb, "ThemeableBrowser", "open", [strUrl, strWindowName, JSON.stringify(strWindowFeatures)]);
+    setTimeout(function() {
+        exec(cb, cb, "ThemeableBrowser", "open", [strUrl, strWindowName, JSON.stringify(strWindowFeatures)]);
+    }, 0);
     return iab;
 };
 
+exports.EVT_ERROR = 'ThemeableBrowserError';
+exports.EVT_WARNING = 'ThemeableBrowserWarning';
+exports.CD_CRITICAL = 'critical';
+exports.CD_LOADFAIL = 'loadfail';
+exports.CD_UNEXPECTED = 'unexpected';
+exports.CD_UNDEFINED = 'undefined';
