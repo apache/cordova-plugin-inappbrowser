@@ -35,11 +35,11 @@ ThemeableBrowser.prototype = {
         }
     },
     close: function (eventname) {
-        exec(null, null, "ThemeableBrowser", "close", []);
+        exec(null, null, 'ThemeableBrowser', 'close', []);
         return this;
     },
     show: function (eventname) {
-        exec(null, null, "ThemeableBrowser", "show", []);
+        exec(null, null, 'ThemeableBrowser', 'show', []);
         return this;
     },
     addEventListener: function (eventname,f) {
@@ -58,9 +58,9 @@ ThemeableBrowser.prototype = {
 
     executeScript: function(injectDetails, cb) {
         if (injectDetails.code) {
-            exec(cb, null, "ThemeableBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
+            exec(cb, null, 'ThemeableBrowser', 'injectScriptCode', [injectDetails.code, !!cb]);
         } else if (injectDetails.file) {
-            exec(cb, null, "ThemeableBrowser", "injectScriptFile", [injectDetails.file, !!cb]);
+            exec(cb, null, 'ThemeableBrowser', 'injectScriptFile', [injectDetails.file, !!cb]);
         } else {
             throw new Error('executeScript requires exactly one of code or file to be specified');
         }
@@ -69,9 +69,9 @@ ThemeableBrowser.prototype = {
 
     insertCSS: function(injectDetails, cb) {
         if (injectDetails.code) {
-            exec(cb, null, "ThemeableBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
+            exec(cb, null, 'ThemeableBrowser', 'injectStyleCode', [injectDetails.code, !!cb]);
         } else if (injectDetails.file) {
-            exec(cb, null, "ThemeableBrowser", "injectStyleFile", [injectDetails.file, !!cb]);
+            exec(cb, null, 'ThemeableBrowser', 'injectStyleFile', [injectDetails.file, !!cb]);
         } else {
             throw new Error('insertCSS requires exactly one of code or file to be specified');
         }
@@ -98,9 +98,9 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
        iab._eventHandler(eventname);
     };
 
-    strWindowFeatures = strWindowFeatures || "";
+    strWindowFeatures = strWindowFeatures && JSON.stringify(strWindowFeatures);
     setTimeout(function() {
-        exec(cb, cb, "ThemeableBrowser", "open", [strUrl, strWindowName, JSON.stringify(strWindowFeatures)]);
+        exec(cb, cb, 'ThemeableBrowser', 'open', [strUrl, strWindowName, strWindowFeatures || '']);
     }, 0);
     return iab;
 };

@@ -141,24 +141,30 @@
 {
     CDVThemeableBrowserOptions* obj = [[CDVThemeableBrowserOptions alloc] init];
     
-    // Min support, iOS 5. We will use the JSON parser that comes with iOS 5.
-    NSError *error = nil;
-    NSData *data = [options dataUsingEncoding:NSUTF8StringEncoding];
-    id jsonObj = [NSJSONSerialization
-                  JSONObjectWithData:data
-                  options:0
-                  error:&error];
-    
-    if(error) {
-        [self emitError:kThemeableBrowserEmitCodeCritical
-            withMessage:[NSString stringWithFormat:@"Invalid JSON %@", error]];
-    } else if([jsonObj isKindOfClass:[NSDictionary class]]) {
-        NSDictionary *dict = jsonObj;
-        for (NSString *key in dict) {
-            if ([obj respondsToSelector:NSSelectorFromString(key)]) {
-                [obj setValue:dict[key] forKey:key];
+    if (options && [options length] > 0) {
+        // Min support, iOS 5. We will use the JSON parser that comes with iOS
+        // 5.
+        NSError *error = nil;
+        NSData *data = [options dataUsingEncoding:NSUTF8StringEncoding];
+        id jsonObj = [NSJSONSerialization
+                      JSONObjectWithData:data
+                      options:0
+                      error:&error];
+        
+        if(error) {
+            [self emitError:kThemeableBrowserEmitCodeCritical
+                withMessage:[NSString stringWithFormat:@"Invalid JSON %@", error]];
+        } else if([jsonObj isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *dict = jsonObj;
+            for (NSString *key in dict) {
+                if ([obj respondsToSelector:NSSelectorFromString(key)]) {
+                    [obj setValue:dict[key] forKey:key];
+                }
             }
         }
+    } else {
+        [self emitWarning:kThemeableBrowserEmitCodeUndefined
+            withMessage:@"No config was given, defaults will be used, which is quite boring."];
     }
     
     return obj;
