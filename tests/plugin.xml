@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin-inappbrowser-tests"
-    version="1.0.0">
+    version="1.0.1-dev">
     <name>Cordova InAppBrowser Plugin Tests</name>
     <license>Apache 2.0</license>
 
