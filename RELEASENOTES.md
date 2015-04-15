@@ -164,3 +164,29 @@
 * ubuntu: implement inject* functions
 * ubuntu: port to oxide
 * CB-7897 ios, android: Update to work with whilelist plugins in Cordova 4.x
+
+### 1.0.0 (Apr 15, 2015)
+* CB-8746 gave plugin major version bump
+* CB-7689 Adds insertCSS support for windows platform
+* CB-4930 - (prefix) InAppBrowser should take into account the status bar
+* CB-8635 Improves UX on windows platform
+* CB-8661 Return executed script result on Windows
+* CB-8683 updated wp and browser specific references of old id to new id
+* CB-8683 changed plugin-id to pacakge-name
+* CB-8653 properly updated translated docs to use new id
+* CB-8653 updated translated docs to use new id
+* Use TRAVIS_BUILD_DIR, install paramedic by npm
+* CB-8432 Correct styles for browser wrapper to display it correctly on some pages
+* CB-8659 - Update InAppBrowser to support both cordova-ios 4.0.x and 3.x (closes #93)
+* CB-7961 Add cordova-plugin-inappbrowser support for browser platform
+* CB-8653 Updated Readme
+* Update docs for Android zoom=no option
+* Added option to disable/enable zoom controls
+* updated docs, set hardwareback default to true
+* Add a hardwareback option to allow for the hardware back button to go back.
+* CB-8570 Integrate TravisCI
+* CB-8438 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
+* CB-8538 Added package.json file
+* Keep external android pages in a single tab. (close #61)
+* CB-8444 Add a clobber for `cordova.InAppBrowser.open` (close #80)
+* CB-8444 Don't clobber `window.open` - Add new symbol/clobber to access open function (`cordova.InAppBrowser.open`) - Change existing tests to use new symbol (i.e. don't rely on plugin clobber of `window.open`) - Add tests to use `window.open` via manual replace with new symbol - Update docs to deprecate plugin clobber of `window.open`
