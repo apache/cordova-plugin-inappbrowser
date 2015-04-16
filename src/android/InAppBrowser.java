@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import org.apache.cordova.inappbrowser.InAppBrowserDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -77,7 +76,6 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
     private static final String TOOLBAR = "toolbar";
-    private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
@@ -96,7 +94,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache= false;
     private boolean clearSessionCache=false;
-    private boolean hadwareBackButton=true;
+    private boolean hadwareBackButton=false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -351,7 +349,6 @@ public class InAppBrowser extends CordovaPlugin {
             } else {
                 intent.setData(uri);
             }
-			intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
             this.cordova.getActivity().startActivity(intent);
             return "";
         } catch (android.content.ActivityNotFoundException e) {
@@ -465,15 +462,6 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private boolean getShowToolbar() {
         return this.showToolbar;
-    }
-
-    /**
-     * Should we show the zoom controls?
-     *
-     * @return boolean
-     */
-    private boolean getShowZoomControls() {
-        return this.showZoomControls;
     }
 
     private InAppBrowser getInAppBrowser(){
@@ -646,7 +634,7 @@ public class InAppBrowser extends CordovaPlugin {
                 RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 close.setLayoutParams(closeLayoutParams);
-                forward.setContentDescription("Close Button");
+                close.setContentDescription("Close Button");
                 close.setId(5);
                 int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
                 Drawable closeIcon = activityRes.getDrawable(closeResId);
