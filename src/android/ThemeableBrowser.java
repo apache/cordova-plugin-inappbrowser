@@ -20,7 +20,6 @@ package com.initialxy.cordova.themeablebrowser;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -58,7 +57,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.apache.cordova.CallbackContext;
@@ -66,7 +64,6 @@ import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
@@ -74,7 +71,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class ThemeableBrowser extends CordovaPlugin {
@@ -95,8 +91,8 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final int TOOLBAR_DEF_HEIGHT = 44;
     private static final int DISABLED_ALPHA = 127;  // 50% AKA 127/255.
 
-    private static final String EVT_ERROR = "ThemeableBrowserError";
-    private static final String EVT_WARNING = "ThemeableBrowserWarning";
+    private static final String EVT_ERR = "ThemeableBrowserError";
+    private static final String EVT_WRN = "ThemeableBrowserWarning";
     private static final String ERR_CRITICAL = "critical";
     private static final String ERR_LOADFAIL = "loadfail";
     private static final String WRN_UNEXPECTED = "unexpected";
@@ -432,11 +428,11 @@ public class ThemeableBrowser extends CordovaPlugin {
     }
 
     private void emitError(String code, String message) {
-        emitLog(EVT_ERROR, code, message);
+        emitLog(EVT_ERR, code, message);
     }
 
     private void emitWarning(String code, String message) {
-        emitLog(EVT_WARNING, code, message);
+        emitLog(EVT_WRN, code, message);
     }
 
     private void emitLog(String type, String code, String message) {

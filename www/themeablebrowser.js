@@ -107,8 +107,8 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     return iab;
 };
 
-exports.EVT_ERROR = 'ThemeableBrowserError';
-exports.EVT_WARNING = 'ThemeableBrowserWarning';
+exports.EVT_ERR = 'ThemeableBrowserError';
+exports.EVT_WRN = 'ThemeableBrowserWarning';
 exports.ERR_CRITICAL = 'critical';
 exports.ERR_LOADFAIL = 'loadfail';
 exports.WRN_UNEXPECTED = 'unexpected';
