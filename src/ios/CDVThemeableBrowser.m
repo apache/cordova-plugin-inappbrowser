@@ -86,7 +86,7 @@
 {
     if (self.themeableBrowserViewController == nil) {
         [self emitWarning:kThemeableBrowserEmitCodeUnexpected
-              withMessage:@"IAB.close() called but it was already closed."];
+              withMessage:@"Close called but already closed."];
         return;
     }
     // Things are cleaned up in browserExit.
@@ -274,12 +274,12 @@
 {
     if (self.themeableBrowserViewController == nil) {
         [self emitWarning:kThemeableBrowserEmitCodeUnexpected
-              withMessage:@"Tried to show IAB after it was closed."];
+              withMessage:@"Show called but already closed."];
         return;
     }
     if (_previousStatusBarStyle != -1) {
         [self emitWarning:kThemeableBrowserEmitCodeUnexpected
-              withMessage:@"Tried to show IAB while already shown"];
+              withMessage:@"Show called but already shown"];
         return;
     }
 
@@ -638,16 +638,31 @@
     
     if (toolbarProps[kThemeableBrowserPropImage]) {
         UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImage]];
-        [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-        [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+        if (image) {
+            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+        } else {
+            [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImage]]];
+        }
     } else if (toolbarProps[kThemeableBrowserPropImagePortrait] || toolbarProps[kThemeableBrowserPropImageLandscape]) {
         if (toolbarProps[kThemeableBrowserPropImagePortrait]) {
             UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImagePortrait]];
-            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+            if (image) {
+                [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+            } else {
+                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImagePortrait]]];
+            }
         }
         if (toolbarProps[kThemeableBrowserPropImageLandscape]) {
             UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImageLandscape]];
-            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+            if (image) {
+                [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+            } else {
+                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImageLandscape]]];
+            }
         }
     }
 
@@ -855,35 +870,50 @@
 - (UIBarButtonItem*) createButton:(NSDictionary*) buttonDef action:(SEL)action withDescription:(NSString*)description
 {
     UIBarButtonItem* result = nil;
-    if (buttonDef && buttonDef[kThemeableBrowserPropImage]) {
-        UIImage *buttonImage = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImage]];
+    if (buttonDef) {
+        UIImage *buttonImage = nil;
+        if (buttonDef[kThemeableBrowserPropImage]) {
+            *buttonImage = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImage]];
+
+            if (!buttonImage) {
+                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                   withMessage:[NSString stringWithFormat:@"Image for %@ button %@ failed to load.", description, buttonDef[kThemeableBrowserPropImage]]];
+            }
+        } else {
+            [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
+                                 withMessage:[NSString stringWithFormat:@"Image for %@ button is not defined. Button will not be shown.", description]];
+        }
+
+        UIImage *buttonImagePressed = nil;
+        if (buttonDef[kThemeableBrowserPropImagePressed]) {
+            buttonImagePressed = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImagePressed]];
+        } else {
+            [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
+                             withMessage:[NSString stringWithFormat:@"Pressed image for %@ button is not defined.", description]];
+
+            if (!buttonImagePressed) {
+                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@ button %@ failed to load.", description, buttonDef[kThemeableBrowserPropImagePressed]]];
+            }
+        }
         
         if (buttonImage) {
             UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
             button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
             
-            UIImage *buttonImagePressed = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImagePressed]];
-            
             if (buttonImagePressed) {
                 [button setImage:buttonImagePressed forState:UIControlStateHighlighted];
-            } else {
-                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@ button failed to load.", description]];
             }
+
             [button setImage:buttonImage forState:UIControlStateNormal];
             [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
             
             result = [[UIBarButtonItem alloc] initWithCustomView:button];
-        } else {
-            [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"Image for %@ button failed to load.", description]];
         }
     } else if (!buttonDef) {
         [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                                 withMessage:[NSString stringWithFormat:@"%@ button is not defined. It will not be shown.", description]];
+                                 withMessage:[NSString stringWithFormat:@"%@ button is not defined. Button will not be shown.", description]];
     } else if (!buttonDef[kThemeableBrowserPropImage]) {
-        [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                                 withMessage:[NSString stringWithFormat:@"Image for %@ button is not defined. It will not be shown.", description]];
     }
     
     return result;
