@@ -95,6 +95,13 @@ public class ThemeableBrowser extends CordovaPlugin {
     private static final int TOOLBAR_DEF_HEIGHT = 44;
     private static final int DISABLED_ALPHA = 127;  // 50% AKA 127/255.
 
+    private static final String EVT_ERROR = "ThemeableBrowserError";
+    private static final String EVT_WARNING = "ThemeableBrowserWarning";
+    private static final String ERR_CRITICAL = "critical";
+    private static final String ERR_LOADFAIL = "loadfail";
+    private static final String WRN_UNEXPECTED = "unexpected";
+    private static final String WRN_UNDEFINED = "undefined";
+
     private ThemeableBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
@@ -120,15 +127,12 @@ public class ThemeableBrowser extends CordovaPlugin {
             final String target = t;
             final Options features = parseFeature(args.optString(2));
 
-            Log.d(LOG_TAG, "target = " + target);
-
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     String result = "";
                     // SELF
                     if (SELF.equals(target)) {
-                        Log.d(LOG_TAG, "in self");
                         /* This code exists for compatibility between 3.x and 4.x versions of Cordova.
                          * Previously the Config class had a static method, isUrlWhitelisted(). That
                          * responsibility has been moved to the plugins, with an aggregating method in
@@ -160,35 +164,31 @@ public class ThemeableBrowser extends CordovaPlugin {
                         }
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
-                            Log.d(LOG_TAG, "loading in webview");
                             webView.loadUrl(url);
                         }
                         //Load the dialer
                         else if (url.startsWith(WebView.SCHEME_TEL))
                         {
                             try {
-                                Log.d(LOG_TAG, "loading in dialer");
                                 Intent intent = new Intent(Intent.ACTION_DIAL);
                                 intent.setData(Uri.parse(url));
                                 cordova.getActivity().startActivity(intent);
                             } catch (android.content.ActivityNotFoundException e) {
-                                LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                                emitError(ERR_CRITICAL,
+                                        String.format("Error dialing %s: %s", url, e.toString()));
                             }
                         }
                         // load in ThemeableBrowser
                         else {
-                            Log.d(LOG_TAG, "loading in ThemeableBrowser");
                             result = showWebPage(url, features);
                         }
                     }
                     // SYSTEM
                     else if (SYSTEM.equals(target)) {
-                        Log.d(LOG_TAG, "in system");
                         result = openExternal(url);
                     }
                     // BLANK - or anything else
                     else {
-                        Log.d(LOG_TAG, "in blank");
                         result = showWebPage(url, features);
                     }
 
@@ -317,8 +317,19 @@ public class ThemeableBrowser extends CordovaPlugin {
      * @return
      */
     private Options parseFeature(String optString) {
-        Options result = ThemeableBrowserUnmarshaller.JSONToObj(
-                optString, Options.class);
+        Options result = null;
+        if (optString != null && !optString.isEmpty()) {
+            try {
+                result = ThemeableBrowserUnmarshaller.JSONToObj(
+                        optString, Options.class);
+            } catch (Exception e) {
+                emitError(ERR_CRITICAL,
+                        String.format("Invalid JSON @s", e.toString()));
+            }
+        } else {
+            emitWarning(WRN_UNDEFINED,
+                    "No config was given, defaults will be used, which is quite boring.");
+        }
 
         if (result == null) {
             result = new Options();
@@ -365,6 +376,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         // The JS protects against multiple calls, so this should happen only when
         // closeDialog() is called by other native code.
         if (childView == null) {
+            emitWarning(WRN_UNEXPECTED, "Close called but already closed.");
             return;
         }
         this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -390,7 +402,6 @@ public class ThemeableBrowser extends CordovaPlugin {
             obj.put("type", EXIT_EVENT);
             sendUpdate(obj, false);
         } catch (JSONException ex) {
-            Log.d(LOG_TAG, "Should never happen");
         }
     }
 
@@ -410,7 +421,28 @@ public class ThemeableBrowser extends CordovaPlugin {
                 sendUpdate(obj, true);
             } catch (JSONException e) {
                 // Ignore, should never happen.
-                Log.d(LOG_TAG, e.toString());
+            }
+        }
+    }
+
+    private void emitError(String code, String message) {
+        emitLog(EVT_ERROR, code, message);
+    }
+
+    private void emitWarning(String code, String message) {
+        emitLog(EVT_WARNING, code, message);
+    }
+
+    private void emitLog(String type, String code, String message) {
+        if (type != null) {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("type", type);
+                obj.put("code", code);
+                obj.put("message", message);
+                sendUpdate(obj, true);
+            } catch (JSONException e) {
+                // Ignore, should never happen.
             }
         }
     }
@@ -537,6 +569,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 // Back button
                 final Button back = createButton(
                     features.backButton,
+                    "back",
                     new View.OnClickListener() {
                         public void onClick(View v) {
                             if (features.backButtonCanClose
@@ -556,6 +589,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 // Forward button
                 final Button forward = createButton(
                     features.forwardButton,
+                    "forward",
                     new View.OnClickListener() {
                         public void onClick(View v) {
                             goForward();
@@ -566,6 +600,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 // Close/Done button
                 Button close = createButton(
                     features.closeButton,
+                    "close",
                     new View.OnClickListener() {
                         public void onClick(View v) {
                             closeDialog();
@@ -581,6 +616,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     menu.setContentDescription("Menu Button");
                     setBackgroundStates(menu,
+                            "menu",
                             features.menu.image,
                             features.menu.imagePressed, DISABLED_ALPHA);
 
@@ -700,6 +736,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         final int index = i;
                         Button button = createButton(
                             buttonDef,
+                            String.format("custom at %d", i),
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
@@ -856,8 +893,8 @@ public class ThemeableBrowser extends CordovaPlugin {
         return result;
     }
 
-    private void setBackgroundStates(View view, String normal, String pressed,
-            int disabledAlpha) {
+    private void setBackgroundStates(View view, String description,
+            String normal, String pressed, int disabledAlpha) {
         Resources activityRes = cordova.getActivity().getResources();
         Drawable normalDrawable = null;
         Drawable disabledDrawable = null;
@@ -874,9 +911,14 @@ public class ThemeableBrowser extends CordovaPlugin {
                 params.width = normalDrawable.getIntrinsicWidth();
                 params.height = normalDrawable.getIntrinsicHeight();
             } catch (Resources.NotFoundException e) {
-                Log.e(LOG_TAG, String.format(
-                        "%s not found as a drawable", normal));
+                emitError(ERR_LOADFAIL,
+                        String.format("Image for %s button %s failed to load",
+                                description, normal));
             }
+        } else {
+            emitWarning(WRN_UNDEFINED,
+                    String.format("Image for %s button is not defined. Button will not be shown",
+                            description));
         }
 
         if (pressed != null) {
@@ -887,9 +929,14 @@ public class ThemeableBrowser extends CordovaPlugin {
                         cordova.getActivity().getPackageName());
                 pressedDrawable = activityRes.getDrawable(pressedId);
             } catch (Resources.NotFoundException e) {
-                Log.e(LOG_TAG, String.format(
-                        "%s not found as a drawable", pressed));
+                emitError(ERR_LOADFAIL,
+                        String.format("Pressed image for %s button %s failed to load",
+                                description, pressed));
             }
+        } else {
+            emitWarning(WRN_UNDEFINED,
+                    String.format("Pressed image for %s button is not defined.",
+                            description));
         }
 
         if (normalDrawable != null) {
@@ -945,8 +992,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     image, "drawable", cordova.getActivity().getPackageName());
             setBackground(view, activityRes.getDrawable(imageId));
         } catch (Resources.NotFoundException e) {
-            Log.e(LOG_TAG, String.format(
-                    "%s not found as a drawable", image));
+            emitError(ERR_LOADFAIL,
+                    String.format("Failed to load %s", image));
         }
     }
 
@@ -958,7 +1005,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         }
     }
 
-    private Button createButton(BrowserButton buttonDef,
+    private Button createButton(BrowserButton buttonDef, String description,
             View.OnClickListener listener) {
         Button result = null;
         if (buttonDef != null) {
@@ -966,11 +1013,16 @@ public class ThemeableBrowser extends CordovaPlugin {
             result.setLayoutParams(new LinearLayout.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
             setBackgroundStates(result,
+                    description,
                     buttonDef.image,
                     buttonDef.imagePressed, DISABLED_ALPHA);
             if (listener != null) {
                 result.setOnClickListener(listener);
             }
+        } else if (buttonDef == null) {
+            emitWarning(WRN_UNDEFINED,
+                    String.format("%s button is not defined. Button will not be shown.",
+                            description));
         }
         return result;
     }
@@ -1045,7 +1097,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                    emitError(ERR_CRITICAL,
+                            String.format("Error dialing %s: %s", url, e.toString()));
                 }
             }
 
@@ -1055,7 +1108,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+                    emitError(ERR_CRITICAL,
+                            String.format("Error with %s: %s", url, e.toString()));
                 }
             }
             // If sms:5551212?body=This is the message
@@ -1086,7 +1140,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     intent.setType("vnd.android-dir/mms-sms");
                     cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
+                    emitError(ERR_CRITICAL,
+                            String.format("Error sending sms %s: %s", url, e.toString()));
                 }
             }
             else {
@@ -1104,7 +1159,6 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
             }
         }
 
@@ -1123,7 +1177,6 @@ public class ThemeableBrowser extends CordovaPlugin {
                             view.canGoForward());
                 }
             } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
             }
         }
 
@@ -1139,7 +1192,6 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 sendUpdate(obj, true, PluginResult.Status.ERROR);
             } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
             }
         }
     }

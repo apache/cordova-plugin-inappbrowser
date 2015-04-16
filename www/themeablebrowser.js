@@ -99,6 +99,8 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     };
 
     strWindowFeatures = strWindowFeatures && JSON.stringify(strWindowFeatures);
+    // Slightly delay the actual native call to give the user a chance to
+    // register event listeners first, otherwise some warnings or errors may be missed.
     setTimeout(function() {
         exec(cb, cb, 'ThemeableBrowser', 'open', [strUrl, strWindowName, strWindowFeatures || '']);
     }, 0);
@@ -107,7 +109,7 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
 
 exports.EVT_ERROR = 'ThemeableBrowserError';
 exports.EVT_WARNING = 'ThemeableBrowserWarning';
-exports.CD_CRITICAL = 'critical';
-exports.CD_LOADFAIL = 'loadfail';
-exports.CD_UNEXPECTED = 'unexpected';
-exports.CD_UNDEFINED = 'undefined';
+exports.ERR_CRITICAL = 'critical';
+exports.ERR_LOADFAIL = 'loadfail';
+exports.WRN_UNEXPECTED = 'unexpected';
+exports.WRN_UNDEFINED = 'undefined';

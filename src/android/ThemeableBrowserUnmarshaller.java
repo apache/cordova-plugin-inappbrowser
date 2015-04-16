@@ -71,6 +71,15 @@ public class ThemeableBrowserUnmarshaller {
     }
 
     /**
+     * Runtime exception to notify parser errors.
+     */
+    public static class ParserException extends RuntimeException {
+        public ParserException(Exception e) {
+            super(e);
+        }
+    }
+
+    /**
      * Given a JSON string, unmarhall it to an instance of the given class.
      *
      * @param json JSON string to unmarshall.
@@ -88,7 +97,7 @@ public class ThemeableBrowserUnmarshaller {
                 JSONObject jsonObj = new JSONObject(json);
                 result = JSONToObj(jsonObj, cls);
             } catch (JSONException e) {
-                // Ignore.
+                throw new ParserException(e);
             }
         }
 
@@ -165,7 +174,7 @@ public class ThemeableBrowserUnmarshaller {
                 }
             }
         } catch (JSONException e) {
-            // Ignore.
+            throw new ParserException(e);
         } catch (NoSuchMethodException e) {
             throw new ClassInstantiationException(
                     "Failed to retrieve constructor for "
@@ -306,7 +315,7 @@ public class ThemeableBrowserUnmarshaller {
                     result.add(converted);
                 }
             } catch (JSONException e) {
-                // Ignore.
+                throw new ParserException(e);
             }
         }
 
