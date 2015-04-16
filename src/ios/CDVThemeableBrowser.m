@@ -643,7 +643,7 @@
             [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
         } else {
             [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImage]]];
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImage]]];
         }
     } else if (toolbarProps[kThemeableBrowserPropImagePortrait] || toolbarProps[kThemeableBrowserPropImageLandscape]) {
         if (toolbarProps[kThemeableBrowserPropImagePortrait]) {
@@ -652,7 +652,7 @@
                 [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
             } else {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImagePortrait]]];
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImagePortrait]]];
             }
         }
         if (toolbarProps[kThemeableBrowserPropImageLandscape]) {
@@ -661,7 +661,7 @@
                 [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
             } else {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", description, toolbarProps[kThemeableBrowserPropImageLandscape]]];
+                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImageLandscape]]];
             }
         }
     }
@@ -873,7 +873,7 @@
     if (buttonDef) {
         UIImage *buttonImage = nil;
         if (buttonDef[kThemeableBrowserPropImage]) {
-            *buttonImage = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImage]];
+            buttonImage = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImage]];
 
             if (!buttonImage) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
@@ -887,14 +887,14 @@
         UIImage *buttonImagePressed = nil;
         if (buttonDef[kThemeableBrowserPropImagePressed]) {
             buttonImagePressed = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImagePressed]];
-        } else {
-            [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                             withMessage:[NSString stringWithFormat:@"Pressed image for %@ is not defined.", description]];
-
+            
             if (!buttonImagePressed) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
                                        withMessage:[NSString stringWithFormat:@"Pressed image for %@, %@, failed to load.", description, buttonDef[kThemeableBrowserPropImagePressed]]];
             }
+        } else {
+            [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
+                             withMessage:[NSString stringWithFormat:@"Pressed image for %@ is not defined.", description]];
         }
         
         if (buttonImage) {
