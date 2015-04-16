@@ -451,8 +451,8 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @return boolean
      */
-    private boolean getShowLocation() {
-        return this.showLocation;
+    private boolean getShowLocationBar() {
+        return this.showLocationBar;
     }
     
     /**
@@ -693,7 +693,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Add the views to our toolbar
                 toolbar.addView(actionButtonContainer);
-                if(getShowLocation()) {
+                if(getShowLocationBar()) {
                 	toolbar.addView(edittext);
                 }
                 toolbar.addView(close);
