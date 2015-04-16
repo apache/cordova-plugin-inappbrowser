@@ -698,10 +698,10 @@
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
     
-    self.closeButton = [self createButton:_browserOptions.closeButton action:@selector(close) withDescription:@"close"];
-    self.backButton = [self createButton:_browserOptions.backButton action:@selector(goBack:) withDescription:@"back"];
-    self.forwardButton = [self createButton:_browserOptions.forwardButton action:@selector(goForward:) withDescription:@"forward"];
-    self.menuButton = [self createButton:_browserOptions.menu action:@selector(goMenu:) withDescription:@"menu"];
+    self.closeButton = [self createButton:_browserOptions.closeButton action:@selector(close) withDescription:@"close button"];
+    self.backButton = [self createButton:_browserOptions.backButton action:@selector(goBack:) withDescription:@"back button"];
+    self.forwardButton = [self createButton:_browserOptions.forwardButton action:@selector(goForward:) withDescription:@"forward button"];
+    self.menuButton = [self createButton:_browserOptions.menu action:@selector(goMenu:) withDescription:@"menu button"];
     
     // This is a hack to remove the mandatory padding from toolbar using a
     // negative width. Note that width is different depending on iPad or iPhone.
@@ -727,7 +727,7 @@
     if (customButtons) {
         NSInteger cnt = 0;
         for (NSDictionary* customButton in customButtons) {
-            UIBarButtonItem* button = [self createButton:customButton action:@selector(goCustomButton:) withDescription:[NSString stringWithFormat:@"custom at %ld", (long)cnt]];
+            UIBarButtonItem* button = [self createButton:customButton action:@selector(goCustomButton:) withDescription:[NSString stringWithFormat:@"custom button at %ld", (long)cnt]];
             ((UIButton*) button.customView).tag = cnt;
             CGFloat width = [self getWidthFromButton:button];
             if ([kThemeableBrowserAlignRight isEqualToString:customButton[kThemeableBrowserPropAlign]]) {
@@ -877,11 +877,11 @@
 
             if (!buttonImage) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"Image for %@ button %@ failed to load.", description, buttonDef[kThemeableBrowserPropImage]]];
+                                   withMessage:[NSString stringWithFormat:@"Image for %@, %@, failed to load.", description, buttonDef[kThemeableBrowserPropImage]]];
             }
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                                 withMessage:[NSString stringWithFormat:@"Image for %@ button is not defined. Button will not be shown.", description]];
+                                 withMessage:[NSString stringWithFormat:@"Image for %@ is not defined. Button will not be shown.", description]];
         }
 
         UIImage *buttonImagePressed = nil;
@@ -889,11 +889,11 @@
             buttonImagePressed = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImagePressed]];
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                             withMessage:[NSString stringWithFormat:@"Pressed image for %@ button is not defined.", description]];
+                             withMessage:[NSString stringWithFormat:@"Pressed image for %@ is not defined.", description]];
 
             if (!buttonImagePressed) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@ button %@ failed to load.", description, buttonDef[kThemeableBrowserPropImagePressed]]];
+                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@, %@, failed to load.", description, buttonDef[kThemeableBrowserPropImagePressed]]];
             }
         }
         
@@ -912,7 +912,7 @@
         }
     } else if (!buttonDef) {
         [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                                 withMessage:[NSString stringWithFormat:@"%@ button is not defined. Button will not be shown.", description]];
+                                 withMessage:[NSString stringWithFormat:@"%@ is not defined. Button will not be shown.", description]];
     } else if (!buttonDef[kThemeableBrowserPropImage]) {
     }
     
@@ -1295,7 +1295,7 @@
             [self.navigationDelegate emitEvent:dict];
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
-                                     withMessage:@"Button clicked, but no event property. No event will be raised."];
+                                     withMessage:@"Button clicked, but event property undefined. No event will be raised."];
         }
     }
 }
