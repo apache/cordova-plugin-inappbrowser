@@ -19,8 +19,8 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="org.apache.cordova.inappbrowser"
-      version="0.6.1-dev">
+           id="cordova-plugin-inappbrowser"
+      version="1.0.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -197,6 +197,7 @@
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <merges target="" />
         </js-module>
+        <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
     </platform>
   
     <!-- firefoxos -->

@@ -6,8 +6,8 @@ node_js:
 install:
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config 
   - cd ..
-  - npm install -g purplecabbage/cordova-paramedic
+  - npm install -g cordova-paramedic
   - npm install -g cordova
   - npm install -g ios-sim
 script:
-  - cordova-paramedic --platform ios --plugin ../cordova-plugin-inappbrowser
+  - cordova-paramedic --platform ios --plugin ${TRAVIS_BUILD_DIR}

@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
 Этот плагин обеспечивает представление веб-браузера, что показывает при вызове`window.open()`.
 
@@ -28,7 +28,7 @@
 
 ## Установка
 
-    cordova plugin add org.apache.cordova.inappbrowser
+    cordova plugin add cordova-plugin-inappbrowser
     
 
 ## window.open
