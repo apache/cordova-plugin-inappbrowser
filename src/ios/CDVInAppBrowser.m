@@ -163,7 +163,7 @@
     self.inAppBrowserViewController.modalPresentationStyle = presentationStyle;
 
     // Set Transition Style
-    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
+    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCrossDissolve; // default
     if (browserOptions.transitionstyle != nil) {
         if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"fliphorizontal"]) {
             transitionStyle = UIModalTransitionStyleFlipHorizontal;
