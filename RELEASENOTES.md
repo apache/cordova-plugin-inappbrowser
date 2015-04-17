@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.2
+=====
+
+Added error and warning reporting capabilities. Added property to disable animation.
+
 0.2.1
 =====
 
