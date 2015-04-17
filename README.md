@@ -90,6 +90,10 @@ This plugin launches an in-app web view on top the existing [CordovaWebView](htt
         alert('hello pressed');
     }).addEventListener('sharePressed', function(e) {
         alert(e.url);
+    }).addEventListener(cordova.ThemeableBrowser.EVT_ERR, function(e) {
+        console.error(e.message);
+    }).addEventListener(cordova.ThemeableBrowser.EVT_WRN, function(e) {
+        console.log(e.message);
     });
 
 ![iOS Sample](doc/images/ios_sample_01.png)
@@ -184,6 +188,42 @@ Then open your native iOS project with Xcode by double clicking on
 In the left hand side panel, make sure you are in Project navigator tab. Then you can see a list of directories under your project. One of them being `Resources`, but you don't see your newly added images there. Now you need to drag your images fron Finder to Xcode and drop it under `Resource` folder. In your JavaScript config, you can then reference to them without suffix or extension. eg. With the previous example, simply `icon` will suffice.
 
 The new school way is to use [Asset Catalog](https://developer.apple.com/library/ios/recipes/xcode_help-image_catalog-1.0/Recipe.html). This is the recommended technique from Xcode 5+ and iOS 7+. It gives you better management of all of your image resources. ie. No more suffix, and you can see all your images for different densities in one table etc. However there are more steps involved to set it up. Please reference to [this guide](http://www.intertech.com/Blog/xcode-assets-xcassets/) for a step by step walkthrough.
+
+Errors and Warnings
+-------------------
+
+This plugin does not want to be the source of your app crash, not to mention that you have no way to catch exceptions from native code, so it does not throw exceptions. Neither does it want to write to log, because it wants to avoid polluting your log and respect your choice of logging library. Hence all errors are warnings are reported back to you through events. You may listen to two special events defined by `cordova.ThemeableBrowser.EVT_ERR` and `cordova.ThemeableBrowser.EVT_WRN`. Upon error or warning, you will receive event object that contains the following properties:
+
++ `code` contains the error or warning code, which is defined by one of the followings:
+    + `cordova.ThemeableBrowser.ERR_CRITICAL` is raised for a critical error that you should definitely try to resolve. eg. JSON parser failure. Dialer launch failure. Raised only for `cordova.ThemeableBrowser.EVT_ERR` event.
+    + `cordova.ThemeableBrowser.ERR_LOADFAIL` is raised when a native image that you referenced in your config failed to load from native resource bundle. Raised only for `cordova.ThemeableBrowser.EVT_ERR` event.
+    + `cordova.ThemeableBrowser.WRN_UNDEFINED` is raised when a property in your config is not defined. You will not get this warning for every property that is undefined, just the ones that might cause confusion. Raised only for `cordova.ThemeableBrowser.EVT_WRN` event.
+    + `cordova.ThemeableBrowser.WRN_UNEXPECTED` is raised when an unexpected behaviour is committed. You can ignore this warning, since such behaviours will be simply ignored. eg. Try to close the browser when it's already closed. Raised only for `cordova.ThemeableBrowser.EVT_WRN` event.
++ `message` contains a readable message that will try its best to tell you want went wrong.
+
+Examples:
+
+    cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
+        ...
+    }).addEventListener(cordova.ThemeableBrowser.EVT_ERR, function(e) {
+        if (e.code === cordova.ThemeableBrowser.ERR_CRITICAL) {
+            // TODO: Handle critical error.
+        } else if (e.code === cordova.ThemeableBrowser.ERR_LOADFAIL) {
+            // TODO: Image failed to load.
+        }
+
+        console.error(e.message);
+    }).addEventListener(cordova.ThemeableBrowser.EVT_WRN, function(e) {
+        if (e.code === cordova.ThemeableBrowser.WRN_UNDEFINED) {
+            // TODO: Some property undefined in config.
+        } else if (e.code === cordova.ThemeableBrowser.WRN_UNEXPECTED) {
+            // TODO: Something strange happened. But no big deal.
+        }
+
+        console.log(e.message);
+    });
+
+These events are intended to help you debug strange behaviours. So if you run into something weird, please listene to these events and it might just tell you what's wrong. Please note errors and warnings are not completely consistent across platforms. There are some minor platform differences.
 
 FAQ
 ---
