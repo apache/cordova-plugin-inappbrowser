@@ -1117,6 +1117,7 @@
     
     if (self.webView.canGoBack) {
         [self.webView goBack];
+        [self updateButtonDelayed:self.webView];
     } else if (_browserOptions.backButtonCanClose) {
         [self close];
     }
@@ -1127,6 +1128,7 @@
     [self emitEventForButton:_browserOptions.forwardButton];
     
     [self.webView goForward];
+    [self updateButtonDelayed:self.webView];
 }
 
 - (void)goCustomButton:(id)sender
@@ -1304,16 +1306,9 @@
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView
 {
-    // loading url, start spinner, update back/forward
+    // loading url, start spinner
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    if (self.backButton) {
-        self.backButton.enabled = _browserOptions.backButtonCanClose || theWebView.canGoBack;
-    }
-
-    if (self.forwardButton) {
-        self.forwardButton.enabled = theWebView.canGoForward;
-    }
 
     [self.spinner startAnimating];
 
@@ -1327,6 +1322,9 @@
     if (isTopLevelNavigation) {
         self.currentURL = request.URL;
     }
+    
+    [self updateButtonDelayed:theWebView];
+    
     return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
 }
 
@@ -1335,13 +1333,7 @@
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
-    if (self.backButton) {
-        self.backButton.enabled = _browserOptions.backButtonCanClose || theWebView.canGoBack;
-    }
-
-    if (self.forwardButton) {
-        self.forwardButton.enabled = theWebView.canGoForward;
-    }
+    [self updateButton:theWebView];
     
     if (self.titleLabel && _browserOptions.title
             && !_browserOptions.title[kThemeableBrowserPropStaticText]
@@ -1374,19 +1366,41 @@
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
 {
-    if (self.backButton) {
-        self.backButton.enabled = _browserOptions.backButtonCanClose || theWebView.canGoBack;
-    }
-
-    if (self.forwardButton) {
-        self.forwardButton.enabled = theWebView.canGoForward;
-    }
+    [self updateButton:theWebView];
 
     [self.spinner stopAnimating];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
 
     [self.navigationDelegate webView:theWebView didFailLoadWithError:error];
+}
+
+- (void)updateButton:(UIWebView*)theWebView
+{
+    if (self.backButton) {
+        self.backButton.enabled = _browserOptions.backButtonCanClose || theWebView.canGoBack;
+    }
+    
+    if (self.forwardButton) {
+        self.forwardButton.enabled = theWebView.canGoForward;
+    }
+}
+
+/**
+ * The reason why this method exists at all is because UIWebView is quite
+ * terrible with dealing this hash change, which IS a history change. However
+ * when moving to a new hash, only shouldStartLoadWithRequest will be called.
+ * Even then it's being called too early such that canGoback and canGoForward
+ * hasn't been updated yet. What makes it worse is that when navigating history
+ * involving hash by goBack and goForward, no callback is called at all, so we
+ * will have to depend on the back and forward button to give us hints when to
+ * change button states.
+ */
+- (void)updateButtonDelayed:(UIWebView*)theWebView
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self updateButton:theWebView];
+    });
 }
 
 #pragma mark CDVScreenOrientationDelegate
