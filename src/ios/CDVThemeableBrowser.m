@@ -91,6 +91,11 @@
     }
     // Things are cleaned up in browserExit.
     [self.themeableBrowserViewController close];
+    
+    // Explicit attempt to remove reference to themeableBrowserViewController.
+    self.themeableBrowserViewController = nil;
+    self.callbackId = nil;
+    self.callbackIdPattern = nil;
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
