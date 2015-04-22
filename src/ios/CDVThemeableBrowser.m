@@ -60,7 +60,7 @@
 #pragma mark CDVThemeableBrowser
 
 @interface CDVThemeableBrowser () {
-    NSInteger _previousStatusBarStyle;
+    BOOL _isShown;
 }
 @end
 
@@ -70,7 +70,7 @@
 {
     self = [super initWithWebView:theWebView];
     if (self != nil) {
-        _previousStatusBarStyle = -1;
+        _isShown = NO;
         _callbackIdPattern = nil;
     }
 
@@ -91,11 +91,6 @@
     }
     // Things are cleaned up in browserExit.
     [self.themeableBrowserViewController close];
-    
-    // Explicit attempt to remove reference to themeableBrowserViewController.
-    self.themeableBrowserViewController = nil;
-    self.callbackId = nil;
-    self.callbackIdPattern = nil;
 }
 
 - (BOOL) isSystemUrl:(NSURL*)url
@@ -213,7 +208,8 @@
         self.themeableBrowserViewController = [[CDVThemeableBrowserViewController alloc]
                                                initWithUserAgent:originalUA prevUserAgent:[self.commandDelegate userAgent]
                                                browserOptions: browserOptions
-                                               navigationDelete:self];
+                                               navigationDelete:self
+                                               statusBarStyle:[UIApplication sharedApplication].statusBarStyle];
 
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
             self.themeableBrowserViewController.orientationDelegate = (UIViewController <CDVScreenOrientationDelegate>*)self.viewController;
@@ -282,13 +278,13 @@
               withMessage:@"Show called but already closed."];
         return;
     }
-    if (_previousStatusBarStyle != -1) {
+    if (_isShown) {
         [self emitWarning:kThemeableBrowserEmitCodeUnexpected
               withMessage:@"Show called but already shown"];
         return;
     }
 
-    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
+    _isShown = YES;
 
     CDVThemeableBrowserNavigationController* nav = [[CDVThemeableBrowserNavigationController alloc]
                                    initWithRootViewController:self.themeableBrowserViewController];
@@ -514,14 +510,10 @@
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.themeableBrowserViewController = nil;
+    self.callbackId = nil;
+    self.callbackIdPattern = nil;
 
-    /*
-    if (IsAtLeastiOSVersion(@"7.0")) {
-        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
-    }
-    */
-
-    _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
+    _isShown = NO;
 }
 
 - (void)emitEvent:(NSDictionary*)event
@@ -565,7 +557,7 @@
 
 @synthesize currentURL;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions navigationDelete:(CDVThemeableBrowser*) navigationDelegate
+- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVThemeableBrowserOptions*) browserOptions navigationDelete:(CDVThemeableBrowser*) navigationDelegate statusBarStyle:(UIStatusBarStyle) statusBarStyle
 {
     self = [super init];
     if (self != nil) {
@@ -574,6 +566,7 @@
         _browserOptions = browserOptions;
         _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
         _navigationDelegate = navigationDelegate;
+        _statusBarStyle = statusBarStyle;
         [self createViews];
     }
 
@@ -631,13 +624,14 @@
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
     self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    self.toolbar.barStyle = UIBarStyleBlackOpaque;
+    self.toolbar.barStyle = UIBarStyleBlack;
     self.toolbar.clearsContextBeforeDrawing = NO;
-    self.toolbar.clipsToBounds = NO;
+    self.toolbar.clipsToBounds = YES;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
     self.toolbar.hidden = NO;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
+    self.toolbar.translucent = NO;
     self.toolbar.userInteractionEnabled = YES;
     self.toolbar.barTintColor = [CDVThemeableBrowserViewController colorFromRGBA:[self getStringFromDict:toolbarProps withKey:kThemeableBrowserPropColor withDefault:@"#ffffffff"]];
     
@@ -1076,7 +1070,7 @@
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
-    return UIStatusBarStyleDefault;
+    return _statusBarStyle;
 }
 
 - (void)close
@@ -1214,11 +1208,9 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    /*
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
     }
-    */
     [self rePositionViews];
 
     [super viewWillAppear:animated];
