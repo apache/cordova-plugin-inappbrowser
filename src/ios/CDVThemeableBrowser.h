@@ -69,6 +69,7 @@
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated;
+- (void)reload:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -101,6 +102,7 @@
 @property (nonatomic) CGFloat titleOffset;
 
 - (void)close;
+- (void)reload;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString*) toolbarPosition;

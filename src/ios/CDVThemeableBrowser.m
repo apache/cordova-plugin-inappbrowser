@@ -135,6 +135,13 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)reload:(CDVInvokedUrlCommand*)command
+{
+    if (self.themeableBrowserViewController) {
+        [self.themeableBrowserViewController reload];
+    }
+}
+
 - (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options
 {
     CDVThemeableBrowserOptions* obj = [[CDVThemeableBrowserOptions alloc] init];
@@ -1036,6 +1043,11 @@
         }
     });
     
+}
+
+- (void)reload
+{
+    [self.webView reload];
 }
 
 - (void)navigateTo:(NSURL*)url

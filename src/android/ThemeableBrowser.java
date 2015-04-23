@@ -242,6 +242,16 @@ public class ThemeableBrowser extends CordovaPlugin {
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
+        else if (action.equals("reload")) {
+            if (inAppWebView != null) {
+                this.cordova.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inAppWebView.reload();
+                    }
+                });
+            }
+        }
         else {
             return false;
         }
@@ -606,6 +616,11 @@ public class ThemeableBrowser extends CordovaPlugin {
                     }
                 );
 
+                if (back != null) {
+                    back.setEnabled(false);
+                }
+
+
                 // Close/Done button
                 Button close = createButton(
                     features.closeButton,
@@ -888,6 +903,11 @@ public class ThemeableBrowser extends CordovaPlugin {
         if (hex != null && !hex.isEmpty()) {
             if (hex.charAt(0) == '#') {
                 hex = hex.substring(1);
+            }
+
+            // No alpha, that's fine, we will just attach ff.
+            if (hex.length() < 8) {
+                hex += "ff";
             }
 
             result = (int) Long.parseLong(hex, 16);
