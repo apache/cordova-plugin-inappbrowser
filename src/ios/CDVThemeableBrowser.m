@@ -37,8 +37,6 @@
 #define    kThemeableBrowserPropHeight @"height"
 #define    kThemeableBrowserPropImage @"image"
 #define    kThemeableBrowserPropImagePressed @"imagePressed"
-#define    kThemeableBrowserPropImagePortrait @"imagePortrait"
-#define    kThemeableBrowserPropImageLandscape @"imageLandscape"
 #define    kThemeableBrowserPropStaticText @"staticText"
 #define    kThemeableBrowserPropShowPageTitle @"showPageTitle"
 #define    kThemeableBrowserPropAlign @"align"
@@ -615,56 +613,27 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-
     CGFloat toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - toolbarHeight : 0.0;
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, toolbarHeight);
     
-    self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
+    self.toolbar = [[UIView alloc] initWithFrame:toolbarFrame];
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
     self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    self.toolbar.barStyle = UIBarStyleBlack;
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = YES;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
     self.toolbar.hidden = NO;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
-    self.toolbar.translucent = NO;
     self.toolbar.userInteractionEnabled = YES;
-    self.toolbar.barTintColor = [CDVThemeableBrowserViewController colorFromRGBA:[self getStringFromDict:toolbarProps withKey:kThemeableBrowserPropColor withDefault:@"#ffffffff"]];
+    self.toolbar.backgroundColor = [CDVThemeableBrowserViewController colorFromRGBA:[self getStringFromDict:toolbarProps withKey:kThemeableBrowserPropColor withDefault:@"#ffffffff"]];
     
     if (toolbarProps[kThemeableBrowserPropImage]) {
         UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImage]];
-        if (image) {
-            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-            [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
-        } else {
-            [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImage]]];
-        }
-    } else if (toolbarProps[kThemeableBrowserPropImagePortrait] || toolbarProps[kThemeableBrowserPropImageLandscape]) {
-        if (toolbarProps[kThemeableBrowserPropImagePortrait]) {
-            UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImagePortrait]];
-            if (image) {
-                [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-            } else {
-                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImagePortrait]]];
-            }
-        }
-        if (toolbarProps[kThemeableBrowserPropImageLandscape]) {
-            UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImageLandscape]];
-            if (image) {
-                [self.toolbar setBackgroundImage:image forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsLandscapePhone];
-            } else {
-                [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"%@ failed to load.", toolbarProps[kThemeableBrowserPropImageLandscape]]];
-            }
-        }
+        self.toolbar.backgroundColor = [UIColor colorWithPatternImage:image];
     }
-
+    
     CGFloat labelInset = 5.0;
     float locationBarY = self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
 
@@ -702,145 +671,97 @@
     self.forwardButton = [self createButton:_browserOptions.forwardButton action:@selector(goForward:) withDescription:@"forward button"];
     self.menuButton = [self createButton:_browserOptions.menu action:@selector(goMenu:) withDescription:@"menu button"];
     
-    // This is a hack to remove the mandatory padding from toolbar using a
-    // negative width. Note that width is different depending on iPad or iPhone.
-    UIBarButtonItem *paddingRemover = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        paddingRemover.width = -20;
-    } else {
-        paddingRemover.width = -16;
-    }
-    
-    UIBarButtonItem *divider = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    divider.width = -10;
-    
     // Arramge toolbar buttons with respect to user configuration.
     CGFloat leftWidth = 0;
     CGFloat rightWidth = 0;
-    BOOL isLeftPrestine = YES;
-    BOOL isRightPrestine = YES;
-    NSMutableArray *toolbarItems = [NSMutableArray new];
-    [toolbarItems addObject:flexibleSpaceButton];
     
-    NSArray* customButtons = _browserOptions.customButtons;
-    if (customButtons) {
-        NSInteger cnt = 0;
-        for (NSDictionary* customButton in customButtons) {
-            UIBarButtonItem* button = [self createButton:customButton action:@selector(goCustomButton:) withDescription:[NSString stringWithFormat:@"custom button at %ld", (long)cnt]];
-            ((UIButton*) button.customView).tag = cnt;
-            CGFloat width = [self getWidthFromButton:button];
-            if ([kThemeableBrowserAlignRight isEqualToString:customButton[kThemeableBrowserPropAlign]]) {
-                if (!isRightPrestine) {
-                    [toolbarItems addObject:divider];
-                }
-                [toolbarItems addObject:button];
-                rightWidth += width;
-                isRightPrestine = NO;
-            } else {
-                if (!isLeftPrestine) {
-                    [toolbarItems insertObject:divider atIndex:0];
-                }
-                [toolbarItems insertObject:button atIndex:0];
-                leftWidth += width;
-                isLeftPrestine = NO;
-            }
-            
-            cnt += 1;
-        }
-    }
+    // Both left and right side buttons will be ordered from outside to inside.
+    NSMutableArray* leftButtons = [NSMutableArray new];
+    NSMutableArray* rightButtons = [NSMutableArray new];
     
-    // Back and forward buttons must be added with special ordering logic such
-    // that back button is always on the left of forward button if both buttons
-    // are on the same side.
-    if (self.forwardButton && ![kThemeableBrowserAlignRight isEqualToString:_browserOptions.forwardButton[kThemeableBrowserPropAlign]]) {
-        if (!isLeftPrestine) {
-            [toolbarItems insertObject:divider atIndex:0];
+    if (self.closeButton) {
+        CGFloat width = [self getWidthFromButton:self.closeButton];
+        
+        if ([kThemeableBrowserAlignRight isEqualToString:_browserOptions.closeButton[kThemeableBrowserPropAlign]]) {
+            [rightButtons addObject:self.closeButton];
+            rightWidth += width;
+        } else {
+            [leftButtons addObject:self.closeButton];
+            leftWidth += width;
         }
-        CGFloat width = [self getWidthFromButton:self.forwardButton];
-        [toolbarItems insertObject:self.forwardButton atIndex:0];
-        leftWidth += width;
-        isLeftPrestine = NO;
-    }
-    
-    if (self.backButton && [kThemeableBrowserAlignRight isEqualToString:_browserOptions.backButton[kThemeableBrowserPropAlign]]) {
-        if (!isRightPrestine) {
-            [toolbarItems addObject:divider];
-        }
-        CGFloat width = [self getWidthFromButton:self.backButton];
-        [toolbarItems addObject:self.backButton];
-        rightWidth += width;
-        isRightPrestine = NO;
-    }
-    
-    if (self.backButton && ![kThemeableBrowserAlignRight isEqualToString:_browserOptions.backButton[kThemeableBrowserPropAlign]]) {
-        if (!isLeftPrestine) {
-            [toolbarItems insertObject:divider atIndex:0];
-        }
-        CGFloat width = [self getWidthFromButton:self.backButton];
-        [toolbarItems insertObject:self.backButton atIndex:0];
-        leftWidth += width;
-        isLeftPrestine = NO;
-    }
-    
-    if (self.forwardButton && [kThemeableBrowserAlignRight isEqualToString:_browserOptions.forwardButton[kThemeableBrowserPropAlign]]) {
-        if (!isRightPrestine) {
-            [toolbarItems addObject:divider];
-        }
-        CGFloat width = [self getWidthFromButton:self.forwardButton];
-        [toolbarItems addObject:self.forwardButton];
-        rightWidth += width;
-        isRightPrestine = NO;
     }
     
     if (self.menuButton) {
         CGFloat width = [self getWidthFromButton:self.menuButton];
         
         if ([kThemeableBrowserAlignRight isEqualToString:_browserOptions.menu[kThemeableBrowserPropAlign]]) {
-            if (!isRightPrestine) {
-                [toolbarItems addObject:divider];
-            }
-            [toolbarItems addObject:self.menuButton];
+            [rightButtons addObject:self.menuButton];
             rightWidth += width;
-            isRightPrestine = NO;
         } else {
-            if (!isLeftPrestine) {
-                [toolbarItems insertObject:divider atIndex:0];
-            }
-            [toolbarItems insertObject:self.menuButton atIndex:0];
+            [leftButtons addObject:self.menuButton];
             leftWidth += width;
-            isLeftPrestine = NO;
         }
     }
     
-    if (self.closeButton) {
-        CGFloat width = [self getWidthFromButton:self.closeButton];
-        
-        if ([kThemeableBrowserAlignRight isEqualToString:_browserOptions.closeButton[kThemeableBrowserPropAlign]]) {
-            if (!isRightPrestine) {
-                [toolbarItems addObject:divider];
+    // Back and forward buttons must be added with special ordering logic such
+    // that back button is always on the left of forward button if both buttons
+    // are on the same side.
+    if (self.backButton && ![kThemeableBrowserAlignRight isEqualToString:_browserOptions.backButton[kThemeableBrowserPropAlign]]) {
+        CGFloat width = [self getWidthFromButton:self.backButton];
+        [leftButtons addObject:self.backButton];
+        leftWidth += width;
+    }
+    
+    if (self.forwardButton && [kThemeableBrowserAlignRight isEqualToString:_browserOptions.forwardButton[kThemeableBrowserPropAlign]]) {
+        CGFloat width = [self getWidthFromButton:self.forwardButton];
+        [rightButtons addObject:self.forwardButton];
+        rightWidth += width;
+    }
+    
+    if (self.forwardButton && ![kThemeableBrowserAlignRight isEqualToString:_browserOptions.forwardButton[kThemeableBrowserPropAlign]]) {
+        CGFloat width = [self getWidthFromButton:self.forwardButton];
+        [leftButtons addObject:self.forwardButton];
+        leftWidth += width;
+    }
+    
+    if (self.backButton && [kThemeableBrowserAlignRight isEqualToString:_browserOptions.backButton[kThemeableBrowserPropAlign]]) {
+        CGFloat width = [self getWidthFromButton:self.backButton];
+        [rightButtons addObject:self.backButton];
+        rightWidth += width;
+    }
+    
+    NSArray* customButtons = _browserOptions.customButtons;
+    if (customButtons) {
+        NSInteger cnt = 0;
+        // Reverse loop because we are laying out from outer to inner.
+        for (NSDictionary* customButton in [customButtons reverseObjectEnumerator]) {
+            UIButton* button = [self createButton:customButton action:@selector(goCustomButton:) withDescription:[NSString stringWithFormat:@"custom button at %ld", (long)cnt]];
+            button.tag = cnt;
+            CGFloat width = [self getWidthFromButton:button];
+            if ([kThemeableBrowserAlignRight isEqualToString:customButton[kThemeableBrowserPropAlign]]) {
+                [rightButtons addObject:button];
+                rightWidth += width;
+            } else {
+                [leftButtons addObject:button];
+                leftWidth += width;
             }
-            [toolbarItems addObject:self.closeButton];
-            rightWidth += width;
-            isRightPrestine = NO;
-        } else {
-            if (!isLeftPrestine) {
-                [toolbarItems insertObject:divider atIndex:0];
-            }
-            [toolbarItems insertObject:self.closeButton atIndex:0];
-            leftWidth += width;
-            isLeftPrestine = NO;
+            
+            cnt += 1;
         }
     }
     
-    if (!isLeftPrestine) {
-        [toolbarItems insertObject:paddingRemover atIndex:0];
+    self.rightButtons = rightButtons;
+    self.leftButtons = leftButtons;
+    
+    for (UIButton* button in self.leftButtons) {
+        [self.toolbar addSubview:button];
     }
     
-    if (!isRightPrestine) {
-        [toolbarItems addObject:paddingRemover];
+    for (UIButton* button in self.rightButtons) {
+        [self.toolbar addSubview:button];
     }
     
-    [self.toolbar setItems:toolbarItems];
+    [self layoutButtons];
     
     self.titleOffset = fmaxf(leftWidth, rightWidth);
     // The correct positioning of title is not that important right now, since
@@ -866,9 +787,9 @@
     // [self.view addSubview:self.spinner];
 }
 
-- (UIBarButtonItem*) createButton:(NSDictionary*) buttonDef action:(SEL)action withDescription:(NSString*)description
+- (UIButton*) createButton:(NSDictionary*) buttonDef action:(SEL)action withDescription:(NSString*)description
 {
-    UIBarButtonItem* result = nil;
+    UIButton* result = nil;
     if (buttonDef) {
         UIImage *buttonImage = nil;
         if (buttonDef[kThemeableBrowserPropImage]) {
@@ -897,17 +818,15 @@
         }
         
         if (buttonImage) {
-            UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-            button.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
+            result = [UIButton buttonWithType:UIButtonTypeCustom];
+            result.bounds = CGRectMake(0, 0, buttonImage.size.width, buttonImage.size.height);
             
             if (buttonImagePressed) {
-                [button setImage:buttonImagePressed forState:UIControlStateHighlighted];
+                [result setImage:buttonImagePressed forState:UIControlStateHighlighted];
             }
 
-            [button setImage:buttonImage forState:UIControlStateNormal];
-            [button addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
-            
-            result = [[UIBarButtonItem alloc] initWithCustomView:button];
+            [result setImage:buttonImage forState:UIControlStateNormal];
+            [result addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
         }
     } else if (!buttonDef) {
         [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
@@ -930,18 +849,42 @@
     [self.webView setFrame:frame];
 }
 
+- (void)layoutButtons
+{
+    CGFloat screenWidth = CGRectGetWidth(self.view.frame);
+    CGFloat toolbarHeight = self.toolbar.frame.size.height;
+    
+    // Layout leftButtons and rightButtons from outer to inner.
+    CGFloat left = 0;
+    for (UIButton* button in self.leftButtons) {
+        CGSize size = button.frame.size;
+        button.frame = CGRectMake(left, floorf((toolbarHeight - size.height) / 2), size.width, size.height);
+        left += size.width;
+    }
+    
+    CGFloat right = 0;
+    for (UIButton* button in self.rightButtons) {
+        CGSize size = button.frame.size;
+        button.frame = CGRectMake(screenWidth - right - size.width, floorf((toolbarHeight - size.height) / 2), size.width, size.height);
+        right += size.width;
+    }
+}
+
 - (void)setCloseButtonTitle:(NSString*)title
 {
+    // This method is not used by ThemeableBrowser. It is inherited from
+    // InAppBrowser and is kept for merge purposes.
+    
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
-    self.closeButton = nil;
-    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
+    // self.closeButton = nil;
+    // self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    // self.closeButton.enabled = YES;
     // self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:0 withObject:self.closeButton];
-    [self.toolbar setItems:items];
+    // NSMutableArray* items = [self.toolbar.items mutableCopy];
+    // [items replaceObjectAtIndex:0 withObject:self.closeButton];
+    // [self.toolbar setItems:items];
 }
 
 - (void)showLocationBar:(BOOL)show
@@ -1240,6 +1183,8 @@
     if (self.titleLabel) {
         self.titleLabel.frame = CGRectMake(floorf((screenWidth - width) / 2.0f), 0, width, toolbarHeight);
     }
+    
+    [self layoutButtons];
 }
 
 - (CGFloat) getFloatFromDict:(NSDictionary*)dict withKey:(NSString*)key withDefault:(CGFloat)def
@@ -1269,9 +1214,9 @@
     return result;
 }
 
-- (CGFloat) getWidthFromButton:(UIBarButtonItem*)button
+- (CGFloat) getWidthFromButton:(UIButton*)button
 {
-    return button.customView.frame.size.width;
+    return button.frame.size.width;
 }
 
 - (void)emitEventForButton:(NSDictionary*)buttonDef
