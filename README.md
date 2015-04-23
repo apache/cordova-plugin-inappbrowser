@@ -161,6 +161,13 @@ One thing to note is that all image resources reference to **native** resource b
 
 You may have noticed that ThemedBrowser added an optional menu as well as custom buttons, which you can utilize to respond to some simple user actions.
 
+Additional Methods
+------------------
+
+The reference object returned by `cordova.ThemeableBrowser.open` contains the following methods in addition to InAppBrowser's implementation:
+
++ `reload` reloads the current page.
+
 Import Native Images
 --------------------
 
