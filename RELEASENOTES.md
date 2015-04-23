@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.4
+=====
+
+Added a reload feature. Better iOS implementation to improve backward compatibility and reduce the amount of hacks.
+
 0.2.3
 =====
 
