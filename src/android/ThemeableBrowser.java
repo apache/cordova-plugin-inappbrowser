@@ -60,12 +60,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.apache.cordova.Whitelist;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -139,13 +139,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                             shouldAllowNavigation = true;
                         }
                         if (shouldAllowNavigation == null) {
-                            try {
-                                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-                            } catch (NoSuchMethodException e) {
-                            } catch (IllegalAccessException e) {
-                            } catch (InvocationTargetException e) {
-                            }
+                            shouldAllowNavigation = new Whitelist().isUrlWhiteListed(url);
                         }
                         if (shouldAllowNavigation == null) {
                             try {
@@ -1049,7 +1043,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             if (listener != null) {
                 result.setOnClickListener(listener);
             }
-        } else if (buttonDef == null) {
+        } else {
             emitWarning(WRN_UNDEFINED,
                     String.format("%s is not defined. Button will not be shown.",
                             description));
