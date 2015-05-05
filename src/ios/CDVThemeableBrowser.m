@@ -743,14 +743,16 @@
         // Reverse loop because we are laying out from outer to inner.
         for (NSDictionary* customButton in [customButtons reverseObjectEnumerator]) {
             UIButton* button = [self createButton:customButton action:@selector(goCustomButton:) withDescription:[NSString stringWithFormat:@"custom button at %ld", (long)cnt]];
-            button.tag = cnt;
-            CGFloat width = [self getWidthFromButton:button];
-            if ([kThemeableBrowserAlignRight isEqualToString:customButton[kThemeableBrowserPropAlign]]) {
-                [rightButtons addObject:button];
-                rightWidth += width;
-            } else {
-                [leftButtons addObject:button];
-                leftWidth += width;
+            if (button) {
+                button.tag = cnt;
+                CGFloat width = [self getWidthFromButton:button];
+                if ([kThemeableBrowserAlignRight isEqualToString:customButton[kThemeableBrowserPropAlign]]) {
+                    [rightButtons addObject:button];
+                    rightWidth += width;
+                } else {
+                    [leftButtons addObject:button];
+                    leftWidth += width;
+                }
             }
             
             cnt += 1;
