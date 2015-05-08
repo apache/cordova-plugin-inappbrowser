@@ -97,7 +97,8 @@ instance, or the system browser.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
-    - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
+    - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close if `dismissablewithbackbutton` is set to `yes`.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser or to do nothing (check `dismissablewithbackbutton` option).
+    - __dismissablewithbackbutton__: set to `no` to prevent the webview dismiss on back button pressed (when there's no previous page or `hardwareback` is set to `no`). Default value is `yes`.   
 
     iOS only:
 
