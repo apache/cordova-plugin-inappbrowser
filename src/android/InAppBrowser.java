@@ -84,6 +84,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
+    private static final String DISMISSABLE_WITH_BACK_BUTTON = "dismissablewithbackbutton";
 
     /*
     Configuration property. Custom applicaiton scheme to be handeld in a _system.
@@ -100,6 +101,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearAllCache= false;
     private boolean clearSessionCache=false;
     private boolean hadwareBackButton=true;
+    private boolean dismissableWithBackButton = true;
 
     /**
      * Executes the request and returns PluginResult.
@@ -426,6 +428,14 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * Has the user set that back button can dismiss the dialog
+     * @return
+     */
+    public boolean isDismissableWithBackButton() {
+        return dismissableWithBackButton;
+    }
+
+    /**
      * Checks to see if it is possible to go forward one page in history, then does so.
      */
     private void goForward() {
@@ -501,6 +511,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
                 hadwareBackButton = hardwareBack.booleanValue();
+            }
+            Boolean dismissable = features.get(DISMISSABLE_WITH_BACK_BUTTON);
+            if (dismissable != null) {
+                dismissableWithBackButton = dismissable.booleanValue();
             }
             Boolean cache = features.get(CLEAR_ALL_CACHE);
             if (cache != null) {
