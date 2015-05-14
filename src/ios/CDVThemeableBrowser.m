@@ -1424,7 +1424,7 @@
         self.clearcache = NO;
         self.clearsessioncache = NO;
 
-        self.enableviewportscale = NO;
+        self.enableviewportscale = YES;
         self.mediaplaybackrequiresuseraction = NO;
         self.allowinlinemediaplayback = NO;
         self.keyboarddisplayrequiresuseraction = YES;
