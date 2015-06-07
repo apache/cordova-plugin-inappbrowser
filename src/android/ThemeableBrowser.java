@@ -697,7 +697,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, new PageLoadListener() {
                     @Override
                     public void onPageFinished(String url, boolean canGoBack, boolean canGoForward) {
-                        if (title != null && features.title != null
+                        if (inAppWebView != null
+                                && title != null && features.title != null
                                 && features.title.staticText == null
                                 && features.title.showPageTitle) {
                             title.setText(inAppWebView.getTitle());
@@ -1173,7 +1174,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 newloc = "http://" + url;
             }
 
-            if (!newloc.equals(edittext.getText().toString())) {
+            if (edittext != null && !newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
             }
 
