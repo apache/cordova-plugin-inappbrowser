@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.8
+-----
+
+No functional change. Migrated to npm as per Cordova's direction.
+
 0.2.7
 -----
 

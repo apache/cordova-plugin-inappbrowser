@@ -105,7 +105,7 @@ This plugin launches an in-app web view on top the existing [CordovaWebView](htt
 Installation
 ------------
 
-    cordova plugin add com.initialxy.cordova.themeablebrowser
+    cordova plugin add cordova-plugin-themeablebrowser
 
 Additional Properties
 ---------------------

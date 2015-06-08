@@ -1,9 +1,9 @@
 {
   "name": "cordova-plugin-themeablebrowser",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Cordova ThemeableBrowser Plugin",
   "cordova": {
-    "id": "com.initialxy.cordova.themeablebrowser",
+    "id": "cordova-plugin-themeablebrowser",
     "platforms": [
       "android",
       "amazon-fireos",
@@ -28,14 +28,7 @@
     "themeablebrowser",
     "ecosystem:cordova",
     "cordova-android",
-    "cordova-amazon-fireos",
-    "cordova-ubuntu",
-    "cordova-ios",
-    "cordova-wp7",
-    "cordova-wp8",
-    "cordova-windows8",
-    "cordova-windows",
-    "cordova-firefoxos"
+    "cordova-ios"
   ],
   "engines": [
     {
