@@ -111,7 +111,11 @@
     self.callbackId = command.callbackId;
 
     if (url != nil) {
+#ifdef __CORDOVA_4_0_0
+        NSURL* baseUrl = [self.webViewEngine URL];
+#else
         NSURL* baseUrl = [self.webView.request URL];
+#endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
 
         if ([self isSystemUrl:absoluteUrl]) {
@@ -307,7 +311,11 @@
 {
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
+#ifdef __CORDOVA_4_0_0
+        [self.webViewEngine loadRequest:request];
+#else
         [self.webView loadRequest:request];
+#endif
     } else { // this assumes the ThemeableBrowser can be excepted from the white-list
         [self openInThemeableBrowser:url withOptions:options];
     }
@@ -569,7 +577,11 @@
         _userAgent = userAgent;
         _prevUserAgent = prevUserAgent;
         _browserOptions = browserOptions;
+#ifdef __CORDOVA_4_0_0
+        _webViewDelegate = [[CDVUIWebViewDelegate alloc] initWithDelegate:self];
+#else
         _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
+#endif
         _navigationDelegate = navigationDelegate;
         _statusBarStyle = statusBarStyle;
         [self createViews];
@@ -1451,6 +1463,19 @@
 #pragma mark CDVScreenOrientationDelegate
 
 @implementation CDVThemeableBrowserNavigationController : UINavigationController
+
+- (void) viewDidLoad {
+
+    CGRect frame = [UIApplication sharedApplication].statusBarFrame;
+
+    // simplified from: http://stackoverflow.com/a/25669695/219684
+
+    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:frame];
+    bgToolbar.barStyle = UIBarStyleDefault;
+    [self.view addSubview:bgToolbar];
+
+    [super viewDidLoad];
+}
 
 - (BOOL)shouldAutorotate
 {

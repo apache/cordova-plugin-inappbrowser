@@ -32,10 +32,13 @@ import org.json.JSONObject;
 public class ThemeableBrowserDialog extends Dialog {
     Context context;
     ThemeableBrowser themeableBrowser = null;
+    boolean hardwareBack;
 
-    public ThemeableBrowserDialog(Context context, int theme) {
+    public ThemeableBrowserDialog(Context context, int theme,
+          boolean hardwareBack) {
         super(context, theme);
         this.context = context;
+        this.hardwareBack = hardwareBack;
     }
 
     public void setThemeableBrowser(ThemeableBrowser browser) {
@@ -46,9 +49,13 @@ public class ThemeableBrowserDialog extends Dialog {
         if (this.themeableBrowser == null) {
             this.dismiss();
         } else {
-            // better to go through the in themeableBrowser
-            // because it does a clean up
-            this.themeableBrowser.closeDialog();
+            // better to go through in themeableBrowser because it does a clean
+            // up
+            if (this.hardwareBack && this.inAppBrowser.canGoBack()) {
+                this.inAppBrowser.goBack();
+            }  else {
+                this.inAppBrowser.closeDialog();
+            }
         }
     }
 }

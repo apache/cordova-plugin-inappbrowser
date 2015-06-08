@@ -463,10 +463,18 @@ public class ThemeableBrowser extends CordovaPlugin {
     /**
      * Checks to see if it is possible to go back one page in history, then does so.
      */
-    private void goBack() {
+    public void goBack() {
         if (this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
+    }
+
+    /**
+     * Can the web browser go back?
+     * @return boolean
+     */
+    public boolean canGoBack() {
+        return this.inAppWebView.canGoBack();
     }
 
     /**
@@ -495,7 +503,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         this.inAppWebView.requestFocus();
     }
 
-    private ThemeableBrowser getThemeableBrowser(){
+    private ThemeableBrowser getThemeableBrowser() {
         return this;
     }
 
@@ -515,7 +523,8 @@ public class ThemeableBrowser extends CordovaPlugin {
             public void run() {
                 // Let's create the main dialog
                 dialog = new ThemeableBrowserDialog(cordova.getActivity(),
-                        android.R.style.Theme_Black_NoTitleBar);
+                        android.R.style.Theme_Black_NoTitleBar,
+                        features.hardwareback);
                 if (!features.disableAnimation) {
                     dialog.getWindow().getAttributes().windowAnimations
                             = android.R.style.Animation_Dialog;
@@ -717,7 +726,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
-                settings.setBuiltInZoomControls(true);
+                settings.setBuiltInZoomControls(features.zoom);
                 settings.setDisplayZoomControls(false);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
 
@@ -1275,6 +1284,8 @@ public class ThemeableBrowser extends CordovaPlugin {
         public boolean hidden = false;
         public boolean clearcache = false;
         public boolean clearsessioncache = false;
+        public boolean zoom = true;
+        public boolean hardwareback = true;
 
         public Toolbar toolbar;
         public Title title;

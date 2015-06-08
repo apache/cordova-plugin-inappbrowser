@@ -34,7 +34,8 @@ var browserWrap,
     navigationButtonsDivInner,
     backButton,
     forwardButton,
-    closeButton;
+    closeButton,
+    bodyOverflowStyle;
 
 // x-ms-webview is available starting from Windows 8.1 (platformId is 'windows')
 // http://msdn.microsoft.com/en-us/library/windows/apps/dn301831.aspx
@@ -86,6 +87,8 @@ var IAB = {
             if (win) win({ type: "exit" });
 
             browserWrap.parentNode.removeChild(browserWrap);
+            // Reset body overflow style to initial value
+            document.body.style.msOverflowStyle = bodyOverflowStyle;
             browserWrap = null;
             popup = null;
         }
@@ -109,13 +112,22 @@ var IAB = {
         } else {
             // "_blank" or anything else
             if (!browserWrap) {
+                var browserWrapStyle = document.createElement('link');
+                browserWrapStyle.rel = "stylesheet";
+                browserWrapStyle.type = "text/css";
+                browserWrapStyle.href = urlutil.makeAbsolute("/www/css/inappbrowser.css");
+
+                document.head.appendChild(browserWrapStyle);
+
                 browserWrap = document.createElement("div");
-                browserWrap.style.position = "absolute";
-                browserWrap.style.borderWidth = "40px";
-                browserWrap.style.width = "calc(100% - 80px)";
-                browserWrap.style.height = "calc(100% - 80px)";
-                browserWrap.style.borderStyle = "solid";
-                browserWrap.style.borderColor = "rgba(0,0,0,0.25)";
+                browserWrap.className = "inAppBrowserWrap";
+
+                if (features.indexOf("fullscreen=yes") > -1) {
+                    browserWrap.classList.add("inAppBrowserWrapFullscreen");
+                }
+
+                // Save body overflow style to be able to reset it back later
+                bodyOverflowStyle = document.body.style.msOverflowStyle;
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
@@ -124,6 +136,8 @@ var IAB = {
                 };
 
                 document.body.appendChild(browserWrap);
+                // Hide scrollbars for the whole body while inappbrowser's window is open
+                document.body.style.msOverflowStyle = "none";
             }
 
             if (features.indexOf("hidden=yes") !== -1) {
@@ -131,6 +145,11 @@ var IAB = {
             }
 
             popup = document.createElement(isWebViewAvailable ? "x-ms-webview" : "iframe");
+            if (popup instanceof HTMLIFrameElement) {
+                // For iframe we need to override bacground color of parent element here
+                // otherwise pages without background color set will have transparent background
+                popup.style.backgroundColor = "white";
+            }
             popup.style.borderWidth = "0px";
             popup.style.width = "100%";
 
@@ -194,7 +213,7 @@ var IAB = {
                         IAB.close(win);
                     }, 0);
                 });
-               
+
                 if (!isWebViewAvailable) {
                     // iframe navigation is not yet supported
                     backButton.disabled = true;
@@ -227,7 +246,10 @@ var IAB = {
 
         if (isWebViewAvailable && browserWrap && popup) {
             var op = popup.invokeScriptAsync("eval", code);
-            op.oncomplete = function () { hasCallback && win([]); };
+            op.oncomplete = function (e) {
+                var result = [e.target.result];
+                hasCallback && win(result);
+            };
             op.onerror = function () { };
             op.start();
         }
@@ -246,14 +268,58 @@ var IAB = {
             Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).done(function (file) {
                 Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
                     var op = popup.invokeScriptAsync("eval", code);
-                    op.oncomplete = function () { hasCallback && win([]); };
+                    op.oncomplete = function(e) {
+                        var result = [e.target.result];
+                        hasCallback && win(result);
+                    };
                     op.onerror = function () { };
                     op.start();
                 });
             });
         }
+    },
+
+    injectStyleCode: function (win, fail, args) {
+        var code = args[0],
+            hasCallback = args[1];
+
+        if (isWebViewAvailable && browserWrap && popup) {
+            injectCSS(popup, code, hasCallback && win);
+        }
+    },
+
+    injectStyleFile: function (win, fail, args) {
+        var filePath = args[0],
+            hasCallback = args[1];
+
+        filePath = filePath && urlutil.makeAbsolute(filePath);
+
+        if (isWebViewAvailable && browserWrap && popup) {
+            var uri = new Windows.Foundation.Uri(filePath);
+            Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
+                return Windows.Storage.FileIO.readTextAsync(file);
+            }).done(function (code) {
+                injectCSS(popup, code, hasCallback && win);
+            }, function () {
+                // no-op, just catch an error
+            });
+        }
     }
 };
+
+function injectCSS (webView, cssCode, callback) {
+    // This will automatically escape all thing that we need (quotes, slashes, etc.)
+    var escapedCode = JSON.stringify(cssCode);
+    var evalWrapper = "(function(d){var c=d.createElement('style');c.innerHTML=%s;d.head.appendChild(c);})(document)"
+        .replace('%s', escapedCode);
+
+    var op = webView.invokeScriptAsync("eval", evalWrapper);
+    op.oncomplete = function() {
+        callback && callback([]);
+    };
+    op.onerror = function () { };
+    op.start();
+}
 
 module.exports = IAB;
 
