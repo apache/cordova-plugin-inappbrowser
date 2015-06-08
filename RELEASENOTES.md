@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.7
+-----
+
+Bug fixes. Merged changes from upstream (InAppBrowser). Added fullscreen feature.
+
 0.2.6
 -----
 
