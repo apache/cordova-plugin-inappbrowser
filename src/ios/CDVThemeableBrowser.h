@@ -38,7 +38,7 @@
 @property (nonatomic) NSString* presentationstyle;
 @property (nonatomic) NSString* transitionstyle;
 
-@property (nonatomic) BOOL enableviewportscale;
+@property (nonatomic) BOOL zoom;
 @property (nonatomic) BOOL mediaplaybackrequiresuseraction;
 @property (nonatomic) BOOL allowinlinemediaplayback;
 @property (nonatomic) BOOL keyboarddisplayrequiresuseraction;

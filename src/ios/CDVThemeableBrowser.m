@@ -266,7 +266,7 @@
     }
 
     // UIWebView options
-    self.themeableBrowserViewController.webView.scalesPageToFit = browserOptions.enableviewportscale;
+    self.themeableBrowserViewController.webView.scalesPageToFit = browserOptions.zoom;
     self.themeableBrowserViewController.webView.mediaPlaybackRequiresUserAction = browserOptions.mediaplaybackrequiresuseraction;
     self.themeableBrowserViewController.webView.allowsInlineMediaPlayback = browserOptions.allowinlinemediaplayback;
     if (IsAtLeastiOSVersion(@"6.0")) {
@@ -1436,7 +1436,7 @@
         self.clearcache = NO;
         self.clearsessioncache = NO;
 
-        self.enableviewportscale = YES;
+        self.zoom = YES;
         self.mediaplaybackrequiresuseraction = NO;
         self.allowinlinemediaplayback = NO;
         self.keyboarddisplayrequiresuseraction = YES;
