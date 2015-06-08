@@ -598,7 +598,9 @@
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop];
     NSDictionary* toolbarProps = _browserOptions.toolbar;
     CGFloat toolbarHeight = [self getFloatFromDict:toolbarProps withKey:kThemeableBrowserPropHeight withDefault:TOOLBAR_DEF_HEIGHT];
-    webViewBounds.size.height -= toolbarHeight;
+    if (!_browserOptions.fullscreen) {
+        webViewBounds.size.height -= toolbarHeight;
+    }
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -928,7 +930,9 @@
             // put locationBar on top of the toolBar
 
             CGRect webViewBounds = self.view.bounds;
-            webViewBounds.size.height -= toolbarHeight;
+            if (!_browserOptions.fullscreen) {
+                webViewBounds.size.height -= toolbarHeight;
+            }
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
@@ -951,7 +955,9 @@
 
             // webView take up whole height less toolBar height
             CGRect webViewBounds = self.view.bounds;
-            webViewBounds.size.height -= toolbarHeight;
+            if (!_browserOptions.fullscreen) {
+                webViewBounds.size.height -= toolbarHeight;
+            }
             [self setWebViewFrame:webViewBounds];
         } else {
             // no toolBar, expand webView to screen dimensions
@@ -980,7 +986,9 @@
         if (locationbarVisible) {
             // locationBar at the bottom, move locationBar up
             // put toolBar at the bottom
-            webViewBounds.size.height -= toolbarHeight;
+            if (!_browserOptions.fullscreen) {
+                webViewBounds.size.height -= toolbarHeight;
+            }
             locationbarFrame.origin.y = webViewBounds.size.height;
             self.addressLabel.frame = locationbarFrame;
             self.toolbar.frame = toolbarFrame;
@@ -991,7 +999,9 @@
 
         if ([toolbarPosition isEqualToString:kThemeableBrowserToolbarBarPositionTop]) {
             toolbarFrame.origin.y = 0;
-            webViewBounds.origin.y += toolbarFrame.size.height;
+            if (!_browserOptions.fullscreen) {
+                webViewBounds.origin.y += toolbarFrame.size.height;
+            }
             [self setWebViewFrame:webViewBounds];
         } else {
             toolbarFrame.origin.y = (webViewBounds.size.height + LOCATIONBAR_HEIGHT);
@@ -1198,9 +1208,10 @@
 
 - (void) rePositionViews {
     CGFloat toolbarHeight = [self getFloatFromDict:_browserOptions.toolbar withKey:kThemeableBrowserPropHeight withDefault:TOOLBAR_DEF_HEIGHT];
+    CGFloat webviewOffset = _browserOptions.fullscreen ? 0.0 : toolbarHeight;
     
     if ([_browserOptions.toolbarposition isEqualToString:kThemeableBrowserToolbarBarPositionTop]) {
-        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, toolbarHeight, self.webView.frame.size.width, self.webView.frame.size.height)];
+        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, webviewOffset, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
     
@@ -1453,6 +1464,7 @@
         self.menu = nil;
         self.backButtonCanClose = NO;
         self.disableAnimation = NO;
+        self.fullscreen = NO;
     }
 
     return self;

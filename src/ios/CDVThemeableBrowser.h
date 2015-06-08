@@ -56,6 +56,7 @@
 @property (nonatomic) NSArray* customButtons;
 @property (nonatomic) BOOL backButtonCanClose;
 @property (nonatomic) BOOL disableAnimation;
+@property (nonatomic) BOOL fullscreen;
 
 @end
 
