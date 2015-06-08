@@ -17,8 +17,8 @@
     under the License.
 -->
 
-com.initialxy.cordova.themeablebrowser
-======================================
+cordova-plugin-themeablebrowser
+===============================
 
 This plugin is a fork of [org.apache.cordova.inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser). It attempts to retain most of the features of the InAppBrowser. In fact, for the full list of features inherited from InAppBrowser, please refer to [InAppBrowser's documentation](https://github.com/apache/cordova-plugin-inappbrowser/blob/master/README.md).
 
