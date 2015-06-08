@@ -85,7 +85,6 @@
     NSInteger _userAgentLockToken;
     UIStatusBarStyle _statusBarStyle;
     CDVThemeableBrowserOptions *_browserOptions;
-    CDVInAppBrowserOptions *_browserOptions;
     
 #ifdef __CORDOVA_4_0_0
     CDVUIWebViewDelegate* _webViewDelegate;
