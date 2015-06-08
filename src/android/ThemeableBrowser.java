@@ -40,9 +40,9 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
@@ -397,7 +397,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         callbackContext = null;
                     }
                 });
-                
+
                 // NB: From SDK 19: "If you call methods on WebView from any
                 // thread other than your app's UI thread, it can cause
                 // unexpected results."
@@ -534,8 +534,14 @@ public class ThemeableBrowser extends CordovaPlugin {
                 dialog.setThemeableBrowser(getThemeableBrowser());
 
                 // Main container layout
-                LinearLayout main = new LinearLayout(cordova.getActivity());
-                main.setOrientation(LinearLayout.VERTICAL);
+                ViewGroup main = null;
+
+                if (features.fullscreen) {
+                    main = new FrameLayout(cordova.getActivity());
+                } else {
+                    main = new LinearLayout(cordova.getActivity());
+                    ((LinearLayout) main).setOrientation(LinearLayout.VERTICAL);
+                }
 
                 // Toolbar layout
                 Toolbar toolbarDef = features.toolbar;
@@ -543,7 +549,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                 toolbar.setBackgroundColor(hexStringToColor(
                         toolbarDef != null && toolbarDef.color != null
                                 ? toolbarDef.color : "#ffffffff"));
-                toolbar.setLayoutParams(new LinearLayout.LayoutParams(
+                toolbar.setLayoutParams(new ViewGroup.LayoutParams(
                         LayoutParams.MATCH_PARENT,
                         dpToPixels(toolbarDef != null
                                 ? toolbarDef.height : TOOLBAR_DEF_HEIGHT)));
@@ -699,9 +705,13 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
-                final LinearLayout.LayoutParams inAppWebViewPrams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
-                inAppWebViewPrams.weight = 1;
-                inAppWebView.setLayoutParams(inAppWebViewPrams);
+                final ViewGroup.LayoutParams inAppWebViewParams = features.fullscreen
+                        ? new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+                        : new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+                if (!features.fullscreen) {
+                    ((LinearLayout.LayoutParams) inAppWebViewParams).weight = 1;
+                }
+                inAppWebView.setLayoutParams(inAppWebViewParams);
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, new PageLoadListener() {
                     @Override
@@ -859,14 +869,21 @@ public class ThemeableBrowser extends CordovaPlugin {
                     toolbar.addView(title);
                 }
 
+                if (features.fullscreen) {
+                    // If full screen mode, we have to add inAppWebView before adding toolbar.
+                    main.addView(inAppWebView);
+                }
+
                 // Don't add the toolbar if its been disabled
                 if (features.location) {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
                 }
 
-                // Add our webview to our main view/layout
-                main.addView(inAppWebView);
+                if (!features.fullscreen) {
+                    // If not full screen, we add inAppWebView after adding toolbar.
+                    main.addView(inAppWebView);
+                }
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
@@ -1296,6 +1313,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         public BrowserButton[] customButtons;
         public boolean backButtonCanClose;
         public boolean disableAnimation;
+        public boolean fullscreen;
     }
 
     private static class Event {
