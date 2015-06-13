@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-inappbrowser",
-  "version": "1.0.1-dev",
-  "description": "Cordova InAppBrowser Plugin",
+  "name": "cordova-plugin-themeablebrowser",
+  "version": "0.2.8",
+  "description": "Cordova ThemeableBrowser Plugin",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser",
+    "id": "cordova-plugin-themeablebrowser",
     "platforms": [
       "android",
       "amazon-fireos",
@@ -18,24 +18,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git"
+    "url": "https://github.com/initialxy/cordova-plugin-themeablebrowser"
   },
   "keywords": [
     "cordova",
     "in",
     "app",
     "browser",
-    "inappbrowser",
+    "themeablebrowser",
     "ecosystem:cordova",
     "cordova-android",
-    "cordova-amazon-fireos",
-    "cordova-ubuntu",
-    "cordova-ios",
-    "cordova-wp7",
-    "cordova-wp8",
-    "cordova-windows8",
-    "cordova-windows",
-    "cordova-firefoxos"
+    "cordova-ios"
   ],
   "engines": [
     {

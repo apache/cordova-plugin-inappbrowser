@@ -57,7 +57,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             iab = window.open(url, target, params, callbacks);
         }
         else {
-            iab = cordova.InAppBrowser.open(url, target, params, callbacks);
+            iab = cordova.ThemeableBrowser.open(url, target, params, callbacks);
         }
         if (!iab) {
             alert('open returned ' + iab);
@@ -108,7 +108,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     function doHookOpen(url, target, params, numExpectedRedirects) {
         var originalFunc = window.open;
         var wasClobbered = window.hasOwnProperty('open');
-        window.open = cordova.InAppBrowser.open;
+        window.open = cordova.ThemeableBrowser.open;
 
         try {
             doOpen(url, target, params, numExpectedRedirects, true);
@@ -181,9 +181,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var loadlistener = function (event) { alert('background window loaded '); };
     function openHidden(url, startHidden) {
         var shopt = (startHidden) ? 'hidden=yes' : '';
-        hiddenwnd = cordova.InAppBrowser.open(url, 'random_string', shopt);
+        hiddenwnd = cordova.ThemeableBrowser.open(url, 'random_string', shopt);
         if (!hiddenwnd) {
-            alert('cordova.InAppBrowser.open returned ' + hiddenwnd);
+            alert('cordova.ThemeableBrowser.open returned ' + hiddenwnd);
             return;
         }
         if (startHidden) hiddenwnd.addEventListener('loadstop', loadlistener);
@@ -201,7 +201,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
     }
 
-    var info_div = '<h1>InAppBrowser</h1>' +
+    var info_div = '<h1>ThemeableBrowser</h1>' +
         '<div id="info">' +
         'Make sure http://cordova.apache.org and http://google.co.uk and https://www.google.co.uk are white listed. </br>' +
         'Make sure http://www.apple.com is not in the white list.</br>' +
@@ -219,15 +219,15 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openLocalSystem"></div>' +
         'Expected result: fails to open' +
         '<p/> <div id="openLocalBlank"></div>' +
-        'Expected result: opens successfully in InAppBrowser with locationBar at top.' +
+        'Expected result: opens successfully in ThemeableBrowser with locationBar at top.' +
         '<p/> <div id="openLocalRandomNoLocation"></div>' +
-        'Expected result: opens successfully in InAppBrowser without locationBar.' +
+        'Expected result: opens successfully in ThemeableBrowser without locationBar.' +
         '<p/> <div id="openLocalRandomToolBarBottom"></div>' +
-        'Expected result: opens successfully in InAppBrowser with locationBar. On iOS the toolbar is at the bottom.' +
+        'Expected result: opens successfully in ThemeableBrowser with locationBar. On iOS the toolbar is at the bottom.' +
         '<p/> <div id="openLocalRandomToolBarTop"></div>' +
-        'Expected result: opens successfully in InAppBrowser with locationBar. On iOS the toolbar is at the top.' +
+        'Expected result: opens successfully in ThemeableBrowser with locationBar. On iOS the toolbar is at the top.' +
         '<p/><div id="openLocalRandomToolBarTopNoLocation"></div>' +
-        'Expected result: open successfully in InAppBrowser with no locationBar. On iOS the toolbar is at the top.';
+        'Expected result: open successfully in ThemeableBrowser with no locationBar. On iOS the toolbar is at the top.';
 
     var white_listed_tests = '<h1>White Listed URL</h1>' +
         '<div id="openWhiteListed"></div>' +
@@ -239,77 +239,77 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openWhiteListedSystem"></div>' +
         'Expected result: open successfully in system browser to cordova.apache.org' +
         '<p/> <div id="openWhiteListedBlank"></div>' +
-        'Expected result: open successfully in InAppBrowser to cordova.apache.org' +
+        'Expected result: open successfully in ThemeableBrowser to cordova.apache.org' +
         '<p/> <div id="openWhiteListedRandom"></div>' +
-        'Expected result: open successfully in InAppBrowser to cordova.apache.org' +
+        'Expected result: open successfully in ThemeableBrowser to cordova.apache.org' +
         '<p/> <div id="openWhiteListedRandomNoLocation"></div>' +
-        'Expected result: open successfully in InAppBrowser to cordova.apache.org with no location bar.';
+        'Expected result: open successfully in ThemeableBrowser to cordova.apache.org with no location bar.';
 
     var non_white_listed_tests = '<h1>Non White Listed URL</h1>' +
         '<div id="openNonWhiteListed"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com.' +
+        'Expected result: open successfully in ThemeableBrowser to apple.com.' +
         '<p/> <div id="openNonWhiteListedHook"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com (using hook of window.open()).' +
+        'Expected result: open successfully in ThemeableBrowser to apple.com (using hook of window.open()).' +
         '<p/> <div id="openNonWhiteListedSelf"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com (_self enforces whitelist).' +
+        'Expected result: open successfully in ThemeableBrowser to apple.com (_self enforces whitelist).' +
         '<p/> <div id="openNonWhiteListedSystem"></div>' +
         'Expected result: open successfully in system browser to apple.com.' +
         '<p/> <div id="openNonWhiteListedBlank"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com.' +
+        'Expected result: open successfully in ThemeableBrowser to apple.com.' +
         '<p/> <div id="openNonWhiteListedRandom"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com.' +
+        'Expected result: open successfully in ThemeableBrowser to apple.com.' +
         '<p/> <div id="openNonWhiteListedRandomNoLocation"></div>' +
-        'Expected result: open successfully in InAppBrowser to apple.com without locationBar.';
+        'Expected result: open successfully in ThemeableBrowser to apple.com without locationBar.';
 
     var page_with_redirects_tests = '<h1>Page with redirect</h1>' +
         '<div id="openRedirect301"></div>' +
-        'Expected result: should 301 and open successfully in InAppBrowser to https://www.google.co.uk.' +
+        'Expected result: should 301 and open successfully in ThemeableBrowser to https://www.google.co.uk.' +
         '<p/> <div id="openRedirect302"></div>' +
-        'Expected result: should 302 and open successfully in InAppBrowser to www.zhihu.com/answer/16714076.';
+        'Expected result: should 302 and open successfully in ThemeableBrowser to www.zhihu.com/answer/16714076.';
 
     var pdf_url_tests = '<h1>PDF URL</h1>' +
         '<div id="openPDF"></div>' +
-        'Expected result: InAppBrowser opens. PDF should render on iOS.' +
+        'Expected result: ThemeableBrowser opens. PDF should render on iOS.' +
         '<p/> <div id="openPDFBlank"></div>' +
-        'Expected result: InAppBrowser opens. PDF should render on iOS.';
+        'Expected result: ThemeableBrowser opens. PDF should render on iOS.';
 
     var invalid_url_tests = '<h1>Invalid URL</h1>' +
         '<div id="openInvalidScheme"></div>' +
-        'Expected result: fail to load in InAppBrowser.' +
+        'Expected result: fail to load in ThemeableBrowser.' +
         '<p/> <div id="openInvalidHost"></div>' +
-        'Expected result: fail to load in InAppBrowser.' +
+        'Expected result: fail to load in ThemeableBrowser.' +
         '<p/> <div id="openInvalidMissing"></div>' +
-        'Expected result: fail to load in InAppBrowser (404).';
+        'Expected result: fail to load in ThemeableBrowser (404).';
 
     var css_js_injection_tests = '<h1>CSS / JS Injection</h1>' +
         '<div id="openOriginalDocument"></div>' +
-        'Expected result: open successfully in InAppBrowser without text "Style updated from..."' +
+        'Expected result: open successfully in ThemeableBrowser without text "Style updated from..."' +
         '<p/> <div id="openCSSInjection"></div>' +
-        'Expected result: open successfully in InAppBrowser with "Style updated from file".' +
+        'Expected result: open successfully in ThemeableBrowser with "Style updated from file".' +
         '<p/> <div id="openCSSInjectionCallback"></div>' +
-        'Expected result: open successfully in InAppBrowser with "Style updated from file", and alert dialog with text "Results verified".' +
+        'Expected result: open successfully in ThemeableBrowser with "Style updated from file", and alert dialog with text "Results verified".' +
         '<p/> <div id="openCSSLiteralInjection"></div>' +
-        'Expected result: open successfully in InAppBrowser with "Style updated from literal".' +
+        'Expected result: open successfully in ThemeableBrowser with "Style updated from literal".' +
         '<p/> <div id="openCSSLiteralInjectionCallback"></div>' +
-        'Expected result: open successfully in InAppBrowser with "Style updated from literal", and alert dialog with text "Results verified".' +
+        'Expected result: open successfully in ThemeableBrowser with "Style updated from literal", and alert dialog with text "Results verified".' +
         '<p/> <div id="openScriptInjection"></div>' +
-        'Expected result: open successfully in InAppBrowser with text "Script file successfully injected".' +
+        'Expected result: open successfully in ThemeableBrowser with text "Script file successfully injected".' +
         '<p/> <div id="openScriptInjectionCallback"></div>' +
-        'Expected result: open successfully in InAppBrowser with text "Script file successfully injected" and alert dialog with the text "Results verified".' +
+        'Expected result: open successfully in ThemeableBrowser with text "Script file successfully injected" and alert dialog with the text "Results verified".' +
         '<p/> <div id="openScriptLiteralInjection"></div>' +
-        'Expected result: open successfully in InAppBrowser with the text "Script literal successfully injected" .' +
+        'Expected result: open successfully in ThemeableBrowser with the text "Script literal successfully injected" .' +
         '<p/> <div id="openScriptLiteralInjectionCallback"></div>' +
-        'Expected result: open successfully in InAppBrowser with the text "Script literal successfully injected" and alert dialog with the text "Results verified".';
+        'Expected result: open successfully in ThemeableBrowser with the text "Script literal successfully injected" and alert dialog with the text "Results verified".';
 
     var open_hidden_tests = '<h1>Open Hidden </h1>' +
         '<div id="openHidden"></div>' +
         'Expected result: no additional browser window. Alert appears with the text "background window loaded".' +
         '<p/> <div id="showHidden"></div>' +
-        'Expected result: after first clicking on previous test "create hidden", open successfully in InAppBrowser to https://www.google.co.uk.' +
+        'Expected result: after first clicking on previous test "create hidden", open successfully in ThemeableBrowser to https://www.google.co.uk.' +
         '<p/> <div id="closeHidden"></div>' +
         'Expected result: no output. But click on "show hidden" again and nothing should be shown.' +
         '<p/> <div id="openHiddenShow"></div>' +
-        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk';
+        'Expected result: open successfully in ThemeableBrowser to https://www.google.co.uk';
 
     var clearing_cache_tests = '<h1>Clearing Cache</h1>' +
         '<div id="openClearCache"></div>' +
@@ -319,13 +319,13 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     var video_tag_tests = '<h1>Video tag</h1>' +
         '<div id="openRemoteVideo"></div>' +
-        'Expected result: open successfully in InAppBrowser with an embedded video that works after clicking the "play" button.';
+        'Expected result: open successfully in ThemeableBrowser with an embedded video that works after clicking the "play" button.';
 
     var local_with_anchor_tag_tests = '<h1>Local with anchor tag</h1>' +
         '<div id="openAnchor1"></div>' +
-        'Expected result: open successfully in InAppBrowser to the local page, scrolled to the top as normal.' +
+        'Expected result: open successfully in ThemeableBrowser to the local page, scrolled to the top as normal.' +
         '<p/> <div id="openAnchor2"></div>' +
-        'Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.';
+        'Expected result: open successfully in ThemeableBrowser to the local page, scrolled to the beginning of the tall div with border.';
 
     // CB-7490 We need to wrap this code due to Windows security restrictions
     // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
