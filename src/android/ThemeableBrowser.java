@@ -300,11 +300,14 @@ public class ThemeableBrowser extends CordovaPlugin {
             @SuppressLint("NewApi")
             @Override
             public void run() {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    // This action will have the side-effect of blurring the currently focused element
-                    inAppWebView.loadUrl("javascript:" + finalScriptToInject);
-                } else {
-                    inAppWebView.evaluateJavascript(finalScriptToInject, null);
+                if (inAppWebView != null) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                        // This action will have the side-effect of blurring the currently focused
+                        // element
+                        inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+                    } else {
+                        inAppWebView.evaluateJavascript(finalScriptToInject, null);
+                    }
                 }
             }
         });
@@ -464,7 +467,7 @@ public class ThemeableBrowser extends CordovaPlugin {
      * Checks to see if it is possible to go back one page in history, then does so.
      */
     public void goBack() {
-        if (this.inAppWebView.canGoBack()) {
+        if (this.inAppWebView != null && this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
     }
@@ -474,14 +477,14 @@ public class ThemeableBrowser extends CordovaPlugin {
      * @return boolean
      */
     public boolean canGoBack() {
-        return this.inAppWebView.canGoBack();
+        return this.inAppWebView != null && this.inAppWebView.canGoBack();
     }
 
     /**
      * Checks to see if it is possible to go forward one page in history, then does so.
      */
     private void goForward() {
-        if (this.inAppWebView.canGoForward()) {
+        if (this.inAppWebView != null && this.inAppWebView.canGoForward()) {
             this.inAppWebView.goForward();
         }
     }
@@ -600,8 +603,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                     "back button",
                     new View.OnClickListener() {
                         public void onClick(View v) {
-                            if (features.backButtonCanClose
-                                    && !inAppWebView.canGoBack()) {
+                            if (features.backButtonCanClose && canGoBack()) {
                                 closeDialog();
                             } else {
                                 goBack();
@@ -667,7 +669,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                                     public void onItemSelected(
                                             AdapterView<?> adapterView,
                                             View view, int i, long l) {
-                                        if (i < features.menu.items.length) {
+                                        if (inAppWebView != null
+                                                && i < features.menu.items.length) {
                                             emitButtonEvent(
                                                     features.menu.items[i],
                                                     inAppWebView.getUrl(), i);
@@ -778,8 +781,10 @@ public class ThemeableBrowser extends CordovaPlugin {
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    emitButtonEvent(buttonDef,
-                                            inAppWebView.getUrl(), index);
+                                    if (inAppWebView != null) {
+                                        emitButtonEvent(buttonDef,
+                                                inAppWebView.getUrl(), index);
+                                    }
                                 }
                             }
                         );
