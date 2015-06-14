@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
@@ -34,6 +35,7 @@ import android.os.Bundle;
 import android.provider.Browser;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -69,6 +71,9 @@ import org.apache.cordova.Whitelist;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -650,9 +655,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                     menu.setLayoutParams(new LinearLayout.LayoutParams(
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     menu.setContentDescription("menu button");
-                    setBackgroundStates(menu,
-                            features.menu.image,
-                            features.menu.imagePressed, DISABLED_ALPHA);
+                    setButtonImages(menu, features.menu, DISABLED_ALPHA);
 
                     if (features.menu.items != null) {
                         HideSelectedAdapter<EventLabel> adapter
@@ -948,29 +951,69 @@ public class ThemeableBrowser extends CordovaPlugin {
         return result;
     }
 
-    private void setBackgroundStates(View view, String normal, String pressed,
-            int disabledAlpha) {
+    /**
+    * This is a rather unintuitive helper method to load images. The reason why this method exists
+    * is because due to some service limitations, one may not be able to add images to native
+    * resource bundle. So this method offers a way to load image from www contents instead.
+    * However loading from native resource bundle is already preferred over loading from www. So
+    * if name is given, then it simply loads from resource bundle and the other two parameters are
+    * ignored. If name is not given, then altPath is assumed to be a file path _under_ www and
+    * altDensity is the desired density of the given image file, because without native resource
+    * bundle, we can't tell what density the image is supposed to be so it needs to be given
+    * explicitly.
+    */
+    private Drawable getImage(String name, String altPath, double altDensity) throws IOException {
+        Drawable result = null;
         Resources activityRes = cordova.getActivity().getResources();
+
+        if (name != null) {
+            int id = activityRes.getIdentifier(name, "drawable",
+                    cordova.getActivity().getPackageName());
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                result = activityRes.getDrawable(id);
+            } else {
+                result = activityRes.getDrawable(id, cordova.getActivity().getTheme());
+            }
+        } else if (altPath != null) {
+            File file = new File("www", altPath);
+            InputStream is = null;
+            try {
+                is = cordova.getActivity().getAssets().open(file.getPath());
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                bitmap.setDensity((int) (DisplayMetrics.DENSITY_MEDIUM * altDensity));
+                result = new BitmapDrawable(activityRes, bitmap);
+            } finally {
+                // Make sure we close this input stream to prevent resource leak.
+                try {
+                    is.close();
+                } catch (Exception e) {}
+            }
+        }
+        return result;
+    }
+
+    private void setButtonImages(View view, BrowserButton buttonDef, int disabledAlpha) {
         Drawable normalDrawable = null;
         Drawable disabledDrawable = null;
         Drawable pressedDrawable = null;
 
         CharSequence description = view.getContentDescription();
 
-        if (normal != null) {
+        if (buttonDef.image != null || buttonDef.wwwImage != null) {
             try {
-                int normalId = activityRes.getIdentifier(
-                        normal,
-                        "drawable",
-                        cordova.getActivity().getPackageName());
-                normalDrawable = activityRes.getDrawable(normalId);
+                normalDrawable = getImage(buttonDef.image, buttonDef.wwwImage,
+                        buttonDef.wwwImageDensity);
                 ViewGroup.LayoutParams params = view.getLayoutParams();
                 params.width = normalDrawable.getIntrinsicWidth();
                 params.height = normalDrawable.getIntrinsicHeight();
             } catch (Resources.NotFoundException e) {
                 emitError(ERR_LOADFAIL,
                         String.format("Image for %s, %s, failed to load",
-                                description, normal));
+                                description, buttonDef.image));
+            } catch (IOException ioe) {
+                emitError(ERR_LOADFAIL,
+                        String.format("Image for %s, %s, failed to load",
+                                description, buttonDef.wwwImage));
             }
         } else {
             emitWarning(WRN_UNDEFINED,
@@ -978,17 +1021,18 @@ public class ThemeableBrowser extends CordovaPlugin {
                             description));
         }
 
-        if (pressed != null) {
+        if (buttonDef.imagePressed != null || buttonDef.wwwImagePressed != null) {
             try {
-                int pressedId = activityRes.getIdentifier(
-                        pressed,
-                        "drawable",
-                        cordova.getActivity().getPackageName());
-                pressedDrawable = activityRes.getDrawable(pressedId);
+                pressedDrawable = getImage(buttonDef.imagePressed, buttonDef.wwwImagePressed,
+                        buttonDef.wwwImageDensity);
             } catch (Resources.NotFoundException e) {
                 emitError(ERR_LOADFAIL,
                         String.format("Pressed image for %s, %s, failed to load",
-                                description, pressed));
+                                description, buttonDef.imagePressed));
+            } catch (IOException e) {
+                emitError(ERR_LOADFAIL,
+                        String.format("Pressed image for %s, %s, failed to load",
+                                description, buttonDef.wwwImagePressed));
             }
         } else {
             emitWarning(WRN_UNDEFINED,
@@ -1011,6 +1055,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             paint.setAlpha(disabledAlpha);
             canvas.drawBitmap(enabledBitmap, 0, 0, paint);
 
+            Resources activityRes = cordova.getActivity().getResources();
             disabledDrawable = new BitmapDrawable(activityRes, disabledBitmap);
         }
 
@@ -1070,9 +1115,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             result.setContentDescription(description);
             result.setLayoutParams(new LinearLayout.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            setBackgroundStates(result,
-                    buttonDef.image,
-                    buttonDef.imagePressed, DISABLED_ALPHA);
+            setButtonImages(result, buttonDef, DISABLED_ALPHA);
             if (listener != null) {
                 result.setOnClickListener(listener);
             }
@@ -1335,7 +1378,10 @@ public class ThemeableBrowser extends CordovaPlugin {
 
     private static class BrowserButton extends Event {
         public String image;
+        public String wwwImage;
         public String imagePressed;
+        public String wwwImagePressed;
+        public double wwwImageDensity;
         public String align = ALIGN_LEFT;
     }
 
