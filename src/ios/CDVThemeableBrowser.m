@@ -1129,6 +1129,10 @@
                                                   alertControllerWithTitle:_browserOptions.menu[kThemeableBrowserPropTitle]
                                                   message:nil
                                                   preferredStyle:UIAlertControllerStyleActionSheet];
+            alertController.popoverPresentationController.sourceView
+                    = self.menuButton;
+            alertController.popoverPresentationController.sourceRect
+                    = self.menuButton.bounds;
             
             for (NSInteger i = 0; i < menuItems.count; i++) {
                 NSInteger index = i;
@@ -1157,6 +1161,7 @@
             UIActionSheet *popup = [[UIActionSheet alloc]
                                     initWithTitle:_browserOptions.menu[kThemeableBrowserPropTitle]
                                     delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+            
             for (NSDictionary *item in menuItems) {
                 [popup addButtonWithTitle:item[@"label"]];
             }
@@ -1164,7 +1169,8 @@
                 [popup addButtonWithTitle:_browserOptions.menu[kThemeableBrowserPropCancel]];
                 popup.cancelButtonIndex = menuItems.count;
             }
-            [popup showInView:[UIApplication sharedApplication].keyWindow];
+            
+            [popup showFromRect:self.menuButton.frame inView:self.view animated:YES];
         }
     } else {
         [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
