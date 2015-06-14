@@ -36,7 +36,10 @@
 #define    kThemeableBrowserPropColor @"color"
 #define    kThemeableBrowserPropHeight @"height"
 #define    kThemeableBrowserPropImage @"image"
+#define    kThemeableBrowserPropWwwImage @"wwwImage"
 #define    kThemeableBrowserPropImagePressed @"imagePressed"
+#define    kThemeableBrowserPropWwwImagePressed @"wwwImagePressed"
+#define    kThemeableBrowserPropWwwImageDensity @"wwwImageDensity"
 #define    kThemeableBrowserPropStaticText @"staticText"
 #define    kThemeableBrowserPropShowPageTitle @"showPageTitle"
 #define    kThemeableBrowserPropAlign @"align"
@@ -810,17 +813,51 @@
     // [self.view addSubview:self.spinner];
 }
 
+/**
+ * This is a rather unintuitive helper method to load images. The reason why this method exists
+ * is because due to some service limitations, one may not be able to add images to native
+ * resource bundle. So this method offers a way to load image from www contents instead.
+ * However loading from native resource bundle is already preferred over loading from www. So
+ * if name is given, then it simply loads from resource bundle and the other two parameters are
+ * ignored. If name is not given, then altPath is assumed to be a file path _under_ www and
+ * altDensity is the desired density of the given image file, because without native resource
+ * bundle, we can't tell what densitiy the image is supposed to be so it needs to be given
+ * explicitly.
+ */
+- (UIImage*) getImage:(NSString*) name altPath:(NSString*) altPath altDensity:(CGFloat) altDensity
+{
+    UIImage* result = nil;
+    if (name) {
+        result = [UIImage imageNamed:name];
+    } else if (altPath) {
+        NSString* path = [[[NSBundle mainBundle] bundlePath]
+                          stringByAppendingPathComponent:[NSString pathWithComponents:@[@"www", altPath]]];
+        if (!altDensity) {
+            altDensity = 1.0;
+        }
+        NSData* data = [NSData dataWithContentsOfFile:path];
+        result = [UIImage imageWithData:data scale:3.0];
+    }
+    
+    return result;
+}
+
 - (UIButton*) createButton:(NSDictionary*) buttonDef action:(SEL)action withDescription:(NSString*)description
 {
     UIButton* result = nil;
     if (buttonDef) {
         UIImage *buttonImage = nil;
-        if (buttonDef[kThemeableBrowserPropImage]) {
-            buttonImage = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImage]];
+        if (buttonDef[kThemeableBrowserPropImage] || buttonDef[kThemeableBrowserPropWwwImage]) {
+            buttonImage = [self getImage:buttonDef[kThemeableBrowserPropImage]
+                                altPath:buttonDef[kThemeableBrowserPropWwwImage]
+                                altDensity:[buttonDef[kThemeableBrowserPropWwwImageDensity] doubleValue]];
 
             if (!buttonImage) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                   withMessage:[NSString stringWithFormat:@"Image for %@, %@, failed to load.", description, buttonDef[kThemeableBrowserPropImage]]];
+                                       withMessage:[NSString stringWithFormat:@"Image for %@, %@, failed to load.",
+                                                    description,
+                                                    buttonDef[kThemeableBrowserPropImage]
+                                                    ? buttonDef[kThemeableBrowserPropImage] : buttonDef[kThemeableBrowserPropWwwImage]]];
             }
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
@@ -828,12 +865,17 @@
         }
 
         UIImage *buttonImagePressed = nil;
-        if (buttonDef[kThemeableBrowserPropImagePressed]) {
-            buttonImagePressed = [UIImage imageNamed:buttonDef[kThemeableBrowserPropImagePressed]];
+        if (buttonDef[kThemeableBrowserPropImagePressed] || buttonDef[kThemeableBrowserPropWwwImagePressed]) {
+            buttonImagePressed = [self getImage:buttonDef[kThemeableBrowserPropImagePressed]
+                                       altPath:buttonDef[kThemeableBrowserPropWwwImagePressed]
+                                       altDensity:[buttonDef[kThemeableBrowserPropWwwImageDensity] doubleValue]];;
             
             if (!buttonImagePressed) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
-                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@, %@, failed to load.", description, buttonDef[kThemeableBrowserPropImagePressed]]];
+                                       withMessage:[NSString stringWithFormat:@"Pressed image for %@, %@, failed to load.",
+                                                    description,
+                                                    buttonDef[kThemeableBrowserPropImagePressed]
+                                                    ? buttonDef[kThemeableBrowserPropImagePressed] : buttonDef[kThemeableBrowserPropWwwImagePressed]]];
             }
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
@@ -846,6 +888,7 @@
             
             if (buttonImagePressed) {
                 [result setImage:buttonImagePressed forState:UIControlStateHighlighted];
+                result.adjustsImageWhenHighlighted = NO;
             }
 
             [result setImage:buttonImage forState:UIControlStateNormal];
