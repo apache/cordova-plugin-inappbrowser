@@ -653,9 +653,19 @@
     self.toolbar.userInteractionEnabled = YES;
     self.toolbar.backgroundColor = [CDVThemeableBrowserViewController colorFromRGBA:[self getStringFromDict:toolbarProps withKey:kThemeableBrowserPropColor withDefault:@"#ffffffff"]];
     
-    if (toolbarProps[kThemeableBrowserPropImage]) {
-        UIImage *image = [UIImage imageNamed:toolbarProps[kThemeableBrowserPropImage]];
-        self.toolbar.backgroundColor = [UIColor colorWithPatternImage:image];
+    if (toolbarProps[kThemeableBrowserPropImage] || toolbarProps[kThemeableBrowserPropWwwImage]) {
+        UIImage *image = [self getImage:toolbarProps[kThemeableBrowserPropImage]
+                               altPath:toolbarProps[kThemeableBrowserPropWwwImage]
+                               altDensity:[toolbarProps[kThemeableBrowserPropWwwImageDensity] doubleValue]];
+        
+        if (image) {
+            self.toolbar.backgroundColor = [UIColor colorWithPatternImage:image];
+        } else {
+            [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
+                                   withMessage:[NSString stringWithFormat:@"Image for toolbar, %@, failed to load.",
+                                                toolbarProps[kThemeableBrowserPropImage]
+                                                ? toolbarProps[kThemeableBrowserPropImage] : toolbarProps[kThemeableBrowserPropWwwImage]]];
+        }
     }
     
     CGFloat labelInset = 5.0;
