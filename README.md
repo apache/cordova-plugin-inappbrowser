@@ -162,38 +162,47 @@ One thing to note is that all image resources reference to **native** resource b
 
 You may have noticed that ThemedBrowser added an optional menu as well as custom buttons, which you can utilize to respond to some simple user actions.
 
+Experimental Properties
+-----------------------
+
+Followings are experimental properties that can be used in some special cases. Usage of these property are discouraged due to stability and efficiency.
+
+For any object that supports `image` and `imagePressed` properties, there is a set of fallback properties that can be used when you absolutely cannot import native sources due to some circumstances.
+
++ `(\w+Button|menu)`
+    + `wwwImage` is like `image` but loads image from Cordova's `www` directory instead. This is a fallback solution when you cannot import native resources. Use `image` property as much as possible.
+    + `wwwImagePressed` is like `image` but loads image from Cordova's `www` directory instead. This is a fallback solution when you cannot import native resources. Use `image` property as much as possible.
+    + `wwwImageDensity` is needed when `wwwImage` and/or `wwwImagePressed` are given. Since these images are not loaded from resource bundle, density is unknown, therefore density needs to set by this property. Corresponds to iOS' `@2x`, `@3x` suffix.
+
+eg.
+
+    cordova.ThemeableBrowser.open('http://apache.org', '_blank', {
+        ...
+        backButton: {
+            wwwImage: 'images/back.png',
+            wwwImagePressed: 'images/back_pressed.png',
+            wwwImageDensity: 2,
+            align: 'left',
+            event: 'backPressed'
+        }
+        ...
+    });
+
+File path is relative to `www` directory, which contains your web app sources. One thing that is very important is the `wwwImageDensity` property. Since images are not loaded from native resource bundle, density of any loaded images cannot not be automatically determined, therefore it needs to be explicity set. *You* are responsible for supplying the correct images with its corresponding density for any given device. If you don't know what image density means, please read [this documentation](https://developer.apple.com/library/ios/documentation/2DDrawing/Conceptual/DrawingPrintingiOS/SupportingHiResScreensInViews/SupportingHiResScreensInViews.html). Ideally you are supposed to perform a device detection based on `window.devicePixelRatio` to supply optimal images. However a cheap way is to always supply high density images and rely on OS to scale down for lower screen density devices. Of course this would be inefficient, but it would save you a lot of trouble. Following is a cheatsheet that corresponds `wwwImageDensity` values to iOS and Android densities. Though `wwwImageDensity` does accept float values, followings are handy lookup.
+
+| `wwwImageDensity` | iOS          | Android |
+| ----------------- | ------------ | ------- |
+| 1                 | *No suffix*  | mdpi    |
+| 2                 | `@2x`        | xhdpi   |
+| 3                 | `@3x`        | xxdpi   |
+| 4                 | *N/A*        | xxxhdpi |
+
 Additional Methods
 ------------------
 
 The reference object returned by `cordova.ThemeableBrowser.open` contains the following methods in addition to InAppBrowser's implementation:
 
 + `reload` reloads the current page.
-
-Import Native Images
---------------------
-
-If you are a native developer and are already aware how to import native image resources, feel free to skip this section. Otherwise, here are some tips. First of all, your native iOS and Android projects are located at:
-
-    <cordova_project_root>/platforms/ios
-    <cordova_project_root>/platforms/android
-
-Let's start with Android, which is quite straightforward. Prepare your images for all of the pixel densities that you'd like to support. [Here is a documentation](http://developer.android.com/guide/practices/screens_support.html) that explains this concept. The gist is that on higher pixel density screens, your images will have to have higher resolution in order to look sharp on an actual device, so you want to prepare multiple files for the same image at different resolutions for their respective pixel density. In Android, there are a lot of densities due to diversity of devices, so you have to decide which ones you want to support. Fortunately if you don't have an image for a particular pixel density, Android will automatically pick up the closest one and try to down scale or up scale it. Of course this process is not very efficient, so you have to make your decisions. The directory where you want to place your images are under
-
-    <cordova_project_root>/platforms/android/res
-
-Notice how there are multiple folders named `drawble-.*`. Each file for the same image should be named the same, but it will need to be moved under the correct directory with respect to its target density. eg. If `icon.png` is intended for xhdpi, then it needs to go under `drawable-xhdpi` directory. In your JavaScript config, you can then reference to this iamge without extension. eg. With the previous example, simply `icon` will suffice.
-
-To import image resources for iOS, it is slightly trickier, because you **have** to register your file in Xcode project file with help from Xcode, and there are two ways of doing this. Let's start with the old school way. iOS also shares similar concept with Android in terms of pixel density. iPhone to iPhone 3GS uses 1x the resolution, iPhone 4 to iPhone 6 uses 2x the resolution while iPhone 6 Plus and above uses 3x the resolution (even though it's actually down scaled, but that's a different discussion). In the old school way, you have to name your images with `@1x`, `@2x`, and `@3x` suffix with respect to their target density. eg. `icon@2x.png`. [Here is a documentation](https://developer.apple.com/library/ios/documentation/2DDrawing/Conceptual/DrawingPrintingiOS/SupportingHiResScreensInViews/SupportingHiResScreensInViews.html) that explains this concept. You then have to move it under
-
-    <cordova_project_root>/platforms/ios/<project_name>/Resources
-
-Then open your native iOS project with Xcode by double clicking on
-
-    <cordova_project_root>/platforms/ios/<project_name>.xcodeproj
-
-In the left hand side panel, make sure you are in Project navigator tab. Then you can see a list of directories under your project. One of them being `Resources`, but you don't see your newly added images there. Now you need to drag your images fron Finder to Xcode and drop it under `Resource` folder. In your JavaScript config, you can then reference to them without suffix or extension. eg. With the previous example, simply `icon` will suffice.
-
-The new school way is to use [Asset Catalog](https://developer.apple.com/library/ios/recipes/xcode_help-image_catalog-1.0/Recipe.html). This is the recommended technique from Xcode 5+ and iOS 7+. It gives you better management of all of your image resources. ie. No more suffix, and you can see all your images for different densities in one table etc. However there are more steps involved to set it up. Please reference to [this guide](http://www.intertech.com/Blog/xcode-assets-xcassets/) for a step by step walkthrough.
 
 Errors and Warnings
 -------------------
@@ -230,6 +239,34 @@ Examples:
     });
 
 These events are intended to help you debug strange behaviours. So if you run into something weird, please listene to these events and it might just tell you what's wrong. Please note errors and warnings are not completely consistent across platforms. There are some minor platform differences.
+
+Import Native Images
+--------------------
+
+If you are a native developer and are already aware how to import native image resources, feel free to skip this section. Otherwise, here are some tips. First of all, your native iOS and Android projects are located at:
+
+    <cordova_project_root>/platforms/ios
+    <cordova_project_root>/platforms/android
+
+Let's start with Android, which is quite straightforward. Prepare your images for all of the pixel densities that you'd like to support. [Here is a documentation](http://developer.android.com/guide/practices/screens_support.html) that explains this concept. The gist is that on higher pixel density screens, your images will have to have higher resolution in order to look sharp on an actual device, so you want to prepare multiple files for the same image at different resolutions for their respective pixel density. In Android, there are a lot of densities due to diversity of devices, so you have to decide which ones you want to support. Fortunately if you don't have an image for a particular pixel density, Android will automatically pick up the closest one and try to down scale or up scale it. Of course this process is not very efficient, so you have to make your decisions. The directory where you want to place your images are under
+
+    <cordova_project_root>/platforms/android/res
+
+Notice how there are multiple folders named `drawble-.*`. Each file for the same image should be named the same, but it will need to be moved under the correct directory with respect to its target density. eg. If `icon.png` is intended for xhdpi, then it needs to go under `drawable-xhdpi` directory. In your JavaScript config, you can then reference to this iamge without extension. eg. With the previous example, simply `icon` will suffice.
+
+To import image resources for iOS, it is slightly trickier, because you **have** to register your file in Xcode project file with help from Xcode, and there are two ways of doing this. Let's start with the old school way. iOS also shares similar concept with Android in terms of pixel density. iPhone to iPhone 3GS uses 1x the resolution, iPhone 4 to iPhone 6 uses 2x the resolution while iPhone 6 Plus and above uses 3x the resolution (even though it's actually down scaled, but that's a different discussion). In the old school way, you have to name your images with `@1x`, `@2x`, and `@3x` suffix with respect to their target density. eg. `icon@2x.png`. [Here is a documentation](https://developer.apple.com/library/ios/documentation/2DDrawing/Conceptual/DrawingPrintingiOS/SupportingHiResScreensInViews/SupportingHiResScreensInViews.html) that explains this concept. You then have to move it under
+
+    <cordova_project_root>/platforms/ios/<project_name>/Resources
+
+Then open your native iOS project with Xcode by double clicking on
+
+    <cordova_project_root>/platforms/ios/<project_name>.xcodeproj
+
+In the left hand side panel, make sure you are in Project navigator tab. Then you can see a list of directories under your project. One of them being `Resources`, but you don't see your newly added images there. Now you need to drag your images fron Finder to Xcode and drop it under `Resource` folder. In your JavaScript config, you can then reference to them without suffix or extension. eg. With the previous example, simply `icon` will suffice.
+
+The new school way is to use [Asset Catalog](https://developer.apple.com/library/ios/recipes/xcode_help-image_catalog-1.0/Recipe.html). This is the recommended technique from Xcode 5+ and iOS 7+. It gives you better management of all of your image resources. ie. No more suffix, and you can see all your images for different densities in one table etc. However there are more steps involved to set it up. Please reference to [this guide](http://www.intertech.com/Blog/xcode-assets-xcassets/) for a step by step walkthrough.
+
+If for some reason you absolutely cannot import native images, you may consider using the `wwwImage`, `wwwImagePressed` and `wwwImageDensity` properties as fallback solution, though this is an experimental feature and is discouraged. See [above](#experimental-properties) for documentation.
 
 FAQ
 ---
