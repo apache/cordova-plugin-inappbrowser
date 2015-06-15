@@ -789,23 +789,23 @@ public class ThemeableBrowser extends CordovaPlugin {
 
                 if (features.customButtons != null) {
                     for (int i = 0; i < features.customButtons.length; i++) {
-                        final BrowserButton buttonDef = features.customButtons[i];
+                        final BrowserButton buttonProps = features.customButtons[i];
                         final int index = i;
                         Button button = createButton(
-                            buttonDef,
+                            buttonProps,
                             String.format("custom button at %d", i),
                             new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
                                     if (inAppWebView != null) {
-                                        emitButtonEvent(buttonDef,
+                                        emitButtonEvent(buttonProps,
                                                 inAppWebView.getUrl(), index);
                                     }
                                 }
                             }
                         );
 
-                        if (ALIGN_RIGHT.equals(buttonDef.align)) {
+                        if (ALIGN_RIGHT.equals(buttonProps.align)) {
                             rightButtonContainer.addView(button);
                             rightContainerWidth
                                     += button.getLayoutParams().width;
@@ -1005,28 +1005,28 @@ public class ThemeableBrowser extends CordovaPlugin {
         return result;
     }
 
-    private void setButtonImages(View view, BrowserButton buttonDef, int disabledAlpha) {
+    private void setButtonImages(View view, BrowserButton buttonProps, int disabledAlpha) {
         Drawable normalDrawable = null;
         Drawable disabledDrawable = null;
         Drawable pressedDrawable = null;
 
         CharSequence description = view.getContentDescription();
 
-        if (buttonDef.image != null || buttonDef.wwwImage != null) {
+        if (buttonProps.image != null || buttonProps.wwwImage != null) {
             try {
-                normalDrawable = getImage(buttonDef.image, buttonDef.wwwImage,
-                        buttonDef.wwwImageDensity);
+                normalDrawable = getImage(buttonProps.image, buttonProps.wwwImage,
+                        buttonProps.wwwImageDensity);
                 ViewGroup.LayoutParams params = view.getLayoutParams();
                 params.width = normalDrawable.getIntrinsicWidth();
                 params.height = normalDrawable.getIntrinsicHeight();
             } catch (Resources.NotFoundException e) {
                 emitError(ERR_LOADFAIL,
                         String.format("Image for %s, %s, failed to load",
-                                description, buttonDef.image));
+                                description, buttonProps.image));
             } catch (IOException ioe) {
                 emitError(ERR_LOADFAIL,
                         String.format("Image for %s, %s, failed to load",
-                                description, buttonDef.wwwImage));
+                                description, buttonProps.wwwImage));
             }
         } else {
             emitWarning(WRN_UNDEFINED,
@@ -1034,18 +1034,18 @@ public class ThemeableBrowser extends CordovaPlugin {
                             description));
         }
 
-        if (buttonDef.imagePressed != null || buttonDef.wwwImagePressed != null) {
+        if (buttonProps.imagePressed != null || buttonProps.wwwImagePressed != null) {
             try {
-                pressedDrawable = getImage(buttonDef.imagePressed, buttonDef.wwwImagePressed,
-                        buttonDef.wwwImageDensity);
+                pressedDrawable = getImage(buttonProps.imagePressed, buttonProps.wwwImagePressed,
+                        buttonProps.wwwImageDensity);
             } catch (Resources.NotFoundException e) {
                 emitError(ERR_LOADFAIL,
                         String.format("Pressed image for %s, %s, failed to load",
-                                description, buttonDef.imagePressed));
+                                description, buttonProps.imagePressed));
             } catch (IOException e) {
                 emitError(ERR_LOADFAIL,
                         String.format("Pressed image for %s, %s, failed to load",
-                                description, buttonDef.wwwImagePressed));
+                                description, buttonProps.wwwImagePressed));
             }
         } else {
             emitWarning(WRN_UNDEFINED,
@@ -1107,15 +1107,15 @@ public class ThemeableBrowser extends CordovaPlugin {
         }
     }
 
-    private Button createButton(BrowserButton buttonDef, String description,
+    private Button createButton(BrowserButton buttonProps, String description,
             View.OnClickListener listener) {
         Button result = null;
-        if (buttonDef != null) {
+        if (buttonProps != null) {
             result = new Button(cordova.getActivity());
             result.setContentDescription(description);
             result.setLayoutParams(new LinearLayout.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-            setButtonImages(result, buttonDef, DISABLED_ALPHA);
+            setButtonImages(result, buttonProps, DISABLED_ALPHA);
             if (listener != null) {
                 result.setOnClickListener(listener);
             }
