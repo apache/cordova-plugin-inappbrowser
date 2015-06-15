@@ -852,22 +852,22 @@
     return result;
 }
 
-- (UIButton*) createButton:(NSDictionary*) buttonDef action:(SEL)action withDescription:(NSString*)description
+- (UIButton*) createButton:(NSDictionary*) buttonProps action:(SEL)action withDescription:(NSString*)description
 {
     UIButton* result = nil;
-    if (buttonDef) {
+    if (buttonProps) {
         UIImage *buttonImage = nil;
-        if (buttonDef[kThemeableBrowserPropImage] || buttonDef[kThemeableBrowserPropWwwImage]) {
-            buttonImage = [self getImage:buttonDef[kThemeableBrowserPropImage]
-                                altPath:buttonDef[kThemeableBrowserPropWwwImage]
-                                altDensity:[buttonDef[kThemeableBrowserPropWwwImageDensity] doubleValue]];
+        if (buttonProps[kThemeableBrowserPropImage] || buttonProps[kThemeableBrowserPropWwwImage]) {
+            buttonImage = [self getImage:buttonProps[kThemeableBrowserPropImage]
+                                altPath:buttonProps[kThemeableBrowserPropWwwImage]
+                                altDensity:[buttonProps[kThemeableBrowserPropWwwImageDensity] doubleValue]];
 
             if (!buttonImage) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
                                        withMessage:[NSString stringWithFormat:@"Image for %@, %@, failed to load.",
                                                     description,
-                                                    buttonDef[kThemeableBrowserPropImage]
-                                                    ? buttonDef[kThemeableBrowserPropImage] : buttonDef[kThemeableBrowserPropWwwImage]]];
+                                                    buttonProps[kThemeableBrowserPropImage]
+                                                    ? buttonProps[kThemeableBrowserPropImage] : buttonProps[kThemeableBrowserPropWwwImage]]];
             }
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
@@ -875,17 +875,17 @@
         }
 
         UIImage *buttonImagePressed = nil;
-        if (buttonDef[kThemeableBrowserPropImagePressed] || buttonDef[kThemeableBrowserPropWwwImagePressed]) {
-            buttonImagePressed = [self getImage:buttonDef[kThemeableBrowserPropImagePressed]
-                                       altPath:buttonDef[kThemeableBrowserPropWwwImagePressed]
-                                       altDensity:[buttonDef[kThemeableBrowserPropWwwImageDensity] doubleValue]];;
+        if (buttonProps[kThemeableBrowserPropImagePressed] || buttonProps[kThemeableBrowserPropWwwImagePressed]) {
+            buttonImagePressed = [self getImage:buttonProps[kThemeableBrowserPropImagePressed]
+                                       altPath:buttonProps[kThemeableBrowserPropWwwImagePressed]
+                                       altDensity:[buttonProps[kThemeableBrowserPropWwwImageDensity] doubleValue]];;
             
             if (!buttonImagePressed) {
                 [self.navigationDelegate emitError:kThemeableBrowserEmitCodeLoadFail
                                        withMessage:[NSString stringWithFormat:@"Pressed image for %@, %@, failed to load.",
                                                     description,
-                                                    buttonDef[kThemeableBrowserPropImagePressed]
-                                                    ? buttonDef[kThemeableBrowserPropImagePressed] : buttonDef[kThemeableBrowserPropWwwImagePressed]]];
+                                                    buttonProps[kThemeableBrowserPropImagePressed]
+                                                    ? buttonProps[kThemeableBrowserPropImagePressed] : buttonProps[kThemeableBrowserPropWwwImagePressed]]];
             }
         } else {
             [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
@@ -904,10 +904,10 @@
             [result setImage:buttonImage forState:UIControlStateNormal];
             [result addTarget:self action:action forControlEvents:UIControlEventTouchUpInside];
         }
-    } else if (!buttonDef) {
+    } else if (!buttonProps) {
         [self.navigationDelegate emitWarning:kThemeableBrowserEmitCodeUndefined
                                  withMessage:[NSString stringWithFormat:@"%@ is not defined. Button will not be shown.", description]];
-    } else if (!buttonDef[kThemeableBrowserPropImage]) {
+    } else if (!buttonProps[kThemeableBrowserPropImage]) {
     }
     
     return result;
@@ -1315,15 +1315,15 @@
     return button.frame.size.width;
 }
 
-- (void)emitEventForButton:(NSDictionary*)buttonDef
+- (void)emitEventForButton:(NSDictionary*)buttonProps
 {
-    [self emitEventForButton:buttonDef withIndex:nil];
+    [self emitEventForButton:buttonProps withIndex:nil];
 }
 
-- (void)emitEventForButton:(NSDictionary*)buttonDef withIndex:(NSNumber*)index
+- (void)emitEventForButton:(NSDictionary*)buttonProps withIndex:(NSNumber*)index
 {
-    if (buttonDef) {
-        NSString* event = buttonDef[kThemeableBrowserPropEvent];
+    if (buttonProps) {
+        NSString* event = buttonProps[kThemeableBrowserPropEvent];
         if (event) {
             NSMutableDictionary* dict = [NSMutableDictionary new];
             [dict setObject:event forKey:@"type"];
