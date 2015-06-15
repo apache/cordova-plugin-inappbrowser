@@ -562,8 +562,21 @@ public class ThemeableBrowser extends CordovaPlugin {
                         dpToPixels(toolbarDef != null
                                 ? toolbarDef.height : TOOLBAR_DEF_HEIGHT)));
 
-                if (toolbarDef != null && toolbarDef.image != null) {
-                    setBackground(toolbar, toolbarDef.image);
+                if (toolbarDef != null
+                        && (toolbarDef.image != null || toolbarDef.wwwImage != null)) {
+                    try {
+                        Drawable background = getImage(toolbarDef.image
+                                , toolbarDef.wwwImage, toolbarDef.wwwImageDensity);
+                        setBackground(toolbar, background);
+                    } catch (Resources.NotFoundException e) {
+                        emitError(ERR_LOADFAIL,
+                                String.format("Image for toolbar, %s, failed to load",
+                                        toolbarDef.image));
+                    } catch (IOException ioe) {
+                        emitError(ERR_LOADFAIL,
+                                String.format("Image for toolbar, %s, failed to load",
+                                        toolbarDef.wwwImage));
+                    }
                 }
 
                 // Left Button Container layout
@@ -1086,19 +1099,6 @@ public class ThemeableBrowser extends CordovaPlugin {
         setBackground(view, states);
     }
 
-    private void setBackground(View view, String image) {
-        Resources activityRes = cordova.getActivity().getResources();
-
-        try {
-            int imageId = activityRes.getIdentifier(
-                    image, "drawable", cordova.getActivity().getPackageName());
-            setBackground(view, activityRes.getDrawable(imageId));
-        } catch (Resources.NotFoundException e) {
-            emitError(ERR_LOADFAIL,
-                    String.format("Failed to load %s", image));
-        }
-    }
-
     private void setBackground(View view, Drawable drawable) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackgroundDrawable(drawable);
@@ -1393,6 +1393,8 @@ public class ThemeableBrowser extends CordovaPlugin {
         public int height = TOOLBAR_DEF_HEIGHT;
         public String color;
         public String image;
+        public String wwwImage;
+        public double wwwImageDensity = 1;
     }
 
     private static class Title {
