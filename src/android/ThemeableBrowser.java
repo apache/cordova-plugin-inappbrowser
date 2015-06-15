@@ -1381,7 +1381,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         public String wwwImage;
         public String imagePressed;
         public String wwwImagePressed;
-        public double wwwImageDensity;
+        public double wwwImageDensity = 1;
         public String align = ALIGN_LEFT;
     }
 
