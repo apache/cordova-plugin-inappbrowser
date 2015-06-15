@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.10
+------
+
+Added a experimental feature to allow loading images from assets instead of native resources.
+
 0.2.9
 -----
 
