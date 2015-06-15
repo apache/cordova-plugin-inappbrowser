@@ -169,7 +169,7 @@ Followings are experimental properties that can be used in some special cases. U
 
 For any object that supports `image` and `imagePressed` properties, there is a set of fallback properties that can be used when you absolutely cannot import native sources due to some circumstances.
 
-+ `(\w+Button|menu)`
++ `(\w+Button|menu|toolbar)`
     + `wwwImage` is like `image` but loads image from Cordova's `www` directory instead. This is a fallback solution when you cannot import native resources. Use `image` property as much as possible.
     + `wwwImagePressed` is like `image` but loads image from Cordova's `www` directory instead. This is a fallback solution when you cannot import native resources. Use `image` property as much as possible.
     + `wwwImageDensity` is needed when `wwwImage` and/or `wwwImagePressed` are given. Since these images are not loaded from resource bundle, density is unknown, therefore density needs to set by this property. Corresponds to iOS' `@2x`, `@3x` suffix.
