@@ -190,3 +190,7 @@
 * Keep external android pages in a single tab. (close #61)
 * CB-8444 Add a clobber for `cordova.InAppBrowser.open` (close #80)
 * CB-8444 Don't clobber `window.open` - Add new symbol/clobber to access open function (`cordova.InAppBrowser.open`) - Change existing tests to use new symbol (i.e. don't rely on plugin clobber of `window.open`) - Add tests to use `window.open` via manual replace with new symbol - Update docs to deprecate plugin clobber of `window.open`
+
+### 1.0.1 (Jun 17, 2015)
+* CB-9128 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
+* fix npm md issue
