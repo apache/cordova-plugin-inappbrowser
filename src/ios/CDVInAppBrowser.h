@@ -50,6 +50,8 @@
 @property (nonatomic, assign) BOOL toolbar;
 @property (nonatomic, copy) NSString* closebuttoncaption;
 @property (nonatomic, copy) NSString* toolbarposition;
+@property (nonatomic, copy) NSString* toolbarstyle;
+@property (nonatomic, assign) BOOL toolbartranslucent;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 

@@ -28,6 +28,9 @@
 #define    kInAppBrowserToolbarBarPositionBottom @"bottom"
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
+#define    kInAppBrowserToolbarBarStyleDefault @"default"
+#define    kInAppBrowserToolbarBarStyleBlack @"black"
+
 #define    TOOLBAR_HEIGHT 44.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
@@ -483,6 +486,14 @@
 
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarIsTranslucent = _browserOptions.toolbartranslucent;
+    NSString* toolbarStyleString = _browserOptions.toolbarstyle;
+
+    UIBarStyle toolbarStyle = UIBarStyleDefault;
+    if ([toolbarStyleString isEqualToString:kInAppBrowserToolbarBarStyleBlack]) {
+        toolbarStyle = UIBarStyleBlack;
+    }
+
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
@@ -532,13 +543,14 @@
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
     self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    self.toolbar.barStyle = UIBarStyleBlackOpaque;
+    self.toolbar.barStyle = toolbarStyle;
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
     self.toolbar.hidden = NO;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
+    self.toolbar.translucent = toolbarIsTranslucent;
     self.toolbar.userInteractionEnabled = YES;
 
     CGFloat labelInset = 5.0;
@@ -919,6 +931,8 @@
         self.toolbar = YES;
         self.closebuttoncaption = nil;
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
+        self.toolbarstyle = kInAppBrowserToolbarBarStyleDefault;
+        self.toolbartranslucent = NO;
         self.clearcache = NO;
         self.clearsessioncache = NO;
 
