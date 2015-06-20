@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.11
+------
+
+Expanded wwwImage feature to toolbar.
+
 0.2.10
 ------
 
