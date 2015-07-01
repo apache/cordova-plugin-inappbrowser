@@ -84,6 +84,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_ERROR_EVENT = "loaderror";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+    private static final String HARDWARE_BACK_BUTTON = "hardwareback";
 
     private InAppBrowserDialog dialog;
     private AmazonWebView inAppWebView;
@@ -94,6 +95,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache= false;
     private boolean clearSessionCache=false;
+    private boolean hadwareBackButton=true;
 
     /**
      * Executes the request and returns PluginResult.
@@ -378,7 +380,7 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Checks to see if it is possible to go back one page in history, then does so.
      */
-    private void goBack() {
+    public void goBack() {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if (InAppBrowser.this.inAppWebView.canGoBack()) {
@@ -387,6 +389,22 @@ public class InAppBrowser extends CordovaPlugin {
             }
         });
     }
+
+    /**
+     * Can the web browser go back?
+     * @return boolean
+     */
+    public boolean canGoBack() {
+        return this.inAppWebView.canGoBack();
+    }
+
+    /**
+     * Has the user set the hardware back button to go back
+     * @return boolean
+     */
+    public boolean hardwareBack() {
+        return hadwareBackButton;
+    } 
 
     /**
      * Checks to see if it is possible to go forward one page in history, then does so.
@@ -468,6 +486,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean hidden = features.get(HIDDEN);
             if (hidden != null) {
                 openWindowHidden = hidden.booleanValue();
+            }
+            Boolean hardwareBack = features.get(HARDWARE_BACK_BUTTON);
+            if (hardwareBack != null) {
+                hadwareBackButton = hardwareBack.booleanValue();
             }
             Boolean cache = features.get(CLEAR_ALL_CACHE);
             if (cache != null) {
