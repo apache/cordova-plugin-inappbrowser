@@ -82,6 +82,13 @@ simply hook `window.open` during initialization.  For example:
         window.open = cordova.InAppBrowser.open;
     }
 
+If you need to access any sites that use certificates which aren't normally
+trusted, such as self-signed certificates. You can force the InAppBrowser to
+trust them by saving the CA certificate (in DER format) to a file called
+`trusted-ca.der` in your `www` folder. The InAppBrowser will load the file and
+verify that all https URLs use a valid certificate (counting certificates
+issued by the CA you specified). This is an Android only feature.
+
 ## cordova.InAppBrowser.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
