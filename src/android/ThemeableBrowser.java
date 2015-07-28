@@ -40,6 +40,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -621,7 +622,11 @@ public class ThemeableBrowser extends CordovaPlugin {
                     "back button",
                     new View.OnClickListener() {
                         public void onClick(View v) {
-                            if (features.backButtonCanClose && canGoBack()) {
+                            emitButtonEvent(
+                                    features.backButton,
+                                    inAppWebView.getUrl());
+
+                            if (features.backButtonCanClose && !canGoBack()) {
                                 closeDialog();
                             } else {
                                 goBack();
@@ -640,6 +645,10 @@ public class ThemeableBrowser extends CordovaPlugin {
                     "forward button",
                     new View.OnClickListener() {
                         public void onClick(View v) {
+                            emitButtonEvent(
+                                    features.forwardButton,
+                                    inAppWebView.getUrl());
+
                             goForward();
                         }
                     }
@@ -656,6 +665,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                     "close button",
                     new View.OnClickListener() {
                         public void onClick(View v) {
+                            emitButtonEvent(
+                                    features.closeButton,
+                                    inAppWebView.getUrl());
                             closeDialog();
                         }
                     }
@@ -669,6 +681,20 @@ public class ThemeableBrowser extends CordovaPlugin {
                             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                     menu.setContentDescription("menu button");
                     setButtonImages(menu, features.menu, DISABLED_ALPHA);
+
+                    // We are not allowed to use onClickListener for Spinner, so we will use
+                    // onTouchListener as a fallback.
+                    menu.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            if (event.getAction() == MotionEvent.ACTION_UP) {
+                                emitButtonEvent(
+                                        features.menu,
+                                        inAppWebView.getUrl());
+                            }
+                            return false;
+                        }
+                    });
 
                     if (features.menu.items != null) {
                         HideSelectedAdapter<EventLabel> adapter
