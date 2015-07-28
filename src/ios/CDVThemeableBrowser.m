@@ -283,6 +283,11 @@
     }
 }
 
+- (void)show:(CDVInvokedUrlCommand*)command
+{
+    [self show:command withAnimation:YES];
+}
+
 - (void)show:(CDVInvokedUrlCommand*)command withAnimation:(BOOL)animated
 {
     if (self.themeableBrowserViewController == nil) {
