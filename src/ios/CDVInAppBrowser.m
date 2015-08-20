@@ -724,6 +724,13 @@
 
 - (void)viewDidLoad
 {
+    CGRect frame = [UIApplication sharedApplication].statusBarFrame;
+    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:frame];
+    bgToolbar.barStyle = UIBarStyleDefault;
+    bgToolbar.tintColor = [UIColor whiteColor];
+    bgToolbar.barTintColor = [UIColor whiteColor];
+    [self.view addSubview:bgToolbar];
+    
     [super viewDidLoad];
 }
 
