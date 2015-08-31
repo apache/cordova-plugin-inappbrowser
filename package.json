@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser",
-  "version": "1.0.1-dev",
+  "version": "1.0.2-dev",
   "description": "Cordova InAppBrowser Plugin",
   "cordova": {
     "id": "cordova-plugin-inappbrowser",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git"
+    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
   },
   "keywords": [
     "cordova",
