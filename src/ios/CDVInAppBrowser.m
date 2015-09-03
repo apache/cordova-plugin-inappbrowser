@@ -423,7 +423,8 @@
 {
     if (_retryFailingRequest) {
         _retryFailingRequest = NO;
-        [self openInSystem:error.userInfo[@"NSErrorFailingURLStringKey"]];
+        NSURL *url =[NSURL URLWithString:error.userInfo[@"NSErrorFailingURLStringKey"]];
+        [self openInSystem:url];
         return;
     } else {
         _retryFailingRequest = YES;
