@@ -36,6 +36,7 @@
 
 @interface CDVInAppBrowser () {
     NSInteger _previousStatusBarStyle;
+    BOOL _retryFailingRequest;
 }
 @end
 
@@ -45,6 +46,7 @@
 {
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
+    _retryFailingRequest = YES;
 }
 
 - (void)onReset
@@ -419,13 +421,20 @@
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
 {
-    if (self.callbackId != nil) {
-        NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
-                                                      messageAsDictionary:@{@"type":@"loaderror", @"url":url, @"code": [NSNumber numberWithInteger:error.code], @"message": error.localizedDescription}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    if (_retryFailingRequest) {
+        _retryFailingRequest = NO;
+        [self openInSystem:error.userInfo[@"NSErrorFailingURLStringKey"]];
+        return;
+    } else {
+        _retryFailingRequest = YES;
+        if (self.callbackId != nil) {
+            NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                                          messageAsDictionary:@{@"type":@"loaderror", @"url":url, @"code": [NSNumber numberWithInteger:error.code], @"message": error.localizedDescription}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        }
     }
 }
 
@@ -729,6 +738,9 @@
     bgToolbar.barStyle = UIBarStyleDefault;
     bgToolbar.tintColor = [UIColor whiteColor];
     bgToolbar.barTintColor = [UIColor whiteColor];
+//    [[UIBarItem appearance] setTitleTextAttributes:@{UITextAttributeTextColor : [UIColor whiteColor]}];
+
+
     [self.view addSubview:bgToolbar];
     
     [super viewDidLoad];
