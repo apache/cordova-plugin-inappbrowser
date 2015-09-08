@@ -54,6 +54,8 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
         console.log("window.open works well");
     }
 
+:warning: Check issues on the [JIRA issue tracker](https://issues.apache.org/jira/browse/CB-6531?filter=-1&jql=project%20%3D%20CB%20AND%20status%20in%20(Open%2C%20%22In%20Progress%22%2C%20Reopened)%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
+
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
