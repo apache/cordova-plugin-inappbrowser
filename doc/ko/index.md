@@ -17,36 +17,53 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
-호출할 때 표시 하는 웹 브라우저 보기를 제공 하는이 플러그인 `window.open()` , 또는 때로 형성 된 링크 열기`<a target="_blank">`.
+이 플러그인 `코르도바를 호출할 때 표시 하는 웹 브라우저 보기를 제공 합니다.InAppBrowser.open()`.
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     
 
-**참고**: 동작 하는 창에 InAppBrowser 표준 웹 브라우저를 좋아하고 코르도바 Api에 액세스할 수 없습니다.
+`코르도바입니다.InAppBrowser.open()` 함수 `window.open ()` 함수에 대 한 대체품 정의 됩니다. 기존의 `window.open ()` 호출 window.open을 대체 하 여 InAppBrowser 윈도우를 사용할 수 있습니다.
 
-## 설치
-
-    cordova plugin add org.apache.cordova.inappbrowser
+    window.open = cordova.InAppBrowser.open;
     
 
-### Firefox 운영 체제
+InAppBrowser 창 표준 웹 브라우저 처럼 동작 및 코르도바 Api에 액세스할 수 없습니다. 이 이유는 InAppBrowser는 것이 좋습니다는 주요 코르도바 webview로 로드 하는 대신 제 3 자 (신뢰할 수 없는) 콘텐츠를 로드 해야 할 경우. InAppBrowser는 허용 될 수도 시스템 브라우저에서 링크를 여는.
 
-[참고 문서][1]에 설명 된 대로 **www/manifest.webapp** 를 만듭니다. 관련 부여할 추가 합니다.
+사용자에 대 한 자체 GUI 컨트롤에서 기본적으로 제공 된 InAppBrowser (뒤로, 앞으로, 완료).
 
- [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+대 한 뒤 호환성,이 플러그인도 `window.open` 후크. 그러나, `window.open`의 플러그인 설치 후크를 가질 수 있습니다 의도 하지 않은 부작용 (특히 경우이 플러그인이 다른 플러그인 종속성 으로만 포함). `window.open` 후크 주요 릴리스에서 제거 됩니다. 후크 플러그인에서 제거 될 때까지 애플 리 케이 션 수 있습니다 수동으로 기본 동작을 복원 하 게 됩니다.
 
-    "permissions": {
-        "browser": {}
+    delete window.open // Reverts the call back to it's prototype's default
+    
+
+`window.open` 전역 범위에 있지만 InAppBrowser 제공 되지 않습니다 때까지 `deviceready` 이벤트 후.
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("window.open works well");
     }
     
 
-## window.open
+## 설치
 
-새 URL을 엽니다 `InAppBrowser` 인스턴스, 현재 브라우저 인스턴스 또는 시스템 브라우저.
+    cordova plugin add cordova-plugin-inappbrowser
+    
 
-    var ref = window.open (url, 대상, 옵션);
+InAppBrowser를 통해가 서 당신의 애플 리 케이 션에서 모든 페이지를 로드 하려는 경우 초기화 하는 동안 `window.open` 간단 하 게 연결할 수 있습니다. 예를 들어:
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        window.open = cordova.InAppBrowser.open;
+    }
+    
+
+## cordova.InAppBrowser.open
+
+새 `InAppBrowser` 인스턴스, 현재 브라우저 인스턴스 또는 시스템 브라우저에서 URL을 엽니다.
+
+    var ref = cordova.InAppBrowser.open(url, target, options);
     
 
 *   **심판**:에 대 한 참조는 `InAppBrowser` 창. *(InAppBrowser)*
@@ -67,7 +84,6 @@
     
     안 드 로이드만:
     
-    *   **closebuttoncaption**: **수행** 하는 단추의 캡션으로 사용할 문자열을 설정 합니다.
     *   **숨겨진**: 설정 `yes` 브라우저를 만들 페이지를 로드 하면, 하지만 그것을 보여주지. Loadstop 이벤트는 로드가 완료 되 면 발생 합니다. 생략 하거나 설정 `no` (기본값) 브라우저 열고 정상적으로 로드 해야 합니다.
     *   **clearcache**: 설정 `yes` 브라우저를 쿠키 캐시 삭제 하기 전에 새 창이 열립니다
     *   **clearsessioncache**: 설정 `yes` 세션 쿠키 캐시를 삭제 하기 전에 새 창이 열립니다
@@ -85,30 +101,66 @@
     *   **allowInlineMediaPlayback**: 설정 `yes` 또는 `no` 인라인 HTML5 미디어 재생, 장치 전용 재생 인터페이스 보다는 브라우저 창 내에서 표시할 수 있도록 합니다. HTML의 `video` 요소가 포함 되어야 합니다는 `webkit-playsinline` 특성 (기본값:`no`)
     *   **keyboardDisplayRequiresUserAction**: 설정 `yes` 또는 `no` 양식 요소는 자바 스크립트를 통해 포커스를 받을 때 키보드를 열고 `focus()` 전화 (기본값:`yes`).
     *   **suppressesIncrementalRendering**: 설정 `yes` 또는 `no` (기본값을 렌더링 하기 전에 모든 새로운 보기 콘텐츠를 받을 때까지 기다려야`no`).
-    *   **presentationstyle**: 설정 `pagesheet` , `formsheet` 또는 `fullscreen` [프레 젠 테이 션 스타일][2] (기본값을 설정 하려면`fullscreen`).
-    *   **transitionstyle**: 설정 `fliphorizontal` , `crossdissolve` 또는 `coververtical` [전환 스타일][3] (기본값을 설정 하려면`coververtical`).
+    *   **presentationstyle**: 설정 `pagesheet` , `formsheet` 또는 `fullscreen` [프레 젠 테이 션 스타일][1] (기본값을 설정 하려면`fullscreen`).
+    *   **transitionstyle**: 설정 `fliphorizontal` , `crossdissolve` 또는 `coververtical` [전환 스타일][2] (기본값을 설정 하려면`coververtical`).
     *   **toolbarposition**: 설정 `top` 또는 `bottom` (기본값은 `bottom` ). 위쪽 또는 아래쪽 창에 도구 모음을 발생 합니다.
+    
+    Windows에만 해당:
+    
+    *   **숨겨진**: 설정 `yes` 브라우저를 만들 페이지를 로드 하면, 하지만 그것을 보여주지. Loadstop 이벤트는 로드가 완료 되 면 발생 합니다. 생략 하거나 설정 `no` (기본값) 브라우저 열고 정상적으로 로드 해야 합니다.
 
- [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### 지원 되는 플랫폼
 
 *   아마존 화재 운영 체제
 *   안 드 로이드
 *   블랙베리 10
+*   Firefox 운영 체제
 *   iOS
+*   윈도우 8과 8.1
 *   Windows Phone 7과 8
 
 ### 예를 들어
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    
+
+### 파이어 폭스 OS 단점
+
+플러그인 어떤 디자인을 적용 하지 않는 경우 열 일부 CSS의 규칙을 추가할 필요가 있다 `target='_blank'`. 이 같이 규칙
+
+     css
+    .inAppBrowserWrap {
+      background-color: rgba(0,0,0,0.75);
+      color: rgba(235,235,235,1.0);
+    }
+    .inAppBrowserWrap menu {
+      overflow: auto;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .inAppBrowserWrap menu li {
+      font-size: 25px;
+      height: 25px;
+      float: left;
+      margin: 0 10px;
+      padding: 3px 10px;
+      text-decoration: none;
+      color: #ccc;
+      display: block;
+      background: rgba(30,30,30,0.50);
+    }
+    .inAppBrowserWrap menu li.disabled {
+        color: #777;
+    }
     
 
 ## InAppBrowser
 
-호출에서 반환 하는 개체`window.open`.
+`Cordova에 대 한 호출에서 반환 하는 개체.InAppBrowser.open`.
 
 ### 메서드
 
@@ -152,11 +204,12 @@
 *   아마존 화재 운영 체제
 *   안 드 로이드
 *   iOS
+*   윈도우 8과 8.1
 *   Windows Phone 7과 8
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
@@ -183,11 +236,12 @@
 *   아마존 화재 운영 체제
 *   안 드 로이드
 *   iOS
+*   윈도우 8과 8.1
 *   Windows Phone 7과 8
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -206,12 +260,14 @@
 
 *   아마존 화재 운영 체제
 *   안 드 로이드
+*   Firefox 운영 체제
 *   iOS
+*   윈도우 8과 8.1
 *   Windows Phone 7과 8
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
     
 
@@ -229,10 +285,11 @@
 *   아마존 화재 운영 체제
 *   안 드 로이드
 *   iOS
+*   윈도우 8과 8.1
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
     
@@ -260,10 +317,11 @@
 *   아마존 화재 운영 체제
 *   안 드 로이드
 *   iOS
+*   윈도우 8과 8.1
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -293,7 +351,7 @@
 
 ### 빠른 예제
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });
