@@ -89,7 +89,7 @@ public class InAppBrowser extends CordovaPlugin {
     /*
     Configuration property. Custom applicaiton scheme to be handeld in a _system.
      */
-    private static final String CUSTOM_APPLICATION_SCHEME = "CustomAppScheme";
+    private static final String CUSTOM_APPLICATION_SCHEME = "kOGAppScheme";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
