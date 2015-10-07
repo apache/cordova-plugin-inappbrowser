@@ -17,98 +17,150 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
-Dieses Plugin bietet eine Web-Browser-Ansicht, die anzeigt, beim Aufrufen von `window.open()` , oder als als bildeten einen Link öffnen`<a target="_blank">`.
+Dieses Plugin bietet eine Web-Browser-Ansicht, die beim Aufruf von `cordova.InAppBrowser.open()`.
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     
 
-**Hinweis**: die InAppBrowser Fenster verhält sich wie einen standard-Webbrowser und Cordova APIs kann nicht zugegriffen werden kann.
+Die `cordova.InAppBrowser.open()` Funktion ist definiert als Ersatz für die `window.open()` Funktion. InAppBrowser Fenster, können vorhandene `window.open()` Aufrufe durch window.open ersetzen:
 
-## Installation
-
-    cordova plugin add org.apache.cordova.inappbrowser
+    window.open = cordova.InAppBrowser.open;
     
 
-### Firefox OS
+Das InAppBrowser-Fenster verhält sich wie einen standard-Webbrowser und Cordova APIs kann nicht zugegriffen werden kann. Aus diesem Grund empfiehlt sich die InAppBrowser Wenn Sie von Drittanbietern (nicht vertrauenswürdige) Inhalte, statt zu laden, die in den wichtigsten Cordova Webview laden müssen. Die InAppBrowser unterliegt nicht der weißen Liste, noch ist Links in der Systembrowser öffnen.
 
-Erstellen Sie **www/manifest.webapp** , wie in [Docs Manifest][1]beschrieben. Fügen Sie die entsprechenden Permisions.
+Die InAppBrowser bietet standardmäßig eine eigene GUI-Steuerelemente für den Benutzer (zurück, vor, erledigt).
 
- [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+Für rückwärts Kompatibilität, dieses Plugin auch `window.open` Haken. Jedoch kann der Plugin installiert Haken der `window.open` haben unbeabsichtigte Nebenwirkungen (vor allem, wenn dieses Plugin nur als eine Abhängigkeit von einem anderen Plugin enthalten ist). Der Haken der `window.open` wird in einer zukünftigen Version entfernt. Bis der Haken aus dem Plugin entfernt wird, können die Vorgabe von apps manuell wiederherstellen:
 
-    "permissions": {
-        "browser": {}
+    delete window.open // Reverts the call back to it's prototype's default
+    
+
+`window.open` im globalen Gültigkeitsbereich ist zwar InAppBrowser nicht verfügbar bis nach dem `deviceready`-Ereignis.
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("window.open works well");
     }
     
 
-## window.open
+## Installation
 
-Öffnet eine URL in einem neuen `InAppBrowser` Instanz, die aktuelle Browserinstanz oder der Systembrowser.
-
-    Var Ref = window.open (Url, Ziel, Optionen);
+    cordova plugin add cordova-plugin-inappbrowser
     
 
-*   **Ref**: Bezugnahme auf die `InAppBrowser` Fenster. *(InAppBrowser)*
+Wenn Sie alle Seite Lasten in Ihrer Anwendung durch die InAppBrowser gehen möchten, können Sie einfach `window.open` während der Initialisierung Haken. Zum Beispiel:
 
-*   **URL**: die URL *(String)*zu laden. Rufen Sie `encodeURI()` auf diese Option, wenn die URL enthält Unicode-Zeichen.
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        window.open = cordova.InAppBrowser.open;
+    }
+    
 
-*   **Ziel**: das Ziel in der URL, einen optionalen Parameter geladen, die standardmäßig auf `_self` . *(String)*
+## cordova.InAppBrowser.open
+
+Öffnet eine URL in eine neue `InAppBrowser`-Instanz, die aktuelle Browserinstanz oder der Systembrowser.
+
+    var ref = cordova.InAppBrowser.open(url, target, options);
+    
+
+*   **Ref**: Bezugnahme auf das `InAppBrowser` Fenster. *(InAppBrowser)*
+
+*   **URL**: die URL um den *(String)* zu laden. Rufen Sie `encodeURI()` auf, wenn die URL Unicode-Zeichen enthält.
+
+*   **target**: das Ziel in welchem die URL geladen werden soll. Standardmäßig entspricht dieser Wert `_self` . *(String)*
     
     *   `_self`: Öffnet sich in der Cordova WebView wenn der URL in der Whitelist ist, andernfalls es öffnet sich in der`InAppBrowser`.
     *   `_blank`: Öffnet den`InAppBrowser`.
     *   `_system`: Öffnet in den System-Web-Browser.
 
-*   **Optionen**: Optionen für die `InAppBrowser` . Optional, säumige an: `location=yes` . *(String)*
+*   **options**: Optionen für die `InAppBrowser` . Optional, säumige an: `location=yes` . *(String)*
     
     Die `options` Zeichenfolge muss keine Leerstelle enthalten, und jede Funktion Name/Wert-Paare müssen durch ein Komma getrennt werden. Featurenamen Groß-/Kleinschreibung. Alle Plattformen unterstützen die anderen Werte:
     
-    *   **Lage**: Legen Sie auf `yes` oder `no` , machen die `InAppBrowser` der Adressleiste ein- oder ausschalten.
+    *   **location**: Legen Sie auf `yes` oder `no` , machen die `InAppBrowser` der Adressleiste ein- oder ausschalten.
     
     Nur Android:
     
-    *   **Closebuttoncaption**: Legen Sie auf eine Zeichenfolge als Beschriftung der **fertig** -Schaltfläche verwenden.
-    *   **versteckte**: Legen Sie auf `yes` um den Browser zu erstellen und laden Sie die Seite, aber nicht zeigen. Das Loadstop-Ereignis wird ausgelöst, wenn der Ladevorgang abgeschlossen ist. Weglassen oder auf `no` (Standard), den Browser öffnen und laden normalerweise zu haben.
-    *   **ClearCache**: Legen Sie auf `yes` , der Browser ist Cookiecache gelöscht, bevor das neue Fenster geöffnet wird
-    *   **Clearsessioncache**: Legen Sie auf `yes` , der Sitzungs-Cookie Cache gelöscht, bevor das neue Fenster geöffnet wird
+    *   **hidden**: Legen Sie auf `yes` um den Browser zu erstellen und laden Sie die Seite, aber nicht zeigen. Das Loadstop-Ereignis wird ausgelöst, wenn der Ladevorgang abgeschlossen ist. Weglassen oder auf `no` (Standard), den Browser öffnen und laden normalerweise zu haben.
+    *   **clearcache**: Legen Sie auf `yes` , der Browser ist Cookiecache gelöscht, bevor das neue Fenster geöffnet wird
+    *   **clearsessioncache**: Legen Sie auf `yes` zu der Session Cookie Cache gelöscht, bevor das neue Fenster geöffnet wird
     
     iOS nur:
     
-    *   **Closebuttoncaption**: Legen Sie auf eine Zeichenfolge als Beschriftung der **fertig** -Schaltfläche verwenden. Beachten Sie, dass Sie diesen Wert selbst zu lokalisieren müssen.
-    *   **Disallowoverscroll**: Legen Sie auf `yes` oder `no` (Standard ist `no` ). Aktiviert/deaktiviert die UIWebViewBounce-Eigenschaft.
-    *   **versteckte**: Legen Sie auf `yes` um den Browser zu erstellen und laden Sie die Seite, aber nicht zeigen. Das Loadstop-Ereignis wird ausgelöst, wenn der Ladevorgang abgeschlossen ist. Weglassen oder auf `no` (Standard), den Browser öffnen und laden normalerweise zu haben.
-    *   **ClearCache**: Legen Sie auf `yes` , der Browser ist Cookiecache gelöscht, bevor das neue Fenster geöffnet wird
-    *   **Clearsessioncache**: Legen Sie auf `yes` zu der Session Cookie Cache gelöscht, bevor das neue Fenster geöffnet wird
-    *   **Symbolleiste**: Legen Sie auf `yes` oder `no` Aktivieren Sie die Symbolleiste ein- oder Ausschalten für InAppBrowser (Standard:`yes`)
-    *   **EnableViewportScale**: Legen Sie auf `yes` oder `no` , Viewport Skalierung durch ein Meta-Tag (standardmäßig zu verhindern`no`).
-    *   **MediaPlaybackRequiresUserAction**: Legen Sie auf `yes` oder `no` , HTML5 audio oder video von automatisches Abspielen (standardmäßig zu verhindern`no`).
-    *   **AllowInlineMediaPlayback**: Legen Sie auf `yes` oder `no` Inline-HTML5-Media-Wiedergabe, Darstellung im Browser-Fenster, sondern in eine gerätespezifische Wiedergabe-Schnittstelle ermöglichen. Des HTML `video` Element muss auch die `webkit-playsinline` Attribut (Standard:`no`)
-    *   **KeyboardDisplayRequiresUserAction**: Legen Sie auf `yes` oder `no` um die Tastatur zu öffnen, wenn Formularelemente Fokus per JavaScript erhalten `focus()` Anruf (Standard:`yes`).
-    *   **SuppressesIncrementalRendering**: Legen Sie auf `yes` oder `no` zu warten, bis alle neuen anzeigen-Inhalte empfangen wird, bevor Sie wiedergegeben wird (standardmäßig`no`).
-    *   **Presentationstyle**: Legen Sie auf `pagesheet` , `formsheet` oder `fullscreen` [Präsentationsstil][2] (standardmäßig fest`fullscreen`).
-    *   **Transitionstyle**: Legen Sie auf `fliphorizontal` , `crossdissolve` oder `coververtical` [Übergangsstil][3] (standardmäßig fest`coververtical`).
-    *   **Toolbarposition**: Legen Sie auf `top` oder `bottom` (Standard ist `bottom` ). Bewirkt, dass die Symbolleiste am oberen oder unteren Rand des Fensters sein.
+    *   **closebuttoncaption**: Legen Sie auf eine Zeichenfolge als Beschriftung der **fertig** -Schaltfläche verwenden. Beachten Sie, dass Sie diesen Wert selbst zu lokalisieren müssen.
+    *   **disallowoverscroll**: Legen Sie auf `yes` oder `no` (Standard ist `no` ). Aktiviert/deaktiviert die UIWebViewBounce-Eigenschaft.
+    *   **hidden**: Legen Sie auf `yes` um den Browser zu erstellen und laden Sie die Seite, aber nicht zeigen. Das Loadstop-Ereignis wird ausgelöst, wenn der Ladevorgang abgeschlossen ist. Weglassen oder auf `no` (Standard), den Browser öffnen und laden normalerweise zu haben.
+    *   **clearcache**: Legen Sie auf `yes` , der Browser ist Cookiecache gelöscht, bevor das neue Fenster geöffnet wird
+    *   **clearsessioncache**: Legen Sie auf `yes` zu der Session Cookie Cache gelöscht, bevor das neue Fenster geöffnet wird
+    *   **toolbar**: Legen Sie auf `yes` oder `no` Aktivieren Sie die Symbolleiste ein- oder Ausschalten für InAppBrowser (Standard:`yes`)
+    *   **enableViewportScale**: Legen Sie auf `yes` oder `no` , Viewport Skalierung durch ein Meta-Tag (standardmäßig zu verhindern`no`).
+    *   **mediaPlaybackRequiresUserAction**: Legen Sie auf `yes` oder `no` , HTML5 audio oder video von automatisches Abspielen (standardmäßig zu verhindern`no`).
+    *   **allowInlineMediaPlayback**: Legen Sie auf `yes` oder `no` Inline-HTML5-Media-Wiedergabe, Darstellung im Browser-Fenster, sondern in eine gerätespezifische Wiedergabe-Schnittstelle ermöglichen. Des HTML `video` Element muss auch die `webkit-playsinline` Attribut (Standard:`no`)
+    *   **keyboardDisplayRequiresUserAction**: Legen Sie auf `yes` oder `no` um die Tastatur zu öffnen, wenn Formularelemente Fokus per JavaScript erhalten `focus()` Anruf (Standard:`yes`).
+    *   **suppressesIncrementalRendering**: Legen Sie auf `yes` oder `no` zu warten, bis alle neuen anzeigen-Inhalte empfangen wird, bevor Sie wiedergegeben wird (standardmäßig`no`).
+    *   **presentationstyle**: Legen Sie auf `pagesheet` , `formsheet` oder `fullscreen` [Präsentationsstil][1] (standardmäßig fest`fullscreen`).
+    *   **transitionstyle**: Legen Sie auf `fliphorizontal` , `crossdissolve` oder `coververtical` [Übergangsstil][2] (standardmäßig fest`coververtical`).
+    *   **toolbarposition**: Legen Sie auf `top` oder `bottom` (Standard ist `bottom` ). Bewirkt, dass die Symbolleiste am oberen oder unteren Rand des Fensters sein.
+    
+    Nur Windows:
+    
+    *   **hidden**: Legen Sie auf `yes` um den Browser zu erstellen und laden Sie die Seite, aber nicht zeigen. Das Loadstop-Ereignis wird ausgelöst, wenn der Ladevorgang abgeschlossen ist. Weglassen oder auf `no` (Standard), den Browser öffnen und laden normalerweise zu haben.
 
- [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### Unterstützte Plattformen
 
 *   Amazon Fire OS
 *   Android
 *   BlackBerry 10
+*   Firefox OS
 *   iOS
+*   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
 ### Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    
+
+### Firefox OS Macken
+
+Als Plugin jedes Design erzwingen nicht besteht die Notwendigkeit, einige CSS-Regeln hinzuzufügen, wenn bei `target='_blank'`. Die Regeln könnte wie diese aussehen.
+
+     css
+    .inAppBrowserWrap {
+      background-color: rgba(0,0,0,0.75);
+      color: rgba(235,235,235,1.0);
+    }
+    .inAppBrowserWrap menu {
+      overflow: auto;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .inAppBrowserWrap menu li {
+      font-size: 25px;
+      height: 25px;
+      float: left;
+      margin: 0 10px;
+      padding: 3px 10px;
+      text-decoration: none;
+      color: #ccc;
+      display: block;
+      background: rgba(30,30,30,0.50);
+    }
+    .inAppBrowserWrap menu li.disabled {
+        color: #777;
+    }
     
 
 ## InAppBrowser
 
-Aus einem Aufruf zurückgegebenen Objekts`window.open`.
+Bei einem Aufruf von `cordova.InAppBrowser.open` zurückgegebene Objekt..
 
 ### Methoden
 
@@ -152,11 +204,12 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Amazon Fire OS
 *   Android
 *   iOS
+*   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
@@ -183,11 +236,12 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Amazon Fire OS
 *   Android
 *   iOS
+*   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -197,7 +251,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 
 > Schließt die `InAppBrowser` Fenster.
 
-    Ref.Close();
+    ref.close();
     
 
 *   **Ref**: Bezugnahme auf die `InAppBrowser` Fenster *(InAppBrowser)*
@@ -206,12 +260,14 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 
 *   Amazon Fire OS
 *   Android
+*   Firefox OS
 *   iOS
+*   Windows 8 und 8.1
 *   Windows Phone 7 und 8
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
     
 
@@ -219,7 +275,7 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 
 > Zeigt ein InAppBrowser-Fenster, das geöffnet wurde, versteckt. Aufrufen, dies hat keine Auswirkungen, wenn die InAppBrowser schon sichtbar war.
 
-    Ref.Show();
+    ref.show();
     
 
 *   **Ref**: Verweis auf die (InAppBrowser) Fenster`InAppBrowser`)
@@ -229,10 +285,11 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Amazon Fire OS
 *   Android
 *   iOS
+*   Windows 8 und 8.1
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
     
@@ -260,10 +317,11 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Amazon Fire OS
 *   Android
 *   iOS
+*   Windows 8 und 8.1
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -291,9 +349,9 @@ Aus einem Aufruf zurückgegebenen Objekts`window.open`.
 *   Android
 *   iOS
 
-### Kleines Beispiel
+### Kurzes Beispiel
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });

@@ -17,36 +17,53 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
-このプラグインを呼び出すときに表示される web ブラウザーのビューを提供します `window.open()` 、または時として形成されたリンクを開く`<a target="_blank">`.
+このプラグインは `コルドバを呼び出すときに表示される web ブラウザーのビューを提供します。InAppBrowser.open()`.
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     
 
-**注**: ウィンドウの動作、InAppBrowser 標準的な web ブラウザーのようとコルドバの Api にアクセスできません。
+`コルドバ。InAppBrowser.open()` `window.open()` 関数との交換を定義する関数。 既存の `window.open()` 呼び出しは、window.open を置き換えることによって InAppBrowser ウィンドウを使用できます。
 
-## インストール
-
-    cordova plugin add org.apache.cordova.inappbrowser
+    window.open = cordova.InAppBrowser.open;
     
 
-### Firefox の OS
+InAppBrowser ウィンドウは標準的な web ブラウザーのように動作し、コルドバ Api にアクセスできません。 この理由から、InAppBrowser お勧めする場合はメインのコルドバの webview を読み込むのではなくサード パーティ (信頼されていない) コンテンツをロードする必要があります。 InAppBrowser、ホワイト リストの対象ではないも、システムのブラウザーでリンクを開くです。
 
-[マニフェストのドキュメント][1]で説明されているように、 **www/manifest.webapp**を作成します。関連する権限を追加します。
+InAppBrowser を提供しますデフォルトで GUI コントロール (戻る、進む、行う)。
 
- [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+後方互換性、このプラグインは、また `window.open` をフックのため。 ただし、`window.open` のプラグイン インストール フックを持つことができます意図しない副作用 （特に場合は、このプラグインは別のプラグインの依存関係としてのみ含まれています)。 `window.open` のフックは、将来のメジャー リリースで削除されます。 プラグインから、フックが削除されるまでアプリはデフォルトの動作を手動で復元できます。
 
-    "permissions": {
-        "browser": {}
+    delete window.open // Reverts the call back to it's prototype's default
+    
+
+`window.open` はグローバル スコープでは、InAppBrowser は、`deviceready` イベントの後まで利用できません。
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("window.open works well");
     }
     
 
-## window.open
+## インストール
 
-新しい URL を開き `InAppBrowser` インスタンス、現在のブラウザー インスタンスまたはシステムのブラウザー。
+    cordova plugin add cordova-plugin-inappbrowser
+    
 
-    var ref = window.open url、ターゲット （オプション）;
+InAppBrowser を通過するアプリですべてのページの読み込みをする場合は初期化中に `window.open` を単にフックできます。たとえば。
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        window.open = cordova.InAppBrowser.open;
+    }
+    
+
+## cordova.InAppBrowser.open
+
+新しい `InAppBrowser` インスタンスを現在のブラウザー インスタンスまたはシステムのブラウザーで URL を開きます。
+
+    var ref = cordova.InAppBrowser.open(url, target, options);
     
 
 *   **ref**: への参照を `InAppBrowser` ウィンドウ。*(InAppBrowser)*
@@ -67,10 +84,9 @@
     
     アンドロイドのみ：
     
-    *   **closebuttoncaption**: [**完了**] ボタンのキャプションとして使用する文字列に設定します。
-    *   **非表示**: 設定 `yes` ブラウザーを作成して、ページの読み込みが表示されません。 Loadstop イベントは、読み込みが完了すると発生します。 省略するか設定 `no` (既定値) を開くし、通常負荷ブラウザーを持っています。
+    *   **非表示**: 設定 `yes` ブラウザーを作成して、ページの読み込みが表示されません。 Loadstop イベントは、読み込みが完了すると発生します。 省略するか設定 `no` (既定値) を開くし、通常読み込みブラウザーを持っています。
     *   **clearcache**: に設定されている `yes` 、ブラウザーのクッキー キャッシュ クリア新しいウィンドウが開く前に
-    *   **clearsessioncache**： に設定されている `yes` はセッション cookie のキャッシュをオフに新しいウィンドウを開く前に
+    *   **clearsessioncache**： に設定されている `yes` はセッション cookie のキャッシュをオフにすると、新しいウィンドウが開く前に
     
     iOS のみ:
     
@@ -85,30 +101,66 @@
     *   **allowInlineMediaPlayback**： に設定されている `yes` または `no` ラインで HTML5 メディア再生には、デバイス固有再生インターフェイスではなく、ブラウザー ウィンドウ内に表示するようにします。 HTML の `video` 要素を含める必要がありますまた、 `webkit-playsinline` 属性 (デフォルトは`no`)
     *   **keyboardDisplayRequiresUserAction**： に設定されている `yes` または `no` をフォーム要素の JavaScript を介してフォーカスを受け取るときに、キーボードを開く `focus()` コール （デフォルトは`yes`).
     *   **suppressesIncrementalRendering**： に設定されている `yes` または `no` (デフォルトでは表示される前にビューのすべての新しいコンテンツを受信するまで待機するには`no`).
-    *   **presentationstyle**： に設定されている `pagesheet` 、 `formsheet` または `fullscreen` (デフォルトでは、[プレゼンテーション スタイル][2]を設定するには`fullscreen`).
-    *   **transitionstyle**： に設定されている `fliphorizontal` 、 `crossdissolve` または `coververtical` (デフォルトでは、[トランジションのスタイル][3]を設定するには`coververtical`).
+    *   **presentationstyle**： に設定されている `pagesheet` 、 `formsheet` または `fullscreen` (デフォルトでは、[プレゼンテーション スタイル][1]を設定するには`fullscreen`).
+    *   **transitionstyle**： に設定されている `fliphorizontal` 、 `crossdissolve` または `coververtical` (デフォルトでは、[トランジションのスタイル][2]を設定するには`coververtical`).
     *   **toolbarposition**： に設定されている `top` または `bottom` (既定値は `bottom` )。上部またはウィンドウの下部にツールバーが発生します。
+    
+    Windows のみ：
+    
+    *   **非表示**: 設定 `yes` ブラウザーを作成して、ページの読み込みが表示されません。 Loadstop イベントは、読み込みが完了すると発生します。 省略するか設定 `no` (既定値) を開くし、通常読み込みブラウザーを持っています。
 
- [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### サポートされているプラットフォーム
 
 *   アマゾン火 OS
 *   アンドロイド
 *   ブラックベリー 10
+*   Firefox の OS
 *   iOS
+*   Windows 8 および 8.1
 *   Windows Phone 7 と 8
 
 ### 例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    
+
+### Firefox OS 癖
+
+開かれた場合にいくつかの CSS ルールを追加する必要があるプラグインは任意のデザインを適用しないと `target ='_blank'`。これらのような規則になります。
+
+     css
+    .inAppBrowserWrap {
+      background-color: rgba(0,0,0,0.75);
+      color: rgba(235,235,235,1.0);
+    }
+    .inAppBrowserWrap menu {
+      overflow: auto;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .inAppBrowserWrap menu li {
+      font-size: 25px;
+      height: 25px;
+      float: left;
+      margin: 0 10px;
+      padding: 3px 10px;
+      text-decoration: none;
+      color: #ccc;
+      display: block;
+      background: rgba(30,30,30,0.50);
+    }
+    .inAppBrowserWrap menu li.disabled {
+        color: #777;
+    }
     
 
 ## InAppBrowser
 
-呼び出しから返されるオブジェクト`window.open`.
+`コルドバへの呼び出しから返されるオブジェクト。InAppBrowser.open`.
 
 ### メソッド
 
@@ -152,11 +204,12 @@
 *   アマゾン火 OS
 *   アンドロイド
 *   iOS
+*   Windows 8 および 8.1
 *   Windows Phone 7 と 8
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
@@ -183,11 +236,12 @@
 *   アマゾン火 OS
 *   アンドロイド
 *   iOS
+*   Windows 8 および 8.1
 *   Windows Phone 7 と 8
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -206,12 +260,14 @@
 
 *   アマゾン火 OS
 *   アンドロイド
+*   Firefox の OS
 *   iOS
+*   Windows 8 および 8.1
 *   Windows Phone 7 と 8
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
     
 
@@ -229,10 +285,11 @@
 *   アマゾン火 OS
 *   アンドロイド
 *   iOS
+*   Windows 8 および 8.1
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
     
@@ -260,10 +317,11 @@
 *   アマゾン火 OS
 *   アンドロイド
 *   iOS
+*   Windows 8 および 8.1
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -293,7 +351,7 @@
 
 ### 簡単な例
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });

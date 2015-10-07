@@ -17,49 +17,66 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
-Questo plugin fornisce una vista di browser web che viene visualizzata quando si chiama `window.open()` , o quando un link di apertura formata come`<a target="_blank">`.
+Questo plugin fornisce una vista di browser web che viene visualizzato quando si chiama `di cordova.InAppBrowser.open()`.
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     
 
-**Nota**: il InAppBrowser finestra si comporta come un browser web standard e non può accedere a Cordova APIs.
+Il `cordova.InAppBrowser.open()` funzione è definita per essere un rimpiazzo per la funzione `window.open`. Esistenti chiamate `Window` possono utilizzare la finestra di InAppBrowser, sostituendo window.open():
 
-## Installazione
-
-    cordova plugin add org.apache.cordova.inappbrowser
+    window.open = cordova.InAppBrowser.open;
     
 
-### Firefox OS
+La finestra di InAppBrowser si comporta come un browser web standard e non può accedere a Cordova APIs. Per questo motivo, è consigliabile la InAppBrowser se è necessario caricare il contenuto (non attendibile) di terze parti, invece di caricamento che in webview Cordova principale. Il InAppBrowser non è soggetto alla whitelist, né sta aprendo il link nel browser di sistema.
 
-Creare **www/manifest.webapp** come descritto nel [Manifesto Docs][1]. Aggiungi permisions rilevanti.
+La InAppBrowser fornisce di default propri controlli GUI per l'utente (indietro, avanti, fatto).
 
- [1]: https://developer.mozilla.org/en-US/Apps/Developing/Manifest
+Per indietro la compatibilità, questo plugin ganci anche `window.open`. Tuttavia, il plugin installato gancio di `window.open` può avere effetti collaterali indesiderati (soprattutto se questo plugin è incluso solo come dipendenza di un altro plugin). Il gancio di `window. open` verrà rimosso in una futura release principale. Fino a quando il gancio è rimosso dal plugin, apps può ripristinare manualmente il comportamento predefinito:
 
-    "permissions": {
-        "browser": {}
+    delete window.open // Reverts the call back to it's prototype's default
+    
+
+Sebbene `window.open` sia in ambito globale, InAppBrowser non è disponibile fino a dopo l'evento `deviceready`.
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        console.log("window.open works well");
     }
     
 
-## window.open
+## Installazione
 
-Apre un URL in una nuova `InAppBrowser` istanza, l'istanza corrente del browser o il browser di sistema.
-
-    rif var = Window. Open (url, destinazione, opzioni);
+    cordova plugin add cordova-plugin-inappbrowser
     
 
-*   **Rif**: fare riferimento alla `InAppBrowser` finestra. *(InAppBrowser)*
+Se si desidera che tutti i carichi di pagina nell'app di passare attraverso il InAppBrowser, si può semplicemente collegare `window.open` durante l'inizializzazione. Per esempio:
 
-*   **URL**: l'URL da caricare *(String)*. Chiamare `encodeURI()` su questo, se l'URL contiene caratteri Unicode.
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+        window.open = cordova.InAppBrowser.open;
+    }
+    
 
-*   **destinazione**: la destinazione in cui caricare l'URL, un parametro facoltativo che il valore predefinito è `_self` . *(String)*
+## cordova.InAppBrowser.open
+
+Apre un URL in una nuova istanza di `InAppBrowser`, l'istanza corrente del browser o il browser di sistema.
+
+    var ref = cordova.InAppBrowser.open(url, target, options);
+    
+
+*   **ref**: fare riferimento alla `InAppBrowser` finestra. *(InAppBrowser)*
+
+*   **url**: l'URL da caricare *(String)*. Chiamare `encodeURI()` su questo, se l'URL contiene caratteri Unicode.
+
+*   **target**: la destinazione in cui caricare l'URL, un parametro facoltativo che il valore predefinito è `_self` . *(String)*
     
     *   `_self`: Si apre in Cordova WebView se l'URL è nella lista bianca, altrimenti si apre nella`InAppBrowser`.
     *   `_blank`: Apre il`InAppBrowser`.
     *   `_system`: Si apre nel browser web del sistema.
 
-*   **opzioni**: opzioni per il `InAppBrowser` . Opzionale, inadempiente a: `location=yes` . *(String)*
+*   **options**: opzioni per il `InAppBrowser` . Opzionale, inadempiente a: `location=yes` . *(String)*
     
     Il `options` stringa non deve contenere alcun spazio vuoto, e coppie nome/valore ogni funzionalità devono essere separate da una virgola. Caratteristica nomi sono tra maiuscole e minuscole. Tutte le piattaforme supportano il valore riportato di seguito:
     
@@ -67,9 +84,8 @@ Apre un URL in una nuova `InAppBrowser` istanza, l'istanza corrente del browser 
     
     Solo su Android:
     
-    *   **closebuttoncaption**: impostare una stringa da utilizzare come didascalia del pulsante **fatto** .
     *   **nascosti**: impostare su `yes` per creare il browser e caricare la pagina, ma non mostrarlo. L'evento loadstop viene generato quando il caricamento è completato. Omettere o impostata su `no` (impostazione predefinita) per avere il browser aperto e caricare normalmente.
-    *   **ClearCache**: impostare su `yes` per avere il browser di cookie cache cancellata prima dell'apertura della nuova finestra
+    *   **ClearCache**: impostare su `yes` per avere il browser cache cookie ha lasciata prima dell'apertura della nuova finestra
     *   **clearsessioncache**: impostare su `yes` per avere la cache cookie di sessione cancellata prima dell'apertura della nuova finestra
     
     solo iOS:
@@ -85,30 +101,66 @@ Apre un URL in una nuova `InAppBrowser` istanza, l'istanza corrente del browser 
     *   **allowInlineMediaPlayback**: impostare su `yes` o `no` per consentire la riproduzione dei supporti HTML5 in linea, visualizzare all'interno della finestra del browser, piuttosto che un'interfaccia specifica del dispositivo di riproduzione. L'HTML `video` elemento deve includere anche il `webkit-playsinline` (default di attributo`no`)
     *   **keyboardDisplayRequiresUserAction**: impostare su `yes` o `no` per aprire la tastiera quando elementi form ricevano lo stato attivo tramite di JavaScript `focus()` chiamata (default`yes`).
     *   **suppressesIncrementalRendering**: impostare su `yes` o `no` aspettare fino a quando tutti i nuovi contenuti di vista viene ricevuto prima il rendering (default`no`).
-    *   **presentationstyle**: impostare su `pagesheet` , `formsheet` o `fullscreen` per impostare lo [stile di presentazione][2] (default`fullscreen`).
-    *   **transitionstyle**: impostare su `fliphorizontal` , `crossdissolve` o `coververtical` per impostare lo [stile di transizione][3] (default`coververtical`).
+    *   **presentationstyle**: impostare su `pagesheet` , `formsheet` o `fullscreen` per impostare lo [stile di presentazione][1] (default`fullscreen`).
+    *   **transitionstyle**: impostare su `fliphorizontal` , `crossdissolve` o `coververtical` per impostare lo [stile di transizione][2] (default`coververtical`).
     *   **toolbarposition**: impostare su `top` o `bottom` (default è `bottom` ). Provoca la barra degli strumenti sia nella parte superiore o inferiore della finestra.
+    
+    Solo per Windows:
+    
+    *   **nascosti**: impostare su `yes` per creare il browser e caricare la pagina, ma non mostrarlo. L'evento loadstop viene generato quando il caricamento è completato. Omettere o impostata su `no` (impostazione predefinita) per avere il browser aperto e caricare normalmente.
 
- [2]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
- [3]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
+ [1]: http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
+ [2]: http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 
 ### Piattaforme supportate
 
 *   Amazon fuoco OS
 *   Android
 *   BlackBerry 10
+*   Firefox OS
 *   iOS
+*   Windows 8 e 8.1
 *   Windows Phone 7 e 8
 
 ### Esempio
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
-    var ref2 = window.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
+    
+
+### Firefox OS stranezze
+
+Come plugin non imporre alcun disegno c'è bisogno di aggiungere alcune regole CSS se aperto con `target='_blank'`. Le regole potrebbero apparire come questi
+
+     css
+    .inAppBrowserWrap {
+      background-color: rgba(0,0,0,0.75);
+      color: rgba(235,235,235,1.0);
+    }
+    .inAppBrowserWrap menu {
+      overflow: auto;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .inAppBrowserWrap menu li {
+      font-size: 25px;
+      height: 25px;
+      float: left;
+      margin: 0 10px;
+      padding: 3px 10px;
+      text-decoration: none;
+      color: #ccc;
+      display: block;
+      background: rgba(30,30,30,0.50);
+    }
+    .inAppBrowserWrap menu li.disabled {
+        color: #777;
+    }
     
 
 ## InAppBrowser
 
-L'oggetto restituito da una chiamata a`window.open`.
+L'oggetto restituito da una chiamata a `di cordova.InAppBrowser.open`.
 
 ### Metodi
 
@@ -152,11 +204,12 @@ L'oggetto restituito da una chiamata a`window.open`.
 *   Amazon fuoco OS
 *   Android
 *   iOS
+*   Windows 8 e 8.1
 *   Windows Phone 7 e 8
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
     
 
@@ -183,11 +236,12 @@ L'oggetto restituito da una chiamata a`window.open`.
 *   Amazon fuoco OS
 *   Android
 *   iOS
+*   Windows 8 e 8.1
 *   Windows Phone 7 e 8
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -197,7 +251,7 @@ L'oggetto restituito da una chiamata a`window.open`.
 
 > Chiude la `InAppBrowser` finestra.
 
-    Ref.Close();
+    ref.close();
     
 
 *   **Rif**: fare riferimento alla `InAppBrowser` finestra *(InAppBrowser)*
@@ -206,12 +260,14 @@ L'oggetto restituito da una chiamata a`window.open`.
 
 *   Amazon fuoco OS
 *   Android
+*   Firefox OS
 *   iOS
+*   Windows 8 e 8.1
 *   Windows Phone 7 e 8
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.close();
     
 
@@ -219,7 +275,7 @@ L'oggetto restituito da una chiamata a`window.open`.
 
 > Visualizza una finestra di InAppBrowser che è stato aperto nascosta. Questa chiamata non ha effetto se la InAppBrowser era già visibile.
 
-    Ref.Show();
+    ref.show();
     
 
 *   **Rif**: riferimento per il InAppBrowser finestra (`InAppBrowser`)
@@ -229,10 +285,11 @@ L'oggetto restituito da una chiamata a`window.open`.
 *   Amazon fuoco OS
 *   Android
 *   iOS
+*   Windows 8 e 8.1
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
     
@@ -260,10 +317,11 @@ L'oggetto restituito da una chiamata a`window.open`.
 *   Amazon fuoco OS
 *   Android
 *   iOS
+*   Windows 8 e 8.1
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -293,7 +351,7 @@ L'oggetto restituito da una chiamata a`window.open`.
 
 ### Esempio rapido
 
-    var ref = window.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });

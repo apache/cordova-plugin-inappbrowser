@@ -20,7 +20,6 @@
 #import "CDVInAppBrowser.h"
 #import <Cordova/CDVPluginResult.h>
 #import <Cordova/CDVUserAgentUtil.h>
-#import <Cordova/CDVJSON.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
 #define    kInAppBrowserTargetSystem @"_system"
@@ -42,15 +41,10 @@
 
 @implementation CDVInAppBrowser
 
-- (CDVInAppBrowser*)initWithWebView:(UIWebView*)theWebView
+- (void)pluginInitialize
 {
-    self = [super initWithWebView:theWebView];
-    if (self != nil) {
-        _previousStatusBarStyle = -1;
-        _callbackIdPattern = nil;
-    }
-
-    return self;
+    _previousStatusBarStyle = -1;
+    _callbackIdPattern = nil;
 }
 
 - (void)onReset
@@ -88,7 +82,11 @@
     self.callbackId = command.callbackId;
 
     if (url != nil) {
+#ifdef __CORDOVA_4_0_0
+        NSURL* baseUrl = [self.webViewEngine URL];
+#else
         NSURL* baseUrl = [self.webView.request URL];
+#endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
 
         if ([self isSystemUrl:absoluteUrl]) {
@@ -232,7 +230,11 @@
 {
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
+#ifdef __CORDOVA_4_0_0
+        [self.webViewEngine loadRequest:request];
+#else
         [self.webView loadRequest:request];
+#endif
     } else { // this assumes the InAppBrowser can be excepted from the white-list
         [self openInInAppBrowser:url withOptions:options];
     }
@@ -265,7 +267,8 @@
     }
 
     if (jsWrapper != nil) {
-        NSString* sourceArrayString = [@[source] JSONString];
+        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
+        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         if (sourceArrayString) {
             NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
             NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
@@ -462,7 +465,12 @@
         _userAgent = userAgent;
         _prevUserAgent = prevUserAgent;
         _browserOptions = browserOptions;
+#ifdef __CORDOVA_4_0_0
+        _webViewDelegate = [[CDVUIWebViewDelegate alloc] initWithDelegate:self];
+#else
         _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
+#endif
+        
         [self createViews];
     }
 
@@ -966,6 +974,20 @@
 @end
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
+
+- (void) viewDidLoad {
+
+    CGRect frame = [UIApplication sharedApplication].statusBarFrame;
+
+    // simplified from: http://stackoverflow.com/a/25669695/219684
+
+    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:frame];
+    bgToolbar.barStyle = UIBarStyleDefault;
+    [self.view addSubview:bgToolbar];
+
+    [super viewDidLoad];
+}
+
 
 #pragma mark CDVScreenOrientationDelegate
 
