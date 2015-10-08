@@ -164,6 +164,26 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             });
         }
+        else if (action.equals("getCookies")) {
+            String cookieUrl = args.getString(0);
+            String[] cookies = CookieManager.getInstance().getCookie(cookieUrl).split(";");
+            for (String cookie: cookies) {
+                webView.getCookieManager().setCookie(cookieUrl, cookie);
+            }
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, cookies.length);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+        else if (action.equals("setCookies")) {
+            String cookieUrl = args.getString(0);
+            String[] cookies = webView.getCookieManager().getCookie(args.getString(0)).split(";");
+            for (String cookie: cookies) {
+                CookieManager.getInstance().setCookie(cookieUrl, cookie);
+            }
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, cookies.length);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
         else if (action.equals("close")) {
             closeDialog();
         }
