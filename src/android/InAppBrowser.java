@@ -72,7 +72,6 @@ public class InAppBrowser extends CordovaPlugin {
     protected static final String LOG_TAG = "InAppBrowser";
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
-    // private static final String BLANK = "_blank";
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
@@ -98,10 +97,10 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
      *
-     * @param action        The action to execute.
-     * @param args          JSONArry of arguments for the plugin.
-     * @param callbackId    The callback id used when calling back into JavaScript.
-     * @return              A PluginResult object with a status and message.
+     * @param action the action to execute.
+     * @param args JSONArry of arguments for the plugin.
+     * @param callbackContext the callbackContext used when calling back into JavaScript.
+     * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
@@ -332,9 +331,8 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Display a new browser with the specified URL.
      *
-     * @param url           The url to load.
-     * @param usePhoneGap   Load url in PhoneGap webview
-     * @return              "" if ok, or error message.
+     * @param url the url to load.
+     * @return "" if ok, or error message.
      */
     public String openExternal(String url) {
         try {
@@ -462,8 +460,8 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Display a new browser with the specified URL.
      *
-     * @param url           The url to load.
-     * @param jsonObject
+     * @param url the url to load.
+     * @param features jsonObject
      */
     public String showWebPage(final String url, HashMap<String, Boolean> features) {
         // Determine if we should hide the location bar.
@@ -746,8 +744,8 @@ public class InAppBrowser extends CordovaPlugin {
         /**
          * Constructor.
          *
-         * @param mContext
-         * @param edittext
+         * @param webView
+         * @param mEditText
          */
         public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
@@ -868,3 +866,4 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 }
+
