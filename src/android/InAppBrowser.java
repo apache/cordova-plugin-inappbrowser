@@ -544,7 +544,7 @@ public class InAppBrowser extends CordovaPlugin {
                 actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
                 actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
-                actionButtonContainer.setId(1);
+                actionButtonContainer.setId(Integer.valueOf(1));
 
                 // Back button
                 Button back = new Button(cordova.getActivity());
@@ -552,7 +552,7 @@ public class InAppBrowser extends CordovaPlugin {
                 backLayoutParams.addRule(RelativeLayout.ALIGN_LEFT);
                 back.setLayoutParams(backLayoutParams);
                 back.setContentDescription("Back Button");
-                back.setId(2);
+                back.setId(Integer.valueOf(2));
                 Resources activityRes = cordova.getActivity().getResources();
                 int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable backIcon = activityRes.getDrawable(backResId);
@@ -576,7 +576,7 @@ public class InAppBrowser extends CordovaPlugin {
                 forwardLayoutParams.addRule(RelativeLayout.RIGHT_OF, 2);
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
-                forward.setId(3);
+                forward.setId(Integer.valueOf(3));
                 int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable fwdIcon = activityRes.getDrawable(fwdResId);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
@@ -599,7 +599,7 @@ public class InAppBrowser extends CordovaPlugin {
                 textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
                 textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
                 edittext.setLayoutParams(textLayoutParams);
-                edittext.setId(4);
+                edittext.setId(Integer.valueOf(4));
                 edittext.setSingleLine(true);
                 edittext.setText(url);
                 edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
@@ -622,7 +622,7 @@ public class InAppBrowser extends CordovaPlugin {
                 closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 close.setLayoutParams(closeLayoutParams);
                 forward.setContentDescription("Close Button");
-                close.setId(5);
+                close.setId(Integer.valueOf(5));
                 int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
                 Drawable closeIcon = activityRes.getDrawable(closeResId);
                 if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN)
@@ -668,7 +668,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 inAppWebView.loadUrl(url);
-                inAppWebView.setId(6);
+                inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(true);
                 inAppWebView.requestFocus();
