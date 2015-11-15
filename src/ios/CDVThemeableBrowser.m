@@ -851,7 +851,7 @@
             altDensity = 1.0;
         }
         NSData* data = [NSData dataWithContentsOfFile:path];
-        result = [UIImage imageWithData:data scale:3.0];
+        result = [UIImage imageWithData:data scale:altDensity];
     }
     
     return result;
