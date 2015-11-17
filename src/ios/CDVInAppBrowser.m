@@ -477,6 +477,11 @@
     return self;
 }
 
+// Prevent crashes on closing windows
+-(void)dealloc {
+   self.webView.delegate = nil;
+}
+
 - (void)createViews
 {
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
