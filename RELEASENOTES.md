@@ -20,6 +20,21 @@
 -->
 # Release Notes
 
+### 1.1.0 (Nov 18, 2015)
+* CB-10035 Updated `RELEASENOTES` to be newest to oldest
+* Invoke webview if using local file
+* Fixed `zIndex` issue on **Windows 8**, **8.188 where InAppBrowser opens behind default app.
+* fix `async` self usage
+* CB-9150 Fix InAppBrowser `executeScript` crash on **Windows** if no data returned
+* CB-10008 Fix InAppBrowser popup layout on **Windows**
+* Setting `setStatusBarStyle` to `-1` causes `CGContextSaveGState`.
+* CB-9167 Fix crash on **browser** window close 
+* CB-9799 Fixed `javaDoc` errors.
+* Fixing contribute link.
+* CB-9760 InAppBrowser: fallback to default `window.open` behavior on **Ripple**
+* CB-9378 Fix InAppBrowser not taking whole screen on **Windows**
+* CB-9158 - InAppBrowser `zoomControls` are always set to true
+
 ### 1.0.1 (Jun 17, 2015)
 * CB-9128 cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
 * fix npm md issue
