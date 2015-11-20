@@ -45,6 +45,9 @@ InAppBrowser.prototype = {
             this.channels[event.type].fire(event);
         }
     },
+    navigateTo: function (newurl) {
+        exec(null, null, "InAppBrowser", "navigate", [newurl]);
+    },
     close: function (eventname) {
         exec(null, null, "InAppBrowser", "close", []);
     },
