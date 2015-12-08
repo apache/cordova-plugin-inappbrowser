@@ -449,6 +449,16 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 
+
+    private String processUrl(String url) {
+        if(!url.contains(".") || url.contains(" ")) {
+           url = "http://google.com/search?q=" + url;
+        }
+
+        return url;
+    }
+
+
     /**
      * Navigate to the new page
      *
@@ -665,7 +675,7 @@ public class InAppBrowser extends CordovaPlugin {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                          navigate(edittext.getText().toString());
+                          navigate(processUrl(edittext.getText().toString()));
                           return true;
                         }
                         return false;
@@ -831,6 +841,21 @@ public class InAppBrowser extends CordovaPlugin {
         public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
             this.edittext = mEditText;
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if(!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
+                try {
+                    Uri uri = Uri.parse(url);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    cordova.getActivity().startActivity(intent);
+                    return true;
+                } catch (Exception e) {
+
+                }
+            }
+            return super.shouldOverrideUrlLoading(view, url);
         }
 
         /**
