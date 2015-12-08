@@ -80,6 +80,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String EDITABLE_LOCATION = "editablelocation";
+    private static final String PRIVATE_SESSION = "private";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
@@ -100,6 +101,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean editableLocationBar = false;
+    private boolean privateSession = false;
     private boolean mediaPlaybackRequiresUserGesture = false;
 
     /**
@@ -482,6 +484,15 @@ public class InAppBrowser extends CordovaPlugin {
         return this.editableLocationBar;
     }
 
+    /**
+     * Should the session be private?
+     * @return boolean
+     */
+
+    private boolean getPrivateSession() {
+        return this.privateSession;
+    }
+
     private InAppBrowser getInAppBrowser(){
         return this;
     }
@@ -532,6 +543,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean editableLocation = features.get(EDITABLE_LOCATION);
             if(editableLocation != null) {
                 editableLocationBar = editableLocation.booleanValue();
+            }
+            Boolean privateSession = features.get(PRIVATE_SESSION);
+            if(privateSession != null) {
+                this.privateSession = privateSession.booleanValue();
             }
         }
 
@@ -703,6 +718,15 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 if (appendUserAgent != null) {
                     settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
+                }
+                if(getPrivateSession()) {
+                    settings.setCacheMode(settings.LOAD_NO_CACHE);
+                    settings.setAppCacheEnabled(false);
+                    inAppWebView.clearFormData();
+                    inAppWebView.clearHistory();
+                    inAppWebView.clearCache(true);
+                    settings.setSaveFormData(false);
+                    settings.setSavePassword(false);
                 }
 
                 //Toggle whether this is enabled or not!
