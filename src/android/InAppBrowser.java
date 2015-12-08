@@ -364,6 +364,17 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * goes back till first page, then closes the dialog
+     */
+
+    public void popPage() {
+        if(!this.inAppWebView.canGoBack())
+            this.closeDialog();
+        else
+            this.inAppWebView.goBack();
+    }
+
+    /**
      * Closes the dialog
      */
     public void closeDialog() {
