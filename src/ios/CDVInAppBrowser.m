@@ -163,7 +163,7 @@
     self.inAppBrowserViewController.modalPresentationStyle = presentationStyle;
 
     // Set Transition Style
-    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCrossDissolve; // default
+    UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
     if (browserOptions.transitionstyle != nil) {
         if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"fliphorizontal"]) {
             transitionStyle = UIModalTransitionStyleFlipHorizontal;
@@ -240,7 +240,6 @@
 #else
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         [self.webView loadRequest:request];
-#endif
     } else { // this assumes the InAppBrowser can be excepted from the white-list
         [self openInInAppBrowser:url withOptions:options];
     }
