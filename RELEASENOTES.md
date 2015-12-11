@@ -20,6 +20,16 @@
 -->
 # Release Notes
 
+### 1.1.1 (Dec 10, 2015)
+
+* CB-9445 Improves executeScript callbacks on iOS
+* CB-10035 Incremented plugin version.
+* CB-10040 - re-fix: backwards compatible with cordova-ios < 4.0
+* CB-8534: Allow plugins to respond to onReceivedHttpAuthRequest. This closes #82
+* CB-3750: Fixes spinner on iOS. This closes #89
+* CB-7696 Document target=_self behavior for Windows
+* CB-10040 - Compile Error in InAppBrowser Plugin for iOS - No known instance method for selector 'URLIsWhitelisted:'
+
 ### 1.1.0 (Nov 18, 2015)
 * [CB-10035](https://issues.apache.org/jira/browse/CB-10035) Updated `RELEASENOTES` to be newest to oldest
 * Invoke webview if using local file
