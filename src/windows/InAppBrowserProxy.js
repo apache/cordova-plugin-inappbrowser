@@ -59,8 +59,17 @@ function attachNavigationEvents(element, callback) {
 
         element.addEventListener("MSWebViewContentLoading", function (e) {
             if (navigationButtonsDiv) {
-                backButton.disabled = !popup.canGoBack;
-                forwardButton.disabled = !popup.canGoForward;
+                if (popup.canGoBack) {
+                    backButton.removeAttribute("disabled");
+                } else {
+                    backButton.setAttribute("disabled", "true");
+                }
+
+                if (popup.canGoForward) {
+                    forwardButton.removeAttribute("disabled");
+                } else {
+                    forwardButton.setAttribute("disabled", "true");
+                }
             }
         });
     } else {
@@ -156,58 +165,39 @@ var IAB = {
             browserWrap.appendChild(popup);
 
             if (features.indexOf("location=yes") !== -1 || features.indexOf("location") === -1) {
-                popup.style.height = "calc(100% - 60px)";
+                popup.style.height = "calc(100% - 70px)";
 
                 navigationButtonsDiv = document.createElement("div");
-                navigationButtonsDiv.style.height = "60px";
-                navigationButtonsDiv.style.backgroundColor = "#404040";
-                navigationButtonsDiv.style.zIndex = "999";
+                navigationButtonsDiv.className = "inappbrowser-app-bar";
                 navigationButtonsDiv.onclick = function (e) {
                     e.cancelBubble = true;
                 };
 
                 navigationButtonsDivInner = document.createElement("div");
-                navigationButtonsDivInner.style.paddingTop = "10px";
-                navigationButtonsDivInner.style.height = "50px";
-                navigationButtonsDivInner.style.width = "160px";
-                navigationButtonsDivInner.style.margin = "0 auto";
-                navigationButtonsDivInner.style.backgroundColor = "#404040";
-                navigationButtonsDivInner.style.zIndex = "999";
+                navigationButtonsDivInner.className = "inappbrowser-app-bar-inner"
                 navigationButtonsDivInner.onclick = function (e) {
                     e.cancelBubble = true;
                 };
 
-
-                backButton = document.createElement("button");
-                backButton.style.width = "40px";
-                backButton.style.height = "40px";
-                backButton.style.borderRadius = "40px";
-
-                backButton.innerText = "<-";
+                backButton = document.createElement("div");
+                backButton.innerText = "back";
+                backButton.className = "app-bar-action action-back";
                 backButton.addEventListener("click", function (e) {
                     if (popup.canGoBack)
                         popup.goBack();
                 });
 
-                forwardButton = document.createElement("button");
-                forwardButton.style.marginLeft = "20px";
-                forwardButton.style.width = "40px";
-                forwardButton.style.height = "40px";
-                forwardButton.style.borderRadius = "40px";
-
-                forwardButton.innerText = "->";
+                forwardButton = document.createElement("div");
+                forwardButton.innerText = "forward";
+                forwardButton.className = "app-bar-action action-forward";
                 forwardButton.addEventListener("click", function (e) {
                     if (popup.canGoForward)
                         popup.goForward();
                 });
 
-                closeButton = document.createElement("button");
-                closeButton.style.marginLeft = "20px";
-                closeButton.style.width = "40px";
-                closeButton.style.height = "40px";
-                closeButton.style.borderRadius = "40px";
-
-                closeButton.innerText = "x";
+                closeButton = document.createElement("div");
+                closeButton.innerText = "close";
+                closeButton.className = "app-bar-action action-close";
                 closeButton.addEventListener("click", function (e) {
                     setTimeout(function () {
                         IAB.close(win);
@@ -216,8 +206,8 @@ var IAB = {
 
                 if (!isWebViewAvailable) {
                     // iframe navigation is not yet supported
-                    backButton.disabled = true;
-                    forwardButton.disabled = true;
+                    backButton.setAttribute("disabled", "true");
+                    forwardButton.setAttribute("disabled", "true");
                 }
 
                 navigationButtonsDivInner.appendChild(backButton);
