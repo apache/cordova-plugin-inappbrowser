@@ -71,8 +71,10 @@ var IAB = {
             features = args[2],
             url;
 
-        if (target === "_system" || target === "_self" || !target) {
+        if (target === "_self" || !target) {
             window.location = strUrl;
+        } else if (target === "_system") {
+            window.CDV_origSymbols['window.open'].call(window, strUrl, "_blank");
         } else {
             // "_blank" or anything else
             if (!browserWrap) {
