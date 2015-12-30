@@ -85,6 +85,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
+    private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -96,6 +97,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
+    private boolean mediaPlaybackRequiresUserGesture = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -471,6 +473,8 @@ public class InAppBrowser extends CordovaPlugin {
         showLocationBar = true;
         showZoomControls = true;
         openWindowHidden = false;
+        mediaPlaybackRequiresUserGesture = false;
+
         if (features != null) {
             Boolean show = features.get(LOCATION);
             if (show != null) {
@@ -487,6 +491,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
                 hadwareBackButton = hardwareBack.booleanValue();
+            }
+            Boolean mediaPlayback = features.get(MEDIA_PLAYBACK_REQUIRES_USER_ACTION);
+            if (mediaPlayback != null) {
+                mediaPlaybackRequiresUserGesture = mediaPlayback.booleanValue();
             }
             Boolean cache = features.get(CLEAR_ALL_CACHE);
             if (cache != null) {
@@ -650,6 +658,10 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
+
+                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
+                }
 
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
@@ -867,7 +879,7 @@ public class InAppBrowser extends CordovaPlugin {
                 Log.d(LOG_TAG, "Should never happen");
             }
         }
-        
+
         /**
          * On received http auth request.
          */
@@ -883,7 +895,7 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (IllegalAccessException e) {
             } catch (InvocationTargetException e) {
             }
-            
+
             if (pluginManager == null) {
                 try {
                     Field pmf = webView.getClass().getField("pluginManager");
@@ -892,14 +904,13 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (IllegalAccessException e) {
                 }
             }
-            
+
             if (pluginManager != null && pluginManager.onReceivedHttpAuthRequest(webView, new CordovaHttpAuthHandler(handler), host, realm)) {
                 return;
             }
-            
+
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
     }
 }
-
