@@ -126,7 +126,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
                     browser.Visibility = Visibility.Visible;
-                    AppBar.IsVisible = true;
+                    AppBar.IsVisible = ShowLocation;
                 });
             }
         }
@@ -345,7 +345,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                             bar.Buttons.Add(closeBtn);
 
                             page.ApplicationBar = bar;
-                            bar.IsVisible = !StartHidden;
+                            bar.IsVisible = ShowLocation && !StartHidden;
                             AppBar = bar;
 
                             page.BackKeyPress += page_BackKeyPress;
