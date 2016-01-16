@@ -20,6 +20,11 @@
 -->
 # Release Notes
 
+### 1.2.0 (Jan 15, 2016)
+* CB-8180: Changing methods of interception in `WebViewClient` class
+* CB-10009 Improve `InAppBrowser` toolbar look and feel on **Windows**
+* Open a new window on the **Browser** platform
+
 ### 1.1.1 (Dec 10, 2015)
 
 * CB-9445 Improves executeScript callbacks on iOS
