@@ -998,6 +998,12 @@
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
+- (void) dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
+    if ( self.presentedViewController) {
+        [super dismissViewControllerAnimated:flag completion:completion];
+    }
+}
+
 - (void) viewDidLoad {
 
     CGRect frame = [UIApplication sharedApplication].statusBarFrame;
