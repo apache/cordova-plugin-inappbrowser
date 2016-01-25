@@ -35,7 +35,8 @@ var browserWrap,
     backButton,
     forwardButton,
     closeButton,
-    bodyOverflowStyle;
+    bodyOverflowStyle,
+    onBackButton;
 
 // x-ms-webview is available starting from Windows 8.1 (platformId is 'windows')
 // http://msdn.microsoft.com/en-us/library/windows/apps/dn301831.aspx
@@ -73,7 +74,7 @@ function attachNavigationEvents(element, callback) {
             }
         });
 		
-		var onBackButton = function () {
+		onBackButton = function () {
             if (popup.canGoBack) {
                 popup.goBack();
             } else {
@@ -84,7 +85,7 @@ function attachNavigationEvents(element, callback) {
             return true;
         };
 
-        WinJS.Application.onbackclick = onBackButton;
+        WinJS.Application.addEventListener("backclick", onBackButton);
     } else {
         var onError = function () {
             callback({ type: "loaderror", url: this.contentWindow.location}, {keepCallback: true});
@@ -113,6 +114,7 @@ var IAB = {
             document.body.style.msOverflowStyle = bodyOverflowStyle;
             browserWrap = null;
             popup = null;
+            WinJS.Application.removeEventListener("backclick", onBackButton);
         }
     },
     show: function (win, lose) {
