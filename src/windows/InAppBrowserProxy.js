@@ -72,6 +72,19 @@ function attachNavigationEvents(element, callback) {
                 }
             }
         });
+		
+		var onBackButton = function () {
+            if (popup.canGoBack) {
+                popup.goBack();
+            } else {
+                setTimeout(function () {
+                    IAB.close(callback);
+                }, 0);
+            }
+            return true;
+        };
+
+        WinJS.Application.onbackclick = onBackButton;
     } else {
         var onError = function () {
             callback({ type: "loaderror", url: this.contentWindow.location}, {keepCallback: true});
