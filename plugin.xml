@@ -198,6 +198,9 @@
             <merges target="" />
         </js-module>
         <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
+        <resource-file src="src/windows/images/arrow_left.png" />
+        <resource-file src="src/windows/images/arrow_right.png" />
+        <resource-file src="src/windows/images/close.png" />
     </platform>
   
     <!-- firefoxos -->
