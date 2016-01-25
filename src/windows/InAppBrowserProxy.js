@@ -174,14 +174,17 @@ var IAB = {
             }
             popup.style.borderWidth = "0px";
             popup.style.width = "100%";
+            popup.style.top = "45px";
+            popup.style.position = "absolute";
 
             browserWrap.appendChild(popup);
 
             if (features.indexOf("location=yes") !== -1 || features.indexOf("location") === -1) {
-                popup.style.height = "calc(100% - 70px)";
+                popup.style.height = "calc(100% - 45px)";
 
                 navigationButtonsDiv = document.createElement("div");
                 navigationButtonsDiv.className = "inappbrowser-app-bar";
+                navigationButtonsDiv.style.background = "url(" + ShoutemApp.skin.navigationBarBackground + ")";
                 navigationButtonsDiv.onclick = function (e) {
                     e.cancelBubble = true;
                 };
@@ -193,7 +196,6 @@ var IAB = {
                 };
 
                 backButton = document.createElement("div");
-                backButton.innerText = "back";
                 backButton.className = "app-bar-action action-back";
                 backButton.addEventListener("click", function (e) {
                     if (popup.canGoBack)
@@ -201,7 +203,6 @@ var IAB = {
                 });
 
                 forwardButton = document.createElement("div");
-                forwardButton.innerText = "forward";
                 forwardButton.className = "app-bar-action action-forward";
                 forwardButton.addEventListener("click", function (e) {
                     if (popup.canGoForward)
@@ -209,7 +210,6 @@ var IAB = {
                 });
 
                 closeButton = document.createElement("div");
-                closeButton.innerText = "close";
                 closeButton.className = "app-bar-action action-close";
                 closeButton.addEventListener("click", function (e) {
                     setTimeout(function () {
@@ -223,9 +223,9 @@ var IAB = {
                     forwardButton.setAttribute("disabled", "true");
                 }
 
+                navigationButtonsDivInner.appendChild(closeButton);
                 navigationButtonsDivInner.appendChild(backButton);
                 navigationButtonsDivInner.appendChild(forwardButton);
-                navigationButtonsDivInner.appendChild(closeButton);
                 navigationButtonsDiv.appendChild(navigationButtonsDivInner);
 
                 browserWrap.appendChild(navigationButtonsDiv);

@@ -40,23 +40,24 @@
 }
 
 .inappbrowser-app-bar {
-    height: 70px;
-    background-color: #404040;
+    height: 45px;
+    top: 0;
+    width: 100%;
+    position: absolute;
     z-index: 9999999;
 }
 
 .inappbrowser-app-bar-inner {
     padding-top: 10px;
-    height: 60px;
+    height: 45px;
     width: 155px;
-    margin: 0 auto;
-    background-color: #404040;
+    margin: 0;
     z-index: 9999999;
 }
 
 .app-bar-action {
-    width: auto;
-    height: 40px;
+    width: 24px;
+    height: 24px;
     margin-left: 20px;
     font-family: "Segoe UI Symbol";
     float: left;
@@ -71,6 +72,7 @@
     color: gray;
     /*disable click*/
     pointer-events: none;
+    opacity: .5;
 }
 
 .app-bar-action::before {
@@ -79,36 +81,15 @@
     height: 36px;
 }
 
-/* Back */
-.action-back { 
-    margin-left: 0px;
+.action-close { 
+    margin-left: 2px;
+    background: url("/www/plugins/cordova-plugin-inappbrowser/src/windows/images/close.png") no-repeat center;
 }
 
-.action-back::before {
-    content: "\E0BA";
+.action-back {
+    background: url("/www/plugins/cordova-plugin-inappbrowser/src/windows/images/arrow_left.png") no-repeat center;
 }
 
-.action-back:not([disabled]):hover::before {
-    content: "\E0B3";
-}
-
-/* Forward */
-.action-forward::before {
-    content: "\E0AC";
-}
-
-.action-forward:not([disabled]):hover::before {
-    content: "\E0AF";
-}
-
-/* Close */
-.action-close::before {
-    content: "\E0C7";
-    /* close icon is larger so we re-size it to fit other icons */
-    font-size: 20px;
-    line-height: 40px;
-}
-
-.action-close:not([disabled]):hover::before {
-    content: "\E0CA";
+.action-forward {
+    background: url("/www/plugins/cordova-plugin-inappbrowser/src/windows/images/arrow_right.png") no-repeat center;
 }
