@@ -24,6 +24,78 @@ var isWindows = cordova.platformId == 'windows';
 
 window.alert = window.alert || navigator.notification.alert;
 
+exports.defineAutoTests = function () {
+
+    describe('cordova.InAppBrowser', function () {
+
+        it("inappbrowser.spec.1 should exist", function () {
+            expect(cordova.InAppBrowser).toBeDefined();
+        });
+
+        it("inappbrowser.spec.2 should contain open function", function () {
+            expect(cordova.InAppBrowser.open).toBeDefined();
+            expect(typeof cordova.InAppBrowser.open === 'function').toBe(true);
+        });
+    });
+
+    describe('open method', function () {
+
+        var iabInsance;
+        var originalTimeout;
+        var url = 'http://apache.org/';
+
+        beforeEach(function () {
+            // increase timeout to ensure test url could be loaded within test time
+            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+
+            iabInsance = null;
+        });
+
+        afterEach(function () {
+            // restore original timeout
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+
+            if (iabInsance && iabInsance.close) {
+                iabInsance.close();
+            }
+            iabInsance = null;
+        });
+
+        function verifyEvent(evt, type) {
+            expect(evt).toBeDefined();
+            expect(evt.type).toEqual(type);
+            expect(evt.url).toEqual(url);
+        }
+
+        it("inappbrowser.spec.3 should retun InAppBrowser class instance", function () {
+            iabInsance = cordova.InAppBrowser.open(url, '_blank');
+
+            expect(iabInsance).toBeDefined();
+
+            expect(iabInsance.addEventListener).toBeDefined();
+            expect(typeof iabInsance.addEventListener === 'function').toBe(true);
+            expect(iabInsance.close).toBeDefined();
+            expect(typeof iabInsance.close === 'function').toBe(true);
+
+        });
+
+        it("inappbrowser.spec.4 should support loadstart and loadstop events", function (done) {
+            var onLoadStart = jasmine.createSpy('loadstart event callback').and.callFake(function (evt) {
+                verifyEvent(evt, 'loadstart');
+            });
+
+            iabInsance = cordova.InAppBrowser.open(url, '_blank');
+            iabInsance.addEventListener('loadstart', onLoadStart);
+            iabInsance.addEventListener('loadstop', function (evt) {
+                verifyEvent(evt, 'loadstop');
+                expect(onLoadStart).toHaveBeenCalled();
+                done();
+            });
+        });
+    });
+};
+
 exports.defineManualTests = function (contentEl, createActionButton) {
 
     function doOpen(url, target, params, numExpectedRedirects, useWindowOpen) {
