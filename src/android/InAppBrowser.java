@@ -376,6 +376,7 @@ public class InAppBrowser extends CordovaPlugin {
                     public void onPageFinished(WebView view, String url) {
                         if (dialog != null) {
                             dialog.dismiss();
+                            dialog = null;
                         }
                     }
                 });
@@ -519,6 +520,12 @@ public class InAppBrowser extends CordovaPlugin {
 
             @SuppressLint("NewApi")
             public void run() {
+
+                // CB-6702 InAppBrowser hangs when opening more than one instance
+                if (dialog != null) {
+                    dialog.dismiss();
+                };
+
                 // Let's create the main dialog
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
