@@ -20,6 +20,18 @@
 -->
 # Release Notes
 
+### 1.2.1 (Feb 02, 2016)
+* [CB-10407](https://issues.apache.org/jira/browse/CB-10407) InAppBrowser not firing loadstart event on android
+* [CB-10428](https://issues.apache.org/jira/browse/CB-10428) Fix syntax error when browserifying inAppBrowser plugin
+* handle app store urls in system browser
+* [CB-6702](https://issues.apache.org/jira/browse/CB-6702) InAppBrowser hangs when opening more than one instance
+* [CB-10456](https://issues.apache.org/jira/browse/CB-10456) InAppBrowser is not closed if I close it programmatically on Android
+* [CB-10451](https://issues.apache.org/jira/browse/CB-10451) InAppBrowser: loadstart event is not triggered on Windows
+* [CB-10452](https://issues.apache.org/jira/browse/CB-10452) InAppBrowser: 'exit' event is not triggered on Windows
+* [CB-10454](https://issues.apache.org/jira/browse/CB-10454) InAppBrowser: 'loaderror' event does not have code and message on Windows
+* [CB-10450](https://issues.apache.org/jira/browse/CB-10450) InAppBrowser: Unable to get property 'canGoBack' of undefined on Windows
+* [CB-10441](https://issues.apache.org/jira/browse/CB-10441) Add auto tests for InAppBrowser plugin
+
 ### 1.2.0 (Jan 15, 2016)
 * CB-8180: Changing methods of interception in `WebViewClient` class
 * CB-10009 Improve `InAppBrowser` toolbar look and feel on **Windows**
