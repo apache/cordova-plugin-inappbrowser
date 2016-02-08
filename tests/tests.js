@@ -42,13 +42,13 @@ exports.defineAutoTests = function () {
 
         var iabInstance;
         var originalTimeout;
-        var url = 'http://apache.org/';
+        var url = 'https://dist.apache.org/repos/dist/dev/cordova/';
         var badUrl = 'http://bad-uri/';
 
         beforeEach(function () {
             // increase timeout to ensure test url could be loaded within test time
             originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-            jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
             iabInstance = null;
         });
