@@ -20,6 +20,15 @@
 -->
 # Release Notes
 
+### 1.3.0 (Feb 09, 2016)
+* [CB-3360](https://issues.apache.org/jira/browse/CB-3360) Set custom inappbrowser user agent for android
+* [CB-10538](https://issues.apache.org/jira/browse/CB-10538) cordova-plugin-inappbrowser timeout issue
+* [CB-10395](https://issues.apache.org/jira/browse/CB-10395) InAppBrowser's WebView not storing cookies reliable on Android
+* Edit package.json license to match SPDX id
+* [CB-10305](https://issues.apache.org/jira/browse/CB-10305) Gray bar appears in the wrong place on iOS
+* [CB-7786](https://issues.apache.org/jira/browse/CB-7786) Support mediaPlaybackRequiresUserAction on Android
+* [CB-7500](https://issues.apache.org/jira/browse/CB-7500) executeScript with callback kills/blurs inAppBrowser window on Android
+
 ### 1.2.1 (Feb 02, 2016)
 * [CB-10407](https://issues.apache.org/jira/browse/CB-10407) InAppBrowser not firing loadstart event on android
 * [CB-10428](https://issues.apache.org/jira/browse/CB-10428) Fix syntax error when browserifying inAppBrowser plugin
