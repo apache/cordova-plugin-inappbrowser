@@ -19,6 +19,9 @@
  *
 */
 
+/* jshint jasmine: true */
+/* global MSApp */
+
 var cordova = require('cordova');
 var isWindows = cordova.platformId == 'windows';
 
@@ -183,13 +186,13 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                 if (e.url != lastLoadStartURL) {
                     alert('Unexpected: ' + e.type + ' event.url != loadstart\'s event.url');
                 }
-                if (numExpectedRedirects === 0 && counts['loadstart'] !== 1) {
+                if (numExpectedRedirects === 0 && counts.loadstart !== 1) {
                     // Do allow a loaderror without a loadstart (e.g. in the case of an invalid URL).
-                    if (!(e.type == 'loaderror' && counts['loadstart'] === 0)) {
-                        alert('Unexpected: got multiple loadstart events. (' + counts['loadstart'] + ')');
+                    if (!(e.type == 'loaderror' && counts.loadstart === 0)) {
+                        alert('Unexpected: got multiple loadstart events. (' + counts.loadstart + ')');
                     }
-                } else if (numExpectedRedirects > 0 && counts['loadstart'] < (numExpectedRedirects + 1)) {
-                    alert('Unexpected: should have got at least ' + (numExpectedRedirects + 1) + ' loadstart events, but got ' + counts['loadstart']);
+                } else if (numExpectedRedirects > 0 && counts.loadstart < (numExpectedRedirects + 1)) {
+                    alert('Unexpected: should have got at least ' + (numExpectedRedirects + 1) + ' loadstart events, but got ' + counts.loadstart);
                 }
                 wasReset = true;
                 numExpectedRedirects = 0;
@@ -197,7 +200,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             }
             // Verify that loadend / loaderror was called.
             if (e.type == 'exit') {
-                var numStopEvents = counts['loadstop'] + counts['loaderror'];
+                var numStopEvents = counts.loadstop + counts.loaderror;
                 if (numStopEvents === 0 && !wasReset) {
                     alert('Unexpected: browser closed without a loadstop or loaderror.');
                 } else if (numStopEvents > 1) {

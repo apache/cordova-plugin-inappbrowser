@@ -37,6 +37,10 @@
     "cordova-windows",
     "cordova-firefoxos"
   ],
+  "scripts": {
+    "test": "npm run jshint",
+    "jshint": "node node_modules/jshint/bin/jshint www && node node_modules/jshint/bin/jshint src && node node_modules/jshint/bin/jshint tests"
+  },
   "engines": [
     {
       "name": "cordova",
@@ -44,5 +48,8 @@
     }
   ],
   "author": "Apache Software Foundation",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "jshint": "^2.6.0"
+  }
 }

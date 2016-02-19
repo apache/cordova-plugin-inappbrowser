@@ -17,6 +17,8 @@
 #         under the License.
 -->
 
+[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)
+
 # cordova-plugin-inappbrowser
 
 This plugin provides a web browser view that displays when calling `cordova.InAppBrowser.open()`.

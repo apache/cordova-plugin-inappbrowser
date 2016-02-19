@@ -22,10 +22,6 @@
 /*jslint sloppy:true */
 /*global Windows:true, require, document, setTimeout, window, module */
 
-
-var cordova = require('cordova'),
-    channel = require('cordova/channel');
-
 var browserWrap;
 
 var IAB = {
@@ -45,7 +41,6 @@ var IAB = {
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
-            features = args[2],
             url,
             elem;
 
