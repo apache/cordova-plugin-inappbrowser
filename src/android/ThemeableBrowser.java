@@ -1203,59 +1203,33 @@ public class ThemeableBrowser extends CordovaPlugin {
             this.callback = callback;
         }
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // workaround to avoid ERR_UNKNOWN_URL_SCHEME page from being displayed on opening
-            // URLs with certain URL schemes
-            // TODO: need more investigation into which URL schemes would result in ERR_UNKNOWN_URL_SCHEME page
-            if (
-                url.startsWith(WebView.SCHEME_TEL)
-                    || url.startsWith(WebView.SCHEME_MAILTO)
-                    || url.startsWith("geo:")
-                    || url.startsWith("market:")
-                    || url.startsWith("sms:")
-            ) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                cordova.getActivity().startActivity(intent);
-                return true;
-            }
-
-            return false;
-        }
-
         /**
-         * Notify the host application that a page has started loading.
+         * Override the URL that should be loaded
          *
-         * @param view          The webview initiating the callback.
-         * @param url           The url of the page.
+         * This handles a small subset of all the URIs that would be encountered.
+         *
+         * @param webView
+         * @param url
          */
         @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);
-            String newloc = "";
-            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
-                newloc = url;
-            }
-            // If dialing phone (tel:5551212)
-            else if (url.startsWith(WebView.SCHEME_TEL)) {
+        public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+            if (url.startsWith(WebView.SCHEME_TEL)) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_DIAL);
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
+                    return true;
                 } catch (android.content.ActivityNotFoundException e) {
-                    emitError(ERR_CRITICAL,
-                            String.format("Error dialing %s: %s", url, e.toString()));
+                    Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
-            }
-
-            else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:")) {
+            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:")) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
                     cordova.getActivity().startActivity(intent);
+                    return true;
                 } catch (android.content.ActivityNotFoundException e) {
-                    emitError(ERR_CRITICAL,
-                            String.format("Error with %s: %s", url, e.toString()));
+                    Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
                 }
             }
             // If sms:5551212?body=This is the message
@@ -1268,8 +1242,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                     int parmIndex = url.indexOf('?');
                     if (parmIndex == -1) {
                         address = url.substring(4);
-                    }
-                    else {
+                    } else {
                         address = url.substring(4, parmIndex);
 
                         // If body, then set sms body
@@ -1285,16 +1258,39 @@ public class ThemeableBrowser extends CordovaPlugin {
                     intent.putExtra("address", address);
                     intent.setType("vnd.android-dir/mms-sms");
                     cordova.getActivity().startActivity(intent);
+                    return true;
                 } catch (android.content.ActivityNotFoundException e) {
-                    emitError(ERR_CRITICAL,
-                            String.format("Error sending sms %s: %s", url, e.toString()));
+                    Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
             }
-            else {
+            return false;
+        }
+
+
+        /*
+         * onPageStarted fires the LOAD_START_EVENT
+         *
+         * @param view
+         * @param url
+         * @param favicon
+         */
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+            String newloc = "";
+            if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
+                newloc = url;
+            }
+            else
+            {
+                // Assume that everything is HTTP at this point, because if we don't specify,
+                // it really should be.  Complain loudly about this!!!
+                Log.e(LOG_TAG, "Possible Uncaught/Unknown URI");
                 newloc = "http://" + url;
             }
 
-            if (edittext != null && !newloc.equals(edittext.getText().toString())) {
+            // Update the UI if we haven't already
+            if (!newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
             }
 
@@ -1302,9 +1298,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_START_EVENT);
                 obj.put("url", newloc);
-
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
+                Log.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
         }
 
