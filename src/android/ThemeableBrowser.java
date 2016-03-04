@@ -1203,27 +1203,25 @@ public class ThemeableBrowser extends CordovaPlugin {
             this.callback = callback;
         }
 
-				@Override
-				public boolean shouldOverrideUrlLoading(WebView view, String url) {
-						// workaround to avoid ERR_UNKNOWN_URL_SCHEME page from being displayed on opening
-						// URLs with certain URL schemes
-						// TODO: need more investigation into which URL schemes would result in ERR_UNKNOWN_URL_SCHEME page
-						if (
-							url.startsWith(WebView.SCHEME_TEL)
-								|| url.startsWith(WebView.SCHEME_MAILTO)
-								|| url.startsWith("geo:")
-								|| url.startsWith("market:")
-								|| url.startsWith("sms:")
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            // workaround to avoid ERR_UNKNOWN_URL_SCHEME page from being displayed on opening
+            // URLs with certain URL schemes
+            // TODO: need more investigation into which URL schemes would result in ERR_UNKNOWN_URL_SCHEME page
+            if (
+                url.startsWith(WebView.SCHEME_TEL)
+                    || url.startsWith(WebView.SCHEME_MAILTO)
+                    || url.startsWith("geo:")
+                    || url.startsWith("market:")
+                    || url.startsWith("sms:")
+            ) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                cordova.getActivity().startActivity(intent);
+                return true;
+            }
 
-						) {
-							Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-							cordova.getActivity().startActivity(intent);
-							return true;
-						}
-
-						return false;
-				}
-
+            return false;
+        }
 
         /**
          * Notify the host application that a page has started loading.
