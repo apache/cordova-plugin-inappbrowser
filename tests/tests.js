@@ -24,6 +24,110 @@ var isWindows = cordova.platformId == 'windows';
 
 window.alert = window.alert || navigator.notification.alert;
 
+exports.defineAutoTests = function () {
+
+    describe('cordova.InAppBrowser', function () {
+
+        it("inappbrowser.spec.1 should exist", function () {
+            expect(cordova.InAppBrowser).toBeDefined();
+        });
+
+        it("inappbrowser.spec.2 should contain open function", function () {
+            expect(cordova.InAppBrowser.open).toBeDefined();
+            expect(cordova.InAppBrowser.open).toEqual(jasmine.any(Function));
+        });
+    });
+
+    describe('open method', function () {
+
+        var iabInstance;
+        var originalTimeout;
+        var url = 'https://dist.apache.org/repos/dist/dev/cordova/';
+        var badUrl = 'http://bad-uri/';
+
+        beforeEach(function () {
+            // increase timeout to ensure test url could be loaded within test time
+            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
+
+            iabInstance = null;
+        });
+
+        afterEach(function (done) {
+            // restore original timeout
+            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+
+            if (iabInstance !== null && iabInstance.close) {
+                iabInstance.close();
+            }
+            iabInstance = null;
+            // add some extra time so that iab dialog is closed
+            setTimeout(done, 2000);
+        });
+
+        function verifyEvent(evt, type) {
+            expect(evt).toBeDefined();
+            expect(evt.type).toEqual(type);
+            if (type !== 'exit') { // `exit` event does not have url field
+                expect(evt.url).toEqual(url);
+            }
+        }
+
+        function verifyLoadErrorEvent(evt) {
+            expect(evt).toBeDefined();
+            expect(evt.type).toEqual('loaderror');
+            expect(evt.url).toEqual(badUrl);
+            expect(evt.code).toEqual(jasmine.any(Number));
+            expect(evt.message).toEqual(jasmine.any(String));
+        }
+
+        it("inappbrowser.spec.3 should retun InAppBrowser instance with required methods", function () {
+            iabInstance = cordova.InAppBrowser.open(url, '_blank');
+
+            expect(iabInstance).toBeDefined();
+
+            expect(iabInstance.addEventListener).toEqual(jasmine.any(Function));
+            expect(iabInstance.removeEventListener).toEqual(jasmine.any(Function));
+            expect(iabInstance.close).toEqual(jasmine.any(Function));
+            expect(iabInstance.show).toEqual(jasmine.any(Function));
+            expect(iabInstance.executeScript).toEqual(jasmine.any(Function));
+            expect(iabInstance.insertCSS).toEqual(jasmine.any(Function));
+        });
+
+        it("inappbrowser.spec.4 should support loadstart and loadstop events", function (done) {
+            var onLoadStart = jasmine.createSpy('loadstart event callback').and.callFake(function (evt) {
+                verifyEvent(evt, 'loadstart');
+            });
+
+            iabInstance = cordova.InAppBrowser.open(url, '_blank');
+            iabInstance.addEventListener('loadstart', onLoadStart);
+            iabInstance.addEventListener('loadstop', function (evt) {
+                verifyEvent(evt, 'loadstop');
+                expect(onLoadStart).toHaveBeenCalled();
+                done();
+            });
+        });
+
+        it("inappbrowser.spec.5 should support exit event", function (done) {
+            iabInstance = cordova.InAppBrowser.open(url, '_blank');
+            iabInstance.addEventListener('exit', function (evt) {
+                verifyEvent(evt, 'exit');
+                done();
+            });
+            iabInstance.close();
+            iabInstance = null;
+        });
+
+        it("inappbrowser.spec.6 should support loaderror event", function (done) {
+            iabInstance = cordova.InAppBrowser.open(badUrl, '_blank');
+            iabInstance.addEventListener('loaderror', function (evt) {
+                verifyLoadErrorEvent(evt);
+                done();
+            });
+        });
+    });
+};
+
 exports.defineManualTests = function (contentEl, createActionButton) {
 
     function doOpen(url, target, params, numExpectedRedirects, useWindowOpen) {
@@ -319,7 +423,11 @@ exports.defineManualTests = function (contentEl, createActionButton) {
 
     var video_tag_tests = '<h1>Video tag</h1>' +
         '<div id="openRemoteVideo"></div>' +
-        'Expected result: open successfully in InAppBrowser with an embedded video that works after clicking the "play" button.';
+        'Expected result: open successfully in InAppBrowser with an embedded video plays automatically on iOS and Android.' +
+        '<div id="openRemoteNeedUserNoVideo"></div>' +
+        'Expected result: open successfully in InAppBrowser with an embedded video plays automatically on iOS and Android.' +
+        '<div id="openRemoteNeedUserYesVideo"></div>' +
+        'Expected result: open successfully in InAppBrowser with an embedded video does not play automatically on iOS and Android but rather works after clicking the "play" button.';
 
     var local_with_anchor_tag_tests = '<h1>Local with anchor tag</h1>' +
         '<div id="openAnchor1"></div>' +
@@ -507,6 +615,12 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('Remote Video', function () {
         doOpen(videohtml, '_blank');
     }, 'openRemoteVideo');
+    createActionButton('Remote Need User No Video', function () {
+        doOpen(videohtml, '_blank', 'mediaPlaybackRequiresUserAction=no');
+    }, 'openRemoteNeedUserNoVideo');
+    createActionButton('Remote Need User Yes Video', function () {
+        doOpen(videohtml, '_blank', 'mediaPlaybackRequiresUserAction=yes');
+    }, 'openRemoteNeedUserYesVideo');
 
     //Local With Anchor Tag
     createActionButton('Anchor1', function () {
@@ -516,4 +630,3 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         doOpen(localhtml + '#anchor2', '_blank');
     }, 'openAnchor2');
 };
-
