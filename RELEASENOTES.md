@@ -21,6 +21,12 @@
 Release Notes
 =============
 
+0.2.13
+------
+
+Bug fix for: Fix for ERR_UNKNOWN_URL_SCHEME for common URL scms
+
+
 0.2.12
 ------
 
