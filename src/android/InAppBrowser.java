@@ -117,7 +117,7 @@ public class InAppBrowser extends CordovaPlugin {
                 t = SELF;
             }
             final String target = t;
-            final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+            final HashMap features = parseFeature(args.optString(2));
 
             Log.d(LOG_TAG, "target = " + target);
 
@@ -315,23 +315,34 @@ public class InAppBrowser extends CordovaPlugin {
      * @param optString
      * @return
      */
-    private HashMap<String, Boolean> parseFeature(String optString) {
+    private HashMap parseFeature(String optString) {
         if (optString.equals(NULL)) {
-            return null;
-        } else {
-            HashMap<String, Boolean> map = new HashMap<String, Boolean>();
-            StringTokenizer features = new StringTokenizer(optString, ",");
-            StringTokenizer option;
-            while(features.hasMoreElements()) {
-                option = new StringTokenizer(features.nextToken(), "=");
-                if (option.hasMoreElements()) {
-                    String key = option.nextToken();
-                    Boolean value = option.nextToken().equals("no") ? Boolean.FALSE : Boolean.TRUE;
-                    map.put(key, value);
+            optString = "";
+        }
+        HashMap map = new HashMap();
+        map.put("showback", Boolean.TRUE);
+        map.put("showforward", Boolean.TRUE);
+        map.put("showurl", Boolean.TRUE);
+        map.put("toolbarcolor", android.graphics.Color.parseColor("#eeeeee"));
+        StringTokenizer features = new StringTokenizer(optString, ",");
+        StringTokenizer option;
+        while(features.hasMoreElements()) {
+            option = new StringTokenizer(features.nextToken(), "=");
+            if (option.hasMoreElements()) {
+                String key = option.nextToken();
+                String value = option.nextToken();
+                if (value.equals("no")) {
+                  map.put(key, Boolean.FALSE);
+                } else if (value.equals("yes")) {
+                  map.put(key, Boolean.TRUE);
+                } else if (key.equals("toolbarcolor")) {
+                  map.put(key, android.graphics.Color.parseColor(value));
+                } else {
+                  map.put(key, value);
                 }
             }
-            return map;
         }
+        return map;
     }
 
     /**
@@ -477,6 +488,7 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+        final HashMap localFeatures = features;
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
@@ -550,7 +562,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
                 //Please, no more black!
-                toolbar.setBackgroundColor(android.graphics.Color.LTGRAY);
+                toolbar.setBackgroundColor((Integer) localFeatures.get("toolbarcolor"));
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 toolbar.setHorizontalGravity(Gravity.LEFT);
@@ -701,12 +713,18 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.requestFocusFromTouch();
 
                 // Add the back and forward buttons to our action button container layout
-                actionButtonContainer.addView(back);
-                actionButtonContainer.addView(forward);
+                if ((Boolean) localFeatures.get("showback")) {
+                  actionButtonContainer.addView(back);
+                }
+                if ((Boolean) localFeatures.get("showforward")) {
+                  actionButtonContainer.addView(forward);
+                }
 
                 // Add the views to our toolbar
                 toolbar.addView(actionButtonContainer);
-                toolbar.addView(edittext);
+                if ((Boolean) localFeatures.get("showurl")) {
+                  toolbar.addView(edittext);
+                }
                 toolbar.addView(close);
 
                 // Don't add the toolbar if its been disabled
