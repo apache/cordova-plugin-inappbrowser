@@ -103,6 +103,10 @@ instance, or the system browser.
     - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
     - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
+    - __toolbarcolor__: set to a HEX color like #8a32b9 (defaults to #eeeeee)
+    - __showback__: set to `no` to hide the display of the back button (defaults to `yes`).
+    - __showforward__: set to `no` to hide the display of the forward button (defaults to `yes`).
+    - __showurl__: set to `no` to hide the display of the url (defaults to `yes`).
 
     iOS only:
 
