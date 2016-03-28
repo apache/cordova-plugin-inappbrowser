@@ -169,6 +169,8 @@
             transitionStyle = UIModalTransitionStyleFlipHorizontal;
         } else if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"crossdissolve"]) {
             transitionStyle = UIModalTransitionStyleCrossDissolve;
+        } else if ([[browserOptions.transitionstyle lowercaseString] isEqualToString:@"partialcurl"]) {
+            transitionStyle = UIModalTransitionStylePartialCurl;
         }
     }
     self.inAppBrowserViewController.modalTransitionStyle = transitionStyle;
@@ -599,7 +601,17 @@
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
 
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    NSMutableArray* toolbarArray = [[NSMutableArray alloc] init];
+    [toolbarArray addObject:self.closeButton];
+    [toolbarArray addObject:flexibleSpaceButton];
+    if (_browserOptions.showback) {
+      [toolbarArray addObject:self.backButton];
+    }
+    if (_browserOptions.showforward) {
+      [toolbarArray addObject:fixedSpaceButton];
+      [toolbarArray addObject:self.forwardButton];
+    }
+    [self.toolbar setItems:toolbarArray];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
@@ -612,6 +624,37 @@
     [self.webView setFrame:frame];
 }
 
+- (unsigned int)intFromHexString:(NSString *)hexStr
+{
+  unsigned int hexInt = 0;
+
+  // Create scanner
+  NSScanner *scanner = [NSScanner scannerWithString:hexStr];
+
+  // Tell scanner to skip the # character
+  [scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@"#"]];
+
+  // Scan hex value
+  [scanner scanHexInt:&hexInt];
+
+  return hexInt;
+}
+
+- (UIColor *)getUIColorObjectFromHexString:(NSString *)hexStr
+{
+  // Convert hex string to an integer
+  unsigned int hexint = [self intFromHexString:hexStr];
+
+  // Create color object, specifying alpha as well
+  UIColor *color =
+    [UIColor colorWithRed:((CGFloat) ((hexint & 0xFF0000) >> 16))/255
+    green:((CGFloat) ((hexint & 0xFF00) >> 8))/255
+    blue:((CGFloat) (hexint & 0xFF))/255
+    alpha:1.0];
+
+  return color;
+}
+
 - (void)setCloseButtonTitle:(NSString*)title
 {
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
@@ -619,7 +662,7 @@
     self.closeButton = nil;
     self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     self.closeButton.enabled = YES;
-    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
+    self.closeButton.tintColor = [self getUIColorObjectFromHexString:_browserOptions.closebuttontint];
 
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:0 withObject:self.closeButton];
@@ -952,6 +995,9 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
+        self.showback = YES;
+        self.showforward = YES;
+        self.closebuttontint = @"#3C88E6";
     }
 
     return self;
