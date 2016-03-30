@@ -7,9 +7,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,6 +20,12 @@
 -->
 Release Notes
 =============
+
+0.2.14
+------
+
+Bug fix for: not building in cordova 6.0.0 cordova-ios 4.0+
+Note: you might need to update the <allow-navigation> in config.xml for cordova 6.0+
 
 0.2.13
 ------
