@@ -481,8 +481,6 @@ Here's a few snippets that show how you do this.
 * Show the help page.
 * Handle page errors.
 
-You can find the complete sample [here](https://github.com/Microsoft/cordova-samples/tree/master/cordova-plugin-inappbrowser).
-
 ### Give users a way to ask for help
 
 There's lots of ways to do this in your app. A drop down list is a simple way to do that.
