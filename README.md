@@ -217,6 +217,79 @@ The object returned from a call to `cordova.InAppBrowser.open`.
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
+## Example
+
+```javascript
+
+var inAppBrowserRef = undefined;
+
+function showHelp(url) {
+
+    var target = "_blank";
+
+    var options = "location=yes,hidden=yes";
+
+    inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
+
+    with (inAppBrowserRef) {
+
+        addEventListener('loadstart', loadStartCallBack);
+
+        addEventListener('loadstop', loadStopCallBack);
+
+        addEventListener('loaderror', loadErrorCallBack);
+    }
+
+}
+
+function loadStartCallBack() {
+
+    $('#status-message').text("loading please wait ...");
+
+}
+
+function loadStopCallBack() {
+
+    if (inAppBrowserRef != undefined) {
+
+        inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;" });
+
+        $('#status-message').text("");
+
+        inAppBrowserRef.show();
+    }
+
+}
+
+function loadErrorCallBack(params) {
+
+    $('#status-message').text("");
+
+    var scriptErrorMesssage =
+       "alert('Sorry we cannot open that page. Message from the server is : "
+       + params.message + "');"
+
+    inAppBrowserRef.executeScript({ code: scriptErrorMesssage }, executeScriptCallBack);
+
+    inAppBrowserRef.close();
+
+    inAppBrowserRef = undefined;
+
+}
+
+function executeScriptCallBack(params) {
+
+    if (params[0] == null) {
+
+        $('#status-message').text(
+           "Sorry we couldn't open that page. Message from the server is : '"
+           + params.message + "'");
+    }
+
+}
+
+```
+
 ### InAppBrowserEvent Properties
 
 - __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
@@ -394,3 +467,165 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });
+__
+
+## Sample: Show help pages with an InAppBrowser
+
+You can use this plugin to show helpful documentation pages within your app. Users can view online help documents and then close them without leaving the app.
+
+Here's a few snippets that show how you do this.
+
+* Give users a way to ask for help.
+* Load a help page.
+* Let users know that you're getting their page ready.
+* Show the help page.
+* Handle page errors.
+
+You can find the complete sample [here](https://github.com/Microsoft/cordova-samples/tree/master/cordova-plugin-inappbrowser).
+
+### Give users a way to ask for help
+
+There's lots of ways to do this in your app. A drop down list is a simple way to do that.
+
+```html
+
+<select id="help-select">
+    <option value="default">Need help?</option>
+    <option value="article">Show me a helpful article</option>
+    <option value="video">Show me a helpful video</option>
+    <option value="search">Search for other topics</option>
+</select>
+
+```
+
+Gather the users choice in the ``onDeviceReady`` function of the page and then send an appropriate URL to a helper function in some shared library file. Our helper function is named ``showHelp()`` and we'll write that function next.
+
+```javascript
+
+$('#help-select').on('change', function (e) {
+
+    var url;
+
+    switch (this.value) {
+
+        case "article":
+            url = "https://cordova.apache.org/docs/en/latest/"
+                        + "reference/cordova-plugin-inappbrowser/index.html";
+            break;
+
+        case "video":
+            url = "https://youtu.be/F-GlVrTaeH0";
+            break;
+
+        case "search":
+            url = "https://www.google.com/#q=inAppBrowser+plugin";
+            break;
+    }
+
+    showHelp(url);
+
+});
+
+```
+
+### Load a help page
+
+We'll use the ``open`` function to load the help page. We're setting the ``hidden`` property to ``yes`` so that we can show the browser only after the page content has loaded. That way, users don't see a blank browser while they wait for content to appear. When the ``loadstop`` event is raised, we'll know when the content has loaded. We'll handle that event shortly.
+
+```javascript
+
+var inAppBrowserRef = undefined;
+
+function showHelp(url) {
+
+    var target = "_blank";
+
+    var options = "location=yes,hidden=yes";
+
+    inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
+
+    with (inAppBrowserRef) {
+
+        addEventListener('loadstart', loadStartCallBack);
+
+        addEventListener('loadstop', loadStopCallBack);
+
+        addEventListener('loaderror', loadErrorCallBack);
+    }
+
+}
+
+```
+
+### Let users know that you're getting their page ready
+
+Because the browser doesn't immediately appear, we can use the ``loadstart`` event to show a status message, progress bar, or other indicator. This assures users that content is on the way.
+
+```javascript
+
+function loadStartCallBack() {
+
+    $('#status-message').text("loading please wait ...");
+
+}
+
+```
+
+### Show the help page
+
+When the ``loadstopcallback`` event is raised, we know that the content has loaded and we can make the browser visible. This sort of trick can create the impression of better performance. The truth is that whether you show the browser before content loads or not, the load times are exactly the same.
+
+```javascript
+
+function loadStopCallBack() {
+
+    if (inAppBrowserRef != undefined) {
+
+        inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;" });
+
+        $('#status-message').text("");
+
+        inAppBrowserRef.show();
+    }
+
+}
+
+```
+You might have noticed the call to the ``insertCSS`` function. This serves no particular purpose in our scenario. But it gives you an idea of why you might use it. In this case, we're just making sure that the font size of your pages have a certain size. You can use this function to insert any CSS style elements. You can even point to a CSS file in your project.
+
+### Handle page errors
+
+Sometimes a page no longer exists, a script error occurs, or a user lacks permission to view the resource. How or if you handle that situation is completely up to you and your design. You can let the browser show that message or you can present it in another way.
+
+We'll try to show that error in a message box. We can do that by injecting a script that calls the ``alert`` function. That said, this won't work in browsers on Windows devices so we'll have to look at the parameter of the ``executeScript`` callback function to see if our attempt worked. If it didn't work out for us, we'll just show the error message in a ``<div>`` on the page.
+
+```javascript
+
+function loadErrorCallBack(params) {
+
+    $('#status-message').text("");
+
+    var scriptErrorMesssage =
+       "alert('Sorry we cannot open that page. Message from the server is : "
+       + params.message + "');"
+
+    inAppBrowserRef.executeScript({ code: scriptErrorMesssage }, executeScriptCallBack);
+
+    inAppBrowserRef.close();
+
+    inAppBrowserRef = undefined;
+
+}
+
+function executeScriptCallBack(params) {
+
+    if (params[0] == null) {
+
+        $('#status-message').text(
+           "Sorry we couldn't open that page. Message from the server is : '"
+           + params.message + "'");
+    }
+
+}
+
+```
