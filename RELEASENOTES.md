@@ -21,6 +21,11 @@
 Release Notes
 =============
 
+0.2.15
+------
+
+Bug fix: fixes typo
+
 0.2.14
 ------
 

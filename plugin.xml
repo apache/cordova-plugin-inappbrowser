@@ -18,9 +18,10 @@
   under the License.
 -->
 
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="cordova-plugin-themeablebrowser"
-      version="0.2.14">
+<plugin
+      xmlns="http://apache.org/cordova/ns/plugins/1.0"
+      id="cordova-plugin-themeablebrowser"
+      version="0.2.15">
 
     <name>ThemeableBrowser</name>
     <description>Cordova ThemeableBrowser Plugin</description>

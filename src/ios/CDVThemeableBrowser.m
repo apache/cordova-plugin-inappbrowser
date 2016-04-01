@@ -334,8 +334,8 @@
 #else
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         [self.webView loadRequest:request];
-    } else { // this assumes the InAppBrowser can be excepted from the white-list
-        [self openInInAppBrowser:url withOptions:options];
+    } else { // this assumes the openInThemeableBrowser can be excepted from the white-list
+        [self openInThemeableBrowser:url withOptions:options];
     }
 #endif
 }
