@@ -80,6 +80,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String EDITABLE_LOCATION = "editablelocation";
+    private static final String LOCATION_URL = "locationbarurl";
     private static final String PRIVATE_SESSION = "private";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
@@ -95,6 +96,7 @@ public class InAppBrowser extends CordovaPlugin {
     private EditText edittext;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
+    private boolean showLocationBarUrl = true;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
@@ -485,6 +487,17 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean getShowLocationBar() {
         return this.showLocationBar;
     }
+   
+    /**
+     * Should we show the location bar Url?
+     *
+     * @return boolean
+     */
+    private boolean getShowLocationBarUrl() {
+        return this.showLocationBarUrl;
+    }
+
+ 
 
     /**
      * Should we make the location bar editable?
@@ -516,6 +529,7 @@ public class InAppBrowser extends CordovaPlugin {
     public String showWebPage(final String url, HashMap<String, Boolean> features) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
+        showLocationBarUrl = true;
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
@@ -524,6 +538,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean show = features.get(LOCATION);
             if (show != null) {
                 showLocationBar = show.booleanValue();
+            }
+            Boolean showUrl = features.get(LOCATION_URL);
+            if (showUrl != null) {
+                showLocationBarUrl = showUrl.booleanValue();
             }
             Boolean zoom = features.get(ZOOM);
             if (zoom != null) {
@@ -776,6 +794,10 @@ public class InAppBrowser extends CordovaPlugin {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
                 }
+                
+                if (!getShowLocationBarUrl()) {
+                    edittext.setVisibility(View.GONE);
+                }
 
                 // Add our webview to our main view/layout
                 main.addView(inAppWebView);
@@ -843,21 +865,6 @@ public class InAppBrowser extends CordovaPlugin {
             this.edittext = mEditText;
         }
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if(!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
-                try {
-                    Uri uri = Uri.parse(url);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    cordova.getActivity().startActivity(intent);
-                    return true;
-                } catch (Exception e) {
-
-                }
-            }
-            return super.shouldOverrideUrlLoading(view, url);
-        }
-
         /**
          * Override the URL that should be loaded
          *
@@ -917,6 +924,18 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
+            } else {
+		    if(!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
+			try {
+			    Uri uri = Uri.parse(url);
+			    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			    cordova.getActivity().startActivity(intent);
+			    return true;
+			} catch (Exception e) {
+
+			}
+		    }
+
             }
             return false;
         }
