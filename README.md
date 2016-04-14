@@ -532,8 +532,6 @@ We'll use the ``open`` function to load the help page. We're setting the ``hidde
 
 ```javascript
 
-var inAppBrowserRef = undefined;
-
 function showHelp(url) {
 
     var target = "_blank";
