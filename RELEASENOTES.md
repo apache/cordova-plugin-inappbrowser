@@ -20,6 +20,13 @@
 -->
 # Release Notes
 
+### 1.4.0 (Apr 15, 2016)
+* CB-7679 add fix for **iOS** upload.
+* CB-10944 `NoSuchMethodError` in `InAppBrowser` plugin
+* CB-10937 fix stretched icons
+* CB-10760 Fixing README for display on Cordova website
+* CB-10636 Add `JSHint` for plugins
+
 ### 1.3.0 (Feb 09, 2016)
 * [CB-3360](https://issues.apache.org/jira/browse/CB-3360) Set custom inappbrowser user agent for android
 * [CB-10538](https://issues.apache.org/jira/browse/CB-10538) cordova-plugin-inappbrowser timeout issue
