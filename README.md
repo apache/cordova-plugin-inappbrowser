@@ -469,19 +469,19 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
     });
 __
 
-## Sample: Show help pages with an InAppBrowser
+## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
 
 You can use this plugin to show helpful documentation pages within your app. Users can view online help documents and then close them without leaving the app.
 
 Here's a few snippets that show how you do this.
 
-* Give users a way to ask for help.
-* Load a help page.
-* Let users know that you're getting their page ready.
-* Show the help page.
-* Handle page errors.
+* [Give users a way to ask for help](#give).
+* [Load a help page](#load).
+* [Let users know that you're getting their page ready](#let).
+* [Show the help page](#show).
+* [Handle page errors](#handle).
 
-### Give users a way to ask for help
+### <a id="give"></a>Give users a way to ask for help
 
 There's lots of ways to do this in your app. A drop down list is a simple way to do that.
 
@@ -526,7 +526,7 @@ $('#help-select').on('change', function (e) {
 
 ```
 
-### Load a help page
+### <a id="load"></a>Load a help page
 
 We'll use the ``open`` function to load the help page. We're setting the ``hidden`` property to ``yes`` so that we can show the browser only after the page content has loaded. That way, users don't see a blank browser while they wait for content to appear. When the ``loadstop`` event is raised, we'll know when the content has loaded. We'll handle that event shortly.
 
@@ -553,7 +553,7 @@ function showHelp(url) {
 
 ```
 
-### Let users know that you're getting their page ready
+### <a id="let"></a>Let users know that you're getting their page ready
 
 Because the browser doesn't immediately appear, we can use the ``loadstart`` event to show a status message, progress bar, or other indicator. This assures users that content is on the way.
 
@@ -567,7 +567,7 @@ function loadStartCallBack() {
 
 ```
 
-### Show the help page
+### <a id="show"></a>Show the help page
 
 When the ``loadstopcallback`` event is raised, we know that the content has loaded and we can make the browser visible. This sort of trick can create the impression of better performance. The truth is that whether you show the browser before content loads or not, the load times are exactly the same.
 
@@ -589,7 +589,7 @@ function loadStopCallBack() {
 ```
 You might have noticed the call to the ``insertCSS`` function. This serves no particular purpose in our scenario. But it gives you an idea of why you might use it. In this case, we're just making sure that the font size of your pages have a certain size. You can use this function to insert any CSS style elements. You can even point to a CSS file in your project.
 
-### Handle page errors
+### <a id="handle"></a>Handle page errors
 
 Sometimes a page no longer exists, a script error occurs, or a user lacks permission to view the resource. How or if you handle that situation is completely up to you and your design. You can let the browser show that message or you can present it in another way.
 
