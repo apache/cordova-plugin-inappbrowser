@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
 這個外掛程式提供了一個 web 瀏覽器視圖，顯示在調用 `cordova.InAppBrowser.open()`.
 
@@ -48,7 +48,7 @@ InAppBrowser 預設情況下它自己的 GUI 控制項為使用者提供 （後�
 
 ## 安裝
 
-    cordova plugin add org.apache.cordova.inappbrowser
+    cordova plugin add cordova-plugin-inappbrowser
     
 
 如果您希望所有頁面載入中您的應用程式要通過 InAppBrowser，你可以簡單地在初始化過程中鉤 `window.open`。舉個例子：

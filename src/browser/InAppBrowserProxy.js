@@ -19,9 +19,7 @@
  *
 */
 
-var cordova = require('cordova'),
-    channel = require('cordova/channel'),
-    urlutil = require('cordova/urlutil');
+var modulemapper = require('cordova/modulemapper');
 
 var browserWrap,
     popup,
@@ -68,11 +66,12 @@ var IAB = {
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],
-            features = args[2],
-            url;
+            features = args[2];
 
-        if (target === "_system" || target === "_self" || !target) {
+        if (target === "_self" || !target) {
             window.location = strUrl;
+        } else if (target === "_system") {
+            modulemapper.getOriginalSymbol(window, 'window.open').call(window, strUrl, "_blank");
         } else {
             // "_blank" or anything else
             if (!browserWrap) {
@@ -190,7 +189,9 @@ var IAB = {
         if (browserWrap && popup) {
             try {
                 popup.contentWindow.eval(code);
-                hasCallback && win([]);
+                if (hasCallback) {
+                    win([]);
+                }
             } catch(e) {
                 console.error('Error occured while trying to injectScriptCode: ' + JSON.stringify(e));
             }
@@ -198,21 +199,27 @@ var IAB = {
     },
 
     injectScriptFile: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectScriptFile is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectScriptFile is not yet implemented';
         console.warn(msg);
-        fail && fail(msg);
+        if (fail) {
+            fail(msg);
+        }
     }, 
 
     injectStyleCode: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectStyleCode is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectStyleCode is not yet implemented';
         console.warn(msg);
-        fail && fail(msg);
+        if (fail) {
+            fail(msg);
+        }
     },
 
     injectStyleFile: function (win, fail, args) {
-        var msg = 'Browser org.apache.cordova.inappbrowser injectStyleFile is not yet implemented';
+        var msg = 'Browser cordova-plugin-inappbrowser injectStyleFile is not yet implemented';
         console.warn(msg);
-        fail && fail(msg);
+        if (fail) {
+            fail(msg);
+        }
     }
 };
 

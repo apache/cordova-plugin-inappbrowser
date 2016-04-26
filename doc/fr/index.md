@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
 Ce module fournit une vue de navigateur web qui s'affiche lorsque vous appelez `cordova.InAppBrowser.open()`.
 
@@ -48,7 +48,7 @@ Bien que `window.open` est dans la portée globale, InAppBrowser n'est pas dispo
 
 ## Installation
 
-    cordova plugin add org.apache.cordova.inappbrowser
+    cordova plugin add cordova-plugin-inappbrowser
     
 
 Si vous souhaitez que toutes les charges de la page dans votre application de passer par le InAppBrowser, vous pouvez simplement accrocher `window.open` pendant l'initialisation. Par exemple :

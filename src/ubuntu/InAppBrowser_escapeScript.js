@@ -19,6 +19,9 @@
  *
 */
 
+/* jshint -W061 */
+/* global oxide */
+
 oxide.addMessageHandler("EXECUTE", function(msg) {
     var code = msg.args.code;
     try {
