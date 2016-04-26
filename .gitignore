@@ -12,6 +12,7 @@ Thumbs.db
 *.swp
 *.user
 
+node_modules
 
 
 

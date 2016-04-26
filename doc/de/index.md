@@ -17,7 +17,7 @@
     under the License.
 -->
 
-# org.apache.cordova.inappbrowser
+# cordova-plugin-inappbrowser
 
 Dieses Plugin bietet eine Web-Browser-Ansicht, die beim Aufruf von `cordova.InAppBrowser.open()`.
 
@@ -48,7 +48,7 @@ Für rückwärts Kompatibilität, dieses Plugin auch `window.open` Haken. Jedoch
 
 ## Installation
 
-    cordova plugin add org.apache.cordova.inappbrowser
+    cordova plugin add cordova-plugin-inappbrowser
     
 
 Wenn Sie alle Seite Lasten in Ihrer Anwendung durch die InAppBrowser gehen möchten, können Sie einfach `window.open` während der Initialisierung Haken. Zum Beispiel:
