@@ -27,6 +27,10 @@ description: Open an in-app browser window.
 
 # cordova-plugin-inappbrowser
 
+You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
+
+> To get a few ideas, check out the [sample](#sample) at the bottom of this page or go straight to the [reference](#reference) content.
+
 This plugin provides a web browser view that displays when calling `cordova.InAppBrowser.open()`.
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
@@ -65,7 +69,7 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
 
 
-
+## <a id="reference">Reference
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
