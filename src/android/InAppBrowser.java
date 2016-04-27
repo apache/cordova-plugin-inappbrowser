@@ -22,6 +22,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Browser;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -67,6 +69,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -88,11 +91,6 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String DISMISSABLE_WITH_BACK_BUTTON = "dismissablewithbackbutton";
-
-    /*
-    Configuration property. Custom applicaiton scheme to be handeld in a _system.
-     */
-    private static final String CUSTOM_APPLICATION_SCHEME = "kOGAppScheme";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -810,23 +808,16 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, String url) {
-          // handle back to application redirect without processing url by webView
-          final CordovaPreferences preferences = Config.getPreferences();
-            if (url.startsWith(preferences.getString(CUSTOM_APPLICATION_SCHEME, "!@#$"))) {
-                try {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW);
-                    final Uri uri = Uri.parse(url);
-                    intent.setData(uri);
-                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    cordova.getActivity().startActivity(intent);
-                    closeDialog();
-                    return;
-                } catch (final android.content.ActivityNotFoundException e) {
-                    LOG.e(LOG_TAG, "Error during redirection " + url + ":" + e.toString());
-                }
+            // handle back to application redirect without processing url by webView
+            final Intent customSchemeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            final PackageManager packageManager = cordova.getActivity().getApplicationContext().getPackageManager();
+            final List<ResolveInfo> resolvedActivities = packageManager.queryIntentActivities(customSchemeIntent, 0);
+            if(resolvedActivities.size() > 0) {
+                cordova.getActivity().startActivity(customSchemeIntent);
+                closeDialog();
+                return true;
             }
 
-            super.onPageStarted(view, url, favicon);
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
