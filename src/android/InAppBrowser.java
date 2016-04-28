@@ -120,6 +120,26 @@ public class InAppBrowser extends CordovaPlugin {
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
 
             Log.d(LOG_TAG, "target = " + target);
+            
+            // HIDE THE STATUS BAR
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // SYSTEM_UI_FLAG_FULLSCREEN is available since JellyBean, but we
+                    // use KitKat here to be aligned with "Fullscreen"  preference
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        int uiOptions = window.getDecorView().getSystemUiVisibility()
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+
+                        window.getDecorView().setSystemUiVisibility(uiOptions);
+                        return;
+                    }
+
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
+            });
+            // --- HIDE THE STATUS BAR ---
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
