@@ -539,6 +539,13 @@ public class InAppBrowser extends CordovaPlugin {
                 // Let's create the main dialog
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+
+                // If the FLAG_SECURE is set on the Cordova Main Window, make sure it is set on the IAB Dialog as well
+                int flags = cordova.getActivity().getWindow().getAttributes().flags;
+                if ((flags & WindowManager.LayoutParams.FLAG_SECURE) != 0) {
+                    dialog.getWindow().addFlags(LayoutParams.FLAG_SECURE);
+                }
+        
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
