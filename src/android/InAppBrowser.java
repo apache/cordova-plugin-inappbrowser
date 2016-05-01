@@ -100,7 +100,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
-    private boolean showWindowSecure = false;
+    private Boolean showWindowSecure = null;
 
 
     /**
@@ -479,7 +479,7 @@ public class InAppBrowser extends CordovaPlugin {
         showLocationBar = true;
         showZoomControls = true;
         openWindowHidden = false;
-        showWindowSecure = false;
+        showWindowSecure = null;
         mediaPlaybackRequiresUserGesture = false;
 
         if (features != null) {
@@ -503,10 +503,9 @@ public class InAppBrowser extends CordovaPlugin {
             if (mediaPlayback != null) {
                 mediaPlaybackRequiresUserGesture = mediaPlayback.booleanValue();
             }
-            Boolean secure = features.get(SECURE_WINDOW);
-            if (secure != null) {
-                showWindowSecure = secure;
-            } 
+            
+            showWindowSecure = features.get(SECURE_WINDOW);
+          
             Boolean cache = features.get(CLEAR_ALL_CACHE);
             if (cache != null) {
                 clearAllCache = cache.booleanValue();
@@ -558,7 +557,11 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
-                if (showWindowSecure || cordovaWindowHasSecureFlag()) {
+                if (showWindowSecure != null) {
+                    if (showWindowSecure) {
+                        dialog.getWindow().addFlags(LayoutParams.FLAG_SECURE);
+                    }
+                } else if (cordovaWindowHasSecureFlag()) {
                     dialog.getWindow().addFlags(LayoutParams.FLAG_SECURE);
                 }
 
