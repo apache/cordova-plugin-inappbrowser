@@ -86,6 +86,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
+    private static final String SECURE_WINDOW = "securewindow";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
 
     private InAppBrowserDialog dialog;
@@ -99,6 +100,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
+    private boolean showWindowSecure = false;
+
 
     /**
      * Executes the request and returns PluginResult.
@@ -476,6 +479,7 @@ public class InAppBrowser extends CordovaPlugin {
         showLocationBar = true;
         showZoomControls = true;
         openWindowHidden = false;
+        showWindowSecure = false;
         mediaPlaybackRequiresUserGesture = false;
 
         if (features != null) {
@@ -499,6 +503,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (mediaPlayback != null) {
                 mediaPlaybackRequiresUserGesture = mediaPlayback.booleanValue();
             }
+            Boolean secure = features.get(SECURE_WINDOW);
+            if (secure != null) {
+                showWindowSecure = secure;
+            } 
             Boolean cache = features.get(CLEAR_ALL_CACHE);
             if (cache != null) {
                 clearAllCache = cache.booleanValue();
@@ -549,6 +557,10 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
+
+                if (showWindowSecure || cordovaWindowHasSecureFlag()) {
+                    dialog.getWindow().addFlags(LayoutParams.FLAG_SECURE);
+                }
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
@@ -959,6 +971,11 @@ public class InAppBrowser extends CordovaPlugin {
 
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
-        }
+        }  
+    }
+
+    private boolean cordovaWindowHasSecureFlag() {
+        int flags = cordova.getActivity().getWindow().getAttributes().flags;
+        return (flags & WindowManager.LayoutParams.FLAG_SECURE) != 0;
     }
 }
