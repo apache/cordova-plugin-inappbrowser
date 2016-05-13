@@ -812,11 +812,6 @@ public class InAppBrowser extends CordovaPlugin {
             final Intent customSchemeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             final PackageManager packageManager = cordova.getActivity().getApplicationContext().getPackageManager();
             final List<ResolveInfo> resolvedActivities = packageManager.queryIntentActivities(customSchemeIntent, 0);
-            if(resolvedActivities.size() > 0) {
-                cordova.getActivity().startActivity(customSchemeIntent);
-                closeDialog();
-                return true;
-            }
 
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
@@ -870,6 +865,10 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
+            } else if(resolvedActivities.size() > 0) {
+                cordova.getActivity().startActivity(customSchemeIntent);
+                closeDialog();
+                return true;
             }
             return false;
         }
