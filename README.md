@@ -237,14 +237,11 @@ function showHelp(url) {
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
-    with (inAppBrowserRef) {
+    inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
-        addEventListener('loadstart', loadStartCallBack);
+    inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
-        addEventListener('loadstop', loadStopCallBack);
-
-        addEventListener('loaderror', loadErrorCallBack);
-    }
+    inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
 }
 
@@ -546,14 +543,11 @@ function showHelp(url) {
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
-    with (inAppBrowserRef) {
+    inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
-        addEventListener('loadstart', loadStartCallBack);
+    inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
-        addEventListener('loadstop', loadStopCallBack);
-
-        addEventListener('loaderror', loadErrorCallBack);
-    }
+    inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
 }
 
