@@ -142,8 +142,11 @@ public class InAppBrowser extends CordovaPlugin {
                                 Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
                                 shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
                             } catch (NoSuchMethodException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             } catch (IllegalAccessException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             } catch (InvocationTargetException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             }
                         }
                         if (shouldAllowNavigation == null) {
@@ -153,8 +156,11 @@ public class InAppBrowser extends CordovaPlugin {
                                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
                             } catch (NoSuchMethodException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             } catch (IllegalAccessException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             } catch (InvocationTargetException e) {
+                                Log.d(LOG_TAG, e.getLocalizedMessage());
                             }
                         }
                         // load in webview
@@ -933,8 +939,11 @@ public class InAppBrowser extends CordovaPlugin {
                 Method gpm = webView.getClass().getMethod("getPluginManager");
                 pluginManager = (PluginManager)gpm.invoke(webView);
             } catch (NoSuchMethodException e) {
+                Log.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
+                Log.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
+                Log.d(LOG_TAG, e.getLocalizedMessage());
             }
 
             if (pluginManager == null) {
@@ -942,7 +951,9 @@ public class InAppBrowser extends CordovaPlugin {
                     Field pmf = webView.getClass().getField("pluginManager");
                     pluginManager = (PluginManager)pmf.get(webView);
                 } catch (NoSuchFieldException e) {
+                    Log.d(LOG_TAG, e.getLocalizedMessage());
                 } catch (IllegalAccessException e) {
+                    Log.d(LOG_TAG, e.getLocalizedMessage());
                 }
             }
 
