@@ -64,11 +64,11 @@
 
 - (BOOL) isSystemUrl:(NSURL*)url
 {
-	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
-		return YES;
-	}
+    if ([[url host] isEqualToString:@"itunes.apple.com"]) {
+        return YES;
+    }
 
-	return NO;
+    return NO;
 }
 
 - (void)open:(CDVInvokedUrlCommand*)command
@@ -224,7 +224,15 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
+            UIView* inAppView = weakSelf.inAppBrowserViewController.view;
+            [weakSelf.viewController addChildViewController:weakSelf.inAppBrowserViewController];
+            [weakSelf.viewController.view addSubview:weakSelf.inAppBrowserViewController.view];
+            inAppView.transform = CGAffineTransformMakeTranslation(0, inAppView.frame.size.height);
+
+            [UIView animateWithDuration:0.4 delay:0 usingSpringWithDamping:0.9 initialSpringVelocity:0.1 options:0 animations:^{
+                inAppView.transform = CGAffineTransformIdentity;
+            } completion:nil];
+//            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
         }
     });
 }
@@ -772,10 +780,14 @@
 
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
-            [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
-        } else {
-            [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
+        if ([weakSelf parentViewController]) {
+            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                weakSelf.view.transform = CGAffineTransformMakeTranslation(0, weakSelf.view.frame.size.height);
+            } completion:^(BOOL finished) {
+                [weakSelf.view removeFromSuperview];
+                [weakSelf removeFromParentViewController];
+                weakSelf.view = nil;
+            }];
         }
     });
 }
@@ -1061,4 +1073,3 @@
 
 
 @end
-
