@@ -208,6 +208,10 @@
         self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
 
+    if (IsAtLeastiOSVersion(@"9.0")) {
+        self.inAppBrowserViewController.webView.allowsPictureInPictureMediaPlayback = browserOptions.enablepictureinpicture;
+    }
+
     [self.inAppBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
         [self show:nil];
@@ -965,6 +969,7 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
+        self.enablepictureinpicture = YES;
     }
 
     return self;
