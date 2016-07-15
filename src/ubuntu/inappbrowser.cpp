@@ -50,15 +50,25 @@ const char LOADSTART_EVENT[] = "{type: 'loadstart'}";
 const char LOADSTOP_EVENT[] = "{type: 'loadstop'}";
 const char LOADERROR_EVENT[] = "{type: 'loaderror'}";
 
-void Inappbrowser::open(int cb, int, const QString &url, const QString &, const QString &) {
+void Inappbrowser::open(int cb, int,
+                        const QString &url,
+                        const QString &windowName,
+                        const QString &windowFeatures) {
     assert(_eventCb == 0);
 
     _eventCb = cb;
 
-    QString path = m_cordova->get_app_dir() + "/../qml/InAppBrowser.qml";
-    QString qml = QString(code)
-      .arg(CordovaInternal::format(path)).arg(CordovaInternal::format(url));
-    m_cordova->execQML(qml);
+    if (windowName == "_blank") {
+      QString path = m_cordova->get_app_dir() + "/../qml/InAppBrowser.qml";
+      QString qml = QString(code)
+        .arg(CordovaInternal::format(path)).arg(CordovaInternal::format(url));
+
+      m_cordova->execQML(qml);
+    } else if (windowName == "_system") {
+      // TODO: use ual?
+      m_cordova->execQML(
+          QString("Qt.openUrlExternally(\"%1\")").arg(url));
+    }
 }
 
 void Inappbrowser::show(int, int) {
