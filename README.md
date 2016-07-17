@@ -85,7 +85,7 @@ instance, or the system browser.
 
     var ref = cordova.InAppBrowser.open(url, target, options);
 
-- __ref__: Reference to the `InAppBrowser` window. _(InAppBrowser)_
+- __ref__: Reference to the `InAppBrowser` window when the target is set to `'_blank'`. _(InAppBrowser)_
 
 - __url__: The URL to load _(String)_. Call `encodeURI()` on this if the URL contains Unicode characters.
 
@@ -195,7 +195,7 @@ Similar to Firefox OS IAB window visual behaviour can be overridden via `inAppBr
 
 ## InAppBrowser
 
-The object returned from a call to `cordova.InAppBrowser.open`.
+The object returned from a call to `cordova.InAppBrowser.open` when the target is set to `'_blank'`.
 
 ### Methods
 
