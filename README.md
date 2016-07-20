@@ -227,7 +227,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 
 ```javascript
 
-var inAppBrowserRef = undefined;
+var inAppBrowserRef;
 
 function showHelp(url) {
 
@@ -623,5 +623,51 @@ function executeScriptCallBack(params) {
     }
 
 }
+
+```
+
+## More Usage Info
+
+### Local Urls ( source is in the app package )
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('local-url.html');                  // loads in the Cordova WebView
+iab.open('local-url.html', '_self');         // loads in the Cordova WebView
+iab.open('local-url.html', '_system');       // Security error: system browser, but url will not load (iOS)
+iab.open('local-url.html', '_blank');        // loads in the InAppBrowser
+iab.open('local-url.html', 'random_string'); // loads in the InAppBrowser
+iab.open('local-url.html', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+
+```
+
+
+
+### Whitelisted Content
+
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('http://whitelisted-url.com');                  // loads in the Cordova WebView
+iab.open('http://whitelisted-url.com', '_self');         // loads in the Cordova WebView
+iab.open('http://whitelisted-url.com', '_system');       // loads in the system browser
+iab.open('http://whitelisted-url.com', '_blank');        // loads in the InAppBrowser
+iab.open('http://whitelisted-url.com', 'random_string'); // loads in the InAppBrowser
+
+iab.open('http://whitelisted-url.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+
+```
+
+### Urls that are not white-listed
+
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('http://url-that-fails-whitelist.com');                  // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', '_self');         // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', '_system');       // loads in the system browser
+iab.open('http://url-that-fails-whitelist.com', '_blank');        // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```
