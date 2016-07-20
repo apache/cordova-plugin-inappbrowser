@@ -581,6 +581,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Drawable backIcon = activityRes.getDrawable(backResId);
                 if (Build.VERSION.SDK_INT >= 16)
                     back.setBackground(null);
+                else
+                    back.setBackgroundDrawable(null);
                 back.setImageDrawable(backIcon);
                 back.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
@@ -604,6 +606,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Drawable fwdIcon = activityRes.getDrawable(fwdResId);
                 if (Build.VERSION.SDK_INT >= 16)
                     forward.setBackground(null);
+                else
+                    forward.setBackgroundDrawable(null);
                 forward.setImageDrawable(fwdIcon);
                 forward.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 forward.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
@@ -650,6 +654,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Drawable closeIcon = activityRes.getDrawable(closeResId);
                 if (Build.VERSION.SDK_INT >= 16)
                     close.setBackground(null);
+                else
+                    close.setBackgroundDrawable(null);
                 close.setImageDrawable(closeIcon);
                 close.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
