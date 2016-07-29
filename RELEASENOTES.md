@@ -21,6 +21,12 @@
 Release Notes
 =============
 
+0.2.17
+------
+
+Bug fix: remove hardcoded density value and add correct param
+Bug fix: Open iTunes Store links in AppStore app for iOS
+
 0.2.15
 ------
 
