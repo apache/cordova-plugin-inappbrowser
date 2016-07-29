@@ -79,6 +79,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
+    private static final String EDITABLE_LOCATION = "editablelocation";
+    private static final String LOCATION_URL = "locationbarurl";
+    private static final String PRIVATE_SESSION = "private";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
@@ -93,11 +96,14 @@ public class InAppBrowser extends CordovaPlugin {
     private EditText edittext;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
+    private boolean showLocationBarUrl = true;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
+    private boolean editableLocationBar = false;
+    private boolean privateSession = false;
     private boolean mediaPlaybackRequiresUserGesture = false;
 
     /**
@@ -368,6 +374,17 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * goes back till first page, then closes the dialog
+     */
+
+    public void popPage() {
+        if(!this.inAppWebView.canGoBack())
+            this.closeDialog();
+        else
+            this.inAppWebView.goBack();
+    }
+
+    /**
      * Closes the dialog
      */
     public void closeDialog() {
@@ -440,6 +457,16 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 
+
+    private String processUrl(String url) {
+        if(!url.contains(".") || url.contains(" ")) {
+           url = "http://google.com/search?q=" + url;
+        }
+
+        return url;
+    }
+
+
     /**
      * Navigate to the new page
      *
@@ -466,6 +493,34 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean getShowLocationBar() {
         return this.showLocationBar;
     }
+   
+    /**
+     * Should we show the location bar Url?
+     *
+     * @return boolean
+     */
+    private boolean getShowLocationBarUrl() {
+        return this.showLocationBarUrl;
+    }
+
+ 
+
+    /**
+     * Should we make the location bar editable?
+     * @return boolean
+     */
+    private boolean getEditableLocationBar() {
+        return this.editableLocationBar;
+    }
+
+    /**
+     * Should the session be private?
+     * @return boolean
+     */
+
+    private boolean getPrivateSession() {
+        return this.privateSession;
+    }
 
     private InAppBrowser getInAppBrowser(){
         return this;
@@ -480,6 +535,7 @@ public class InAppBrowser extends CordovaPlugin {
     public String showWebPage(final String url, HashMap<String, Boolean> features) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
+        showLocationBarUrl = true;
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
@@ -488,6 +544,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean show = features.get(LOCATION);
             if (show != null) {
                 showLocationBar = show.booleanValue();
+            }
+            Boolean showUrl = features.get(LOCATION_URL);
+            if (showUrl != null) {
+                showLocationBarUrl = showUrl.booleanValue();
             }
             Boolean zoom = features.get(ZOOM);
             if (zoom != null) {
@@ -513,6 +573,14 @@ public class InAppBrowser extends CordovaPlugin {
                 if (cache != null) {
                     clearSessionCache = cache.booleanValue();
                 }
+            }
+            Boolean editableLocation = features.get(EDITABLE_LOCATION);
+            if(editableLocation != null) {
+                editableLocationBar = editableLocation.booleanValue();
+            }
+            Boolean privateSession = features.get(PRIVATE_SESSION);
+            if(privateSession != null) {
+                this.privateSession = privateSession.booleanValue();
             }
         }
 
@@ -631,12 +699,15 @@ public class InAppBrowser extends CordovaPlugin {
                 edittext.setText(url);
                 edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
                 edittext.setImeOptions(EditorInfo.IME_ACTION_GO);
-                edittext.setInputType(InputType.TYPE_NULL); // Will not except input... Makes the text NON-EDITABLE
+
+                if(!getEditableLocationBar()) {
+                    edittext.setInputType(InputType.TYPE_NULL); // Will not except input... Makes the text NON-EDITABLE
+                }
                 edittext.setOnKeyListener(new View.OnKeyListener() {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                          navigate(edittext.getText().toString());
+                          navigate(processUrl(edittext.getText().toString()));
                           return true;
                         }
                         return false;
@@ -694,6 +765,15 @@ public class InAppBrowser extends CordovaPlugin {
                 if (appendUserAgent != null) {
                     settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
                 }
+                if(getPrivateSession()) {
+                    settings.setCacheMode(settings.LOAD_NO_CACHE);
+                    settings.setAppCacheEnabled(false);
+                    inAppWebView.clearFormData();
+                    inAppWebView.clearHistory();
+                    inAppWebView.clearCache(true);
+                    settings.setSaveFormData(false);
+                    settings.setSavePassword(false);
+                }
 
                 //Toggle whether this is enabled or not!
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
@@ -731,6 +811,10 @@ public class InAppBrowser extends CordovaPlugin {
                 if (getShowLocationBar()) {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
+                }
+                
+                if (!getShowLocationBarUrl()) {
+                    edittext.setVisibility(View.GONE);
                 }
 
                 // Add our webview to our main view/layout
@@ -858,6 +942,18 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
+            } else {
+		    if(!(url.startsWith("http://") || url.startsWith("https://") || url.startsWith("file://"))) {
+			try {
+			    Uri uri = Uri.parse(url);
+			    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			    cordova.getActivity().startActivity(intent);
+			    return true;
+			} catch (Exception e) {
+
+			}
+		    }
+
             }
             return false;
         }
