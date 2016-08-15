@@ -23,7 +23,7 @@
       version="1.7.2-dev">
 
     <name>InAppBrowser</name>
-    <description>Cordova InAppBrowser Plugin</description>
+    <description>Cordova InAppBrowser Plugin with additional certificate trust support</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
     <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git</repo>
@@ -125,10 +125,26 @@
             </feature>
         </config-file>
 
-        <header-file src="src/ios/CDVInAppBrowser.h" />
-	    <source-file src="src/ios/CDVInAppBrowser.m" />
 
-	    <framework src="CoreGraphics.framework" />
+        <header-file src="src/ios/CacheStoragePolicy.h" />
+        <header-file src="src/ios/CanonicalRequest.h" />
+        <header-file src="src/ios/CDVInAppBrowser.h" />
+        <header-file src="src/ios/CredentialsManager.h" />
+        <header-file src="src/ios/CustomHTTPProtocol.h" />
+        <header-file src="src/ios/QNSURLSessionDemux.h" />
+        <header-file src="src/ios/ThreadInfo.h" />
+        <header-file src="src/ios/WebViewController.h" />
+
+        <source-file src="src/ios/CacheStoragePolicy.m" />
+        <source-file src="src/ios/CanonicalRequest.m" />
+        <source-file src="src/ios/CDVInAppBrowser.m" />
+        <source-file src="src/ios/CredentialsManager.m" />
+        <source-file src="src/ios/CustomHTTPProtocol.m" />
+        <source-file src="src/ios/QNSURLSessionDemux.m" />
+        <source-file src="src/ios/ThreadInfo.m" />
+        <source-file src="src/ios/WebViewController.m" />
+
+        <framework src="CoreGraphics.framework" />
     </platform>
 
     <!-- osx -->

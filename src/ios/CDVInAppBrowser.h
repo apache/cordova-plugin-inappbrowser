@@ -17,6 +17,9 @@
  under the License.
  */
 
+#import "CredentialsManager.h"
+#import "CustomHTTPProtocol.h"
+#import "WebViewController.h"
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
@@ -32,9 +35,23 @@
 @interface CDVInAppBrowser : CDVPlugin {
 }
 
+@property (nonatomic, strong, readwrite) CredentialsManager *   credentialsManager;
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
 @property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
+
+
+/*! For threadInfoByThreadID, each key is an NSNumber holding a thread ID and each
+ value is a ThreadInfo object.  The dictionary is protected by @synchronized on
+ the app delegate object itself.
+
+ In the debugger you can dump this info with:
+
+ (lldb) po [[[UIApplication sharedApplication] delegate] threadInfoByThreadID]
+ */
+
+@property (atomic, strong, readwrite) NSMutableDictionary *     threadInfoByThreadID;
+@property (atomic, assign, readwrite) NSUInteger                nextThreadNumber;           ///< Protected by @synchronized on the delegate object.
 
 - (void)open:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
@@ -68,19 +85,19 @@
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
+@interface CDVInAppBrowserViewController : WebViewController <WebViewControllerDelegate, CustomHTTPProtocolDelegate, UIWebViewDelegate, CDVScreenOrientationDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
     CDVInAppBrowserOptions *_browserOptions;
-    
+
 #ifdef __CORDOVA_4_0_0
     CDVUIWebViewDelegate* _webViewDelegate;
 #else
     CDVWebViewDelegate* _webViewDelegate;
 #endif
-    
+
 }
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
@@ -110,4 +127,3 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
-
