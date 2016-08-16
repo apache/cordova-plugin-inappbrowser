@@ -87,6 +87,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+    private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -99,6 +100,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
+    private boolean shouldPauseInAppBrowser = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -263,6 +265,26 @@ public class InAppBrowser extends CordovaPlugin {
     @Override
     public void onReset() {
         closeDialog();
+    }
+
+    /**
+     * Called when the system is about to start resuming a previous activity.
+     */
+    @Override
+    public void onPause(boolean multitasking) {
+        if (shouldPauseInAppBrowser) {
+            inAppWebView.onPause();
+        }
+    }
+
+    /**
+     * Called when the activity will start interacting with the user.
+     */
+    @Override
+    public void onResume(boolean multitasking) {
+        if (shouldPauseInAppBrowser) {
+            inAppWebView.onResume();
+        }
     }
 
     /**
@@ -513,6 +535,10 @@ public class InAppBrowser extends CordovaPlugin {
                 if (cache != null) {
                     clearSessionCache = cache.booleanValue();
                 }
+            }
+            Boolean shouldPause = features.get(SHOULD_PAUSE);
+            if (shouldPause != null) {
+                shouldPauseInAppBrowser = shouldPause.booleanValue();
             }
         }
 
