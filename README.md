@@ -131,6 +131,7 @@ instance, or the system browser.
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __fullscreen__: set to `yes` to create the browser control without a border around it. Please note that if __location=no__ is also specified, there will be no control presented to user to close IAB window.
+    - __hardwareback__: works the same way as on Android platform.
 
 ### Supported Platforms
 
