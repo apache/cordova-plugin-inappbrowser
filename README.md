@@ -109,10 +109,15 @@ instance, or the system browser.
     - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
     - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
+    - __toolbarcolor__: set to a HEX color like #8a32b9 (defaults to #eeeeee)
+    - __showback__: set to `no` to hide the display of the back button (defaults to `yes`).
+    - __showforward__: set to `no` to hide the display of the forward button (defaults to `yes`).
+    - __showurl__: set to `no` to hide the display of the url (defaults to `yes`).
 
     iOS only:
 
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
+    - __closebuttontint__: set to a HEX color like #8a32b9 (defaults to #3C88E6)
     - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
@@ -124,8 +129,10 @@ instance, or the system browser.
     - __keyboardDisplayRequiresUserAction__: Set to `yes` or `no` to open the keyboard when form elements receive focus via JavaScript's `focus()` call (defaults to `yes`).
     - __suppressesIncrementalRendering__: Set to `yes` or `no` to wait until all new view content is received before being rendered (defaults to `no`).
     - __presentationstyle__:  Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style](http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle) (defaults to `fullscreen`).
-    - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
+    - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve`, `partialcurl` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
+    - __showback__: set to `no` to hide the display of the back button (defaults to `yes`).
+    - __showforward__: set to `no` to hide the display of the forward button (defaults to `yes`).
 
     Windows only:
 
