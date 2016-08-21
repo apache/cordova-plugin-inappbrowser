@@ -199,9 +199,9 @@ public class InAppBrowser extends CordovaPlugin {
                         result = showWebPage(url, features);
                     }
 
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-                    pluginResult.setKeepCallback(true);
-                    callbackContext.sendPluginResult(pluginResult);
+                    if (!result.equals("")) {
+                        sendErrorEvent(url, 0, result, false);
+                    }
                 }
             });
         }
@@ -781,6 +781,19 @@ public class InAppBrowser extends CordovaPlugin {
         return "";
     }
 
+    private void sendErrorEvent(String url, int code, String message, boolean keepCallback) {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("type", LOAD_ERROR_EVENT);
+            obj.put("url", url);
+            obj.put("code", code);
+            obj.put("message", message);
+            sendUpdate(obj, keepCallback, PluginResult.Status.ERROR);
+        } catch (JSONException ex) {
+            Log.d(LOG_TAG, "Should never happen");
+        }
+    }
+
     /**
      * Create a new plugin success result and send it back to JavaScript
      *
@@ -952,17 +965,7 @@ public class InAppBrowser extends CordovaPlugin {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
 
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_ERROR_EVENT);
-                obj.put("url", failingUrl);
-                obj.put("code", errorCode);
-                obj.put("message", description);
-
-                sendUpdate(obj, true, PluginResult.Status.ERROR);
-            } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
-            }
+            sendErrorEvent(failingUrl, errorCode, description, true);
         }
 
         /**
