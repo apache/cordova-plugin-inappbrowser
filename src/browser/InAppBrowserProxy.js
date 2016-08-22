@@ -107,6 +107,7 @@ var IAB = {
 
             if (features.indexOf("location=yes") !== -1 || features.indexOf("location") === -1) {
                 popup.style.height = "calc(100% - 60px)";
+                popup.style.marginBottom = "-4px";
 
                 navigationButtonsDiv = document.createElement("div");
                 navigationButtonsDiv.style.height = "60px";
