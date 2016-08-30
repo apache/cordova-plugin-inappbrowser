@@ -323,8 +323,8 @@ public class InAppBrowser extends CordovaPlugin {
         }
         if (shouldAllowNavigation == null) {
             try {
-                Method gpm = inAppWebView.getClass().getMethod("getPluginManager");
-                PluginManager pm = (PluginManager)gpm.invoke(inAppWebView);
+                Method gpm = this.inAppWebView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(this.inAppWebView);
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
