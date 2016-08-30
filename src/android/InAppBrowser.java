@@ -110,6 +110,9 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        LOG.d(LOG_TAG, "Action ********");
+        LOG.d(LOG_TAG, action);
+        LOG.d(LOG_TAG, "****************");
         if (action.equals("open")) {
             openInAppBrowser(args, callbackContext);
         }
@@ -159,7 +162,7 @@ public class InAppBrowser extends CordovaPlugin {
         this.callbackContext.sendPluginResult(pluginResult);
     }
 
-    private void openInAppBrowser(CordovaArgs args, final CallbackContext callbackContext) {
+    private void openInAppBrowser(CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         this.callbackContext = callbackContext;
         final String url = args.getString(0);
         String t = args.optString(1);
@@ -254,11 +257,11 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private void hide()  throws JSONException {
+    private void hide() throws JSONException {
         LOG.d(LOG_TAG, "hiding in InAppBrowser");
     }
 
-    private void reveal()  throws JSONException {
+    private void reveal() throws JSONException {
         LOG.d(LOG_TAG, "reveal in InAppBrowser");
     }
 
@@ -272,7 +275,7 @@ public class InAppBrowser extends CordovaPlugin {
         injectDeferredObject(args.getString(0), jsWrapper);
     }
 
-    private void injectStyleCode(CordovaArgs args, CallbackContext callbackContext)  throws JSONException {
+    private void injectStyleCode(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         String jsWrapper;
         if (args.getBoolean(1)) {
             jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
@@ -282,7 +285,7 @@ public class InAppBrowser extends CordovaPlugin {
         injectDeferredObject(args.getString(0), jsWrapper);
     }
 
-    private void injectScriptFile(CordovaArgs args, CallbackContext callbackContext)  throws JSONException {
+    private void injectScriptFile(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         String jsWrapper;
         if (args.getBoolean(1)) {
             jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
@@ -292,7 +295,7 @@ public class InAppBrowser extends CordovaPlugin {
         injectDeferredObject(args.getString(0), jsWrapper);
     }
 
-    private void injectScriptCode(CordovaArgs args, CallbackContext callbackContext)  throws JSONException {
+    private void injectScriptCode(CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         String jsWrapper = null;
         if (args.getBoolean(1)) {
             jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
