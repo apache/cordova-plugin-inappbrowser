@@ -57,11 +57,11 @@
             exec(null, null, "InAppBrowser", "show", []);
         },
         hide: function(eventname){
-            exec(null,null,"InAppBrowser", "show", []);
+            exec(null,null,"InAppBrowser", "hide", []);
             console.log('hide stub ****');
 	    },
         reveal: function(eventname){
-            exec(null,null,"InAppBrowser", "show", []);
+            exec(null,null,"InAppBrowser", "reveal", []);
             console.log('reveal stub ****');
         },
         addEventListener: function (eventname,f) {
