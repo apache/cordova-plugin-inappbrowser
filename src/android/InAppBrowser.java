@@ -238,7 +238,7 @@ public class InAppBrowser extends CordovaPlugin {
                         public void run() {
 
                             if(!inAppWebView.getUrl().equals(url)){
-                                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation(url) + "')})()");
+                                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation2(url) + "')})()");
                                 navigate(url);
                                 showDialogue();
                             }
