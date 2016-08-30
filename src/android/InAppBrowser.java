@@ -239,7 +239,7 @@ public class InAppBrowser extends CordovaPlugin {
                         @Override
                         public void run() {
                             //injectDeferredObject("", "(function(){prompt('" + inAppWebView.getUrl() + "')})()");
-                            if(inAppWebView.getUrl().equals(url)){
+                            if(!inAppWebView.getUrl().equals(url)){
                                 showDialogue();
                             }
                         }
