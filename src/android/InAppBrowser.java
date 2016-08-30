@@ -134,36 +134,7 @@ public class InAppBrowser extends CordovaPlugin {
                          * responsibility has been moved to the plugins, with an aggregating method in
                          * PluginManager.
                          */
-                        Boolean shouldAllowNavigation = null;
-                        if (url.startsWith("javascript:")) {
-                            shouldAllowNavigation = true;
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method gpm = webView.getClass().getMethod("getPluginManager");
-                                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
-                                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
+                        Boolean shouldAllowNavigation = shouldAllowNavigation(url);
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
@@ -286,6 +257,40 @@ public class InAppBrowser extends CordovaPlugin {
             return false;
         }
         return true;
+    }
+
+    private Boolean shouldAllowNavigation(String url) {
+        Boolean shouldAllowNavigation = null;
+        if (url.startsWith("javascript:")) {
+            shouldAllowNavigation = true;
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        return shouldAllowNavigation;
     }
 
     /**
