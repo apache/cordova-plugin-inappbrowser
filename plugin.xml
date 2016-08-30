@@ -36,7 +36,7 @@
     <!-- android -->
     <platform name="android">
         <js-module src="www/android/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="cordova.InAppBrowser.open" />git diff
             <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
