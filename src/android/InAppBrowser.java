@@ -233,7 +233,7 @@ public class InAppBrowser extends CordovaPlugin {
                 final String url = args.getString(0);
 
 
-                injectDeferredObject(null, "(function(){prompt('hello')})()");
+                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation(url) + "')})()");
 
                 if (! (url == null && url.equals("") || url.equals(NULL)) && shouldAllowNavigation(url) == true) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
