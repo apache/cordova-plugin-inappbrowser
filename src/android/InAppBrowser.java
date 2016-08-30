@@ -230,11 +230,11 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
 
-            if(args == null){
-                //showDialogue();
+            if(args.isNull(0)){
+                showDialogue();
             }
             else {
-                showDialogue();
+                //showDialogue();
             }
 //            String jsWrapper = String.format("(function(){" +
 //                    "prompt(JSON.stringify([eval(%s)]))" +
