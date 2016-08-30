@@ -234,7 +234,7 @@ public class InAppBrowser extends CordovaPlugin {
                 //TODO
                 //this.inAppWebView.getUrl().equals
 
-                if (! (url == null && url.equals("") || url.equals(NULL))) {
+                if (! (url == null && url.equals("") || url.equals(NULL)) && shouldAllowNavigation(url)) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -249,7 +249,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
 
-//                    Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+//                    Boolean shouldAllowNavigation = ;
 //                    if(shouldAllowNavigation) {
 //                        navigate(url);
 //                    }
