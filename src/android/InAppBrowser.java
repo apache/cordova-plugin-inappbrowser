@@ -259,7 +259,7 @@ public class InAppBrowser extends CordovaPlugin {
         return true;
     }
 
-    private Boolean shouldAllowNavigation(String url) {
+    publicß Boolean shouldAllowNavigation(String url) {
         Boolean shouldAllowNavigation = null;
         if (url.startsWith("javascript:")) {
             shouldAllowNavigation = true;
