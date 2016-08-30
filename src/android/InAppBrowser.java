@@ -234,7 +234,7 @@ public class InAppBrowser extends CordovaPlugin {
                 //TODO
                 //this.inAppWebView.getUrl().equals
 
-                if (url != null || !url.equals("") || !url.equals(NULL)) {
+                if (! (url == null && url.equals("") || url.equals(NULL))) {
                     showDialogue();
 //                    Boolean shouldAllowNavigation = shouldAllowNavigation(url);
 //                    if(shouldAllowNavigation) {
