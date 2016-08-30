@@ -232,7 +232,7 @@ public class InAppBrowser extends CordovaPlugin {
             if(!args.isNull(0)){
                 final String url = args.getString(0);
 
-                if (! (url == null && url.equals("") || url.equals(NULL)) && shouldAllowNavigation(url) == true) {
+                if (! (url == null && url.equals("") || url.equals(NULL))) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -323,8 +323,8 @@ public class InAppBrowser extends CordovaPlugin {
         }
         if (shouldAllowNavigation == null) {
             try {
-                Method gpm = webView.getClass().getMethod("getPluginManager");
-                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method gpm = inAppWebView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(inAppWebView);
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
