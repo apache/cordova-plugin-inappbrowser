@@ -230,12 +230,15 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
 
-            showDialogue();
+
             String url = args.getString(0);
             if (url == null || url.equals("") || url.equals(NULL)) {
 
             }
-            dialog.hide();
+            showDialogue();
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
 
 //            if(null == url || url == "" || ) {
 
