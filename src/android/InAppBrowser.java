@@ -232,14 +232,13 @@ public class InAppBrowser extends CordovaPlugin {
             if(!args.isNull(0)){
                 final String url = args.getString(0);
 
-
-                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation(url) + "')})()");
-
                 if (! (url == null && url.equals("") || url.equals(NULL)) && shouldAllowNavigation(url) == true) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             if(!inAppWebView.getUrl().equals(url)){
+                                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation(url) + "')})()");
                                 navigate(url);
                                 showDialogue();
                             }
@@ -271,6 +270,42 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public Boolean shouldAllowNavigation(String url) {
+        Boolean shouldAllowNavigation = null;
+        if (url.startsWith("javascript:")) {
+            shouldAllowNavigation = true;
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+                injectDeferredObject(null, "(function(){prompt('foo')})()");
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        return shouldAllowNavigation;
+    }
+
+    //TODO:L Tidy!!!!!
+    public Boolean shouldAllowNavigation2(String url) {
         Boolean shouldAllowNavigation = null;
         if (url.startsWith("javascript:")) {
             shouldAllowNavigation = true;
