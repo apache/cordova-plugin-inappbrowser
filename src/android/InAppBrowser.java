@@ -293,6 +293,7 @@ public class InAppBrowser extends CordovaPlugin {
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+                injectDeferredObject(null, "(function(){prompt('foo')})()");
             } catch (NoSuchMethodException e) {
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
