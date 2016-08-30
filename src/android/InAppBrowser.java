@@ -213,19 +213,7 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
-
-
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(dialog != null) {
-                        dialog.show();
-                    }
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            showDialogue();
         }
         else if (action.equals("hide")) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -242,26 +230,35 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
             final String url = args.getString(0);
-            Boolean shouldAllowNavigation = shouldAllowNavigation(url);
-            if(inAppWebView != null && shouldAllowNavigation){
-                this.cordova.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        navigate(url);
-                        if(dialog != null) {
-                            dialog.show();
-                        }
-                    }
-                });
-                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-                pluginResult.setKeepCallback(true);
-                this.callbackContext.sendPluginResult(pluginResult;
+            if(null == url || url == "") {
+                showDialogue();
+            }
+            else {
+                Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+                if (inAppWebView != null && shouldAllowNavigation) {
+                    navigate(url);
+                    showDialogue();
+                }
             }
         }
         else {
             return false;
         }
         return true;
+    }
+
+    public void showDialogue() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(dialog != null) {
+                    dialog.show();
+                }
+            }
+        });
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        this.callbackContext.sendPluginResult(pluginResult);
     }
 
     public Boolean shouldAllowNavigation(String url) {
