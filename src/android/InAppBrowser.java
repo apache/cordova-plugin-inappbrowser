@@ -233,6 +233,9 @@ public class InAppBrowser extends CordovaPlugin {
             if(args == null){
                 showDialogue();
             }
+            else {
+                showDialogue();
+            }
 //            String jsWrapper = String.format("(function(){" +
 //                    "prompt(JSON.stringify([eval(%s)]))" +
 //                    "})()", args );
@@ -240,9 +243,9 @@ public class InAppBrowser extends CordovaPlugin {
 
             String url = args.getString(0);
 
-            if (url == null || url.equals("") || url.equals(NULL)) {
-
-            }
+//            if (url == null || url.equals("") || url.equals(NULL)) {
+//
+//            }
 
 
 
