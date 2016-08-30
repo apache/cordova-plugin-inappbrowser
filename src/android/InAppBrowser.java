@@ -231,8 +231,14 @@ public class InAppBrowser extends CordovaPlugin {
         else if (action.equals("reveal")) {
             if(!args.isNull(0)){
                 final String url = args.getString(0);
-                if (url == null || url.equals("") || url.equals(NULL)) {
-                    showDialogue();
+                //TODO
+                //this.inAppWebView.getUrl().equals
+                showDialogue();
+                if (url != null || !url.equals("") || !url.equals(NULL)) {
+                    Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+                    if(shouldAllowNavigation) {
+                        navigate(url);
+                    }
                 }
             }
 
@@ -244,7 +250,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
 //            else {
-//                Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+//
 //                if (inAppWebView != null && shouldAllowNavigation) {
 //                    navigate(url);
 //                    showDialogue();
