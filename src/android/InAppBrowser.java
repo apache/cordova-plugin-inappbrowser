@@ -230,17 +230,20 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
 
-            String jsWrapper = String.format("(function(){" +
-                    "prompt(JSON.stringify([eval(%s)]))" +
-                    "})()", args );
-            injectDeferredObject("console.log('YAY**************');", jsWrapper);
+            if(args == null){
+                showDialogue();
+            }
+//            String jsWrapper = String.format("(function(){" +
+//                    "prompt(JSON.stringify([eval(%s)]))" +
+//                    "})()", args );
+//            injectDeferredObject("console.log('YAY**************');", jsWrapper);
 
             String url = args.getString(0);
 
             if (url == null || url.equals("") || url.equals(NULL)) {
 
             }
-            showDialogue();
+
 
 
 //            else {
