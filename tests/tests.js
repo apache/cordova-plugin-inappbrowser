@@ -41,8 +41,7 @@ exports.defineAutoTests = function () {
         });
 
         it("inappbrowser.spec.3 should contain reveal function", function () {
-            expect(cordova.InAppBrowser.revel).toBeDefined();
-            expect(cordova.InAppBrowser.revel).toEqual(jasmine.any(Function));
+            assert.fail();
         });
     });
 
