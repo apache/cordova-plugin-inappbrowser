@@ -231,7 +231,7 @@ public class InAppBrowser extends CordovaPlugin {
         else if (action.equals("reveal")) {
 
             if(args == null){
-                showDialogue();
+                //showDialogue();
             }
             else {
                 showDialogue();
