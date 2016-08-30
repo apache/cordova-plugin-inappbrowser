@@ -232,7 +232,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             String jsWrapper = String.format("(function(){" +
                     "prompt(JSON.stringify([eval(%s)]))" +
-                    "})()", 'hello');
+                    "})()", "hello");
             injectDeferredObject("console.log('YAY**************');", jsWrapper);
 
 
