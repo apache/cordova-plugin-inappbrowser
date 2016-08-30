@@ -111,151 +111,187 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
-            this.callbackContext = callbackContext;
-            final String url = args.getString(0);
-            String t = args.optString(1);
-            if (t == null || t.equals("") || t.equals(NULL)) {
-                t = SELF;
-            }
-            final String target = t;
-            final HashMap<String, Boolean> features = parseFeature(args.optString(2));
-
-            LOG.d(LOG_TAG, "target = " + target);
-
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    String result = "";
-                    // SELF
-                    if (SELF.equals(target)) {
-                        LOG.d(LOG_TAG, "in self");
-                        /* This code exists for compatibility between 3.x and 4.x versions of Cordova.
-                         * Previously the Config class had a static method, isUrlWhitelisted(). That
-                         * responsibility has been moved to the plugins, with an aggregating method in
-                         * PluginManager.
-                         */
-                        Boolean shouldAllowNavigation = null;
-                        if (url.startsWith("javascript:")) {
-                            shouldAllowNavigation = true;
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method gpm = webView.getClass().getMethod("getPluginManager");
-                                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
-                                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
-                        // load in webview
-                        if (Boolean.TRUE.equals(shouldAllowNavigation)) {
-                            LOG.d(LOG_TAG, "loading in webview");
-                            webView.loadUrl(url);
-                        }
-                        //Load the dialer
-                        else if (url.startsWith(WebView.SCHEME_TEL))
-                        {
-                            try {
-                                LOG.d(LOG_TAG, "loading in dialer");
-                                Intent intent = new Intent(Intent.ACTION_DIAL);
-                                intent.setData(Uri.parse(url));
-                                cordova.getActivity().startActivity(intent);
-                            } catch (android.content.ActivityNotFoundException e) {
-                                LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
-                            }
-                        }
-                        // load in InAppBrowser
-                        else {
-                            LOG.d(LOG_TAG, "loading in InAppBrowser");
-                            result = showWebPage(url, features);
-                        }
-                    }
-                    // SYSTEM
-                    else if (SYSTEM.equals(target)) {
-                        LOG.d(LOG_TAG, "in system");
-                        result = openExternal(url);
-                    }
-                    // BLANK - or anything else
-                    else {
-                        LOG.d(LOG_TAG, "in blank");
-                        result = showWebPage(url, features);
-                    }
-
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-                    pluginResult.setKeepCallback(true);
-                    callbackContext.sendPluginResult(pluginResult);
-                }
-            });
+            openInAppBrowser(args, callbackContext);
         }
         else if (action.equals("close")) {
-            closeDialog();
+            closeInAppBrowser();
         }
         else if (action.equals("injectScriptCode")) {
-            String jsWrapper = null;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
-            }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectScriptCode(args, callbackContext);
         }
         else if (action.equals("injectScriptFile")) {
-            String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
-            } else {
-                jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
-            }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectScriptFile(args, callbackContext);
         }
         else if (action.equals("injectStyleCode")) {
-            String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
-            } else {
-                jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
-            }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectStyleCode(args, callbackContext);
         }
         else if (action.equals("injectStyleFile")) {
-            String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
-            } else {
-                jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
-            }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectStyleFile(args, callbackContext);
         }
         else if (action.equals("show")) {
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.show();
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            show();
         }
         else {
             return false;
         }
         return true;
+    }
+
+    private void closeInAppBrowser() {
+        closeDialog();
+    }
+
+    private void show() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show();
+            }
+        });
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        this.callbackContext.sendPluginResult(pluginResult);
+    }
+
+    private void openInAppBrowser(CordovaArgs args, final CallbackContext callbackContext) {
+        this.callbackContext = callbackContext;
+        final String url = args.getString(0);
+        String t = args.optString(1);
+        if (t == null || t.equals("") || t.equals(NULL)) {
+            t = SELF;
+        }
+        final String target = t;
+        final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+
+        LOG.d(LOG_TAG, "target = " + target);
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String result = "";
+                // SELF
+                if (SELF.equals(target)) {
+                    LOG.d(LOG_TAG, "in self");
+                    /* This code exists for compatibility between 3.x and 4.x versions of Cordova.
+                     * Previously the Config class had a static method, isUrlWhitelisted(). That
+                     * responsibility has been moved to the plugins, with an aggregating method in
+                     * PluginManager.
+                     */
+                    Boolean shouldAllowNavigation = null;
+                    if (url.startsWith("javascript:")) {
+                        shouldAllowNavigation = true;
+                    }
+                    if (shouldAllowNavigation == null) {
+                        try {
+                            Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                            shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+                        } catch (NoSuchMethodException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        } catch (IllegalAccessException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        } catch (InvocationTargetException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        }
+                    }
+                    if (shouldAllowNavigation == null) {
+                        try {
+                            Method gpm = webView.getClass().getMethod("getPluginManager");
+                            PluginManager pm = (PluginManager)gpm.invoke(webView);
+                            Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                            shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+                        } catch (NoSuchMethodException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        } catch (IllegalAccessException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        } catch (InvocationTargetException e) {
+                            LOG.d(LOG_TAG, e.getLocalizedMessage());
+                        }
+                    }
+                    // load in webview
+                    if (Boolean.TRUE.equals(shouldAllowNavigation)) {
+                        LOG.d(LOG_TAG, "loading in webview");
+                        webView.loadUrl(url);
+                    }
+                    //Load the dialer
+                    else if (url.startsWith(WebView.SCHEME_TEL))
+                    {
+                        try {
+                            LOG.d(LOG_TAG, "loading in dialer");
+                            Intent intent = new Intent(Intent.ACTION_DIAL);
+                            intent.setData(Uri.parse(url));
+                            cordova.getActivity().startActivity(intent);
+                        } catch (android.content.ActivityNotFoundException e) {
+                            LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                        }
+                    }
+                    // load in InAppBrowser
+                    else {
+                        LOG.d(LOG_TAG, "loading in InAppBrowser");
+                        result = showWebPage(url, features);
+                    }
+                }
+                // SYSTEM
+                else if (SYSTEM.equals(target)) {
+                    LOG.d(LOG_TAG, "in system");
+                    result = openExternal(url);
+                }
+                // BLANK - or anything else
+                else {
+                    LOG.d(LOG_TAG, "in blank");
+                    result = showWebPage(url, features);
+                }
+
+                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+                pluginResult.setKeepCallback(true);
+                callbackContext.sendPluginResult(pluginResult);
+            }
+        });
+    }
+
+    private void hide(){
+        LOG.d(LOG_TAG, "hiding in InAppBrowser");
+    }
+
+    private void reveal(){
+        LOG.d(LOG_TAG, "reveal in InAppBrowser");
+    }
+
+    private void injectStyleFile(CordovaArgs args, CallbackContext callbackContext) {
+        String jsWrapper;
+        if (args.getBoolean(1)) {
+            jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+        } else {
+            jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
+        }
+        injectDeferredObject(args.getString(0), jsWrapper);
+    }
+
+    private void injectStyleCode(CordovaArgs args, CallbackContext callbackContext) {
+        String jsWrapper;
+        if (args.getBoolean(1)) {
+            jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+        } else {
+            jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
+        }
+        injectDeferredObject(args.getString(0), jsWrapper);
+    }
+
+    private void injectScriptFile(CordovaArgs args, CallbackContext callbackContext) {
+        String jsWrapper;
+        if (args.getBoolean(1)) {
+            jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
+        } else {
+            jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
+        }
+        injectDeferredObject(args.getString(0), jsWrapper);
+    }
+
+    private void injectScriptCode(CordovaArgs args, CallbackContext callbackContext) {
+        String jsWrapper = null;
+        if (args.getBoolean(1)) {
+            jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
+        }
+        injectDeferredObject(args.getString(0), jsWrapper);
     }
 
     /**
