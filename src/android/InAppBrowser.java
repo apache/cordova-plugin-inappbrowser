@@ -179,6 +179,12 @@ public class InAppBrowser extends CordovaPlugin {
         else if (action.equals("close")) {
             closeDialog();
         }
+        else if (action.equals("reveal")) {
+            reveal();
+        }
+        else if (action.equals("hide")) {
+            hide();
+        }
         else if (action.equals("injectScriptCode")) {
             String jsWrapper = null;
             if (args.getBoolean(1)) {
