@@ -328,10 +328,13 @@ public class InAppBrowser extends CordovaPlugin {
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
+                injectDeferredObject(null, "(function(){prompt('no method')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
+                injectDeferredObject(null, "(function(){prompt('illegal')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
+                injectDeferredObject(null, "(function(){prompt('invocation target')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
