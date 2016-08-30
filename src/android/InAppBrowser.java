@@ -266,7 +266,7 @@ public class InAppBrowser extends CordovaPlugin {
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
-            this.callbackContext.PluginResult(pluginResult);
+            this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
             //todo!!!
