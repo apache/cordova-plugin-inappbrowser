@@ -60,8 +60,8 @@
             exec(null,null,"InAppBrowser", "hide", []);
             console.log('hide stub ****');
 	    },
-        reveal: function(eventname){
-            exec(null,null,"InAppBrowser", "reveal", []);
+        reveal: function(strUrl, eventname){
+            exec(null,null,"InAppBrowser", "reveal", [strUrl]);
             console.log('reveal stub ****');
         },
         addEventListener: function (eventname,f) {
