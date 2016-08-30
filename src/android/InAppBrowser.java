@@ -229,24 +229,18 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
-
-            if(args.isNull(0)){
-                showDialogue();
+            if(!args.isNull(0)){
+                final String url = args.getString(0);
+                if (url == null || url.equals("") || url.equals(NULL)) {
+                    showDialogue();
+                }
             }
-            else {
-                //showDialogue();
-            }
-//            String jsWrapper = String.format("(function(){" +
-//                    "prompt(JSON.stringify([eval(%s)]))" +
-//                    "})()", args );
-//            injectDeferredObject("console.log('YAY**************');", jsWrapper);
 
-            String url = args.getString(0);
 
-//            if (url == null || url.equals("") || url.equals(NULL)) {
-//
-//            }
 
+
+
+            //showDialogue();
 
 
 //            else {
