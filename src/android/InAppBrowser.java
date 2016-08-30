@@ -213,6 +213,8 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
+
+
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -226,7 +228,6 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("hide")) {
-            //todo!!!
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -240,18 +241,22 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
-            //todo!!!
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(dialog != null) {
-                        dialog.show();
+            final String url = args.getString(0);
+            Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+            if(inAppWebView != null && shouldAllowNavigation){
+                this.cordova.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        navigate(url);
+                        if(dialog != null) {
+                            dialog.show();
+                        }
                     }
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+                });
+                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+                pluginResult.setKeepCallback(true);
+                this.callbackContext.sendPluginResult(pluginResult;
+            }
         }
         else {
             return false;
