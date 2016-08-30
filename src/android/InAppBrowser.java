@@ -110,7 +110,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
-        LOG.d("keith","waz eer");
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
@@ -416,6 +415,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl("about:blank");
+                childView.destroy();
 
                 try {
                     JSONObject obj = new JSONObject();
