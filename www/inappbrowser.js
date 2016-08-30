@@ -35,10 +35,6 @@
        this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
-            'revealstart': channel.create('revealstart'),
-            'revealstop' : channel.create('revealstop'),
-            'hidestart': channel.create('hidestart'),
-            'hidestop' : channel.create('hidestop'),
             'loaderror' : channel.create('loaderror'),
             'exit' : channel.create('exit')
        };
@@ -58,12 +54,12 @@
         },
         hide: function(eventname){
             exec(null,null,"InAppBrowser", "hide", []);
-            console.log('hide stub ****');
-	    },
+            console.log('hide');
+	},
         reveal: function(eventname){
             exec(null,null,"InAppBrowser", "reveal", []);
-            console.log('reveal stub ****');
-        },
+            console.log('reveal');
+        }
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
