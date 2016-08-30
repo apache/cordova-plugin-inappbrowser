@@ -230,19 +230,18 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
 
+            String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)])})()");
+            injectDeferredObject("console.log('YAY**************');", jsWrapper);
+
 
             String url = args.getString(0);
+
             if (url == null || url.equals("") || url.equals(NULL)) {
 
             }
             showDialogue();
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
 
-//            if(null == url || url == "" || ) {
 
-//            }
 //            else {
 //                Boolean shouldAllowNavigation = shouldAllowNavigation(url);
 //                if (inAppWebView != null && shouldAllowNavigation) {
