@@ -260,7 +260,7 @@ public class InAppBrowser extends CordovaPlugin {
                 @Override
                 public void run() {
                     if(dialog != null) {
-                        dialog.show();
+                        dialog.hide();
                     }
                 }
             });
