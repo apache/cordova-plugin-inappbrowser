@@ -255,6 +255,11 @@ public class InAppBrowser extends CordovaPlugin {
             return;
         }
 
+        if(shouldAllowNavigation(url, "shouldAllowRequest") ) {
+            showDialogue();
+            return;
+        }
+
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -266,13 +271,8 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    if(shouldAllowNavigation2(url) == false){
-                        showDialogue();
-                    }
-                    else {
-                        reOpenOnNextPageFinished = true;
-                        navigate(url);
-                    }
+                    reOpenOnNextPageFinished = true;
+                    navigate(url);
                 }
             }
         });
@@ -293,54 +293,58 @@ public class InAppBrowser extends CordovaPlugin {
         this.callbackContext.sendPluginResult(pluginResult);
     }
 
-    public Boolean shouldAllowNavigation2(String url) {
-        Boolean shouldAllowNavigation = null;
-        injectDeferredObject(null, "(function(){console.log('checking whitelist')})()");
-        if (url.startsWith("javascript:")) {
-            injectDeferredObject(null, "(function(){console.log('is JS!!')})()");
-            shouldAllowNavigation = true;
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                injectDeferredObject(null, "(function(){console.log('config')})()");
-                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+//    public Boolean shouldAllowNavigation2(String url) {
+//        Boolean shouldAllowNavigation = null;
+//        injectDeferredObject(null, "(function(){console.log('checking whitelist')})()");
+//        if (url.startsWith("javascript:")) {
+//            injectDeferredObject(null, "(function(){console.log('is JS!!')})()");
+//            shouldAllowNavigation = true;
+//        }
+//        if (shouldAllowNavigation == null) {
+//            try {
+//                injectDeferredObject(null, "(function(){console.log('config')})()");
+//                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+//
+//                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+//            } catch (NoSuchMethodException e) {
+//                injectDeferredObject(null, "(function(){console.log('No Method')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            } catch (IllegalAccessException e) {
+//                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            } catch (InvocationTargetException e) {
+//                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            }
+//        }
+//        if (shouldAllowNavigation == null) {
+//            try {
+//                injectDeferredObject(null, "(function(){console.log('plugin manager')})()");
+//                Method gpm = webView.getClass().getMethod("getPluginManager");
+//                PluginManager pm = (PluginManager)gpm.invoke(webView);
+//                Method san = pm.getClass().getMethod("shouldAllowRequest", String.class);
+//                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+//            } catch (NoSuchMethodException e) {
+//                injectDeferredObject(null, "(function(){console.log('No Method')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            } catch (IllegalAccessException e) {
+//                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            } catch (InvocationTargetException e) {
+//                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
+//                LOG.d(LOG_TAG, e.getLocalizedMessage());
+//            }
+//        }
+//        injectDeferredObject(null, "(function(){alert('" + url + "')})()");
+//        injectDeferredObject(null, "(function(){alert('" + shouldAllowNavigation + "')})()");
+//        return shouldAllowNavigation;
+//    }
 
-                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-            } catch (NoSuchMethodException e) {
-                injectDeferredObject(null, "(function(){console.log('No Method')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (IllegalAccessException e) {
-                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (InvocationTargetException e) {
-                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            }
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                injectDeferredObject(null, "(function(){console.log('plugin manager')})()");
-                Method gpm = webView.getClass().getMethod("getPluginManager");
-                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                Method san = pm.getClass().getMethod("shouldAllowRequest", String.class);
-                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-            } catch (NoSuchMethodException e) {
-                injectDeferredObject(null, "(function(){console.log('No Method')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (IllegalAccessException e) {
-                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (InvocationTargetException e) {
-                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            }
-        }
-        injectDeferredObject(null, "(function(){alert('" + url + "')})()");
-        injectDeferredObject(null, "(function(){alert('" + shouldAllowNavigation + "')})()");
-        return shouldAllowNavigation;
+    public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+        return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
-    public Boolean shouldAllowNavigation(String url) {
+    public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
         Boolean shouldAllowNavigation = null;
         if (url.startsWith("javascript:")) {
             shouldAllowNavigation = true;
