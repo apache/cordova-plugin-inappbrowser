@@ -58,11 +58,9 @@
         },
         hide: function(eventname){
             exec(null,null,"InAppBrowser", "hide", []);
-            console.log('hide stub ****');
 	    },
         reveal: function(strUrl, eventname){
             exec(null,null,"InAppBrowser", "reveal", [strUrl]);
-            console.log('reveal stub ****');
         },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
