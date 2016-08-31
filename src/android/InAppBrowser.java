@@ -215,7 +215,15 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
-            showDialogue();
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                        dialog.show();
+                }
+            });
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("hide")) {
             hideDialog(args);
@@ -295,9 +303,9 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //if(dialog != null) {
+                if(dialog != null) {
                     dialog.show();
-                //}
+                }
             }
         });
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
