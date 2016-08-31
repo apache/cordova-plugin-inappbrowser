@@ -602,7 +602,6 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         final CordovaWebView thatWebView = this.webView;
-        InAppBrowserClient client;
 
         // Create dialog in new thread
         Runnable runnable = new Runnable() {
@@ -759,7 +758,7 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
-                client = new InAppBrowserClient(thatWebView, edittext);
+                WebViewClient = new InAppBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
