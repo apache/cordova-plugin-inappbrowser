@@ -240,6 +240,7 @@ public class InAppBrowser extends CordovaPlugin {
                             if(!inAppWebView.getUrl().equals(url)){
                                 inAppWebView.setWebViewClient(new WebViewClient() {
                                     // NB: wait for about:blank before dismissing
+                                    @Override
                                     public void onPageFinished(WebView view, String url) {
                                         if (dialog != null) {
                                             dialog.show();
