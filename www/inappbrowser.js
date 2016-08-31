@@ -35,10 +35,6 @@
        this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
-            'revealstart': channel.create('revealstart'),
-            'revealstop' : channel.create('revealstop'),
-            'hidestart': channel.create('hidestart'),
-            'hidestop' : channel.create('hidestop'),
             'loaderror' : channel.create('loaderror'),
             'exit' : channel.create('exit')
        };
