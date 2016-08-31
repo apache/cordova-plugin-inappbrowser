@@ -136,7 +136,7 @@ public class InAppBrowser extends CordovaPlugin {
                          * responsibility has been moved to the plugins, with an aggregating method in
                          * PluginManager.
                          */
-                        Boolean shouldAllowNavigation = shouldAllowNavigation(url, "shouldAllowNavigation");
+                        Boolean shouldAllowNavigation = shouldAllowNavigation(url);
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
@@ -215,15 +215,7 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                        dialog.show();
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            showDialogue();
         }
         else if (action.equals("hide")) {
             hideDialog(args);
