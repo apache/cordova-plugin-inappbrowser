@@ -303,7 +303,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (shouldAllowNavigation == null) {
             injectDeferredObject(null, "(function(){alert('config')})()");
             try {
-                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                Method iuw = Config.class.getDeclaredMethod("isUrlWhiteListed", String.class);
                 shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
             } catch (NoSuchMethodException e) {
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
@@ -316,7 +316,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (shouldAllowNavigation == null) {
             injectDeferredObject(null, "(function(){alert('plugin')})()");
             try {
-                Method gpm = webView.getClass().getMethod("getPluginManager");
+                Method gpm = webView.getClass().getDeclaredMethod("getPluginManager");
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
