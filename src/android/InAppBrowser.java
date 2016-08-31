@@ -217,26 +217,7 @@ public class InAppBrowser extends CordovaPlugin {
             showDialogue();
         }
         else if (action.equals("hide")) {
-            final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    if(null == inAppWebView){
-                        return;
-                    }
-
-                    if(dialog != null) {
-                        dialog.hide();
-                        if(goToBlank){
-                            inAppWebView.loadUrl("about:blank");
-                        }
-                    }
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            hideDialog(args);
         }
         else if (action.equals("reveal")) {
             revealDialog(args);
@@ -246,6 +227,29 @@ public class InAppBrowser extends CordovaPlugin {
             return false;
         }
         return true;
+    }
+
+    public void hideDialog(CordovaArgs args) {
+        final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(null == inAppWebView){
+                    return;
+                }
+
+                if(dialog != null) {
+                    dialog.hide();
+                    if(goToBlank){
+                        inAppWebView.loadUrl("about:blank");
+                    }
+                }
+            }
+        });
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        this.callbackContext.sendPluginResult(pluginResult);
     }
 
     public void revealDialog(CordovaArgs args) throws JSONException {
