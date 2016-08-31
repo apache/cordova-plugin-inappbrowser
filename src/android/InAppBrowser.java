@@ -322,7 +322,7 @@ public class InAppBrowser extends CordovaPlugin {
                 injectDeferredObject(null, "(function(){console.log('plugin manager')})()");
                 Method gpm = webView.getClass().getMethod("getPluginManager");
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
-                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                Method san = pm.getClass().getMethod("shouldAllowRequest", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
                 injectDeferredObject(null, "(function(){console.log('No Method')})()");
