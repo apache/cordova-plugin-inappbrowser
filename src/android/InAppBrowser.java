@@ -267,7 +267,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     }
 
-    public void showDialogue() {
+    public void showDialogue() throws JSONException {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
