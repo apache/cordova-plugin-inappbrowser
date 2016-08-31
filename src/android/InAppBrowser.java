@@ -295,36 +295,43 @@ public class InAppBrowser extends CordovaPlugin {
 
     public Boolean shouldAllowNavigation2(String url) {
         Boolean shouldAllowNavigation = null;
-        injectDeferredObject(null, "(function(){alert('Checking whitelist')})()");
+        injectDeferredObject(null, "(function(){console.log('checking whitelist')})()");
         if (url.startsWith("javascript:")) {
-            injectDeferredObject(null, "(function(){alert('JavaScript')})()");
+            injectDeferredObject(null, "(function(){console.log('is JS!!')})()");
             shouldAllowNavigation = true;
         }
         if (shouldAllowNavigation == null) {
-            injectDeferredObject(null, "(function(){alert('config')})()");
             try {
+                injectDeferredObject(null, "(function(){console.log('config')})()");
                 Method iuw = Config.class.getDeclaredMethod("isUrlWhiteListed", String.class);
+
                 shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
             } catch (NoSuchMethodException e) {
+                injectDeferredObject(null, "(function(){console.log('No Method')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
+                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
+                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
         if (shouldAllowNavigation == null) {
-            injectDeferredObject(null, "(function(){alert('plugin')})()");
             try {
+                injectDeferredObject(null, "(function(){console.log('plugin manager')})()");
                 Method gpm = webView.getClass().getDeclaredMethod("getPluginManager");
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
                 Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
+                injectDeferredObject(null, "(function(){console.log('No Method')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
+                injectDeferredObject(null, "(function(){console.log('Illegal Access')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
+                injectDeferredObject(null, "(function(){console.log('Invocation target')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
