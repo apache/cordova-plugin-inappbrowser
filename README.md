@@ -479,6 +479,50 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
     });
 __
 
+## InAppBrowser.hide
+
+> Hides the `InAppBrowser` for non _system windows.
+
+    ref.hide(blankUrl);
+
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_ . Must have target '_blank' or '_self' to take effect.
+
+- __blankUrl__: Optional, If, true if the browser navigates to about:blank to preserve resources before hide. _(Boolean)_
+ 
+
+### Supported Platforms
+
+- Android
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_system', 'location=yes');
+    ref.hide();
+__
+
+## InAppBrowser.show
+
+> Shows the `InAppBrowser` if hidden.
+
+    ref.hide(newUrl);
+
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_ . Must be hidden to take effect.
+
+- __newUrl__: Optional, The new URL to navigate to before showing(waits for page load to finish). _(String)_
+ 
+
+### Supported Platforms
+
+- Android
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_system', 'location=yes');
+    ref.hide(true);
+    ref.show("http://www.google.com");
+__
+
+
 ## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
 
 You can use this plugin to show helpful documentation pages within your app. Users can view online help documents and then close them without leaving the app.
