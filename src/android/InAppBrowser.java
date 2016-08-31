@@ -266,7 +266,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    if(shouldAllowNavigation(url) == true){
+                    if(shouldAllowNavigation(url) == false){
                         showDialogue();
                     }
                     else {
