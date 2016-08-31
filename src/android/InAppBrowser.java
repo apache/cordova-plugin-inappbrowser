@@ -247,9 +247,15 @@ public class InAppBrowser extends CordovaPlugin {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
                                         showDialogue();
+                                        inAppWebView.requestFocus();
                                     }
                                 });
-                                navigate(url);
+                                if (!url.startsWith("http") && !url.startsWith("file:")) {
+                                    inAppWebView.loadUrl("http://" + url);
+                                } else {
+                                    inAppWebView.loadUrl(url);
+                                }
+                                //navigate(url);
                             }
                         }
                     });
