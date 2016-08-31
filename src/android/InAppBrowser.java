@@ -236,18 +236,15 @@ public class InAppBrowser extends CordovaPlugin {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             if(!inAppWebView.getUrl().equals(url)){
-                                injectDeferredObject(null, "(function(){prompt('" + shouldAllowNavigation2(url) + "')})()");
                                 navigate(url);
-                                showDialogue();
                             }
                         }
 
                     });
                 }
             }
-            //showDialogue();
+            showDialogue();
         }
         else {
             return false;
@@ -297,44 +294,6 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (IllegalAccessException e) {
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            }
-        }
-        return shouldAllowNavigation;
-    }
-
-    //TODO:L Tidy!!!!!
-    public Boolean shouldAllowNavigation2(String url) {
-        Boolean shouldAllowNavigation = null;
-        if (url.startsWith("javascript:")) {
-            shouldAllowNavigation = true;
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-            } catch (NoSuchMethodException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (IllegalAccessException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (InvocationTargetException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            }
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                Method gpm = this.inAppWebView.getClass().getMethod("getPluginManager");
-                PluginManager pm = (PluginManager)gpm.invoke(this.inAppWebView);
-                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
-                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-            } catch (NoSuchMethodException e) {
-                injectDeferredObject(null, "(function(){prompt('no method')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (IllegalAccessException e) {
-                injectDeferredObject(null, "(function(){prompt('illegal')})()");
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
-            } catch (InvocationTargetException e) {
-                injectDeferredObject(null, "(function(){prompt('invocation target')})()");
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
