@@ -266,7 +266,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    if(shouldAllowNavigation(url) == false){
+                    if(shouldAllowNavigation2(url) == false){
                         showDialogue();
                     }
                     else {
@@ -291,6 +291,42 @@ public class InAppBrowser extends CordovaPlugin {
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
         pluginResult.setKeepCallback(true);
         this.callbackContext.sendPluginResult(pluginResult);
+    }
+
+    public Boolean shouldAllowNavigation2(String url) {
+        Boolean shouldAllowNavigation = null;
+        injectDeferredObject(null, "(function(){prompt('Oh hai')})()");
+        if (url.startsWith("javascript:")) {
+
+            shouldAllowNavigation = true;
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        return shouldAllowNavigation;
     }
 
     public Boolean shouldAllowNavigation(String url) {
