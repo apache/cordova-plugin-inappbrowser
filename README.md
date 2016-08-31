@@ -21,10 +21,6 @@ description: Open an in-app browser window.
 #         under the License.
 -->
 
-|Android|iOS| Windows 8.1 Store | Windows 8.1 Phone | Windows 10 Store | Travis CI |
-|:-:|:-:|:-:|:-:|:-:|:-:|
-|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=android,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=android,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=ios,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=ios,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=windows-8.1-store,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=windows-8.1-store,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=windows-8.1-phone,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=windows-8.1-phone,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=windows-10-store,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=windows-10-store,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
-
 # cordova-plugin-inappbrowser
 
 You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
@@ -68,6 +64,11 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 
 Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
 
+##Fork Changes (ANDROID ONLY)
+We use InAppBrowser in a non-standard way. The existing infrastructure had a couple of limitations on Android which we have attempted to redress:
+* Browsers opened as _system we blanked, but not destroyed. On some devices this was enough to cause a crash
+* The show method would crash if a _system window was opened, then closed, then the `cordova.InAppBrowser.show()` method called
+* We want to keep a persistent _self window open. Open creates a new instance, close blanks (and now destroys) it so it cannot be re-used. We have introduced new functions - `cordova.InAppBrowser.hide()` and `cordova.InAppBrowser.reveal()`. These can be used as a direct replacement for `cordova.InAppBrowser.show()` and `cordova.InAppBrowser.close()` where you want to keep the instance alive - saving load time when opening the InAppBrowser, which can be substantial.  `cordova.InAppBrowser.hide()` takes an optional boolean - if set to true the browser is sent to about:blank to prevent uneccessary work on the device. Similarly `cordova.InAppBrowser.reveal()` takes an optional URL to navigate to beforehand.
 
 ## <a id="reference">Reference
 ## Installation
