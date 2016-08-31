@@ -100,6 +100,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    boolean reOpenOnNextPageFinished = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -259,7 +260,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    ((InAppBrowserClient)client).openWhenPageFinished();
+                    reOpenOnNextPageFinished = true;
                     navigate(url);
                     showDialogue();
                 }
@@ -870,7 +871,6 @@ public class InAppBrowser extends CordovaPlugin {
      * The webview client receives notifications about appView
      */
     public class InAppBrowserClient extends WebViewClient {
-        boolean reOpenOnNextPageFinished = false;
         EditText edittext;
         CordovaWebView webView;
 
@@ -996,6 +996,11 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieSyncManager.getInstance().sync();
             }
 
+            if(reOpenOnNextPageFinished){
+                //Todo: re-open!
+                reOpenOnNextPageFinished = false;
+            }
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_STOP_EVENT);
@@ -1021,10 +1026,6 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
-        }
-
-        public void openWhenPageFinished(){
-            reOpenOnNextPageFinished = true;
         }
 
         /**
