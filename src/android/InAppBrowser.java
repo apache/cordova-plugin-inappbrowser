@@ -295,12 +295,13 @@ public class InAppBrowser extends CordovaPlugin {
 
     public Boolean shouldAllowNavigation2(String url) {
         Boolean shouldAllowNavigation = null;
-        injectDeferredObject(null, "(function(){prompt('Oh hai')})()");
+        injectDeferredObject(null, "(function(){alert('Checking whitelist')})()");
         if (url.startsWith("javascript:")) {
-
+            injectDeferredObject(null, "(function(){alert('JavaScript')})()");
             shouldAllowNavigation = true;
         }
         if (shouldAllowNavigation == null) {
+            injectDeferredObject(null, "(function(){alert('config')})()");
             try {
                 Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
                 shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
@@ -313,6 +314,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
         if (shouldAllowNavigation == null) {
+            injectDeferredObject(null, "(function(){alert('plugin')})()");
             try {
                 Method gpm = webView.getClass().getMethod("getPluginManager");
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
