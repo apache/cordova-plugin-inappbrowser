@@ -259,7 +259,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    ((InAppBrowserClient)inAppWebView).openWhenPageFinished();
+                    ((InAppBrowserClient)client).openWhenPageFinished();
                     navigate(url);
                     showDialogue();
                 }
