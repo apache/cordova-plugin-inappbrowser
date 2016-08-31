@@ -328,6 +328,7 @@ public class InAppBrowser extends CordovaPlugin {
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
+        injectDeferredObject(null, "(function(){alert('" + shouldAllowNavigation + "')})()");
         return shouldAllowNavigation;
     }
 
