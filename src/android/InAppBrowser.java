@@ -100,6 +100,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    boolean reOpenOnNextPageFinished = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -134,36 +135,7 @@ public class InAppBrowser extends CordovaPlugin {
                          * responsibility has been moved to the plugins, with an aggregating method in
                          * PluginManager.
                          */
-                        Boolean shouldAllowNavigation = null;
-                        if (url.startsWith("javascript:")) {
-                            shouldAllowNavigation = true;
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method gpm = webView.getClass().getMethod("getPluginManager");
-                                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
-                                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
+                        Boolean shouldAllowNavigation = shouldAllowNavigation(url);
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
@@ -242,20 +214,133 @@ public class InAppBrowser extends CordovaPlugin {
             injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("show")) {
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.show();
-                }
-            });
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            showDialogue();
+        }
+        else if (action.equals("hide")) {
+            hideDialog(args);
+        }
+        else if (action.equals("reveal")) {
+            revealDialog(args);
+
         }
         else {
             return false;
         }
         return true;
+    }
+
+    public void hideDialog(CordovaArgs args) throws JSONException {
+        final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(null == inAppWebView){
+                    return;
+                }
+
+                if(dialog != null) {
+                    dialog.hide();
+                    if(goToBlank){
+                        inAppWebView.loadUrl("about:blank");
+                    }
+                }
+            }
+        });
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        this.callbackContext.sendPluginResult(pluginResult);
+    }
+
+    public void revealDialog(CordovaArgs args) throws JSONException {
+
+        if(args.isNull(0)) {
+            showDialogue();
+            return;
+        }
+
+        final String url = args.getString(0);
+
+        if (url == null || url.equals("") || url.equals(NULL)) {
+            showDialogue();
+            return;
+        }
+
+        if(!shouldAllowNavigation(url, "shouldAllowRequest") ) {
+            return;
+        }
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(null == inAppWebView  || null == inAppWebView.getUrl()){
+                    return;
+                }
+
+                if(inAppWebView.getUrl().equals(url)){
+                    showDialogue();
+                }
+                else {
+                    reOpenOnNextPageFinished = true;
+                    navigate(url);
+                }
+            }
+        });
+
+    }
+
+    public void showDialogue() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(dialog != null) {
+                    dialog.show();
+                }
+            }
+        });
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+        pluginResult.setKeepCallback(true);
+        this.callbackContext.sendPluginResult(pluginResult);
+    }
+
+    public Boolean shouldAllowNavigation(String url) {
+        return shouldAllowNavigation(url, "shouldAllowNavigation");
+    }
+
+    public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+
+        Boolean shouldAllowNavigation = null;
+        if (url.startsWith("javascript:")) {
+            shouldAllowNavigation = true;
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod(pluginManagerMethod, String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        return shouldAllowNavigation;
     }
 
     /**
@@ -415,6 +500,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl("about:blank");
+                childView.destroy();
 
                 try {
                     JSONObject obj = new JSONObject();
@@ -552,8 +638,8 @@ public class InAppBrowser extends CordovaPlugin {
              */
             private int dpToPixels(int dipValue) {
                 int value = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
-                                                            (float) dipValue,
-                                                            cordova.getActivity().getResources().getDisplayMetrics()
+                        (float) dipValue,
+                        cordova.getActivity().getResources().getDisplayMetrics()
                 );
 
                 return value;
@@ -661,8 +747,8 @@ public class InAppBrowser extends CordovaPlugin {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                          navigate(edittext.getText().toString());
-                          return true;
+                            navigate(edittext.getText().toString());
+                            return true;
                         }
                         return false;
                     }
@@ -913,7 +999,7 @@ public class InAppBrowser extends CordovaPlugin {
             // Update the UI if we haven't already
             if (!newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
-             }
+            }
 
             try {
                 JSONObject obj = new JSONObject();
@@ -925,8 +1011,6 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
-
-
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
@@ -935,6 +1019,11 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieManager.getInstance().flush();
             } else {
                 CookieSyncManager.getInstance().sync();
+            }
+
+            if(reOpenOnNextPageFinished){
+                reOpenOnNextPageFinished = false;
+                showDialogue();
             }
 
             try {
