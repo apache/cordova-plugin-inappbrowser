@@ -494,6 +494,7 @@ public class InAppBrowser extends CordovaPlugin {
                         if (dialog != null) {
                             dialog.dismiss();
                             dialog = null;
+                            this.destroy();
                         }
                     }
                 });
@@ -501,7 +502,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl("about:blank");
-                childView.destroy();
+
 
                 try {
                     JSONObject obj = new JSONObject();
