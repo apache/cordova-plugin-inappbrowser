@@ -295,9 +295,9 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(dialog != null) {
+                //if(dialog != null) {
                     dialog.show();
-                }
+                //}
             }
         });
         PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
