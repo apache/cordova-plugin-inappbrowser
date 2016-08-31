@@ -233,36 +233,19 @@ public class InAppBrowser extends CordovaPlugin {
                 final String url = args.getString(0);
 
                 //TODO: look at whitelisting
-                if ((url == null && url.equals("") || url.equals(NULL))) {
-                    showDialogue();
-                }
-                else{
+                if (! (url == null && url.equals("") || url.equals(NULL))) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(inAppWebView.getUrl().equals(url)){
-                                showDialogue();
-                            } else {
-                                inAppWebView.loadUrl("about:blank");
-                                inAppWebView.setWebViewClient(new WebViewClient() {
-                                    @Override
-                                    public void onPageFinished(WebView view, String url) {
-                                        showDialogue();
-                                        inAppWebView.requestFocus();
-                                    }
-                                });
-                                if (!url.startsWith("http") && !url.startsWith("file:")) {
-                                    inAppWebView.loadUrl("http://" + url);
-                                } else {
-                                    inAppWebView.loadUrl(url);
-                                }
-                                //navigate(url);
+
+                            if(!inAppWebView.getUrl().equals(url)){
+                                navigate(url);
                             }
                         }
                     });
                 }
             }
-            //
+            showDialogue();
         }
         else {
             return false;
