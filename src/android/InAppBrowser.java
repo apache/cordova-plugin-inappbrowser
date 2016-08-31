@@ -136,7 +136,7 @@ public class InAppBrowser extends CordovaPlugin {
                          * responsibility has been moved to the plugins, with an aggregating method in
                          * PluginManager.
                          */
-                        Boolean shouldAllowNavigation = shouldAllowNavigation(url);
+                        Boolean shouldAllowNavigation = shouldAllowNavigation(url, "shouldAllowNavigation");
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
