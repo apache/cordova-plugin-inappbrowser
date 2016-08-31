@@ -996,14 +996,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             if(reOpenOnNextPageFinished){
                 reOpenOnNextPageFinished = false;
-                this.cordova.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(dialog != null){
-                            dialog.show();
-                        }
-                    }
-                });
+                showDialogue();
             }
 
             try {
