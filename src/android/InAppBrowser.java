@@ -229,28 +229,42 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
-            if(!args.isNull(0)){
-                final String url = args.getString(0);
+            revealDialog(args);
 
-                //TODO: look at whitelisting
-                if (! (url == null && url.equals("") || url.equals(NULL))) {
-                    this.cordova.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            if(!inAppWebView.getUrl().equals(url)){
-                                navigate(url);
-                            }
-                        }
-                    });
-                }
-            }
-            showDialogue();
         }
         else {
             return false;
         }
         return true;
+    }
+
+    public void revealDialog(CordovaArgs args) {
+        if(args.isNull(0)) {
+            showDialogue();
+            return;
+        }
+
+        final String url = args.getString(0);
+
+        //TODO: look at whitelisting
+        if (url == null || url.equals("") || url.equals(NULL)) {
+            showDialogue();
+            return;
+        }
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(inAppWebView.getUrl().equals(url)){
+                    showDialogue();
+                }
+                else {
+                    navigate(url);
+                    showDialogue();
+                }
+            }
+        });
+
     }
 
     public void showDialogue() {
