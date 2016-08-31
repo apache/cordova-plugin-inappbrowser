@@ -340,7 +340,7 @@ public class InAppBrowser extends CordovaPlugin {
 //        return shouldAllowNavigation;
 //    }
 
-    public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+    public Boolean shouldAllowNavigation(String url) {
         return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
