@@ -243,9 +243,10 @@ public class InAppBrowser extends CordovaPlugin {
                             if(inAppWebView.getUrl().equals(url)){
                                 showDialogue();
                             } else {
-                                inAppWebView.setWebViewClient(new WebViewClient() {
+                                inAppWebView.setWebViewClient(new InAppBrowserClient() {
                                     @Override
                                     public void onPageFinished(WebView view, String url) {
+                                        super.onPageFinished(view,url);
                                         showDialogue();
                                         inAppWebView.requestFocus();
                                     }
