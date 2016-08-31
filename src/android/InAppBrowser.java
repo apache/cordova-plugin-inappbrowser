@@ -217,6 +217,7 @@ public class InAppBrowser extends CordovaPlugin {
             showDialogue();
         }
         else if (action.equals("hide")) {
+
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -240,7 +241,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public void revealDialog(CordovaArgs args) throws JSONException {
-        if(null == inAppWebView){
+        if(inAppWebView == null){
             return;
         }
 
