@@ -229,7 +229,7 @@ public class InAppBrowser extends CordovaPlugin {
         return true;
     }
 
-    public void hideDialog(CordovaArgs args) {
+    public void hideDialog(CordovaArgs args) throws JSONException {
         final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
