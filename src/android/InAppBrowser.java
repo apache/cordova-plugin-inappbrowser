@@ -232,19 +232,27 @@ public class InAppBrowser extends CordovaPlugin {
             if(!args.isNull(0)){
                 final String url = args.getString(0);
 
+                //TODO: look at whitelisting
                 if (! (url == null && url.equals("") || url.equals(NULL))) {
                     this.cordova.getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             if(!inAppWebView.getUrl().equals(url)){
+                                inAppWebView.setWebViewClient(new WebViewClient() {
+                                    // NB: wait for about:blank before dismissing
+                                    public void onPageFinished(WebView view, String url) {
+                                        if (dialog != null) {
+                                            dialog.show();
+                                        }
+                                    }
+                                });
                                 navigate(url);
                             }
                         }
-
                     });
                 }
             }
-            showDialogue();
+            //showDialogue();
         }
         else {
             return false;
