@@ -56,8 +56,8 @@
         show: function (eventname) {
             exec(null, null, "InAppBrowser", "show", []);
         },
-        hide: function(eventname){
-            exec(null,null,"InAppBrowser", "hide", []);
+        hide: function(boolGoToBlank, eventname){
+            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
 	    },
         reveal: function(strUrl, eventname){
             exec(null,null,"InAppBrowser", "reveal", [strUrl]);

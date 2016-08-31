@@ -217,12 +217,24 @@ public class InAppBrowser extends CordovaPlugin {
             showDialogue();
         }
         else if (action.equals("hide")) {
+            boolean goToBlank = false;
+
+            if(!args.isNull(0)){
+                goToBlank = args.getBoolean(0);
+            }
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if(null == inAppWebView){
+                        return;
+                    }
+
                     if(dialog != null) {
                         dialog.hide();
+                        if(goToBlank){
+                            inAppWebView.loadUrl("about:blank");
+                        }
                     }
                 }
             });
