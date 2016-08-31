@@ -249,18 +249,14 @@ public class InAppBrowser extends CordovaPlugin {
 
         final String url = args.getString(0);
 
-        //TODO: look at whitelisting
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
             return;
         }
 
-        if(shouldAllowNavigation(url, "shouldAllowRequest") ) {
-            showDialogue();
+        if(!shouldAllowNavigation(url, "shouldAllowRequest") ) {
             return;
         }
-
-
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
