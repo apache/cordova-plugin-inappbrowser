@@ -255,15 +255,18 @@ public class InAppBrowser extends CordovaPlugin {
             return;
         }
 
-        if(shouldAllowNavigation(url, "shouldAllowRequest") ) {
-            showDialogue();
-            return;
-        }
+
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 if(null == inAppWebView  || null == inAppWebView.getUrl()){
+                    return;
+                }
+
+                if(shouldAllowNavigation(url, "shouldAllowRequest") ) {
+                    showDialogue();
                     return;
                 }
 
