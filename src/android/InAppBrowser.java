@@ -259,6 +259,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
+                    inAppWebView.openWhenPageFinished();
                     navigate(url);
                     showDialogue();
                 }
@@ -868,6 +869,7 @@ public class InAppBrowser extends CordovaPlugin {
      * The webview client receives notifications about appView
      */
     public class InAppBrowserClient extends WebViewClient {
+        boolean reOpenOnNextPageFinished = false;
         EditText edittext;
         CordovaWebView webView;
 
@@ -983,8 +985,6 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
-
-
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
@@ -1020,6 +1020,10 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+        }
+
+        public void openWhenPageFinished(){
+            reOpenOnNextPageFinished = true;
         }
 
         /**
