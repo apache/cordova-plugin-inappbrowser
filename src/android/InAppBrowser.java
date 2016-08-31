@@ -220,10 +220,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    boolean goToBlank = false;
-                    if(!args.isNull(0)){
-                        goToBlank = args.getBoolean(0);
-                    }
+                    final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
 
                     if(null == inAppWebView){
                         return;
