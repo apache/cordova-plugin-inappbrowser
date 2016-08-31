@@ -259,7 +259,7 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(inAppWebView == null || inAppWebView.getUrl() == null){
+                if(null == inAppWebView  || null == inAppWebView.getUrl()){
                     return;
                 }
 
