@@ -241,9 +241,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public void revealDialog(CordovaArgs args) throws JSONException {
-        if(inAppWebView == null){
-            return;
-        }
+
 
         if(args.isNull(0)) {
             showDialogue();
@@ -261,6 +259,9 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if(inAppWebView == null){
+                    return;
+                }
                 if(inAppWebView.getUrl().equals(url)){
                     showDialogue();
                 }
