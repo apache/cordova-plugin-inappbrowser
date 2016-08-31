@@ -262,7 +262,6 @@ public class InAppBrowser extends CordovaPlugin {
                 else {
                     reOpenOnNextPageFinished = true;
                     navigate(url);
-                    showDialogue();
                 }
             }
         });
@@ -996,8 +995,10 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             if(reOpenOnNextPageFinished){
-                //Todo: re-open!
                 reOpenOnNextPageFinished = false;
+                if(dialog != null){
+                    dialog.show();
+                }
             }
 
             try {
