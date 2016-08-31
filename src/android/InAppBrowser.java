@@ -238,7 +238,7 @@ public class InAppBrowser extends CordovaPlugin {
         return true;
     }
 
-    public void revealDialog(CordovaArgs args) {
+    public void revealDialog(CordovaArgs args) throws JSONException {
         if(args.isNull(0)) {
             showDialogue();
             return;
@@ -267,7 +267,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     }
 
-    public void showDialogue() throws JSONException {
+    public void showDialogue() {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
