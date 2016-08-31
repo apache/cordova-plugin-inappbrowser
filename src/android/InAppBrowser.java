@@ -348,6 +348,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+
         Boolean shouldAllowNavigation = null;
         if (url.startsWith("javascript:")) {
             shouldAllowNavigation = true;
@@ -368,7 +369,7 @@ public class InAppBrowser extends CordovaPlugin {
             try {
                 Method gpm = webView.getClass().getMethod("getPluginManager");
                 PluginManager pm = (PluginManager)gpm.invoke(webView);
-                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                Method san = pm.getClass().getMethod(pluginManagerMethod, String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
                 LOG.d(LOG_TAG, e.getLocalizedMessage());
