@@ -1003,7 +1003,7 @@ public class InAppBrowser extends CordovaPlugin {
                             dialog.show();
                         }
                     }
-                }
+                });
             }
 
             try {
