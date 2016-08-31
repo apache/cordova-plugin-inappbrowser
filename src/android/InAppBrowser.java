@@ -242,7 +242,6 @@ public class InAppBrowser extends CordovaPlugin {
 
     public void revealDialog(CordovaArgs args) throws JSONException {
 
-
         if(args.isNull(0)) {
             showDialogue();
             return;
@@ -267,8 +266,13 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 }
                 else {
-                    reOpenOnNextPageFinished = true;
-                    navigate(url);
+                    if(shouldAllowNavigation(url)){
+                        showDialogue();
+                    }
+                    else {
+                        reOpenOnNextPageFinished = true;
+                        navigate(url);
+                    }
                 }
             }
         });
