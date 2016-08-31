@@ -216,13 +216,21 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("show")) {
             showDialogue();
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("hide")) {
             hideDialog(args);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
             revealDialog(args);
-
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+            pluginResult.setKeepCallback(true);
+            this.callbackContext.sendPluginResult(pluginResult);
         }
         else {
             return false;
@@ -248,9 +256,6 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
         });
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-        pluginResult.setKeepCallback(true);
-        this.callbackContext.sendPluginResult(pluginResult);
     }
 
     public void revealDialog(CordovaArgs args) throws JSONException {
@@ -300,9 +305,6 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
         });
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-        pluginResult.setKeepCallback(true);
-        this.callbackContext.sendPluginResult(pluginResult);
     }
 
     public Boolean shouldAllowNavigation(String url) {
