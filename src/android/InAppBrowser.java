@@ -87,6 +87,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+    private static final String BLANK_PAGE_URL = "about:blank";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -220,12 +221,14 @@ public class InAppBrowser extends CordovaPlugin {
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("hide")) {
-            hideDialog(args);
+            final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
+            hideDialog(goToBlank);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("reveal")) {
+            final String url = args.isNull(0) ? null : args.getString(0);
             revealDialog(args);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
@@ -235,109 +238,6 @@ public class InAppBrowser extends CordovaPlugin {
             return false;
         }
         return true;
-    }
-
-    public void hideDialog(CordovaArgs args) throws JSONException {
-        final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
-        this.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if(null == inAppWebView){
-                    return;
-                }
-
-                if(dialog != null) {
-                    dialog.hide();
-                    if(goToBlank){
-                        destroyHistoryOnNextPageFinished = true;
-                        inAppWebView.loadUrl("about:blank");
-                    }
-                }
-            }
-        });
-    }
-
-    public void revealDialog(CordovaArgs args) throws JSONException {
-
-        if(args.isNull(0)) {
-            showDialogue();
-            return;
-        }
-
-        final String url = args.getString(0);
-
-        if (url == null || url.equals("") || url.equals(NULL)) {
-            showDialogue();
-            return;
-        }
-
-        if(!shouldAllowNavigation(url, "shouldAllowRequest") ) {
-            return;
-        }
-
-        this.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if(null == inAppWebView  || null == inAppWebView.getUrl()){
-                    return;
-                }
-
-                if(inAppWebView.getUrl().equals(url)){
-                    showDialogue();
-                }
-                else {
-                    reOpenOnNextPageFinished = true;
-                    navigate(url);
-                }
-            }
-        });
-
-    }
-
-    public void showDialogue() {
-        this.cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(dialog != null) {
-                    dialog.show();
-                }
-            }
-        });
-    }
-
-    public Boolean shouldAllowNavigation(String url) {
-        return shouldAllowNavigation(url, "shouldAllowNavigation");
-    }
-
-    public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
-        Boolean shouldAllowNavigation = null;
-
-        if (url.startsWith("javascript:")) {
-            shouldAllowNavigation = true;
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-            } catch (NoSuchMethodException e) {
-            } catch (IllegalAccessException e) {
-            } catch (InvocationTargetException e) {
-            }
-        }
-        if (shouldAllowNavigation == null) {
-            try {
-                Method gpm = webView.getClass().getMethod("getPluginManager");
-                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                Method san = pm.getClass().getMethod(pluginManagerMethod, String.class);
-                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-            } catch (NoSuchMethodException e) {
-            } catch (IllegalAccessException e) {
-            } catch (InvocationTargetException e) {
-            }
-        }
-        return shouldAllowNavigation;
     }
 
     /**
@@ -432,6 +332,110 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * hides the dialog without destroying the instance if goToBlank is trye
+     * the browser is navigated to about blank, this can be used to preserve
+     * system resources
+     *
+     * @param goToBlank
+     * @return
+     */
+    private void hideDialog(boolean goToBlank) throws JSONException {
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(null == inAppWebView){
+                    return;
+                }
+
+                if(dialog != null) {
+                    dialog.hide();
+                    if(goToBlank){
+                        destroyHistoryOnNextPageFinished = true;
+                        inAppWebView.loadUrl(BLANK_PAGE_URL);
+                    }
+                }
+            }
+        });
+    }
+
+    private void revealDialog(string url) throws JSONException {
+
+        if (url == null || url.equals("") || url.equals(NULL)) {
+            showDialogue();
+            return;
+        }
+
+        if(!shouldAllowNavigation(url, "shouldAllowRequest") ) {
+            return;
+        }
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if(null == inAppWebView  || null == inAppWebView.getUrl()){
+                    return;
+                }
+
+                if(inAppWebView.getUrl().equals(url)){
+                    showDialogue();
+                }
+                else {
+                    reOpenOnNextPageFinished = true;
+                    navigate(url);
+                }
+            }
+        });
+    }
+
+    private void showDialogue() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(dialog != null) {
+                    dialog.show();
+                }
+            }
+        });
+    }
+
+    private Boolean shouldAllowNavigation(String url) {
+        return shouldAllowNavigation(url, "shouldAllowNavigation");
+    }
+
+    private Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+        Boolean shouldAllowNavigation = null;
+
+        if (url.startsWith("javascript:")) {
+            shouldAllowNavigation = true;
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod(pluginManagerMethod, String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+        }
+        return shouldAllowNavigation;
+    }
+
+
+    /**
      * Display a new browser with the specified URL.
      *
      * @param url the url to load.
@@ -485,7 +489,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // NB: From SDK 19: "If you call methods on WebView from any thread
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
-                childView.loadUrl("about:blank");
+                childView.loadUrl(BLANK_PAGE_URL);
 
 
                 try {
