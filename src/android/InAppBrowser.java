@@ -339,7 +339,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param goToBlank
      * @return
      */
-    private void hideDialog(boolean goToBlank) throws JSONException {
+    private void hideDialog(final boolean goToBlank) throws JSONException {
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -360,7 +360,7 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private void revealDialog(string url) throws JSONException {
+    private void revealDialog(private String url) throws JSONException {
 
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
@@ -401,7 +401,7 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private Boolean shouldAllowNavigation(String url) {
+    private Boolean shouldAllowNavigation(private String url) {
         return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
