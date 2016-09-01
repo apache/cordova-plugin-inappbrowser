@@ -332,7 +332,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
-     * hides the dialog without destroying the instance if goToBlank is trye
+     * hides the dialog without destroying the instance if goToBlank is true
      * the browser is navigated to about blank, this can be used to preserve
      * system resources
      *
@@ -360,6 +360,15 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    /**
+     * un-hides the dialog - will work if the dialog has been started hidden
+     * and not show. Passing a URL will navigate to that page and, when the
+     * on loaded event is raised show it.
+     * system resources
+     *
+     * @param url
+     * @return
+     */
     private void revealDialog(final String url) throws JSONException {
 
         if (url == null || url.equals("") || url.equals(NULL)) {
@@ -390,6 +399,12 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    /**
+     * Shows the dialog in the standard way
+     *
+     * @param
+     * @return
+     */
     private void showDialogue() {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -401,10 +416,23 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    /**
+     * Determines whether the dialog can navigate to the URL
+     *
+     * @param url
+     * @return true if navigable, otherwise false or null
+     */
     public Boolean shouldAllowNavigation(String url) {
         return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
+    /**
+     * Determines whether the dialog can navigate to the URL
+     * This allows us to specifiy the type of navgation
+     *
+     * @param url
+     * @return true if navigable, otherwise false or null
+     */
     private Boolean shouldAllowNavigation(final String url, final String pluginManagerMethod) {
         Boolean shouldAllowNavigation = null;
 
@@ -995,13 +1023,12 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieSyncManager.getInstance().sync();
             }
 
-            if(destroyHistoryOnNextPageFinished){
-                destroyHistoryOnNextPageFinished = false;
-                view.clearHistory();
-            }
-
             if(reOpenOnNextPageFinished){
                 reOpenOnNextPageFinished = false;
+                if(destroyHistoryOnNextPageFinished){
+                    destroyHistoryOnNextPageFinished = false;
+                    view.clearHistory();
+                }
                 showDialogue();
             }
 
