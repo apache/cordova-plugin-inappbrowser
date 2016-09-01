@@ -670,7 +670,7 @@ public class InAppBrowser extends CordovaPlugin {
                 Resources activityRes = cordova.getActivity().getResources();
                 int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable backIcon = activityRes.getDrawable(backResId);
-                back.setBackground(null);
+                back.setBackground(null);
                 back.setImageDrawable(backIcon);
                 back.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
