@@ -87,7 +87,6 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
-    private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -100,7 +99,6 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
-    private boolean shouldPauseInAppBrowser = false;
     boolean reOpenOnNextPageFinished = false;
 
     /**
@@ -122,7 +120,7 @@ public class InAppBrowser extends CordovaPlugin {
             final String target = t;
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
 
-            LOG.d(LOG_TAG, "target = " + target);
+            Log.d(LOG_TAG, "target = " + target);
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -139,14 +137,14 @@ public class InAppBrowser extends CordovaPlugin {
                         Boolean shouldAllowNavigation = shouldAllowNavigation(url);
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
-                            LOG.d(LOG_TAG, "loading in webview");
+                            Log.d(LOG_TAG, "loading in webview");
                             webView.loadUrl(url);
                         }
                         //Load the dialer
                         else if (url.startsWith(WebView.SCHEME_TEL))
                         {
                             try {
-                                LOG.d(LOG_TAG, "loading in dialer");
+                                Log.d(LOG_TAG, "loading in dialer");
                                 Intent intent = new Intent(Intent.ACTION_DIAL);
                                 intent.setData(Uri.parse(url));
                                 cordova.getActivity().startActivity(intent);
@@ -156,18 +154,18 @@ public class InAppBrowser extends CordovaPlugin {
                         }
                         // load in InAppBrowser
                         else {
-                            LOG.d(LOG_TAG, "loading in InAppBrowser");
+                            Log.d(LOG_TAG, "loading in InAppBrowser");
                             result = showWebPage(url, features);
                         }
                     }
                     // SYSTEM
                     else if (SYSTEM.equals(target)) {
-                        LOG.d(LOG_TAG, "in system");
+                        Log.d(LOG_TAG, "in system");
                         result = openExternal(url);
                     }
                     // BLANK - or anything else
                     else {
-                        LOG.d(LOG_TAG, "in blank");
+                        Log.d(LOG_TAG, "in blank");
                         result = showWebPage(url, features);
                     }
 
@@ -312,8 +310,8 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
-
         Boolean shouldAllowNavigation = null;
+
         if (url.startsWith("javascript:")) {
             shouldAllowNavigation = true;
         }
@@ -322,11 +320,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
                 shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
             } catch (NoSuchMethodException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
         if (shouldAllowNavigation == null) {
@@ -336,11 +331,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Method san = pm.getClass().getMethod(pluginManagerMethod, String.class);
                 shouldAllowNavigation = (Boolean)san.invoke(pm, url);
             } catch (NoSuchMethodException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
         }
         return shouldAllowNavigation;
@@ -352,26 +344,14 @@ public class InAppBrowser extends CordovaPlugin {
     @Override
     public void onReset() {
         closeDialog();
-    }
 
     /**
      * Called when the system is about to start resuming a previous activity.
      */
-    @Override
-    public void onPause(boolean multitasking) {
-        if (shouldPauseInAppBrowser) {
-            inAppWebView.onPause();
-        }
-    }
 
     /**
      * Called when the activity will start interacting with the user.
      */
-    @Override
-    public void onResume(boolean multitasking) {
-        if (shouldPauseInAppBrowser) {
-            inAppWebView.onResume();
-        }
     }
 
     /**
@@ -471,7 +451,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().startActivity(intent);
             return "";
         } catch (android.content.ActivityNotFoundException e) {
-            LOG.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
+            Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
             return e.toString();
         }
     }
@@ -511,7 +491,7 @@ public class InAppBrowser extends CordovaPlugin {
                     obj.put("type", EXIT_EVENT);
                     sendUpdate(obj, false);
                 } catch (JSONException ex) {
-                    LOG.d(LOG_TAG, "Should never happen");
+                    Log.d(LOG_TAG, "Should never happen");
                 }
             }
         });
@@ -625,10 +605,6 @@ public class InAppBrowser extends CordovaPlugin {
                     clearSessionCache = cache.booleanValue();
                 }
             }
-            Boolean shouldPause = features.get(SHOULD_PAUSE);
-            if (shouldPause != null) {
-                shouldPauseInAppBrowser = shouldPause.booleanValue();
-            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -694,14 +670,10 @@ public class InAppBrowser extends CordovaPlugin {
                 Resources activityRes = cordova.getActivity().getResources();
                 int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable backIcon = activityRes.getDrawable(backResId);
-                if (Build.VERSION.SDK_INT >= 16)
-                    back.setBackground(null);
-                else
-                    back.setBackgroundDrawable(null);
+                back.setBackground(null);
                 back.setImageDrawable(backIcon);
                 back.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
-                if (Build.VERSION.SDK_INT >= 16)
                     back.getAdjustViewBounds();
 
                 back.setOnClickListener(new View.OnClickListener() {
@@ -719,14 +691,10 @@ public class InAppBrowser extends CordovaPlugin {
                 forward.setId(Integer.valueOf(3));
                 int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable fwdIcon = activityRes.getDrawable(fwdResId);
-                if (Build.VERSION.SDK_INT >= 16)
                     forward.setBackground(null);
-                else
-                    forward.setBackgroundDrawable(null);
                 forward.setImageDrawable(fwdIcon);
                 forward.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 forward.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
-                if (Build.VERSION.SDK_INT >= 16)
                     forward.getAdjustViewBounds();
 
                 forward.setOnClickListener(new View.OnClickListener() {
@@ -767,14 +735,10 @@ public class InAppBrowser extends CordovaPlugin {
                 close.setId(Integer.valueOf(5));
                 int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
                 Drawable closeIcon = activityRes.getDrawable(closeResId);
-                if (Build.VERSION.SDK_INT >= 16)
                     close.setBackground(null);
-                else
-                    close.setBackgroundDrawable(null);
                 close.setImageDrawable(closeIcon);
                 close.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
-                if (Build.VERSION.SDK_INT >= 16)
                     close.getAdjustViewBounds();
 
                 close.setOnClickListener(new View.OnClickListener() {
@@ -933,7 +897,7 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
-            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+            } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:")) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
@@ -1037,7 +1001,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
-                LOG.d(LOG_TAG, "Should never happen");
+                Log.d(LOG_TAG, "Should never happen");
             }
         }
 
@@ -1053,7 +1017,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 sendUpdate(obj, true, PluginResult.Status.ERROR);
             } catch (JSONException ex) {
-                LOG.d(LOG_TAG, "Should never happen");
+                Log.d(LOG_TAG, "Should never happen");
             }
         }
 
@@ -1069,11 +1033,8 @@ public class InAppBrowser extends CordovaPlugin {
                 Method gpm = webView.getClass().getMethod("getPluginManager");
                 pluginManager = (PluginManager)gpm.invoke(webView);
             } catch (NoSuchMethodException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (IllegalAccessException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             } catch (InvocationTargetException e) {
-                LOG.d(LOG_TAG, e.getLocalizedMessage());
             }
 
             if (pluginManager == null) {
@@ -1081,9 +1042,7 @@ public class InAppBrowser extends CordovaPlugin {
                     Field pmf = webView.getClass().getField("pluginManager");
                     pluginManager = (PluginManager)pmf.get(webView);
                 } catch (NoSuchFieldException e) {
-                    LOG.d(LOG_TAG, e.getLocalizedMessage());
                 } catch (IllegalAccessException e) {
-                    LOG.d(LOG_TAG, e.getLocalizedMessage());
                 }
             }
 
