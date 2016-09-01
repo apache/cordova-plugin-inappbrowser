@@ -40,8 +40,8 @@
             'hidestart': channel.create('hidestart'),
             'hidestop' : channel.create('hidestop'),
             'loaderror' : channel.create('loaderror'),
-            'hide' : channel.create('hide')
-            'reveal' : channel.create('reveal')
+            'hide' : channel.create('hide'),
+            'reveal' : channel.create('reveal'),
             'exit' : channel.create('exit')
        };
     }
