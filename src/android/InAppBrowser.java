@@ -99,7 +99,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
-    boolean reOpenOnNextPageFinished = false;
+    private boolean destroyHistoryOnNextPageFinished = false;
+    private boolean reOpenOnNextPageFinished = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -249,6 +250,7 @@ public class InAppBrowser extends CordovaPlugin {
                 if(dialog != null) {
                     dialog.hide();
                     if(goToBlank){
+                        destroyHistoryOnNextPageFinished = true;
                         inAppWebView.loadUrl("about:blank");
                     }
                 }
@@ -987,6 +989,11 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieManager.getInstance().flush();
             } else {
                 CookieSyncManager.getInstance().sync();
+            }
+
+            if(destroyHistoryOnNextPageFinished){
+                destroyHistoryOnNextPageFinished = false;
+                view.clearHistory();
             }
 
             if(reOpenOnNextPageFinished){
