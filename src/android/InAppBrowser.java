@@ -360,7 +360,7 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private void revealDialog(private String url) throws JSONException {
+    private void revealDialog(final String url) throws JSONException {
 
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
@@ -401,7 +401,7 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private Boolean shouldAllowNavigation(private String url) {
+    private Boolean shouldAllowNavigation(final String url) {
         return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
