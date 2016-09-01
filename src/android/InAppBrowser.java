@@ -229,7 +229,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("reveal")) {
             final String url = args.isNull(0) ? null : args.getString(0);
-            revealDialog(args);
+            revealDialog(url);
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
