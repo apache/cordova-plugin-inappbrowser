@@ -401,11 +401,11 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private Boolean shouldAllowNavigation(final String url) {
+    public Boolean shouldAllowNavigation(String url) {
         return shouldAllowNavigation(url, "shouldAllowNavigation");
     }
 
-    private Boolean shouldAllowNavigation(String url, String pluginManagerMethod) {
+    private Boolean shouldAllowNavigation(final String url, final String pluginManagerMethod) {
         Boolean shouldAllowNavigation = null;
 
         if (url.startsWith("javascript:")) {
