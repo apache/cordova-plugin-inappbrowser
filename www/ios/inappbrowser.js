@@ -30,6 +30,7 @@
     var channel = require('cordova/channel');
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
+    var pollIntervalId = null;
 
     function InAppBrowser() {
        this.channels = {
@@ -53,6 +54,12 @@
         show: function (eventname) {
           exec(null, null, "InAppBrowser", "show", []);
         },
+        startPoll(pollingFunction, pollInterval){
+            exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
+        },
+        stopPoll(){
+            exec(null, null, "InAppBrowser", "stopPoll", [])
+        }
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);

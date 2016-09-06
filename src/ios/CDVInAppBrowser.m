@@ -428,9 +428,25 @@
 
 - (void)sendPollResult
 {
+
+}
+
+- (void)startPoll:(CDVInvokedUrlCommand*)command
+{
     if (self.callbackId != nil)
     {
-        NSString* result = @"Test Result";
+        NSString* result = @"Start";
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":result}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+}
+
+- (void)stopPoll:(CDVInvokedUrlCommand*)command
+{
+    if (self.callbackId != nil)
+    {
+        NSString* result = @"Stop";
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":result}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
