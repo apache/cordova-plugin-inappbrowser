@@ -423,7 +423,20 @@
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+    [self sendPollResult];//******** TEST RIG
 }
+
+- (void)sendPollResult
+{
+    if (self.callbackId != nil)
+    {
+        NSString* result = @"Test Result";
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":result}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+}
+
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
 {
