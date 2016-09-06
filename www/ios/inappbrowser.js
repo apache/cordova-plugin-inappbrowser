@@ -43,11 +43,7 @@
 
     InAppBrowser.prototype = {
         _eventHandler: function (event) {
-            if(event){
-                console.log('Event of type' + event.type);
-            }
             if (event && (event.type in this.channels)) {
-                console.log('Firirng' + event.type);
                 this.channels[event.type].fire(event);
             }
         },
@@ -58,10 +54,8 @@
           exec(null, null, "InAppBrowser", "show", []);
         },
         addEventListener: function (eventname,f) {
-            console.log('Subscribing ' + event.type);
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
-                console.log('Subscribed to ' + event.type);
             }
         },
         removeEventListener: function(eventname, f) {
