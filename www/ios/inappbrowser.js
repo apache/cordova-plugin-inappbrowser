@@ -59,7 +59,7 @@
         },
         stopPoll(){
             exec(null, null, "InAppBrowser", "stopPoll", [])
-        }
+        },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
