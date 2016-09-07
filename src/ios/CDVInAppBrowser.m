@@ -426,12 +426,11 @@
     [self sendPollResult];//******** TEST RIG
 }
 
-- (void)sendPollResult
+- (void)sendPollResult:(NSString*)data
 {
     if (self.callbackId != nil)
     {
-        NSString* result = @"Start";
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":"polled"}];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":data}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
@@ -445,14 +444,21 @@ NSTimer *PollTimer;
     PollTime = nil;
 }
 
+-(void)onPollTick:(NSTimer *)timer {
+   [self sendPollResult data:@"Polled"];
+}
+
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {
+
+    [self sendPollResult data:@"sendPoll"];
     if(!PollTimer)
     {
-        [self stopTimer]
+        [self sendPollResult data:@"StoppingPreExisting"];
+        [self stopTimer];
     }
-    PollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5  target:self selector:@selector(sendPollResult) userInfo:nil repeats:YES]
-    [self sendPollResult];
+    PollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    [self sendPollResult data:@"sendPollDone"];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
