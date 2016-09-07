@@ -479,7 +479,7 @@ CDVInvokedUrlCommand *Command;
                     NSString *action = (NSString *)actionId;
                     //if( action == @"close")
                     //{
-                        [self sendPollResult:[NSString stringWithFormat:@"{ Array: %@ }",  action]]];
+                        [self sendPollResult:[NSString stringWithFormat:@"{ Array: %@ }",  action]];
                     //}
                     //else
                     //{
