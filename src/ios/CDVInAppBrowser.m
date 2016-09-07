@@ -472,7 +472,7 @@ CDVInvokedUrlCommand *Command;
 
     if(Command !=nil )
     {
-        NSString *source = [command argumentAtIndex:0];
+        NSString *source = [Command argumentAtIndex:0];
         [self sendPollResult:source];
         NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
         [self sendPollResult:result];
