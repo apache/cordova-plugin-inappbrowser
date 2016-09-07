@@ -481,7 +481,7 @@ CDVInvokedUrlCommand *Command;
         //NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         //NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
         //[self sendPollResult:result];
-        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"JSON.stringify({foo:'bar'}]"];
         [self sendPollResult:result];
     }
 }
