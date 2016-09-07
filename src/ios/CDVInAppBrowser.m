@@ -476,17 +476,13 @@ CDVInvokedUrlCommand *Command;
         NSString *source = [Command argumentAtIndex:0];
         [self sendPollResult:source];
 
-
-
-
-
         //[self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         //NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         //NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         //NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
         //[self sendPollResult:result];
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"alert('tune')"];
-
+        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"return 'They on the daynce flooer';"];
+        [self sendPollResult:result];
     }
 }
 
