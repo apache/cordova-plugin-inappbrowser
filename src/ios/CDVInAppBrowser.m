@@ -423,7 +423,6 @@
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-    [self sendPollResult];//******** TEST RIG
 }
 
 - (void)sendPollResult:(NSString*)data
@@ -441,24 +440,24 @@ NSTimer *PollTimer;
 - (void)stopTimer
 {
     [PollTimer invalidate];
-    PollTime = nil;
+    PollTimer = nil;
 }
 
 -(void)onPollTick:(NSTimer *)timer {
-   [self sendPollResult data:@"Polled"];
+   [self sendPollResult:@"Polled"];
 }
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {
 
-    [self sendPollResult data:@"sendPoll"];
+    [self sendPollResult:@"sendPoll"];
     if(!PollTimer)
     {
-        [self sendPollResult data:@"StoppingPreExisting"];
+        [self sendPollResult:@"StoppingPreExisting"];
         [self stopTimer];
     }
     PollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
-    [self sendPollResult data:@"sendPollDone"];
+    [self sendPollResult:@"sendPollDone"];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
