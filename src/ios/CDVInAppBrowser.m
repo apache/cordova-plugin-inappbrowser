@@ -456,9 +456,9 @@ CDVInvokedUrlCommand *Command;
 
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-        if(result === @"InAppBrowser:CloseWindow"){
-            [self stopPoll];
-            [self close];
+        if(result == @"InAppBrowser:CloseWindow"){
+            [self stopPoll:nil];
+            [self close:nil];
         }
         else {
             [self sendPollResult:result];
