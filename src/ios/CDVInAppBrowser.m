@@ -470,7 +470,7 @@ CDVInvokedUrlCommand *Command;
         {
             if ([jsonObject isKindOfClass:[NSArray class]])
             {
-                    [self sendPollResult:[NSString stringWithFormat:@"{ Array: %@ }",  [NSString stringWithFormat:@"%i", (int)sizeof(jsonObject)] ];
+                    [self sendPollResult:[NSString stringWithFormat:@"{ Array: %@ }",  [NSString stringWithFormat:@"%i", (int)sizeof(jsonObject)]]];
                     [self sendPollResult:result];
             }
             else
