@@ -447,10 +447,6 @@ CDVInvokedUrlCommand *Command;
 -(void)onPollTick:(NSTimer *)timer {
     if(Command !=nil )
     {
-        //NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval((function(){return {foo:2};})())])";
-        //NSString *foo = @"(function(){return {foo:2};})()";
-        //[self sendPollResult:[Command argumentAtIndex:0]];
-
         NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
         NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
 
