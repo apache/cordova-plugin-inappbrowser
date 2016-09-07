@@ -464,7 +464,7 @@ CDVInvokedUrlCommand *Command;
 {
     if(!PollTimer)
     {
-        [self stopTimer];q
+        [self stopTimer];
     }
     Command = command;
     NSNumber *interval = command.arguments[1] / 1000.0;
