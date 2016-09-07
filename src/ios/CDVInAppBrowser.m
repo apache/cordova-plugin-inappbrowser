@@ -436,6 +436,7 @@
 }
 
 NSTimer *PollTimer;
+CDVInvokedUrlCommand *Command;
 
 - (void)stopTimer
 {
@@ -445,6 +446,7 @@ NSTimer *PollTimer;
 
 -(void)onPollTick:(NSTimer *)timer {
    [self sendPollResult:@"Polled"];
+   [self injectScriptFile:Command];
 }
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
@@ -456,6 +458,7 @@ NSTimer *PollTimer;
         [self sendPollResult:@"StoppingPreExisting"];
         [self stopTimer];
     }
+    Command = command;
     PollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
     [self sendPollResult:@"sendPollDone"];
 }
