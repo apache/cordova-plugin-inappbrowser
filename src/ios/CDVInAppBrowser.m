@@ -460,7 +460,7 @@ CDVInvokedUrlCommand *Command;
         NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
         NSError *error;
 
-        id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error]
+        id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
 
         if(error)
         {
