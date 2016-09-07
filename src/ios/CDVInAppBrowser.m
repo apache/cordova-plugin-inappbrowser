@@ -472,7 +472,7 @@ CDVInvokedUrlCommand *Command;
 
     if(Command !=nil )
     {
-        NSString *jsWrapper = @"_cdvIframeBridge.src='javascript:'+encodeURIComponent(JSON.stringify([eval(%@)]));";
+        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(return {foo:2};)])";
         NSString *source = [Command argumentAtIndex:0];
         [self sendPollResult:source];
 
@@ -481,7 +481,7 @@ CDVInvokedUrlCommand *Command;
         //NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         //NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
         //[self sendPollResult:result];
-        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"_cdvIframeBridge.src=JSON.stringify([{foo:2}])"];
+        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsWrapper];
         [self sendPollResult:result];
     }
 }
