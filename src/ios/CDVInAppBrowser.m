@@ -475,8 +475,6 @@ NSTimer *PollTimer;
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-
-        [self sendPollResult];
     }
 }
 
