@@ -445,6 +445,16 @@ CDVInvokedUrlCommand *Command;
 }
 
 -(void)onPollTick:(NSTimer *)timer {
+    //NSString* jsWrapper = nil;
+    //    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
+    //        jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
+    //    }
+    //    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+
+    if(Command !=nil)
+    {
+        [self sendPollResult:@"HAS COMMAND"];
+    }
    [self sendPollResult:@"Polled"];
    [self injectScriptFile:Command];
 }
