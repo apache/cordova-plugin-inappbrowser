@@ -474,12 +474,12 @@ CDVInvokedUrlCommand *Command;
     {
 
         //NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval((function(){return {foo:2};})())])";
-        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
-        NSString *foo = @"(function(){return {foo:2};})()";
-        NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,foo];
+        //NSString *foo = @"(function(){return {foo:2};})()";
 
-        NSString *source = [Command argumentAtIndex:0];
-        [self sendPollResult:source];
+        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
+        NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
+
+        [self sendPollResult:[Command argumentAtIndex:0]];
 
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         //NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
