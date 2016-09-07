@@ -472,7 +472,7 @@ CDVInvokedUrlCommand *Command;
 
     if(Command !=nil )
     {
-        NSString jsWrapper = @"_cdvIframeBridge.src='javascript:'+encodeURIComponent(JSON.stringify([eval(%@)]));"];
+        NSString *jsWrapper = @"_cdvIframeBridge.src='javascript:'+encodeURIComponent(JSON.stringify([eval(%@)]));";
         NSString *source = [Command argumentAtIndex:0];
         [self sendPollResult:source];
 
@@ -484,8 +484,9 @@ CDVInvokedUrlCommand *Command;
         //NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         //NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         //NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+        //[self sendPollResult:result];
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"alert('tune')"];
-        [self sendPollResult:result];
+
     }
 }
 
