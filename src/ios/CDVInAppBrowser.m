@@ -445,47 +445,16 @@ CDVInvokedUrlCommand *Command;
 }
 
 -(void)onPollTick:(NSTimer *)timer {
-    //NSString* jsWrapper = nil;
-    //    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
-    //        jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
-    //    }
-    //    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-
-    //- (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
-    //{
-        // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
-    //    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
-
-    //    if (jsWrapper != nil) {
-    //        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
-    //        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    //        if (sourceArrayString) {
-    //            NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
-    //            NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
-    //            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
-    //        }
-    //    } else {
-    //        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
-    //    }
-    //}
-
-
     if(Command !=nil )
     {
-
         //NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval((function(){return {foo:2};})())])";
         //NSString *foo = @"(function(){return {foo:2};})()";
+        //[self sendPollResult:[Command argumentAtIndex:0]];
 
         NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
         NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
 
-        [self sendPollResult:[Command argumentAtIndex:0]];
-
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
-        //NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
-        //NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        //NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
-        //[self sendPollResult:result];
         NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
         [self sendPollResult:result];
     }
@@ -493,11 +462,8 @@ CDVInvokedUrlCommand *Command;
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {
-
-    [self sendPollResult:@"sendPoll"];
     if(!PollTimer)
     {
-        [self sendPollResult:@"StoppingPreExisting"];
         [self stopTimer];
     }
     Command = command;
