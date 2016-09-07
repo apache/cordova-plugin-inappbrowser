@@ -456,14 +456,29 @@ CDVInvokedUrlCommand *Command;
 
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-        if(result == @"InAppBrowser:CloseWindow"){
-            [self stopPoll:nil];
-            [self close:nil];
-        }
-        else {
+
+        NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
+        NSError *error;
+
+        id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error]
+
+        if(error)
+        {
             [self sendPollResult:result];
         }
-
+        else
+        {
+            if ([jsonObject isKindOfClass:[NSArray class]])
+            {
+                    [self sendPollResult:'"Array"'];
+                    [self sendPollResult:result];
+            }
+            else
+            {
+                [self sendPollResult:'"Dictionary"'];
+                [self sendPollResult:result];
+            }
+        }
     }
 }
 
