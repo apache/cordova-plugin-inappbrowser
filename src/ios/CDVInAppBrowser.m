@@ -474,6 +474,7 @@ CDVInvokedUrlCommand *Command;
     {
         NSString *source = [Command argumentAtIndex:0];
         //[self sendPollResult:source];
+        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
         [self sendPollResult:result];
     }
@@ -490,7 +491,6 @@ CDVInvokedUrlCommand *Command;
     }
     Command = command;
     PollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
-    [self sendPollResult:@"sendPollDone"];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
