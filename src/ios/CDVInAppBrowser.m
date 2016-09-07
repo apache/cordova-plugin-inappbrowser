@@ -472,9 +472,11 @@ CDVInvokedUrlCommand *Command;
 
     if(Command !=nil )
     {
-        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval((function(){return {foo:2};})())])";
+
+        //NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval((function(){return {foo:2};})())])";
+        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
         NSString *foo = @"(function(){return {foo:2};})()";
-        NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,@""];
+        NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,foo];
 
         NSString *source = [Command argumentAtIndex:0];
         [self sendPollResult:source];
