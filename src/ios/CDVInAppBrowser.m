@@ -451,9 +451,31 @@ CDVInvokedUrlCommand *Command;
     //    }
     //    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 
-    if(Command !=nil)
+    //- (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
+    //{
+        // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
+    //    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
+
+    //    if (jsWrapper != nil) {
+    //        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
+    //        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    //        if (sourceArrayString) {
+    //            NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
+    //            NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
+    //            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
+    //        }
+    //    } else {
+    //        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+    //    }
+    //}
+
+
+    if(Command !=nil )
     {
-        [self sendPollResult:@"HAS COMMAND"];
+        NSString *source = [command argumentAtIndex:0];
+        [self sendPollResult:source];
+        NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+        [self sendPollResult:result];
     }
    [self sendPollResult:@"Polled"];
    [self injectScriptFile:Command];
