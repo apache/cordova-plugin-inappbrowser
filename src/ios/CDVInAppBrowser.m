@@ -479,7 +479,8 @@ CDVInvokedUrlCommand *Command;
                     NSString *action = (NSString *)actionId;
                     if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                     {
-                        [self sendPollResult:[NSString stringWithFormat:@"{ Array: %@ }",  action]];
+                        [self stopTimer];
+                        [self.inAppBrowserViewController close];
                     }
                     else
                     {
