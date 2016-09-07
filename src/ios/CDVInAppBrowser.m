@@ -464,10 +464,10 @@ CDVInvokedUrlCommand *Command;
 {
     if(!PollTimer)
     {
-        [self stopTimer];
+        [self stopTimer];q
     }
     Command = command;
-    NSNumber *interval = [command argumentAtIndex:1] / 1000.0;
+    NSNumber *interval = command.arguments[1] / 1000.0;
     PollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
 }
 
