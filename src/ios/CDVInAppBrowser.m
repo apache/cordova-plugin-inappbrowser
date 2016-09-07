@@ -475,6 +475,7 @@ CDVInvokedUrlCommand *Command;
             }
             else
             {
+                [self sendPollResult: @"{ Dictionary: true }"];
                 [self sendPollResult:result];
             }
         }
