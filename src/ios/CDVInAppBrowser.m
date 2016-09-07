@@ -473,10 +473,10 @@ CDVInvokedUrlCommand *Command;
     if(Command !=nil )
     {
         NSString *source = [Command argumentAtIndex:0];
-        //[self sendPollResult:source];
+        [self sendPollResult:source];
         [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
         NSString *result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
-        [self sendPollResult:result];
+        //[self sendPollResult:result];
     }
 }
 
@@ -496,6 +496,7 @@ CDVInvokedUrlCommand *Command;
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
 {
     [self stopTimer];
+    Command = nil;
 }
 
 
