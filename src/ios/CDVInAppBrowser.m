@@ -368,6 +368,7 @@
     NSLog(@"*********************************************");
     NSLog([url host]);
     NSLog([url scheme]);
+    NSSLog([url path]);
     NSLog(@"*********************************************");
 
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
@@ -493,12 +494,13 @@ CDVInvokedUrlCommand *Command;
     {
 
         [self sendPollResult:@"polling"];
-        //jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://' + encodeURIComponent(JSON.stringify([eval(%@)]))";
+        [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
+
         //NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
         // [self ensureIFrameBridgeForCDVInAppBrowserViewController];
         // [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-        [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
+        //jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
 
         // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
         // NSError *error;
