@@ -267,8 +267,8 @@
 - (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
 {
     // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
-    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
-
+    [self ensureIFrameBridgeForCDVInAppBrowserViewController];
+    
     if (jsWrapper != nil) {
         NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -390,7 +390,42 @@
             [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
             return NO;
         }
-    } 
+    }
+    else if([[url scheme] isEqualToString:@"gap-iab-native"])
+    {
+        //NSString* scriptResult = [url path];
+        // if ((scriptResult == nil) || ([scriptResult length] < 2))
+        // {
+        //     return NO;
+        // }
+        // NSString* scriptResult = [scriptResult substringFromIndex:1];
+        // NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+
+        //**********************This is the original code
+        // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
+        // NSError *error;
+
+        // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+        // if (!error && [jsonObject isKindOfClass:[NSArray class]])
+        // {
+        //     NSArray * array = (NSArray *) jsonObject;
+
+        //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
+
+        //     if([actionId isKindOfClass:[NSString class]])
+        //     {
+        //         NSString *action = (NSString *)actionId;
+        //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+        //         {
+        //             [self stopTimer];
+        //             [self.inAppBrowserViewController close];
+        //             return;
+        //         }
+        //     }
+        // }
+        [self sendPollResult:@"Polled"];
+        return NO;
+    }
     //if is an app store link, let the system handle it, otherwise it fails to load it
     else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
         [theWebView stopLoading];
@@ -444,37 +479,43 @@ CDVInvokedUrlCommand *Command;
     PollTimer = nil;
 }
 
+-void ensureIFrameBridgeForCDVInAppBrowserViewController:
+{
+    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
+}
+
 -(void)onPollTick:(NSTimer *)timer {
     if(Command !=nil )
     {
-        NSString *jsWrapper = @"_cdvIframeBridge.src=JSON.stringify([eval(%@)])";
+        NSString *jsWrapper = @"_cdvIframeBridge.src=gap-iab-native://encodeURIComponent(JSON.stringify([eval(%@)]))";
         NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
+        [self sendPollResult:'polling'];
 
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
-        NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
+        [self ensureIFrameBridgeForCDVInAppBrowserViewController];
+        // NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
 
-        NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
-        NSError *error;
+        // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
+        // NSError *error;
 
-        id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-        if (!error && [jsonObject isKindOfClass:[NSArray class]])
-        {
-            NSArray * array = (NSArray *) jsonObject;
+        // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+        // if (!error && [jsonObject isKindOfClass:[NSArray class]])
+        // {
+        //     NSArray * array = (NSArray *) jsonObject;
 
-            id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
+        //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
 
-            if([actionId isKindOfClass:[NSString class]])
-            {
-                NSString *action = (NSString *)actionId;
-                if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
-                {
-                    [self stopTimer];
-                    [self.inAppBrowserViewController close];
-                    return;
-                }
-            }
-        }
-        [self sendPollResult:result];
+        //     if([actionId isKindOfClass:[NSString class]])
+        //     {
+        //         NSString *action = (NSString *)actionId;
+        //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+        //         {
+        //             [self stopTimer];
+        //             [self.inAppBrowserViewController close];
+        //             return;
+        //         }
+        //     }
+        // }
+        // [self sendPollResult:result];
     }
 }
 
