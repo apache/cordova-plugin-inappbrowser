@@ -481,7 +481,7 @@ CDVInvokedUrlCommand *Command;
     {
         return;
     }
-    
+
     [PollTimer invalidate];
     PollTimer = nil;
 }
@@ -518,7 +518,8 @@ CDVInvokedUrlCommand *Command;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    [self close:command];
+    //self.inAppBrowserViewController.webView 
+    [self show:nil];
 }
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
