@@ -422,7 +422,7 @@
                     NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     [self stopTimer];
                     [self.inAppBrowserViewController close];
-                    return;
+                    return NO;
                 }
             }
 
