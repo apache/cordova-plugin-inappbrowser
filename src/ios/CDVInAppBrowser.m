@@ -462,8 +462,8 @@ CDVInvokedUrlCommand *Command;
 
             NSArray * array = (NSArray *) jsonObject;
 
-            //if([array count] ==1)
-            //{
+            if([array count] ==1)
+            {
                 id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
 
                 if([actionId isKindOfClass:[NSString class]])
@@ -476,10 +476,10 @@ CDVInvokedUrlCommand *Command;
                         return;
                     }
                 }
-            //}
+            }
 
         }
-            [self sendPollResult:result];
+        [self sendPollResult:result];
     }
 }
 
