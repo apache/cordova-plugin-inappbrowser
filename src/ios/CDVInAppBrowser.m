@@ -366,8 +366,8 @@
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
     NSLog(@"*********************************************");
-    NSLog([url host]);
     NSLog([url scheme]);
+    NSLog([url host]);
     NSSLog([url path]);
     NSLog(@"*********************************************");
 
@@ -494,7 +494,7 @@ CDVInvokedUrlCommand *Command;
     {
 
         [self sendPollResult:@"polling"];
-        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://' + encodeURIComponent(JSON.stringify([eval(%@)]))";
+        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
         [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
 
         //NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
