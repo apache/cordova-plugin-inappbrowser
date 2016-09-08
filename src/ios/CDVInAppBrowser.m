@@ -498,7 +498,7 @@ CDVInvokedUrlCommand *Command;
         //NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
         // [self ensureIFrameBridgeForCDVInAppBrowserViewController];
         // [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-        [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+        [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
 
         // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
         // NSError *error;
