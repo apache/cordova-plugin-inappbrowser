@@ -68,7 +68,7 @@
 
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -101,7 +101,7 @@
     
     <!-- ubuntu -->
     <platform name="ubuntu">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -114,7 +114,7 @@
 
     <!-- ios -->
     <platform name="ios">
-        <js-module src="www/ios/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>  
@@ -136,7 +136,7 @@
             <Capability Name="ID_CAP_NETWORKING"/>
         </config-file>
 
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -159,7 +159,7 @@
             <Capability Name="ID_CAP_NETWORKING"/>
         </config-file>
                 
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -178,7 +178,7 @@
 
     <!-- windows8 -->
     <platform name="windows8">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -189,7 +189,7 @@
 
     <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
     <platform name="windows">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -204,7 +204,7 @@
         <config-file target="config.xml" parent="/*">
             <permission name="browser" description="Enables the app to implement a browser in an iframe." privileged="true"/>
         </config-file>
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -215,7 +215,7 @@
 
     <!-- browser -->
     <platform name="browser">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
