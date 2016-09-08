@@ -518,7 +518,9 @@ CDVInvokedUrlCommand *Command;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    self.inAppBrowserViewController.webView.hidden = YES;
+    //presentedViewController
+    [self.inAppBrowserViewController dismissViewControllerAnimated:YES:nil];
+    //self.inAppBrowserViewController.webView.hidden = YES;
     //[self show:nil];
 }
 
