@@ -467,7 +467,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     pollInterval = nil;
 }
 
-- (void)openBrowser:(NSString*)url:(NSString*)target:(NSString*)options:(NSString*)callbackId
+- (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options withCallbackId:(NSString*)callbackId
 {
     CDVPluginResult* pluginResult;
 
@@ -556,8 +556,8 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
 {
-    NSString* requestedUrl = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
-    [self open:requestedUrl:lastTarget:lastOptions:command.callbackId];
+    NSString* urlToOpen = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
+    [self openUrl:urlToOpen targets:lastTarget withOptions:lastOptions withCallbackId:command.callbackId];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
