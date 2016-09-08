@@ -410,34 +410,39 @@
 
         scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
         NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+        if ((error != nil) && [decodedResult isKindOfClass:[NSArray class]])
+        {
+            NSLog(@"*********************************************");
+            NSLog(scriptResult); 
+            NSLog(@"*********************************************");
+            NSArray * array = (NSArray *) jsonObject;
+            //**********************This is the original code
+            // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
+            // NSError *error;
 
-        NSLog(@"*********************************************");
-        NSLog([url path]); 
-        NSLog(@"*********************************************");
+            // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+            // if (!error && [jsonObject isKindOfClass:[NSArray class]])
+            // {
+            //     NSArray * array = (NSArray *) jsonObject;
 
-        //**********************This is the original code
-        // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
-        // NSError *error;
+            //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
 
-        // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-        // if (!error && [jsonObject isKindOfClass:[NSArray class]])
-        // {
-        //     NSArray * array = (NSArray *) jsonObject;
-
-        //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
-
-        //     if([actionId isKindOfClass:[NSString class]])
-        //     {
-        //         NSString *action = (NSString *)actionId;
-        //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
-        //         {
-        //             [self stopTimer];
-        //             [self.inAppBrowserViewController close];
-        //             return;
-        //         }
-        //     }
-        // }
-        [self sendPollResult:@"Polled"];
+            //     if([actionId isKindOfClass:[NSString class]])
+            //     {
+            //         NSString *action = (NSString *)actionId;
+            //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+            //         {
+            //             [self stopTimer];
+            //             [self.inAppBrowserViewController close];
+            //             return;
+            //         }
+            //     }
+            // }
+            return NO;
+        }
+        
+        [self sendPollResult:scriptResult];
+        return NO;
     }
     //if is an app store link, let the system handle it, otherwise it fails to load it
     else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
