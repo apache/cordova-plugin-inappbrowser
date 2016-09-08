@@ -464,7 +464,6 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
     PollTimer = nil;
     pollJavascriptCode = nil;
-    pollInterval = nil;
 }
 
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options withCallbackId:(NSString*)callbackId
