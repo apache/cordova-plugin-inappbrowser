@@ -457,17 +457,13 @@ CDVInvokedUrlCommand *Command;
         NSError *error;
 
         id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-
-        if(error)
+        if (!error && [jsonObject isKindOfClass:[NSArray class]])
         {
-            [self sendPollResult:result];
-        }
-        else
-        {
-            if ([jsonObject isKindOfClass:[NSArray class]])
-            {
-                NSArray * array = (NSArray *) jsonObject;
 
+            NSArray * array = (NSArray *) jsonObject;
+
+            //if([array count] ==1)
+            //{
                 id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
 
                 if([actionId isKindOfClass:[NSString class]])
@@ -477,23 +473,13 @@ CDVInvokedUrlCommand *Command;
                     {
                         [self stopTimer];
                         [self.inAppBrowserViewController close];
-                    }
-                    else
-                    {
-                        [self sendPollResult:result];
+                        return;
                     }
                 }
-                else
-                {
-                    [self sendPollResult:result];
-                }
-            }
-            else
-            {
-                [self sendPollResult: @"{ Dictionary: true }"];
-                [self sendPollResult:result];
-            }
+            //}
+
         }
+            [self sendPollResult:result];
     }
 }
 
