@@ -58,7 +58,7 @@
         NSLog(@"IAB.close() called but it was already closed.");
         return;
     }
-    [self stopPoll:nil];
+    [self stopPolling];
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -80,35 +80,7 @@
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
 
-    self.callbackId = command.callbackId;
-
-    if (url != nil) {
-#ifdef __CORDOVA_4_0_0
-        NSURL* baseUrl = [self.webViewEngine URL];
-#else
-        NSURL* baseUrl = [self.webView.request URL];
-#endif
-        NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
-
-        if ([self isSystemUrl:absoluteUrl]) {
-            target = kInAppBrowserTargetSystem;
-        }
-
-        if ([target isEqualToString:kInAppBrowserTargetSelf]) {
-            [self openInCordovaWebView:absoluteUrl withOptions:options];
-        } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
-            [self openInSystem:absoluteUrl];
-        } else { // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
-        }
-
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
-    }
-
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [self openBrowser:url:target:options:command.callbackId];
 }
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
@@ -418,7 +390,7 @@
                 NSString *action = (NSString *)decodedAction;
                 if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                 {
-                    [self stopTimer];
+                    [self stopPolling];
                     [self.inAppBrowserViewController close];
                     return NO;
                 }
@@ -473,18 +445,72 @@
     }
 }
 
-NSTimer *PollTimer;
-CDVInvokedUrlCommand *Command;
+NSTimer* PollTimer;
+NSString* pollJavascriptCode = nil;
+NSTimeInterval* pollInterval = nil;
 
-- (void)stopTimer
+(NSString*)lastUrl =nil
+(NSString*)lastTarget = nil;
+(NSString*)lastOptions = nil;
+
+CDVInvokedUrlCommand* lastInvokedCommand = nil;
+
+-(void)stopPolling
 {
     if(PollTimer != nil)
     {
-        return;
+        [PollTimer invalidate];
     }
 
-    [PollTimer invalidate];
     PollTimer = nil;
+    pollJavascriptCode = nil;
+    pollInterval = nil;
+}
+
+- (void)openBrowser:(NSString*)url:(NSString*)target:(NSString*)options:(NSString*)callbackId
+{
+    CDVPluginResult* pluginResult;
+
+    self.callbackId = callbackId;
+
+    if (url != nil) {
+#ifdef __CORDOVA_4_0_0
+        NSURL* baseUrl = [self.webViewEngine URL];
+#else
+        NSURL* baseUrl = [self.webView.request URL];
+#endif
+        NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+
+        if ([self isSystemUrl:absoluteUrl]) {
+            target = kInAppBrowserTargetSystem;
+        }
+
+        if ([target isEqualToString:kInAppBrowserTargetSelf]) 
+        {
+            lastUrl = url;
+            lastTarget = target;
+            lastOptions = options;
+            [self openInCordovaWebView:absoluteUrl withOptions:options];
+        } 
+        else if ([target isEqualToString:kInAppBrowserTargetSystem]) 
+        {
+            [self openInSystem:absoluteUrl];
+        }
+        else 
+        { // _blank or anything else
+            lastUrl = url;
+            lastTarget = target;
+            lastOptions = options;
+            [self openInInAppBrowser:absoluteUrl withOptions:options];
+        }
+
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
+    }
+
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
@@ -493,10 +519,14 @@ CDVInvokedUrlCommand *Command;
 }
 
 -(void)onPollTick:(NSTimer *)timer {
-    if(Command !=nil )
+    if(pollJavascriptCode != nil)
     {
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
+        [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
+    }
+    else if (PollTimer != null)
+    {
+        [self stopPolling];
     }
 }
 
@@ -504,27 +534,30 @@ CDVInvokedUrlCommand *Command;
 {
     if(!PollTimer)
     {
-        [self stopTimer];
+        [self stopPolling];
     }
-    Command = command;
-    NSTimeInterval interval = [command.arguments[1] doubleValue]/ 1000.0;
-    PollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    pollJavascriptCode = [command argumentAtIndex:0];
+    pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
+    PollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
 {
-    [self stopTimer];
-    Command = nil;
+    [self stopPolling];
 }
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
+    // Ignore the boolean intended to release resource - in iOS we destroy the browser as hiding it is hard
+    // because the View Controller is not standard - the performance is acceptable without it anyway.
+    // Instead blank out the polling so it is not restarted - in line with other OSs. 
     [self close:command];
 }
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
 {
-    [self close:show];
+    NSString* requestedUrl = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
+    [self open:requestedUrl:lastTarget:lastOptions:command.callbackId];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
