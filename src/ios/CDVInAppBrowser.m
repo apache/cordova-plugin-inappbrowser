@@ -410,33 +410,18 @@
         
         if (error == nil && [decodedResult isKindOfClass:[NSArray class]])
         {
-            NSLog(@"*********************************************");
             NSArray * array = (NSArray *) decodedResult;
             NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
             if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]])
             {
-                NSLog(@"++++++++++++++++++++++++++++++++++++++++++++++++");
                 NSString *action = (NSString *)decodedAction;
                 if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                 {
-                    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     [self stopTimer];
                     [self.inAppBrowserViewController close];
                     return NO;
                 }
             }
-
-            //**********************This is the original code
-            // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
-            // NSError *error;
-
-            // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-            // if (!error && [jsonObject isKindOfClass:[NSArray class]])
-            // {
-            //     NSArray * array = (NSArray *) jsonObject;
-            //     
-            //     
-            // }
             return NO;
         }
 
