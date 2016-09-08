@@ -449,9 +449,9 @@ NSTimer* PollTimer;
 NSString* pollJavascriptCode = nil;
 NSTimeInterval* pollInterval = nil;
 
-(NSString*)lastUrl =nil
-(NSString*)lastTarget = nil;
-(NSString*)lastOptions = nil;
+NSString* lastUrl =nil;
+NSString* lastTarget = nil;
+NSString* lastOptions = nil;
 
 CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
