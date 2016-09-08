@@ -477,6 +477,11 @@ CDVInvokedUrlCommand *Command;
 
 - (void)stopTimer
 {
+    if(PollTimer != nil)
+    {
+        return;
+    }
+    
     [PollTimer invalidate];
     PollTimer = nil;
 }
@@ -513,7 +518,7 @@ CDVInvokedUrlCommand *Command;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    [self exit:command];
+    [self close:command];
 }
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
