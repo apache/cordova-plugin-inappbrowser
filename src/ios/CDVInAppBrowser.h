@@ -6,9 +6,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
-
+ 
  http://www.apache.org/licenses/LICENSE-2.0
-
+ 
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,9 +22,9 @@
 #import <Cordova/CDVScreenOrientationDelegate.h>
 
 #ifdef __CORDOVA_4_0_0
-    #import <Cordova/CDVUIWebViewDelegate.h>
+#import <Cordova/CDVUIWebViewDelegate.h>
 #else
-    #import <Cordova/CDVWebViewDelegate.h>
+#import <Cordova/CDVWebViewDelegate.h>
 #endif
 
 @class CDVInAppBrowserViewController;
@@ -63,23 +63,38 @@
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 
+//PATCH - Color Variables for Navbar
+@property (nonatomic, copy) NSString* closebuttoncolor;
+@property (nonatomic, assign) BOOL shownavigationbtns;
+@property (nonatomic, copy) NSString* toolbarbgcolor;
+@property (nonatomic, copy) NSString* gradient1;
+@property (nonatomic, copy) NSString* gradient2;
+@property (nonatomic, copy) NSString* alphagradient1;
+@property (nonatomic, copy) NSString* alphagradient2;
+@property (nonatomic, copy) NSString* toolbarcolor;
+//PATCH - Set statusbar light or dark
+@property (nonatomic, assign) BOOL statusbarstylelight;
+
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
 @end
 
 @interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
-    @private
+@private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
     CDVInAppBrowserOptions *_browserOptions;
+    
+    UIView *statusBar;
+    CAGradientLayer *gradientStatus;
+    CAGradientLayer *gradientToolbar;
     
 #ifdef __CORDOVA_4_0_0
     CDVUIWebViewDelegate* _webViewDelegate;
 #else
     CDVWebViewDelegate* _webViewDelegate;
 #endif
-    
 }
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
@@ -87,8 +102,11 @@
 @property (nonatomic, strong) IBOutlet UILabel* addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* backButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* forwardButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* flexibleSpaceButton;
+@property (nonatomic, strong) IBOutlet UIBarButtonItem* fixedSpaceButton;
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView* spinner;
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
+@property (nonatomic, strong) UIView *navBg;
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
@@ -98,7 +116,11 @@
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
+- (void)showNavigationBtns:(BOOL)show; //PATCH - setting forward and back buttons
+- (void)setCloseButtonColor:(NSString*)color; //PATCH - setting forward and back buttons
 - (void)setCloseButtonTitle:(NSString*)title;
+- (void)setToolbarFlatColor:(NSString*)color;
+- (void)setToolbarGradientColor:(NSString*)color1 : (NSString *) color2 : (NSString *) alpha1 : (NSString *) alpha2; //PATCH - setting gradient
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
@@ -110,3 +132,8 @@
 
 @end
 
+@interface UIColor(HexString)
+
++ (UIColor *)colorWithHexValue:(uint)hexValue andAlpha:(float)alpha;
+
+@end
