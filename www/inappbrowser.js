@@ -59,6 +59,12 @@
         stopPoll(){
             exec(null, null, "InAppBrowser", "stopPoll", [])
         },
+        hide: function(boolGoToBlank, eventname){
+            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
+        },
+        reveal: function(strUrl, eventname){
+            exec(null,null,"InAppBrowser", "reveal", [strUrl]);
+        },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
