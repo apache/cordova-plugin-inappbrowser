@@ -489,38 +489,8 @@ CDVInvokedUrlCommand *Command;
 -(void)onPollTick:(NSTimer *)timer {
     if(Command !=nil )
     {
-
-        [self sendPollResult:@"polling"];
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
         [self injectDeferredObject:[Command argumentAtIndex:0] withWrapper:jsWrapper];
-
-        //NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
-        // [self ensureIFrameBridgeForCDVInAppBrowserViewController];
-        // [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-        //jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
-
-        // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
-        // NSError *error;
-
-        // id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-        // if (!error && [jsonObject isKindOfClass:[NSArray class]])
-        // {
-        //     NSArray * array = (NSArray *) jsonObject;
-
-        //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
-
-        //     if([actionId isKindOfClass:[NSString class]])
-        //     {
-        //         NSString *action = (NSString *)actionId;
-        //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
-        //         {
-        //             [self stopTimer];
-        //             [self.inAppBrowserViewController close];
-        //             return;
-        //         }
-        //     }
-        // }
-        // [self sendPollResult:result];
     }
 }
 
