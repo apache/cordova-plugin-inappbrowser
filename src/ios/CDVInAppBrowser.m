@@ -424,7 +424,6 @@
         //     }
         // }
         [self sendPollResult:@"Polled"];
-        return NO;
     }
     //if is an app store link, let the system handle it, otherwise it fails to load it
     else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
@@ -479,7 +478,7 @@ CDVInvokedUrlCommand *Command;
     PollTimer = nil;
 }
 
--void ensureIFrameBridgeForCDVInAppBrowserViewController:
+-(void)ensureIFrameBridgeForCDVInAppBrowserViewController
 {
     [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
 }
