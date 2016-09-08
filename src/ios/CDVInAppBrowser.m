@@ -511,6 +511,15 @@ CDVInvokedUrlCommand *Command;
     Command = nil;
 }
 
+- (void)hide:(CDVInvokedUrlCommand*)command
+{
+    [self exit:command];
+}
+
+- (void)reveal:(CDVInvokedUrlCommand*)command
+{
+    [self show:command];
+}
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
 {
