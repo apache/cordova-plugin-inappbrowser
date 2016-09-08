@@ -365,8 +365,6 @@
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
-    
-
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
@@ -407,17 +405,27 @@
         }
 
         NSError* __autoreleasing error = nil;
-
         scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
         NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
-         NSLog(@"+++++++++++++++++++++++++++++++++++++++++++++++++");
+        
         if (error == nil && [decodedResult isKindOfClass:[NSArray class]])
         {
-            //
-            NSLog(@"*********************************************");
-            NSLog(scriptResult); 
             NSLog(@"*********************************************");
             NSArray * array = (NSArray *) decodedResult;
+            NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
+            if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]])
+            {
+                NSLog(@"++++++++++++++++++++++++++++++++++++++++++++++++");
+                NSString *action = (NSString *)decodedAction;
+                if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+                {
+                    NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    [self stopTimer];
+                    [self.inAppBrowserViewController close];
+                    return;
+                }
+            }
+
             //**********************This is the original code
             // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
             // NSError *error;
@@ -426,19 +434,8 @@
             // if (!error && [jsonObject isKindOfClass:[NSArray class]])
             // {
             //     NSArray * array = (NSArray *) jsonObject;
-
-            //     id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
-
-            //     if([actionId isKindOfClass:[NSString class]])
-            //     {
-            //         NSString *action = (NSString *)actionId;
-            //         if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
-            //         {
-            //             [self stopTimer];
-            //             [self.inAppBrowserViewController close];
-            //             return;
-            //         }
-            //     }
+            //     
+            //     
             // }
             return NO;
         }
