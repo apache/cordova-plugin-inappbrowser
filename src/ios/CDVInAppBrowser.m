@@ -447,7 +447,7 @@
 
 NSTimer* PollTimer;
 NSString* pollJavascriptCode = nil;
-NSTimeInterval* pollInterval = nil;
+NSTimeInterval pollInterval = nil;
 
 NSString* lastUrl =nil;
 NSString* lastTarget = nil;
@@ -537,8 +537,8 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
         [self stopPolling];
     }
     pollJavascriptCode = [command argumentAtIndex:0];
-    pollInterval = &([command.arguments[1] doubleValue]/ 1000.0);
-    PollTimer = [NSTimer scheduledTimerWithTimeInterval:*pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
+    PollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
