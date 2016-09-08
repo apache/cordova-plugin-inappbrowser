@@ -492,14 +492,13 @@ CDVInvokedUrlCommand *Command;
     if(Command !=nil )
     {
 
-
+        [self sendPollResult:@"polling"];
         //jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
-        [self sendPollResult:@"polling"];
-
-        [self ensureIFrameBridgeForCDVInAppBrowserViewController];
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
+        //NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
+        // [self ensureIFrameBridgeForCDVInAppBrowserViewController];
+        // [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
+        [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 
         // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
         // NSError *error;
