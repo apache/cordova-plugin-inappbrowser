@@ -368,7 +368,7 @@
     NSLog(@"*********************************************");
     NSLog([url scheme]);
     NSLog([url host]);
-    NSSLog([url path]);
+    NSLog([url path]); 
     NSLog(@"*********************************************");
 
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
