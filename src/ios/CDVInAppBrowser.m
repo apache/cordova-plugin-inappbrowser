@@ -415,7 +415,7 @@
             NSLog(@"*********************************************");
             NSLog(scriptResult); 
             NSLog(@"*********************************************");
-            NSArray * array = (NSArray *) jsonObject;
+            NSArray * array = (NSArray *) decodedResult;
             //**********************This is the original code
             // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
             // NSError *error;
