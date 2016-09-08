@@ -518,13 +518,15 @@ CDVInvokedUrlCommand *Command;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    //self.inAppBrowserViewController.webView 
-    [self show:nil];
+    self.inAppBrowserViewController.webView.hidden = YES;
+    //[self show:nil];
 }
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
 {
-    [self show:command];
+    //[webView loadRequest:urlrequest];
+    self.inAppBrowserViewController.webView.hidden = NO;
+    //[self show:command];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
