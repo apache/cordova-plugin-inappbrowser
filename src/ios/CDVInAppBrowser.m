@@ -365,11 +365,7 @@
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
-    NSLog(@"*********************************************");
-    NSLog([url scheme]);
-    NSLog([url host]);
-    NSLog([url path]); 
-    NSLog(@"*********************************************");
+    
 
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
@@ -399,13 +395,23 @@
     }
     else if([[url scheme] isEqualToString:@"gap-iab-native"])
     {
-        //NSString* scriptResult = [url path];
-        // if ((scriptResult == nil) || ([scriptResult length] < 2))
-        // {
-        //     return NO;
-        // }
-        // NSString* scriptResult = [scriptResult substringFromIndex:1];
-        // NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+        if(![[url host] isEqualToString:@"poll"])
+        {
+            return NO;
+        }
+
+        NSString* scriptResult = [url path];
+        if ((scriptResult == nil) || ([scriptResult length] < 2))
+        {
+             return NO;
+        }
+        
+        NSString* scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+        NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+
+        NSLog(@"*********************************************");
+        NSLog([url path]); 
+        NSLog(@"*********************************************");
 
         //**********************This is the original code
         // NSData *jsonData = [result dataUsingEncoding:NSUTF8StringEncoding];
