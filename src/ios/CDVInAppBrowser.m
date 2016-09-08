@@ -366,7 +366,8 @@
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
     NSLog(@"*********************************************");
-    NSLog(url);
+    NSLog([url host]);
+    NSLog([url scheme]);
     NSLog(@"*********************************************");
 
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
