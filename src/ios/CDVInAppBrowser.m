@@ -447,7 +447,7 @@
 
 NSTimer* PollTimer;
 NSString* pollJavascriptCode = nil;
-NSTimeInterval pollInterval = nil;
+NSTimeInterval pollInterval;
 
 NSString* lastUrl =nil;
 NSString* lastTarget = nil;
