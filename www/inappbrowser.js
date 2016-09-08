@@ -36,6 +36,7 @@
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
+            'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
        };
     }
@@ -51,6 +52,12 @@
         },
         show: function (eventname) {
           exec(null, null, "InAppBrowser", "show", []);
+        },
+        startPoll(pollingFunction, pollInterval){
+            exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
+        },
+        stopPoll(){
+            exec(null, null, "InAppBrowser", "stopPoll", [])
         },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
