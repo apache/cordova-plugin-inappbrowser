@@ -411,9 +411,9 @@
         scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
         NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
          NSLog(@"+++++++++++++++++++++++++++++++++++++++++++++++++");
-        if (error != nil )
+        if (error == nil && [decodedResult isKindOfClass:[NSArray class]])
         {
-            //&& [decodedResult isKindOfClass:[NSArray class]]
+            //
             NSLog(@"*********************************************");
             NSLog(scriptResult); 
             NSLog(@"*********************************************");
