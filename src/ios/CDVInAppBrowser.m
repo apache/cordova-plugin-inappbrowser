@@ -510,7 +510,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     }
 
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
@@ -524,7 +524,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
         [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
     }
-    else if (PollTimer != null)
+    else if (PollTimer != nil)
     {
         [self stopPolling];
     }
@@ -537,8 +537,8 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
         [self stopPolling];
     }
     pollJavascriptCode = [command argumentAtIndex:0];
-    pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
-    PollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    pollInterval = &([command.arguments[1] doubleValue]/ 1000.0);
+    PollTimer = [NSTimer scheduledTimerWithTimeInterval:*pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
