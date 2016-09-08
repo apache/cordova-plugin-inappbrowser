@@ -488,7 +488,7 @@ CDVInvokedUrlCommand *Command;
     {
         NSString *jsWrapper = @"_cdvIframeBridge.src=gap-iab-native://encodeURIComponent(JSON.stringify([eval(%@)]))";
         NSString *jsToExecute = [NSString stringWithFormat:jsWrapper,[Command argumentAtIndex:0]];
-        [self sendPollResult:'polling'];
+        [self sendPollResult:@"polling"];
 
         [self ensureIFrameBridgeForCDVInAppBrowserViewController];
         // NSString* result = [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
