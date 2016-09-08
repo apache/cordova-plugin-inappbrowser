@@ -58,6 +58,7 @@
         NSLog(@"IAB.close() called but it was already closed.");
         return;
     }
+    [self stopPoll:nil];
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -518,17 +519,12 @@ CDVInvokedUrlCommand *Command;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    //presentedViewController
-    [self.inAppBrowserViewController dismissViewControllerAnimated:YES:nil];
-    //self.inAppBrowserViewController.webView.hidden = YES;
-    //[self show:nil];
+    [self close:command];
 }
 
 - (void)reveal:(CDVInvokedUrlCommand*)command
 {
-    //[webView loadRequest:urlrequest];
-    self.inAppBrowserViewController.webView.hidden = NO;
-    //[self show:command];
+    [self close:show];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
