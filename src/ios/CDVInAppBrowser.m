@@ -459,25 +459,20 @@ CDVInvokedUrlCommand *Command;
         id jsonObject = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
         if (!error && [jsonObject isKindOfClass:[NSArray class]])
         {
-
             NSArray * array = (NSArray *) jsonObject;
 
-            if([array count] ==1)
-            {
-                id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
+            id actionId = [array[0] valueForKey: @"InAppBrowserAction"];
 
-                if([actionId isKindOfClass:[NSString class]])
+            if([actionId isKindOfClass:[NSString class]])
+            {
+                NSString *action = (NSString *)actionId;
+                if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                 {
-                    NSString *action = (NSString *)actionId;
-                    if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
-                    {
-                        [self stopTimer];
-                        [self.inAppBrowserViewController close];
-                        return;
-                    }
+                    [self stopTimer];
+                    [self.inAppBrowserViewController close];
+                    return;
                 }
             }
-
         }
         [self sendPollResult:result];
     }
