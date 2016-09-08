@@ -80,7 +80,7 @@
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
 
-    [self openBrowser:url:target:options:command.callbackId];
+    [self openUrl:url targets:target withOptions:options withCallbackId:command.callbackId];
 }
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
