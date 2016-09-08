@@ -405,8 +405,10 @@
         {
              return NO;
         }
-        
-        NSString* scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+
+        NSError* __autoreleasing error = nil;
+
+        scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
         NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
         NSLog(@"*********************************************");
