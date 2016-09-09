@@ -1,3 +1,18 @@
+#import "CDVInAppBrowser.h"
+#import <Cordova/CDVPluginResult.h>
+#import <Cordova/CDVUserAgentUtil.h>
+
+#define    kInAppBrowserTargetSelf @"_self"
+#define    kInAppBrowserTargetSystem @"_system"
+#define    kInAppBrowserTargetBlank @"_blank"
+
+#define    kInAppBrowserToolbarBarPositionBottom @"bottom"
+#define    kInAppBrowserToolbarBarPositionTop @"top"
+
+#define    TOOLBAR_HEIGHT 44.0
+#define    LOCATIONBAR_HEIGHT 21.0
+#define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
+
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
 - (void) dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
