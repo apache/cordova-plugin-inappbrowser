@@ -893,6 +893,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
 - (void)viewDidUnload
 {
+    #pragma GCC diagnostic ignored "-Wnonnull"
     [self.webView loadHTMLString:nil baseURL:nil];
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     [super viewDidUnload];
