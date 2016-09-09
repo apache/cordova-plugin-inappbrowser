@@ -1,3 +1,8 @@
+#import "CDVInAppBrowser.h"
+
+#define    kInAppBrowserToolbarBarPositionBottom @"bottom"
+#define    kInAppBrowserToolbarBarPositionTop @"top"
+
 @implementation CDVInAppBrowserOptions
 
 - (id)init
