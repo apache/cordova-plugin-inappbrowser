@@ -43,7 +43,7 @@
 - (void)startPoll:(CDVInvokedUrlCommand*)command;
 - (void)stopPoll:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
-- (void)reveal:(CDVInvokedUrlCommand*)command;
+- (void)unHide:(CDVInvokedUrlCommand*)command;
 
 @end
 
