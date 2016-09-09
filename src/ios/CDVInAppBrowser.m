@@ -74,6 +74,7 @@
 
 - (void)open:(CDVInvokedUrlCommand*)command
 {
+    #pragma unused(pluginResult)
     CDVPluginResult* pluginResult;
 
     NSString* url = [command argumentAtIndex:0];
