@@ -507,7 +507,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     }
 
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
@@ -554,7 +554,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 - (void)reveal:(CDVInvokedUrlCommand*)command
 {
     NSString* urlToOpen = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
-    [self openUrl:urlToOpen targets:lastTarget withOptions:lastOptions withCallbackId:command.callbackId];
+    [self openUrl:urlToOpen targets:lastTarget withOptions:lastOptions];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
