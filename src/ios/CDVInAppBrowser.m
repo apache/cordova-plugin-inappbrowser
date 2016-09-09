@@ -79,8 +79,8 @@
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-
-    [self openUrl:url targets:target withOptions:options withCallbackId:command.callbackId];
+    self.callbackId = command.callbackId;
+    [self openUrl:url targets:target withOptions:options];
 }
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
@@ -466,11 +466,9 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     pollJavascriptCode = nil;
 }
 
-- (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options withCallbackId:(NSString*)callbackId
+- (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options
 {
     CDVPluginResult* pluginResult;
-
-    self.callbackId = callbackId;
 
     if (url != nil) {
 #ifdef __CORDOVA_4_0_0
@@ -509,7 +507,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     }
 
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
