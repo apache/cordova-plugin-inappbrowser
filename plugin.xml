@@ -126,6 +126,7 @@
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
 	    <source-file src="src/ios/CDVInAppBrowser.m" />
+        <source-file src="src/ios/CDVInAppBrowserNavigationController.m" />
 	    
 	    <framework src="CoreGraphics.framework" />
     </platform>

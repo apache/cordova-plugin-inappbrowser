@@ -548,13 +548,32 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     // Ignore the boolean intended to release resource - in iOS we destroy the browser as hiding it is hard
     // because the View Controller is not standard - the performance is acceptable without it anyway.
     // Instead blank out the polling so it is not restarted - in line with other OSs. 
-    [self close:command];
+
+    [self stopPolling];
+    // Things are cleaned up in browserExit.
+    [self.inAppBrowserViewController close];
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"hidden"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
 }
 
-- (void)reveal:(CDVInvokedUrlCommand*)command
+- (void)unHide:(CDVInvokedUrlCommand*)command
 {
     NSString* urlToOpen = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
     [self openUrl:urlToOpen targets:lastTarget withOptions:lastOptions];
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"unhidden"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error

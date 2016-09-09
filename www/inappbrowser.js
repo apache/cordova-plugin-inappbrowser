@@ -36,6 +36,8 @@
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
+            'hidden' : channel.create('hidden'),
+            'unhidden' : channel.create('revealready'),
             'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
        };
@@ -62,8 +64,8 @@
         hide: function(boolGoToBlank, eventname){
             exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
         },
-        reveal: function(strUrl, eventname){
-            exec(null,null,"InAppBrowser", "reveal", [strUrl]);
+        unHide: function(strUrl, eventname){
+            exec(null,null,"InAppBrowser", "unHide", [strUrl]);
         },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
