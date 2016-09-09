@@ -74,9 +74,6 @@
 
 - (void)open:(CDVInvokedUrlCommand*)command
 {
-    #pragma unused(pluginResult)
-    CDVPluginResult* pluginResult;
-
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
