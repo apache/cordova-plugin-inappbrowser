@@ -33,17 +33,50 @@
 
     var InAppBrowser = function() {
 
-        var eventHandlers = {},
-            lastPollInterval = null,
-            lastPollFunction = null,
-            clearPolling = function() {
-                lastPollInterval = null;
-                lastPollFunction = null;
-            },
-            clear = function(){
-                this.clearPolling();
-                unhideState.eventHandlers = {};
-            };
+        var eventListenersToRestore = {},
+            lastPollIntervalToRestore = null,
+            lastPollFunctionToRestore = null;
+
+        function clearPolling () {
+            lastPollIntervalToRestore = null;
+            lastPollFunctionToRestore = null;
+        }
+
+        function clearRestoring(){
+            this.clearPolling();
+            unhideState.eventHandlers = {};
+        }
+
+        function addEventListenerToRestore(eventname, f){
+            if(!f) {
+                throw 'the event handler is not defined';
+            }
+            if(!f.observer_guid) {
+                throw 'the event handler does not have an observer GUID. Has the function been subscribed?';
+            }
+
+            if(!eventListenersToRestore[f]){
+                eventListenersToRestore[f] = {};
+            }
+
+            eventListenersToRestore[eventname][f.observer_guid] = f;
+        }
+
+        function removeEventListenerToRestore(eventname, f){
+            if(!f) {
+                throw 'the event handler is not defined';
+            }
+
+            if(!f.observer_guid) {
+                throw 'the event handler does not have an observer GUID. Has the function been subscribed?';
+            }
+
+            if(!eventListenersToRestore[eventname]){
+                return;
+            }
+
+            delete eventListenersToRestore[eventname][f.observer_guid];
+        }
 
         this.channels = {
             'loadstart': channel.create('loadstart'),
@@ -62,8 +95,8 @@
         }
 
         this.close = function(eventname) {
-           clear();
            exec(null, null, "InAppBrowser", "close", []);
+           clearRestoring(); //TODO - ensure exit is called.
         }
 
         this.show = function(eventname) {
@@ -78,15 +111,26 @@
 
         this.stopPoll = function() {
            clearPolling();
-           exec(null, null, "InAppBrowser", "stopPoll", [])
+           exec(null, null, "InAppBrowser", "stopPoll", []);
         }
 
         this.hide = function(releaseResources, eventname){
-            //TODO: intercept exit
-            //TODO: hide.
-            // if(boolGoToBlank){
-            //     unhideState.clear();
-            // }
+            
+            for(eventName in eventListenersToRestore){
+                if(eventName === 'hidden'){
+                    continue; //preserve hide
+                }
+                foreach(f in eventListenersToRestore[eventname]){
+                    this.channels[eventname].unsubscribe(f);  
+                    if(releaseResources){
+                        removeEventListenerToRestore(eventname, f);
+                    }
+                }
+                //TODO: clean up hides when hidden done.
+            }
+
+            // Release resources has no effect in native iOS - the IAB 
+            // Is fully closed & the JS pretends it isn't
             exec(null,null,"InAppBrowser", "hide", [releaseResources]);
         }
 
@@ -100,16 +144,14 @@
         this.addEventListener = function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
-                console.log(f.observer_guid);
-                console.log('TODO: Add Event Handler');
+                addEventListenerToRestore(eventname, f);
             }
         }
 
         this.removeEventListener = function (eventname, f) {
             if (eventname in this.channels) {
+                removeEventListenerToRestore(eventname, f);
                 this.channels[eventname].unsubscribe(f);
-                console.log('TODO: Add Remove Handler');
-
             }
         }
 
