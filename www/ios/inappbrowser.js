@@ -55,8 +55,8 @@
                 throw 'the event handler does not have an observer GUID. Has the function been subscribed?';
             }
 
-            if(!eventListenersToRestore[f]){
-                eventListenersToRestore[f] = {};
+            if(!eventListenersToRestore[eventname]){
+                eventListenersToRestore[eventname] = {};
             }
             console.log(eventname);
             console.log(f.observer_guid);
