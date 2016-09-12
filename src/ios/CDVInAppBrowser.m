@@ -547,7 +547,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
     // because the View Controller is not standard - the performance is acceptable without it anyway.
     // Instead blank out the polling so it is not restarted - in line with other OSs. 
 
-    [self stopPolling];
+    
     // Things are cleaned up in browserExit.
     
     if (self.callbackId != nil) {
@@ -558,6 +558,7 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+    [self stopPolling];
     [self.inAppBrowserViewController close];
 }
 
