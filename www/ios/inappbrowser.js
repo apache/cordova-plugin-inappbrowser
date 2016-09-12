@@ -129,9 +129,6 @@
             }
 
             this.channels['exit'].subscribe(cleanUpCallback);
-            this.channels[eventname].subscribe();
-
-
 
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
