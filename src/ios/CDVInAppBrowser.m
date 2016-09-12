@@ -549,9 +549,6 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
     
     // Things are cleaned up in browserExit.
-    Log.d('+++++++++++++++++++++++++++++');
-    Log.d(self.callbackId);
-    Log.d('+++++++++++++++++++++++++++++');
     if (self.callbackId != nil) {
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
@@ -560,8 +557,8 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-    // [self stopPolling];
-    // [self.inAppBrowserViewController close];
+    [self stopPolling];
+    [self.inAppBrowserViewController close];
 }
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
