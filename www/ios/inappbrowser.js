@@ -35,7 +35,7 @@
         polling:{
             interval: null,
             function: null,
-        }
+        },
         eventHandlers : {
 
         },
