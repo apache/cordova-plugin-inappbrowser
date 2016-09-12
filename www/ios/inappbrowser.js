@@ -106,16 +106,12 @@
 
         this.hide = function(releaseResources, eventname){
             var cleanUpCallback = function(){
-                console.log('............');
                 for(f in eventListenersToRestore['hidden']){
                     this.channels['hidden'].unsubscribe(f);
                     if(releaseResources){
                         removeEventListenerToRestore('hidden', f);
                     }
                 }
-                console.log('removing self');
-                //clean itself up.
-                this.channels['exit'].unsubscribe(cleanUpCallback);
             }
 
             for(eventName in eventListenersToRestore){
