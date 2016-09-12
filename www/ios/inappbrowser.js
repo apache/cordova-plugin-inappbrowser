@@ -31,6 +31,30 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
+    var unhideState = {
+        polling:{
+            interval: null,
+            function: null,
+        }
+        eventHandlers : {
+
+        },
+        clearPolling: {
+            unhideState.poll.interval = null;
+            unhideState.interval.function = null;    
+        },
+        clear: function(){
+            this.clearPolling();
+            unhideState.eventHandlers = {};
+        },
+        addEventHandler: function(eventname, eventHandlers){
+            if(!eventHandlers[eventname]) {
+                eventHandlers[eventname] = {};
+            }
+        }
+    };
+
+
     function InAppBrowser() {
        this.channels = {
             'loadstart': channel.create('loadstart'),
@@ -50,18 +74,28 @@
             }
         },
         close: function (eventname) {
+            unhideState.clear();
             exec(null, null, "InAppBrowser", "close", []);
         },
         show: function (eventname) {
           exec(null, null, "InAppBrowser", "show", []);
         },
         startPoll(pollingFunction, pollInterval){
+            unhideState.poll.function = pollingFunction;
+            unhideState.poll.interval = pollInterval;
+
             exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
         },
         stopPoll(){
+            unhideState.clearPolling();
             exec(null, null, "InAppBrowser", "stopPoll", [])
         },
-        hide: function(boolGoToBlank, eventname){
+        hide: function(releaseResources, eventname){
+            //TODO: intercept exit
+            //TODO: hide.
+            // if(boolGoToBlank){
+            //     unhideState.clear();
+            // }
             exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
         },
         unHide: function(strUrl, eventname){
@@ -73,6 +107,7 @@
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
+                console.log(f);
             }
         },
         removeEventListener: function(eventname, f) {
