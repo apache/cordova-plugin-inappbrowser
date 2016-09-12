@@ -58,7 +58,8 @@
             if(!eventListenersToRestore[f]){
                 eventListenersToRestore[f] = {};
             }
-
+            console.log(eventname);
+            console.log(f.observer_guid);
             eventListenersToRestore[eventname][f.observer_guid] = f;
         }
 
