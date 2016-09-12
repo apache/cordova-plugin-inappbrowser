@@ -48,9 +48,9 @@
             unhideState.eventHandlers = {};
         },
         addEventHandler: function(eventname, eventHandlers){
-            if(!eventHandlers[eventname]) {
-                eventHandlers[eventname] = {};
-            }
+            // if(!eventHandlers[eventname]) {
+            //     eventHandlers[eventname] = {};
+            // }
         }
     };
 
