@@ -58,24 +58,13 @@
             if(!eventListenersToRestore[eventname]){
                 eventListenersToRestore[eventname] = {};
             }
-            console.log(eventname);
-            console.log(f.observer_guid);
             eventListenersToRestore[eventname][f.observer_guid] = f;
         }
 
         function removeEventListenerToRestore(eventname, f){
-            if(!f) {
-                throw 'the event handler is not defined';
-            }
-
-            if(!f.observer_guid) {
-                throw 'the event handler does not have an observer GUID. Has the function been subscribed?';
-            }
-
-            if(!eventListenersToRestore[eventname]){
+            if(!f && !f.observer_guid && !eventListenersToRestore[eventname]) {
                 return;
             }
-
             delete eventListenersToRestore[eventname][f.observer_guid];
         }
 
@@ -116,7 +105,17 @@
         }
 
         this.hide = function(releaseResources, eventname){
-            
+            var cleanUpCallback = function(){
+                for(f in eventListenersToRestore['hidden']){
+                    this.channels['hidden'].unsubscribe(f);
+                    if(releaseResources){
+                        removeEventListenerToRestore('hidden', f);
+                    }
+                }
+                //clean itself up.
+                this.channels['exit'].unsubscribe(cleanUpCallback);
+            }
+
             for(eventName in eventListenersToRestore){
                 if(eventName === 'hidden'){
                     continue; //preserve hide
@@ -127,8 +126,12 @@
                         removeEventListenerToRestore(eventname, f);
                     }
                 }
-                //TODO: clean up hides when hidden done.
             }
+
+            this.channels['exit'].subscribe(cleanUpCallback);
+            this.channels[eventname].subscribe();
+
+
 
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
