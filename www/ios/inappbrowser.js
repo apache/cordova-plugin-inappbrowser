@@ -120,7 +120,7 @@
                 if(eventName === 'hidden'){
                     continue; //preserve hide
                 }
-                foreach(f in eventListenersToRestore[eventname]){
+                for(f in eventListenersToRestore[eventname]){
                     this.channels[eventname].unsubscribe(f);  
                     if(releaseResources){
                         removeEventListenerToRestore(eventname, f);
