@@ -33,10 +33,10 @@
 
     var InAppBrowser = function() {
 
-        var eventHandlers: {},
-            lastPollInterval: null,
-            lastPollFunction: null,
-            clearPolling: function {
+        var eventHandlers = {},
+            lastPollInterval = null,
+            lastPollFunction = null,
+            clearPolling = function {
                 polling.pollInterval = null;
                 polling.pollFunction = null;
             },
