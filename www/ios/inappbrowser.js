@@ -87,7 +87,7 @@
             // if(boolGoToBlank){
             //     unhideState.clear();
             // }
-            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
+            exec(null,null,"InAppBrowser", "hide", [releaseResources]);
         }
 
         this.unHide = function(strUrl, eventname){
@@ -100,7 +100,7 @@
         this.addEventListener = function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
-                console.log(f);
+                console.log(f.observer_guid);
                 console.log('TODO: Add Event Handler');
             }
         }
