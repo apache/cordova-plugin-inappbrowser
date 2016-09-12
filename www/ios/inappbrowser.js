@@ -36,9 +36,9 @@
         var eventHandlers = {},
             lastPollInterval = null,
             lastPollFunction = null,
-            clearPolling = function {
-                polling.pollInterval = null;
-                polling.pollFunction = null;
+            clearPolling = function() {
+                lastPollInterval = null;
+                lastPollFunction = null;
             },
             clear = function(){
                 this.clearPolling();
@@ -55,18 +55,18 @@
             'exit' : channel.create('exit')
         }
 
-        this._eventHandler = function (event) {
+        this._eventHandler(event) {
             if (event && (event.type in this.channels)) {
                this.channels[event.type].fire(event);
             }
         }
 
-        this.close = function (eventname) {
+        this.close(eventname) {
            clear();
            exec(null, null, "InAppBrowser", "close", []);
         }
 
-        this.show = function (eventname) {
+        this.show(eventname) {
             exec(null, null, "InAppBrowser", "show", []);
         }
 
@@ -76,12 +76,12 @@
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
         }
 
-        this.stopPoll(){
+        this.stopPoll() {
            clearPolling();
            exec(null, null, "InAppBrowser", "stopPoll", [])
         }
 
-        this.hide = function(releaseResources, eventname){
+        this.hide(releaseResources, eventname){
             //TODO: intercept exit
             //TODO: hide.
             // if(boolGoToBlank){
@@ -90,14 +90,14 @@
             exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
         }
 
-        this.unHide = function(strUrl, eventname){
+        this.unHide (strUrl, eventname){
             console.log('+++++++++++++++++++++++++++++++++++++++++');
             console.log('TODO!!!!');
             console.log('+++++++++++++++++++++++++++++++++++++++++');
             //exec(null,null,"InAppBrowser", "unHide", [strUrl]);
         }
 
-        this.addEventListener = function (eventname,f) {
+        this.addEventListene (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
                 console.log(f);
@@ -105,7 +105,7 @@
             }
         }
 
-        this.removeEventListener = function(eventname, f) {
+        this.removeEventListener (eventname, f) {
             if (eventname in this.channels) {
                 this.channels[eventname].unsubscribe(f);
                 console.log('TODO: Add Remove Handler');
@@ -113,7 +113,7 @@
             }
         }
 
-        this.executeScript = function(injectDetails, cb) {
+        this.executeScript (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -123,7 +123,7 @@
             }
         }
 
-        this.insertCSS = function(injectDetails, cb) {
+        this.insertCSS (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
