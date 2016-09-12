@@ -447,10 +447,6 @@ NSTimer* PollTimer;
 NSString* pollJavascriptCode = nil;
 NSTimeInterval pollInterval;
 
-NSString* lastUrl =nil;
-NSString* lastTarget = nil;
-NSString* lastOptions = nil;
-
 CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
 -(void)stopPolling
@@ -482,9 +478,6 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
         if ([target isEqualToString:kInAppBrowserTargetSelf]) 
         {
-            lastUrl = url;
-            lastTarget = target;
-            lastOptions = options;
             [self openInCordovaWebView:absoluteUrl withOptions:options];
         } 
         else if ([target isEqualToString:kInAppBrowserTargetSystem]) 
@@ -493,9 +486,6 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
         }
         else 
         { // _blank or anything else
-            lastUrl = url;
-            lastTarget = target;
-            lastOptions = options;
             [self openInInAppBrowser:absoluteUrl withOptions:options];
         }
 
@@ -543,12 +533,10 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    // Ignore the boolean intended to release resource - in iOS we destroy the browser as hiding it is hard
-    // because the View Controller is not standard - the performance is acceptable without it anyway.
-    // Instead blank out the polling so it is not restarted - in line with other OSs. 
-
+    // On iOS it seems hiding is a messy business. As startup performance is good
+    // Close. The JS will re-establish re-polling as needed.
+    [self stopPolling];
     
-    // Things are cleaned up in browserExit.
     if (self.callbackId != nil) {
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
@@ -557,22 +545,8 @@ CDVInvokedUrlCommand* lastInvokedCommand = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-    [self stopPolling];
+    
     [self.inAppBrowserViewController close];
-}
-
-- (void)unHide:(CDVInvokedUrlCommand*)command
-{
-    NSString* urlToOpen = [command argumentAtIndex:0] ? [command argumentAtIndex:0] : lastUrl;
-    [self openUrl:urlToOpen targets:lastTarget withOptions:lastOptions];
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"unhidden"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
