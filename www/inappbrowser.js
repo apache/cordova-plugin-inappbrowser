@@ -68,6 +68,9 @@
             exec(null,null,"InAppBrowser", "unHide", [strUrl]);
         },
         addEventListener: function (eventname,f) {
+            console.log('***********************');
+            console.log(eventname);
+            console.log('***********************');
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
             }
