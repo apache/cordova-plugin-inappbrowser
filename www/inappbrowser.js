@@ -37,7 +37,7 @@
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
             'hidden' : channel.create('hidden'),
-            'unhidden' : channel.create('revealready'),
+            'unhidden' : channel.create('unhidden'),
             'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
        };
