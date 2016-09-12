@@ -31,32 +31,21 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    var unhideState = {
-        polling:{
-            interval: null,
-            function: null,
-        },
-        eventHandlers : {
+    var InAppBrowser = function() {
 
-        },
-        clearPolling: {
-            unhideState.poll.interval = null;
-            unhideState.interval.function = null;    
-        },
-        clear: function(){
-            this.clearPolling();
-            unhideState.eventHandlers = {};
-        },
-        addEventHandler: function(eventname, eventHandlers){
-            // if(!eventHandlers[eventname]) {
-            //     eventHandlers[eventname] = {};
-            // }
-        }
-    };
+        var eventHandlers: {},
+            lastPollInterval: null,
+            lastPollFunction: null,
+            clearPolling: function {
+                polling.pollInterval = null;
+                polling.pollFunction = null;
+            },
+            clear = function(){
+                this.clearPolling();
+                unhideState.eventHandlers = {};
+            };
 
-
-    function InAppBrowser() {
-       this.channels = {
+        this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
@@ -64,59 +53,67 @@
             'unhidden' : channel.create('unhidden'),
             'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
-       };
-    }
+        }
 
-    InAppBrowser.prototype = {
-        _eventHandler: function (event) {
+        this._eventHandler = function (event) {
             if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
+               this.channels[event.type].fire(event);
             }
-        },
-        close: function (eventname) {
-            unhideState.clear();
-            exec(null, null, "InAppBrowser", "close", []);
-        },
-        show: function (eventname) {
-          exec(null, null, "InAppBrowser", "show", []);
-        },
-        startPoll(pollingFunction, pollInterval){
-            unhideState.poll.function = pollingFunction;
-            unhideState.poll.interval = pollInterval;
+        }
 
-            exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
-        },
-        stopPoll(){
-            unhideState.clearPolling();
-            exec(null, null, "InAppBrowser", "stopPoll", [])
-        },
-        hide: function(releaseResources, eventname){
+        this.close = function (eventname) {
+           clear();
+           exec(null, null, "InAppBrowser", "close", []);
+        }
+
+        this.show = function (eventname) {
+            exec(null, null, "InAppBrowser", "show", []);
+        }
+
+        this.startPoll(pollFunction, pollInterval){
+           lastPollInterval = pollInterval;
+           lastPollFunction = pollFunction;
+           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+        }
+
+        this.stopPoll(){
+           clearPolling();
+           exec(null, null, "InAppBrowser", "stopPoll", [])
+        }
+
+        this.hide = function(releaseResources, eventname){
             //TODO: intercept exit
             //TODO: hide.
             // if(boolGoToBlank){
             //     unhideState.clear();
             // }
             exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
-        },
-        unHide: function(strUrl, eventname){
+        }
+
+        this.unHide = function(strUrl, eventname){
             console.log('+++++++++++++++++++++++++++++++++++++++++');
             console.log('TODO!!!!');
             console.log('+++++++++++++++++++++++++++++++++++++++++');
             //exec(null,null,"InAppBrowser", "unHide", [strUrl]);
-        },
-        addEventListener: function (eventname,f) {
+        }
+
+        this.addEventListener = function (eventname,f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
                 console.log(f);
+                console.log('TODO: Add Event Handler');
             }
-        },
-        removeEventListener: function(eventname, f) {
+        }
+
+        this.removeEventListener = function(eventname, f) {
             if (eventname in this.channels) {
                 this.channels[eventname].unsubscribe(f);
-            }
-        },
+                console.log('TODO: Add Remove Handler');
 
-        executeScript: function(injectDetails, cb) {
+            }
+        }
+
+        this.executeScript = function(injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -124,9 +121,9 @@
             } else {
                 throw new Error('executeScript requires exactly one of code or file to be specified');
             }
-        },
+        }
 
-        insertCSS: function(injectDetails, cb) {
+        this.insertCSS = function(injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -135,7 +132,7 @@
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
         }
-    };
+    }
 
     module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
