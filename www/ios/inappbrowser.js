@@ -75,6 +75,20 @@
             delete eventListenersToRestore[eventname][f.observer_guid];
         }
 
+        function removeEventListenersForEvent(eventName, releaseResources)
+        {
+            console.log('Removing for event: ' + eventName + ', RELEASING=' + releaseResources);
+            for(var observer_guid in eventListenersToRestore[eventName]) {
+                var functionToRemove = eventListenersToRestore[eventName][observer_guid];
+                console.log('Removing: ' + eventName + ', ' + functionToRemove.observer_guid);
+                me.channels[eventName].unsubscribe(functionToRemove);
+                if(releaseResources){
+                    console.log('Releasing: ' + eventName + ', ' + functionToRemove.observer_guid);
+                    removeEventListenerToRestore(eventName, functionToRemove);
+                }
+            }
+        }
+
         this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
@@ -111,19 +125,7 @@
            exec(null, null, "InAppBrowser", "stopPoll", []);
         }
 
-        function removeEventListenersForEvent(eventName, releaseResources)
-        {
-            console.log('Removing for event: ' + eventName + ', RELEASING=' + releaseResources);
-            for(var observer_guid in eventListenersToRestore[eventName]) {
-                var functionToRemove = eventListenersToRestore[eventName][observer_guid];
-                console.log('Removing: ' + eventName + ', ' + functionToRemove.observer_guid);
-                me.channels[eventName].unsubscribe(functionToRemove);
-                if(releaseResources){
-                    console.log('Releasing: ' + eventName + ', ' + functionToRemove.observer_guid);
-                    removeEventListenerToRestore(eventName, functionToRemove);
-                }
-            }
-        }
+
 
         this.hide = function(releaseResources){
             var cleanUpCallback = function(){
@@ -155,20 +157,23 @@
 
             lastUrl = strUrl;
 
-
-            //TODO: remove GUIDs?
-            for (var callbackName in eventListenersToRestore) {
-                console.log('Callback: ' + callbackName)
-                var i =0;
-                for (var f in eventListenersToRestore[callbackName]) {
-                    console.log('Adding: ' + ++i);
-                    inAppBrowserInstance.addEventListener(callbackName, f);
-                }
-            }
+            //The functions need to be issued with new GUIDs so the old ones will not be valid the next time around
+            var oldListenersToRestore = eventListenersToRestore;
+            eventListenersToRestore = {};
 
             //TODO: show if hidden.
             //TODO: call unhide - don't need to re-esrablish channels etc?
             exec(null, null, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
+
+            for (var callbackName in oldListenersToRestore) {
+                console.log('restoring: ' + callbackName);
+                for (var observer_guid in oldListenersToRestore[callbackName]) {
+                    var functionToRestore = oldListenersToRestore[callbackName][observer_guid];
+                    console.log('Restoring:' + callbackName + ', ' + functionToRestore.observer_guid);
+                    //TODO: remove GUIDs?
+                    this.addEventListener(eventname, functionToRestore);
+                }
+            }
 
             //TODO: clean up anything needed for above step
             //TODO: Re-establish polling if URL not changed and have polling information.
