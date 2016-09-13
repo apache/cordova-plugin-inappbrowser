@@ -148,8 +148,8 @@
 
             lastUrl = strUrl;
 
-            for (var callbackName in callbacks) {
-                        inAppBrowserInstance.addEventListener(callbackName, callbacks[callbackName]);
+            for (var callbackName in eventListenersToRestore) {
+                inAppBrowserInstance.addEventListener(callbackName, eventListenersToRestore[callbackName]);
             }
 
             //TODO: show if hidden.
