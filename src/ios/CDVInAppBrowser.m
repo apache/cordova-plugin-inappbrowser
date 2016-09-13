@@ -423,6 +423,7 @@
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
+    NSLog(@"Web View Finished Load");
     if (self.callbackId != nil) 
     {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
@@ -435,8 +436,10 @@
 
     if(unHiding)
     {
+        NSLog(@"Unhiding");
         if (_previousStatusBarStyle != -1)
         {
+            NSLog(@"Showing");
             [self show:nil];
         }
         if (self.callbackId != nil) 
@@ -570,6 +573,7 @@ BOOL unHiding = NO;
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
 {
+    NSLog(@"unHiding");
     unHiding = YES;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
