@@ -437,7 +437,7 @@
     {
         if (_previousStatusBarStyle != -1)
         {
-            [this show:nil];
+            [self show:nil];
         }
         if (self.callbackIdPatternd != nil) {
             // Send a loadstart event for each top-level navigation (includes redirects).
