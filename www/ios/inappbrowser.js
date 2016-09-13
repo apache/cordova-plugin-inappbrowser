@@ -159,8 +159,11 @@
                 console.log('restoring: ' + callbackName);
                 for (var observer_guid in oldListenersToRestore[callbackName]) {
                     var functionToRestore = oldListenersToRestore[callbackName][observer_guid];
+                    delete functionToRestore[observer_guid];
                     console.log('Restoring:' + callbackName + ', ' + functionToRestore.observer_guid);
                     //TODO: remove GUIDs?
+                    console.log(eventname);
+                    console.log(functionToRestore);
                     me.addEventListener(eventname, functionToRestore);
                 }
             }
