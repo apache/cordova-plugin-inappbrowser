@@ -450,6 +450,7 @@
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+            NSLog(@"Sent event response");
         }
         unHiding = NO;        
     }
@@ -574,7 +575,8 @@ BOOL unHiding = NO;
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"unHide called");
+    NSLog(@"unHide called" +  _previousStatusBarStyle);
+
     unHiding = YES;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
