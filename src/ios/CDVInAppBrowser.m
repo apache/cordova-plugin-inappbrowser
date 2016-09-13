@@ -436,7 +436,7 @@
 
     if(unHiding)
     {
-        NSLog(@"Unhiding");
+        NSLog(@"Unhiding previous bar style = %i", _previousStatusBarStyle);
         if (_previousStatusBarStyle != -1)
         {
             NSLog(@"Showing");
@@ -575,7 +575,7 @@ BOOL unHiding = NO;
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"unHide called previous bar style = %i", _previousStatusBarStyle);
+    NSLog(@"unHide called, previous bar style = %i", _previousStatusBarStyle);
 
     unHiding = YES;
     NSString* url = [command argumentAtIndex:0];
