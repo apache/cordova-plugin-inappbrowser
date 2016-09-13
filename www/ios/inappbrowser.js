@@ -111,6 +111,7 @@
         }
 
         this.hide = function(releaseResources, eventname){
+        console.log('releaseResources=' + releaseResources);
             var cleanUpCallback = function(){
                 for(f in eventListenersToRestore['hidden']){
                     this.channels['hidden'].unsubscribe(f);
@@ -121,16 +122,16 @@
                 }
             }
 
-            for(eventName in eventListenersToRestore){
-                console.log('Removing for event: ' + eventname);
-                if(eventName === 'hidden'){
+            for(var eventNameToRestore in eventListenersToRestore){
+                console.log('Removing for event: ' + eventNameToRestore);
+                if(eventNameToRestore === 'hidden'){
                     continue; //preserve hide
                 }
-                for(f in eventListenersToRestore[eventname]){
-                    console.log('Removing: ' + eventname + ', ' + f.observer_guid);
-                    this.channels[eventname].unsubscribe(f);  
+                for(f in eventListenersToRestore[eventNameToRestore]){
+                    console.log('Removing: ' + eventNameToRestore + ', ' + f.observer_guid);
+                    this.channels[eventNameToRestore].unsubscribe(f);
                     if(releaseResources){
-                        removeEventListenerToRestore(eventname, f);
+                        removeEventListenerToRestore(eventNameToRestore, f);
                     }
                 }
             }
