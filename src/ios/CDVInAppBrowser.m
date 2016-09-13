@@ -423,13 +423,31 @@
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
-    if (self.callbackId != nil) {
+    if (self.callbackId != nil) 
+    {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+
+    if(unHiding)
+    {
+        if (_previousStatusBarStyle != -1)
+        {
+            [this show:nil];
+        }
+        if (self.callbackIdPatternd != nil) {
+            // Send a loadstart event for each top-level navigation (includes redirects).
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                          messageAsDictionary:@{@"type":@"unhidden"}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        }
+        unHiding = NO;        
     }
 }
 
@@ -527,7 +545,7 @@ NSString* pollJavascriptCode = nil;
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
 {
     [self stopPolling];
-}
+} 
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
@@ -545,6 +563,18 @@ NSString* pollJavascriptCode = nil;
     }
     
     [self.inAppBrowserViewController close];
+}
+
+BOOL unHiding = NO;
+
+- (void)unHide:(CDVInvokedUrlCommand*)command
+{
+    unHiding = YES;
+    NSString* url = [command argumentAtIndex:0];
+    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    self.callbackId = command.callbackId;
+    [self openUrl:url targets:target withOptions:options];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error

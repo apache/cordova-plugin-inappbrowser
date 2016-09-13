@@ -31,6 +31,11 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
+    var inAppBrowserInstance = null;
+    var lastUrl = '';
+    var lastWindowName = '';
+    var lasrWindowFeatures = '';
+
     var InAppBrowser = function() {
 
         var eventListenersToRestore = {},
@@ -134,10 +139,28 @@
         }
 
         this.unHide = function(strUrl, eventname){
-            console.log('+++++++++++++++++++++++++++++++++++++++++');
-            console.log('TODO!!!!');
-            console.log('+++++++++++++++++++++++++++++++++++++++++');
-            //exec(null,null,"InAppBrowser", "unHide", [strUrl]);
+            lastUrl = strUrl || lastUrl;
+
+            // TODO: not sure this is needed
+            //            var cb = function(eventname) {
+            //               inAppBrowserInstance._eventHandler(eventname);
+            //            };
+
+            lastUrl = strUrl;
+
+            for (var callbackName in callbacks) {
+                        inAppBrowserInstance.addEventListener(callbackName, callbacks[callbackName]);
+            }
+
+            //TODO: show if hidden.
+            //TODO: call unhide - don't need to re-esrablish channels etc?
+            exec(cb, cb, "InAppBrowser", "open", [lastUrl, lastWindowName, lasrWindowFeatures]);
+            // exec(null,null,"InAppBrowser", "unHide", [strUrl]);
+
+            //TODO: clean up anything needed for above step
+            //TODO: Re-establish polling if URL not changed and have polling information.
+            //TODO: look at creating unhide....
+
         }
 
         this.addEventListener = function (eventname,f) {
@@ -183,20 +206,23 @@
         }
 
         strUrl = urlutil.makeAbsolute(strUrl);
-        var iab = new InAppBrowser();
+        inAppBrowserInstance = new InAppBrowser();
 
         callbacks = callbacks || {};
         for (var callbackName in callbacks) {
-            iab.addEventListener(callbackName, callbacks[callbackName]);
+            inAppBrowserInstance.addEventListener(callbackName, callbacks[callbackName]);
         }
 
         var cb = function(eventname) {
-           iab._eventHandler(eventname);
+           inAppBrowserInstance._eventHandler(eventname);
         };
 
         strWindowFeatures = strWindowFeatures || "";
 
+        lastUrl = strUrl;
+        lastWindowName = strWindowName;
+        lasrWindowFeatures = strWindowFeatures;
         exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-        return iab;
+        return inAppBrowserInstance;
     };
 })();
