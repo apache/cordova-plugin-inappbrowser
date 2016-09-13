@@ -163,7 +163,7 @@
 
             //TODO: show if hidden.
             //TODO: call unhide - don't need to re-esrablish channels etc?
-            exec(null, null, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
+
 
             for (var callbackName in oldListenersToRestore) {
                 console.log('restoring: ' + callbackName);
@@ -174,6 +174,12 @@
                     this.addEventListener(eventname, functionToRestore);
                 }
             }
+
+
+            var cb = function(eventname) {
+               inAppBrowserInstance._eventHandler(eventname);
+            };
+            exec(cb, cb, "InAppBrowser", "open", [lastUrl, lastWindowName, lasrWindowFeatures]);
 
             //TODO: clean up anything needed for above step
             //TODO: Re-establish polling if URL not changed and have polling information.
