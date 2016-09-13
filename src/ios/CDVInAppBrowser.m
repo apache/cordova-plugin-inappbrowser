@@ -183,21 +183,7 @@
         return;
     }
 
-    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
-
-    __block CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
-                                   initWithRootViewController:self.inAppBrowserViewController];
-    nav.orientationDelegate = self.inAppBrowserViewController;
-    nav.navigationBarHidden = YES;
-
-    __weak CDVInAppBrowser* weakSelf = self;
-
-    // Run later to avoid the "took a long time" log message.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (weakSelf.inAppBrowserViewController != nil) {
-            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
-        }
-    });
+    [self showWindow];
 }
 
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
@@ -437,11 +423,7 @@
     if(unHiding)
     {
         NSLog(@"Unhiding previous bar style = %i", _previousStatusBarStyle);
-        if (_previousStatusBarStyle != -1)
-        {
-            NSLog(@"Showing");
-            [self show:nil];
-        }
+        [self showWindow];
         if (self.callbackId != nil) 
         {
             // Send a loadstart event for each top-level navigation (includes redirects).
@@ -454,6 +436,25 @@
         }
         unHiding = NO;        
     }
+}
+
+- (void)showWindow
+{
+    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
+
+    __block CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
+                                   initWithRootViewController:self.inAppBrowserViewController];
+    nav.orientationDelegate = self.inAppBrowserViewController;
+    nav.navigationBarHidden = YES;
+
+    __weak CDVInAppBrowser* weakSelf = self;
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (weakSelf.inAppBrowserViewController != nil) {
+            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
+        }
+    });
 }
 
 - (void)sendPollResult:(NSString*)data
