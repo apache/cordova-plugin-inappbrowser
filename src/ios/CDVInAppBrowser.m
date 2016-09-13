@@ -482,6 +482,7 @@ NSString* pollJavascriptCode = nil;
 
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options
 {
+    NSLog(@"Setting the WebView's frame to %@, %@, %@", url, target, options);
     CDVPluginResult* pluginResult;
 
     if (url != nil) {
@@ -573,7 +574,7 @@ BOOL unHiding = NO;
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"unHiding");
+    NSLog(@"unHide called");
     unHiding = YES;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
