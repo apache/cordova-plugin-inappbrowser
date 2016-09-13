@@ -166,7 +166,7 @@
 
 
             var cb = function(eventname) {
-               this._eventHandler(eventname);
+               me._eventHandler(eventname);
             };
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
 
