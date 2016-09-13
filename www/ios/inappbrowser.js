@@ -48,7 +48,7 @@
         }
 
         function clearRestoring(){
-            this.clearPolling();
+            clearPolling();
             unhideState.eventHandlers = {};
         }
 
