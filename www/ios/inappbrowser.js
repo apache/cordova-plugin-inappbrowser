@@ -184,7 +184,7 @@
 
         this.addEventListener = function (eventname,f) {
             if (eventname in this.channels) {
-                this.channels[eventname].subscribe(f);
+                me.channels[eventname].subscribe(f);
                 addEventListenerToRestore(eventname, f);
             }
         }
