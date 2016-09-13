@@ -149,8 +149,10 @@
             lastUrl = strUrl;
 
             for (var callbackName in eventListenersToRestore) {
-                for (var f in eventListenersToRestore[callbackName])
-                {
+                console.log('Callback: ' + callbackName)
+                var i =0;
+                for (var f in eventListenersToRestore[callbackName]) {
+                    console.log('Adding: ' + ++i);
                     inAppBrowserInstance.addEventListener(callbackName, f);
                 }
             }
