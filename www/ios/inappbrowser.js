@@ -38,7 +38,8 @@
 
     var InAppBrowser = function() {
 
-        var eventListenersToRestore = {},
+        var me = this,
+            eventListenersToRestore = {},
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
 
@@ -112,11 +113,11 @@
 
         function removeEventListenersForEvent(eventName, releaseResources)
         {
-            console.log('Removing for event: ' + eventName);
-            for(var observer_guid in eventListenersToRestore[eventName]){
+            console.log('Removing for event: ' + eventName + ', RELEASING=' + releaseResources);
+            for(var observer_guid in eventListenersToRestore[eventName]) {
                 var functionToRemove = eventListenersToRestore[eventName][observer_guid];
                 console.log('Removing: ' + eventName + ', ' + functionToRemove.observer_guid);
-                this.channels[eventName].unsubscribe(functionToRemove);
+                me.channels[eventName].unsubscribe(functionToRemove);
                 if(releaseResources){
                     console.log('Releasing: ' + eventName + ', ' + functionToRemove.observer_guid);
                     removeEventListenerToRestore(eventName, functionToRemove);
