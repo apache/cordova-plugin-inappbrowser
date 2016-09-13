@@ -122,6 +122,7 @@
             }
 
             for(eventName in eventListenersToRestore){
+                console.log('Removing for event: ' + eventname);
                 if(eventName === 'hidden'){
                     continue; //preserve hide
                 }
