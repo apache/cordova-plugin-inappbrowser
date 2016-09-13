@@ -101,8 +101,8 @@
 
         this._eventHandler = function(event) {
             if (event && (event.type in this.channels)) {
-                console.log(channels);
-               this.channels[event.type].fire(event);
+                console.log(this.channels);
+                this.channels[event.type].fire(event);
             }
         }
 
@@ -164,6 +164,8 @@
                     this.addEventListener(eventname, functionToRestore);
                 }
             }
+
+            console.log(this.channels);
 
 
             var cb = function(eventname) {
