@@ -439,7 +439,8 @@
         {
             [self show:nil];
         }
-        if (self.callbackIdPatternd != nil) {
+        if (self.callbackId != nil) 
+        {
             // Send a loadstart event for each top-level navigation (includes redirects).
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                           messageAsDictionary:@{@"type":@"unhidden"}];
