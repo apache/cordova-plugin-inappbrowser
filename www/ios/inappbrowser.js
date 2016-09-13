@@ -100,7 +100,7 @@
         }
 
         this._eventHandler = function(event) {
-            console.log(event);
+            console.log(event.type);
             console.log(this.channels);
              console.log(me.channels);
             if (event && (event.type in this.channels)) {
