@@ -148,9 +148,12 @@
 
             lastUrl = strUrl;
 
-//            for (var callbackName in eventListenersToRestore) {
-//                inAppBrowserInstance.addEventListener(callbackName, eventListenersToRestore[callbackName]);
-//            }
+            for (var callbackName in eventListenersToRestore) {
+                for (var f in eventListenersToRestore[callbackName])
+                {
+                    inAppBrowserInstance.addEventListener(callbackName, f);
+                }
+            }
 
             //TODO: show if hidden.
             //TODO: call unhide - don't need to re-esrablish channels etc?
