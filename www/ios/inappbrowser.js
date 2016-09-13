@@ -110,31 +110,30 @@
            exec(null, null, "InAppBrowser", "stopPoll", []);
         }
 
-        this.hide = function(releaseResources, eventname){
-        console.log('releaseResources=' + releaseResources);
+        function removeEventListenersForEvent(eventName)
+        {
+            console.log('Removing for event: ' + eventName);
+            for(var observer_guid in eventListenersToRestore[eventName]){
+                var functionToRemove = eventListenersToRestore[eventName][observer_guid];
+                console.log('Removing: ' + eventName + ', ' + functionToRemove.observer_guid);
+                this.channels[eventName].unsubscribe(functionToRemove);
+                if(releaseResources){
+                    console.log('Releasing: ' + eventName + ', ' + functionToRemove.observer_guid);
+                    removeEventListenerToRestore(eventName, functionToRemove);
+                }
+            }
+        }
+
+        this.hide = function(releaseResources){
             var cleanUpCallback = function(){
-//                for(var observer_guid in eventListenersToRestore['hidden']){
-//                    this.channels['hidden'].unsubscribe(f);
-//                    if(releaseResources){
-//                        removeEventListenerToRestore('hidden', f);
-//                        console.log('Removing: hidden , ' + f.observer_guid);
-//                    }
-//                }
+                removeEventListenersForEvent('hidden');
             }
 
-            for(var eventNameToRestore in eventListenersToRestore){
-                console.log('Removing for event: ' + eventNameToRestore);
-                if(eventNameToRestore === 'hidden'){
-                    continue; //preserve hide
+            for(var eventName in eventListenersToRestore){
+                if(eventName === 'hidden'){
+                    continue; //preserve hide, needed to inform client!
                 }
-                for(var observer_guid in eventListenersToRestore[eventNameToRestore]){
-                    var functionToRemove = eventListenersToRestore[eventNameToRestore][observer_guid];
-                    console.log('Removing: ' + eventNameToRestore + ', ' + functionToRemove.observer_guid);
-                    this.channels[eventNameToRestore].unsubscribe(functionToRemove);
-                    if(releaseResources){
-                        removeEventListenerToRestore(eventNameToRestore, functionToRemove);
-                    }
-                }
+                removeEventListenersForEvent(eventName);
             }
 
             this.channels['exit'].subscribe(cleanUpCallback);
@@ -147,6 +146,7 @@
         this.unHide = function(strUrl, eventname){
             lastUrl = strUrl || lastUrl;
 
+
             // TODO: not sure this is needed
             //            var cb = function(eventname) {
             //               inAppBrowserInstance._eventHandler(eventname);
@@ -154,6 +154,8 @@
 
             lastUrl = strUrl;
 
+
+            //TODO: remove GUIDs?
             for (var callbackName in eventListenersToRestore) {
                 console.log('Callback: ' + callbackName)
                 var i =0;
