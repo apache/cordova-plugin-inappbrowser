@@ -128,7 +128,7 @@
                     continue; //preserve hide
                 }
                 for(var f in eventListenersToRestore[eventNameToRestore]){
-                    console.log('Removing: ' + eventNameToRestore + ', ' + f.observer_guid);
+                    console.log('Removing: ' + eventNameToRestore + ', ' + f);
                     this.channels[eventNameToRestore].unsubscribe(f);
                     if(releaseResources){
                         removeEventListenerToRestore(eventNameToRestore, f);
