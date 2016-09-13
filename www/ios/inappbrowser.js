@@ -149,22 +149,11 @@
         this.unHide = function(strUrl, eventname){
             lastUrl = strUrl || lastUrl;
 
-
-            // TODO: not sure this is needed
-            //            var cb = function(eventname) {
-            //               inAppBrowserInstance._eventHandler(eventname);
-            //            };
-
-            lastUrl = strUrl;
-
             //The functions need to be issued with new GUIDs so the old ones will not be valid the next time around
             var oldListenersToRestore = eventListenersToRestore;
             eventListenersToRestore = {};
 
-            //TODO: show if hidden.
             //TODO: call unhide - don't need to re-esrablish channels etc?
-
-
             for (var callbackName in oldListenersToRestore) {
                 console.log('restoring: ' + callbackName);
                 for (var observer_guid in oldListenersToRestore[callbackName]) {
@@ -177,9 +166,9 @@
 
 
             var cb = function(eventname) {
-               inAppBrowserInstance._eventHandler(eventname);
+               this._eventHandler(eventname);
             };
-            exec(cb, cb, "InAppBrowser", "open", [lastUrl, lastWindowName, lasrWindowFeatures]);
+            exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
 
             //TODO: clean up anything needed for above step
             //TODO: Re-establish polling if URL not changed and have polling information.
@@ -245,7 +234,7 @@
 
         lastUrl = strUrl;
         lastWindowName = strWindowName;
-        lasrWindowFeatures = strWindowFeatures;
+        lastWindowFeatures = strWindowFeatures;
         exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
         return inAppBrowserInstance;
     };
