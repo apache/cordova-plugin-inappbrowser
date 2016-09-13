@@ -49,7 +49,7 @@
 
         function clearRestoring(){
             clearPolling();
-            unhideState.eventHandlers = {};
+            eventListenersToRestore = {};
         }
 
         function addEventListenerToRestore(eventname, f){
