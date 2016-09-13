@@ -110,7 +110,7 @@
            exec(null, null, "InAppBrowser", "stopPoll", []);
         }
 
-        function removeEventListenersForEvent(eventName)
+        function removeEventListenersForEvent(eventName, releaseResources)
         {
             console.log('Removing for event: ' + eventName);
             for(var observer_guid in eventListenersToRestore[eventName]){
@@ -126,14 +126,14 @@
 
         this.hide = function(releaseResources){
             var cleanUpCallback = function(){
-                removeEventListenersForEvent('hidden');
+                removeEventListenersForEvent('hidden', releaseResources);
             }
 
             for(var eventName in eventListenersToRestore){
                 if(eventName === 'hidden'){
                     continue; //preserve hide, needed to inform client!
                 }
-                removeEventListenersForEvent(eventName);
+                removeEventListenersForEvent(eventName, releaseResources);
             }
 
             this.channels['exit'].subscribe(cleanUpCallback);
