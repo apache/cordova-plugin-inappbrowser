@@ -64,6 +64,7 @@
                 eventListenersToRestore[eventname] = {};
             }
             eventListenersToRestore[eventname][f.observer_guid] = f;
+            console.log('Added: ' + eventname + ', ' + f.observer_guid);
         }
 
         function removeEventListenerToRestore(eventname, f){
@@ -115,6 +116,7 @@
                     this.channels['hidden'].unsubscribe(f);
                     if(releaseResources){
                         removeEventListenerToRestore('hidden', f);
+                        console.log('Removing: hidden , ' + f.observer_guid);
                     }
                 }
             }
@@ -124,6 +126,7 @@
                     continue; //preserve hide
                 }
                 for(f in eventListenersToRestore[eventname]){
+                    console.log('Removing: ' + eventname + ', ' + f.observer_guid);
                     this.channels[eventname].unsubscribe(f);  
                     if(releaseResources){
                         removeEventListenerToRestore(eventname, f);
