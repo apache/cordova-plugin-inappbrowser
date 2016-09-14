@@ -350,34 +350,45 @@
     }
     else if([[url scheme] isEqualToString:@"gap-iab-native"])
     {
+        NSLog(@"Event Bridge result");
         if(![[url host] isEqualToString:@"poll"])
         {
             return NO;
         }
+        NSLog(@"Is Poll");
 
         NSString* scriptResult = [url path];
         if ((scriptResult == nil) || ([scriptResult length] < 2))
         {
+            NSLog(@"Result is empty");
              return NO;
         }
 
         NSError* __autoreleasing error = nil;
         scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
         NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
-        
+
+                
         if (error == nil && [decodedResult isKindOfClass:[NSArray class]])
         {
+            NSLog(@"No Error and is array");
             NSArray * array = (NSArray *) decodedResult;
             NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
             if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]])
             {
+                NSLog(@"Has in app browser action");
                 NSString *action = (NSString *)decodedAction;
                 if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                 {
+                    //TODO: *******************************************************************
+                    //TODO: Hide **************************************************************
+                    //TODO: *******************************************************************
+                    NSLog(@"In app browser action is close");
                     [self stopPolling];
                     [self.inAppBrowserViewController close];
                     return NO;
                 }
+
             }
             return NO;
         }

@@ -141,6 +141,7 @@
         }
 
         this.hide = function(releaseResources, blankPage){
+            //blankPage has no effect in iOS - the view is destroyed
             if(hidden){
                 return;
             }
