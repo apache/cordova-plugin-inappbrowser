@@ -34,7 +34,7 @@
     var inAppBrowserInstance = null;
     var lastUrl = '';
     var lastWindowName = '';
-    var lasrWindowFeatures = '';
+    var lastWindowFeatures = '';
 
     var InAppBrowser = function() {
 
@@ -125,7 +125,7 @@
             var cb = function(eventname) {
                me._eventHandler(eventname);
             };
-            exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
+            exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
         }
 
         this.addEventListener = function (eventname,f) {
