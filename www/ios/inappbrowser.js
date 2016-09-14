@@ -174,9 +174,7 @@
                me._eventHandler(eventname);
             };
 
-            console.log('interval =' + lastPollIntervalToRestore);
-            console.log('interval =' + lastPollFunctionToRestore);
-            startPoll(lastPollFunction, lastPollInterval);
+            me.startPoll(lastPollFunction, lastPollInterval);
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
         }
