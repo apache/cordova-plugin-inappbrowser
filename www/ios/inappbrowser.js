@@ -108,7 +108,7 @@
 
         this.close = function(eventname) {
            exec(null, null, "InAppBrowser", "close", []);
-           clearRestoring(); //TODO - ensure exit is called.
+           this.stopPoll();
         }
 
         this.show = function(eventname) {
@@ -126,22 +126,13 @@
            exec(null, null, "InAppBrowser", "stopPoll", []);
         }
 
-
-
         this.hide = function(releaseResources){
-//            var cleanUpCallback = function(){
-//                removeEventListenersForEvent('hidden', releaseResources);
-//            }
-//
-//            for(var eventName in eventListenersToRestore){
-//                if(eventName === 'hidden'){
-//                    continue; //preserve hide, needed to inform client!
-//                }
-//                removeEventListenersForEvent(eventName, releaseResources);
-//            }
 
-//            this.channels['exit'].subscribe(cleanUpCallback);
-//          TODO: remove clean up callback
+            //TODO: suspend and re-establish exit
+            //TODO: Polling
+            //TODO: If release remove listeners
+            console.log(this.channels);
+
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
             exec(null,null,"InAppBrowser", "hide", [releaseResources]);
@@ -154,44 +145,23 @@
             var oldListenersToRestore = eventListenersToRestore;
             eventListenersToRestore = {};
 
-            //TODO: call unhide - don't need to re-esrablish channels etc?
-//            for (var callbackName in oldListenersToRestore) {
-//                console.log('restoring: ' + callbackName);
-//                for (var observer_guid in oldListenersToRestore[callbackName]) {
-//                    var functionToRestore = oldListenersToRestore[callbackName][observer_guid];
-//                    delete functionToRestore[observer_guid];
-//                    console.log('Restoring:' + callbackName + ', ' + functionToRestore.observer_guid);
-//                    //TODO: remove GUIDs?
-//                    console.log(eventname);
-//                    console.log(functionToRestore);
-//                    me.addEventListener(eventname, functionToRestore);
-//                }
-//            }
-
-            console.log(this.channels);
+            //TODO: Polling
 
 
             var cb = function(eventname) {
                me._eventHandler(eventname);
             };
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lasrWindowFeatures]);
-
-            //TODO: clean up anything needed for above step
-            //TODO: Re-establish polling if URL not changed and have polling information.
-            //TODO: look at creating unhide....
-
         }
 
         this.addEventListener = function (eventname,f) {
             if (eventname in this.channels) {
                 me.channels[eventname].subscribe(f);
-                addEventListenerToRestore(eventname, f);
             }
         }
 
         this.removeEventListener = function (eventname, f) {
             if (eventname in this.channels) {
-                removeEventListenerToRestore(eventname, f);
                 this.channels[eventname].unsubscribe(f);
             }
         }
