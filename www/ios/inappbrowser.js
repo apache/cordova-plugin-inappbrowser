@@ -31,7 +31,7 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    var InAppBrowser = function(url, windowName, windowFeatures) {
+    var InAppBrowser = function(url, windowName, windowFeatures, callbacks) {
         var me = this,
             hidden = false,
             backChannels = {
