@@ -81,7 +81,7 @@
         function releaseListeners(){
             for(var eventname in me.channels)
             {
-                for(var listenerObserverId in me.channels[eventname])
+                for(var listenerObserverId in me.channels[eventname].handlers)
                 {
                     console.log(eventname);
                     console.log(listenerObserverId);
