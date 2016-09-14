@@ -83,9 +83,6 @@
             {
                 for(var listenerObserverId in me.channels[eventname].handlers)
                 {
-                    console.log(eventname);
-                    console.log(listenerObserverId);
-                    console.log(me.channels[eventname].handlers);
                     me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
                 }
             }
@@ -149,10 +146,10 @@
 
             if(releaseResources){
                 me.stopPoll();
-                preventExitListenerFireOnHide();
+                releaseListeners();
             } else {
                 //TODO: Polling
-                releaseListeners();
+                preventExitListenerFireOnHide();
             }
 
             // Release resources has no effect in native iOS - the IAB 
