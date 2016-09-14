@@ -31,13 +31,16 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    var InAppBrowser = function(lastUrl, lastWindowName, lastWindowFeatures) {
+    var InAppBrowser = function(url, windowName, windowFeatures) {
         var me = this,
             hidden = false,
             backChannels = {
                 preventexitonhide : channel.create('preventexitonhide')
             }
             polling = false,
+            lastUrl = url,
+            lastWindowName = windowName,
+            lastWindowFeatures = windowFeatures
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
 
@@ -53,6 +56,15 @@
                 {
                     me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
                 }
+            }
+        }
+
+        function eventCallback (event) {
+            if (event && (event.type in backChannels)) {
+                backChannels[event.type].fire(event);
+            }
+            if (event && (event.type in me.channels)) {
+                me.channels[event.type].fire(event);
             }
         }
 
@@ -84,7 +96,7 @@
                 }
         });
 
-        this.channels = {
+        me.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
@@ -94,51 +106,44 @@
             'exit' : channel.create('exit')
         }
 
-        this._eventHandler = function(event) {
-            if (event && (event.type in backChannels)) {
-                backChannels[event.type].fire(event);
-            }
-            if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
-            }
-        }
 
-        this.isHidden = function(){
+
+        me.isHidden = function(){
             return hidden;
         }
 
-        this.isPolling = function(){
+        me.isPolling = function(){
             return polling;
         }
 
-        this.close = function(eventname) {
+        me.close = function(eventname) {
             exec(null, null, "InAppBrowser", "close", []);
-            this.stopPoll();
+            me.stopPoll();
             if(hidden){
-                this.channels['exit'].fire();
+                me.channels['exit'].fire();
             }
             hidden = false;
         }
 
-        this.show = function(eventname) {
+        me.show = function(eventname) {
             exec(null, null, "InAppBrowser", "show", []);
             hidden = false;
         }
 
-        this.startPoll = function(pollFunction, pollInterval){
+        me.startPoll = function(pollFunction, pollInterval){
            lastPollIntervalToRestore = pollInterval;
            lastPollFunctionToRestore = pollFunction;
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
            polling = true;
         }
 
-        this.stopPoll = function() {
+        me.stopPoll = function() {
            exec(null, null, "InAppBrowser", "stopPoll", []);
            clearPolling();
            polling = false;
         }
 
-        this.hide = function(releaseResources, blankPage){
+        me.hide = function(releaseResources, blankPage){
             //blankPage has no effect in iOS - the view is destroyed
             if(hidden){
                 return;
@@ -155,7 +160,7 @@
             hidden = true;
         }
 
-        this.unHide = function(strUrl, eventname){
+        me.unHide = function(strUrl, eventname){
             if(!hidden){
                 return;
             }
@@ -164,28 +169,24 @@
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl;
             }
 
-            var cb = function(eventname) {
-               me._eventHandler(eventname);
-            };
-
             me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
-            exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
+            exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
         }
 
-        this.addEventListener = function (eventname,f) {
-            if (eventname in this.channels) {
+        me.addEventListener = function (eventname,f) {
+            if (eventname in me.channels) {
                 me.channels[eventname].subscribe(f);
             }
         }
 
-        this.removeEventListener = function (eventname, f) {
-            if (eventname in this.channels) {
-                this.channels[eventname].unsubscribe(f);
+        me.removeEventListener = function (eventname, f) {
+            if (eventname in me.channels) {
+                me.channels[eventname].unsubscribe(f);
             }
         }
 
-        this.executeScript = function (injectDetails, cb) {
+        me.executeScript = function (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -195,7 +196,7 @@
             }
         }
 
-        this.insertCSS = function (injectDetails, cb) {
+        me.insertCSS = function (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -204,6 +205,12 @@
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
         }
+
+        for (var callbackName in callbacks) {
+            me.addEventListener(callbackName, callbacks[callbackName]);
+        }
+
+        exec(eventCallback, eventCallback, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
     }
 
     module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
@@ -222,18 +229,7 @@
 
 
         } else {
-            var instance = new InAppBrowser(strUrl, strWindowName, strWindowFeatures);
-
-            callbacks = callbacks || {};
-            for (var callbackName in callbacks) {
-                instance.addEventListener(callbackName, callbacks[callbackName]);
-            }
-
-            var cb = function(eventname) {
-                       instance._eventHandler(eventname);
-            };
-
-            exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+            var instance = new InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks || {});
             return instance
         }
     };
