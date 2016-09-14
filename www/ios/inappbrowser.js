@@ -53,6 +53,31 @@
             clearPolling();
         }
 
+        function preventExitListenerFireOnHide(){
+            var exitHandlersToRestore = {},
+                exitChannel = me.channels['exit'],
+                exitRestoreCallBack = function(){
+                    // This cleans up the current handler
+                    if(exitRestoreCallBack.observer_guid){
+                        me.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBack.observer_guid]);
+                    }
+
+                    for(var exitCallbackObserverId in exitHandlersToRestore) {
+                        var eventHandler = exitHandlersToRestore[exitCallbackObserverId];
+                        me.addEventListener('exit', eventHandler);
+                    }
+                };
+
+            if(exitChannel.numHandlers >0){
+                for(var exitCallbackObserverId in exitChannel.handlers) {
+                    var eventHandler = exitChannel.handlers[exitCallbackObserverId];
+                    exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
+                    me.removeEventListener('exit', eventHandler);
+                }
+                me.addEventListener('exit', exitRestoreCallBack);
+            }
+        }
+
         this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
@@ -108,30 +133,11 @@
             if(hidden){
                 return;
             }
+
+            preventExitListenerFireOnHide();
             //TODO: Polling
             //TODO: remove handlers if releaseResources
-            var exitHandlersToRestore = {},
-                exitChannel = me.channels['exit'],
-                exitRestoreCallBack = function(){
-                    // This cleans up the current handler
-                    if(exitRestoreCallBack.observer_guid){
-                        me.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBack.observer_guid]);
-                    }
 
-                    for(var exitCallbackObserverId in exitHandlersToRestore) {
-                        var eventHandler = exitHandlersToRestore[exitCallbackObserverId];
-                        me.addEventListener('exit', eventHandler);
-                    }
-                };
-
-            if(exitChannel.numHandlers >0){
-                for(var exitCallbackObserverId in exitChannel.handlers) {
-                    var eventHandler = exitChannel.handlers[exitCallbackObserverId];
-                    exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
-                    me.removeEventListener('exit', eventHandler);
-                }
-                me.addEventListener('exit', exitRestoreCallBack);
-            }
 
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
