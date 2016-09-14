@@ -95,13 +95,17 @@
             console.log(this.channels);
             var exitHandlersToRestore = {},
                 exitChannel = this.channels['exit'],
+                exitRestoreCallBackObserverId = null;
                 exitRestoreCallBack = function(){
                     // This cleans up any handlers we've added since hide.
                     // This should just be the function we're in
-                    for(var exitCallbackObserverId in exitChannel.handlers) {
-                        this.removeEventListener('exit', exitChannel.handlers[exitCallbackObserverId]);
+                    console.log('*****************************************************');
+                    console.log(exitRestoreCallBackObserverId);
+                    console.log('*****************************************************');
+                    if(exitRestoreCallBackObserverId){
+                        this.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBackObserverId]);
                     }
-                    console.log(exitChannel);
+
                     console.log('TODO - re-add original handlers');
 
                     //TODO: re-establish exit
@@ -115,6 +119,7 @@
                     this.removeEventListener('exit', eventHandler);
                 }
                 this.addEventListener('exit', exitRestoreCallBack);
+                exitRestoreCallBackObserverId = exitRestoreCallBack.observer_guid;
             }
 
             console.log(exitHandlersToRestore);
