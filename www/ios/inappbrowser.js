@@ -210,7 +210,7 @@
             me.addEventListener(callbackName, callbacks[callbackName]);
         }
 
-        exec(eventCallback, eventCallback, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+        exec(eventCallback, eventCallback, "InAppBrowser", "open", [lastUrl, lastWindowName, lastWindowFeatures]);
     }
 
     module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
