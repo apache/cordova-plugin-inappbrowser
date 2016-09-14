@@ -35,11 +35,12 @@
     var lastUrl = '';
     var lastWindowName = '';
     var lastWindowFeatures = '';
-    var hidden = false;
+
 
     var InAppBrowser = function() {
-
         var me = this,
+            hidden = false,
+            polling = false,
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
 
@@ -68,27 +69,39 @@
             }
         }
 
+        this.isHidden = function(){
+            return hidden;
+        }
+
+        this.isPolling = function(){
+            return polling;
+        }
+
         this.close = function(eventname) {
             exec(null, null, "InAppBrowser", "close", []);
             this.stopPoll();
             if(hidden){
                 this.channels['exit'].fire();
             }
+            hidden = false;
         }
 
         this.show = function(eventname) {
             exec(null, null, "InAppBrowser", "show", []);
+            hidden = false;
         }
 
         this.startPoll = function(pollFunction, pollInterval){
            lastPollInterval = pollInterval;
            lastPollFunction = pollFunction;
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+           polling = true;
         }
 
         this.stopPoll = function() {
            clearPolling();
            exec(null, null, "InAppBrowser", "stopPoll", []);
+           polling = true;
         }
 
         this.hide = function(releaseResources){
