@@ -31,12 +31,7 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    var lastUrl = '';
-    var lastWindowName = '';
-    var lastWindowFeatures = '';
-
-
-    var InAppBrowser = function() {
+    var InAppBrowser = function(lastUrl, lastWindowName, lastWindowFeatures) {
         var me = this,
             hidden = false,
             backChannels = {
@@ -164,7 +159,10 @@
             if(!hidden){
                 return;
             }
-            lastUrl = strUrl || lastUrl;
+
+            if(strUrl){
+                lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl;
+            }
 
             var cb = function(eventname) {
                me._eventHandler(eventname);
@@ -216,27 +214,25 @@
         }
 
         strUrl = urlutil.makeAbsolute(strUrl);
-        var instance = new InAppBrowser();
-
-        callbacks = callbacks || {};
-        for (var callbackName in callbacks) {
-            instance.addEventListener(callbackName, callbacks[callbackName]);
-        }
-
         strWindowFeatures = strWindowFeatures || "";
 
-        if(strWindowName !== '_system')
-        {
-            lastUrl = strUrl;
-            lastWindowName = strWindowName;
-            lastWindowFeatures = strWindowFeatures;
+        if(strWindowName !== '_system') {
+            var instance = new InAppBrowser(strUrl, strWindowName, strWindowFeatures);
+
+            callbacks = callbacks || {};
+            for (var callbackName in callbacks) {
+                instance.addEventListener(callbackName, callbacks[callbackName]);
+            }
+
+            var cb = function(eventname) {
+                       instance._eventHandler(eventname);
+            };
+
+            exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+
+        } else {
+            //TODO: open system browser
+            exec(null, null, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
         }
-
-        var cb = function(eventname) {
-           instance._eventHandler(eventname);
-        };
-
-        exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-        return instance;
     };
 })();
