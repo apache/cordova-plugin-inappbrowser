@@ -108,7 +108,7 @@
                         var eventHandler = exitHandlersToRestore[exitCallbackObserverId];
                         me.addEventListener('exit', eventHandler);
                     }
-                    console.log(this.channels['exit']);
+                    console.log(me.channels['exit']);
                 };
 
             if(exitChannel.numHandlers >0){
@@ -116,7 +116,7 @@
                 for(var exitCallbackObserverId in exitChannel.handlers) {
                     var eventHandler = exitChannel.handlers[exitCallbackObserverId];
                     exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
-                    this.removeEventListener('exit', eventHandler);
+                    me.removeEventListener('exit', eventHandler);
                 }
                 this.addEventListener('exit', exitRestoreCallBack);
                 exitRestoreCallBackObserverId = exitRestoreCallBack.observer_guid;
