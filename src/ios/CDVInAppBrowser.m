@@ -537,8 +537,19 @@ NSString* pollJavascriptCode = nil;
 {
     // On iOS it seems hiding is a messy business. As startup performance is good
     // Close. The JS will re-establish re-polling as needed.
-    [self stopPolling];
     
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"preventexitonhide"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+
+    [self stopPolling];
+    [self.inAppBrowserViewController close];
+
     if (self.callbackId != nil) {
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
@@ -547,8 +558,6 @@ NSString* pollJavascriptCode = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-    
-    [self.inAppBrowserViewController close];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController

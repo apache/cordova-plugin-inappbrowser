@@ -40,6 +40,9 @@
     var InAppBrowser = function() {
         var me = this,
             hidden = false,
+            backChannels = {
+                preventExitOnHide : channel.create('preventexitonhide')
+            }
             polling = false,
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
@@ -88,6 +91,10 @@
             }
         }
 
+        backChannels['preventexitonhide'].subscribe(function(){
+            console.log('******************BACK CHANNEL PREVENTION*****************************');
+        });
+
         this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
@@ -99,6 +106,9 @@
         }
 
         this._eventHandler = function(event) {
+            if (event && (event.type in backChannels)) {
+                backChannels[event.type].fire(event);
+            }
             if (event && (event.type in this.channels)) {
                 this.channels[event.type].fire(event);
             }
