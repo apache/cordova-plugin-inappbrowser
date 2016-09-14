@@ -47,11 +47,12 @@
 
 @end
 
+
+@interface CDVSystemBrowser : CDVPlugin { }
+
 @property (nonatomic, copy) NSString* callbackId;
 
-@interface CDVSystemBrowser : CDVPlugin {
-	- (void)openSystem:(CDVInvokedUrlCommand*)command;
-}
+- (void)open:(CDVInvokedUrlCommand*)command;
 
 @end
 
