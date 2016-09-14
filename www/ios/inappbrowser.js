@@ -31,7 +31,6 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    var inAppBrowserInstance = null;
     var lastUrl = '';
     var lastWindowName = '';
     var lastWindowFeatures = '';
@@ -217,23 +216,27 @@
         }
 
         strUrl = urlutil.makeAbsolute(strUrl);
-        inAppBrowserInstance = new InAppBrowser();
+        var instance = new InAppBrowser();
 
         callbacks = callbacks || {};
         for (var callbackName in callbacks) {
-            inAppBrowserInstance.addEventListener(callbackName, callbacks[callbackName]);
+            instance.addEventListener(callbackName, callbacks[callbackName]);
         }
-
-        var cb = function(eventname) {
-           inAppBrowserInstance._eventHandler(eventname);
-        };
 
         strWindowFeatures = strWindowFeatures || "";
 
-        lastUrl = strUrl;
-        lastWindowName = strWindowName;
-        lastWindowFeatures = strWindowFeatures;
+        if(strWindowName !== '_system')
+        {
+            lastUrl = strUrl;
+            lastWindowName = strWindowName;
+            lastWindowFeatures = strWindowFeatures;
+        }
+
+        var cb = function(eventname) {
+           instance._eventHandler(eventname);
+        };
+
         exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-        return inAppBrowserInstance;
+        return instance;
     };
 })();
