@@ -100,18 +100,17 @@
                 exitRestoreCallBack = function(){
                     console.log('TODO');
                     //TODO: re-establish exit
+                    //TODO: remove self from list
                 };
 
-            for(var exitCallbackObserverId in exitChannel.handlers) {
-                var eventHandler = exitChannel.handlers[exitCallbackObserverId];
-                exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
-                this.removeEventListener('exit', eventHandler);
-            }
-
-            if(exitHandlersToRestore !== {} ){
+            if(exitChannel.numHandlers >0){
                 console.log('Had functions to restore');
+                for(var exitCallbackObserverId in exitChannel.handlers) {
+                    var eventHandler = exitChannel.handlers[exitCallbackObserverId];
+                    exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
+                    this.removeEventListener('exit', eventHandler);
+                }
                 this.addEventListener('exit', exitRestoreCallBack);
-                //TODO add the restore callback to exit.
             }
 
             console.log(exitHandlersToRestore);
