@@ -546,10 +546,8 @@ NSString* pollJavascriptCode = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-
     [self stopPolling];
-    [self.inAppBrowserViewController close];
-
+    
     if (self.callbackId != nil) {
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
@@ -558,6 +556,9 @@ NSString* pollJavascriptCode = nil;
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+
+    //This must come after the hide callback - otherwise it isn't fired
+    [self.inAppBrowserViewController close];
 }
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
@@ -1252,5 +1253,3 @@ BOOL unHiding = NO;
 
 
 @end
-
-
