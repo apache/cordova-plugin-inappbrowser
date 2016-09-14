@@ -164,7 +164,6 @@
         }
 
         this.unHide = function(strUrl, eventname){
-            console.log('unhide, hidden=' + hidden);
             if(!hidden){
                 return;
             }
@@ -174,7 +173,7 @@
                me._eventHandler(eventname);
             };
 
-            me.startPoll(lastPollFunction, lastPollInterval);
+            me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
         }
