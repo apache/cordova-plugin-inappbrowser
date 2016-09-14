@@ -132,7 +132,6 @@
         }
 
         this.startPoll = function(pollFunction, pollInterval){
-           console.log('JS Start Polling');
            lastPollIntervalToRestore = pollInterval;
            lastPollFunctionToRestore = pollFunction;
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
@@ -140,7 +139,6 @@
         }
 
         this.stopPoll = function() {
-            console.log('Bridge stopping poll');
            exec(null, null, "InAppBrowser", "stopPoll", []);
            clearPolling();
            polling = false;
