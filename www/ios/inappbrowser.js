@@ -35,6 +35,7 @@
     var lastUrl = '';
     var lastWindowName = '';
     var lastWindowFeatures = '';
+    var hidden = false;
 
     var InAppBrowser = function() {
 
@@ -68,9 +69,11 @@
         }
 
         this.close = function(eventname) {
-           //TODO: if hidden fire close event
-           exec(null, null, "InAppBrowser", "close", []);
-           this.stopPoll();
+            exec(null, null, "InAppBrowser", "close", []);
+            this.stopPoll();
+            if(hidden){
+                this.channels['exit'].fire();
+            }
         }
 
         this.show = function(eventname) {
@@ -89,7 +92,11 @@
         }
 
         this.hide = function(releaseResources){
+            if(hidden){
+                return;
+            }
             //TODO: Polling
+            //TODO: remove handlers if releaseResources
             var exitHandlersToRestore = {},
                 exitChannel = me.channels['exit'],
                 exitRestoreCallBack = function(){
@@ -116,9 +123,13 @@
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
             exec(null,null,"InAppBrowser", "hide", [releaseResources]);
+            hidden = true;
         }
 
         this.unHide = function(strUrl, eventname){
+            if(!hidden){
+                return;
+            }
             lastUrl = strUrl || lastUrl;
 
             //TODO: Polling
@@ -126,6 +137,7 @@
                me._eventHandler(eventname);
             };
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
+            hidden = false;
         }
 
         this.addEventListener = function (eventname,f) {
