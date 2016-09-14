@@ -129,16 +129,16 @@
 
 
         this.hide = function(releaseResources){
-            var cleanUpCallback = function(){
-                removeEventListenersForEvent('hidden', releaseResources);
-            }
-
-            for(var eventName in eventListenersToRestore){
-                if(eventName === 'hidden'){
-                    continue; //preserve hide, needed to inform client!
-                }
-                removeEventListenersForEvent(eventName, releaseResources);
-            }
+//            var cleanUpCallback = function(){
+//                removeEventListenersForEvent('hidden', releaseResources);
+//            }
+//
+//            for(var eventName in eventListenersToRestore){
+//                if(eventName === 'hidden'){
+//                    continue; //preserve hide, needed to inform client!
+//                }
+//                removeEventListenersForEvent(eventName, releaseResources);
+//            }
 
             this.channels['exit'].subscribe(cleanUpCallback);
 
@@ -155,18 +155,18 @@
             eventListenersToRestore = {};
 
             //TODO: call unhide - don't need to re-esrablish channels etc?
-            for (var callbackName in oldListenersToRestore) {
-                console.log('restoring: ' + callbackName);
-                for (var observer_guid in oldListenersToRestore[callbackName]) {
-                    var functionToRestore = oldListenersToRestore[callbackName][observer_guid];
-                    delete functionToRestore[observer_guid];
-                    console.log('Restoring:' + callbackName + ', ' + functionToRestore.observer_guid);
-                    //TODO: remove GUIDs?
-                    console.log(eventname);
-                    console.log(functionToRestore);
-                    me.addEventListener(eventname, functionToRestore);
-                }
-            }
+//            for (var callbackName in oldListenersToRestore) {
+//                console.log('restoring: ' + callbackName);
+//                for (var observer_guid in oldListenersToRestore[callbackName]) {
+//                    var functionToRestore = oldListenersToRestore[callbackName][observer_guid];
+//                    delete functionToRestore[observer_guid];
+//                    console.log('Restoring:' + callbackName + ', ' + functionToRestore.observer_guid);
+//                    //TODO: remove GUIDs?
+//                    console.log(eventname);
+//                    console.log(functionToRestore);
+//                    me.addEventListener(eventname, functionToRestore);
+//                }
+//            }
 
             console.log(this.channels);
 
