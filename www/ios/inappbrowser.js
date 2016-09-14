@@ -216,7 +216,12 @@
         strUrl = urlutil.makeAbsolute(strUrl);
         strWindowFeatures = strWindowFeatures || "";
 
-        if(strWindowName !== '_system') {
+        if(strWindowName === '_system') {
+            //TODO: open system browser
+            exec(null, null, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+
+
+        } else {
             var instance = new InAppBrowser(strUrl, strWindowName, strWindowFeatures);
 
             callbacks = callbacks || {};
@@ -229,10 +234,7 @@
             };
 
             exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-
-        } else {
-            //TODO: open system browser
-            exec(null, null, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+            return instance
         }
     };
 })();
