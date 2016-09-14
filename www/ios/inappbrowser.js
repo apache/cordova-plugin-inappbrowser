@@ -63,7 +63,6 @@
 
         this._eventHandler = function(event) {
             if (event && (event.type in this.channels)) {
-                console.log(this.channels);
                 this.channels[event.type].fire(event);
             }
         }
@@ -91,8 +90,6 @@
 
         this.hide = function(releaseResources){
             //TODO: Polling
-
-            console.log(this.channels);
             var exitHandlersToRestore = {},
                 exitChannel = me.channels['exit'],
                 exitRestoreCallBack = function(){
@@ -105,11 +102,9 @@
                         var eventHandler = exitHandlersToRestore[exitCallbackObserverId];
                         me.addEventListener('exit', eventHandler);
                     }
-                    console.log(me.channels['exit']);
                 };
 
             if(exitChannel.numHandlers >0){
-                console.log('Had functions to restore');
                 for(var exitCallbackObserverId in exitChannel.handlers) {
                     var eventHandler = exitChannel.handlers[exitCallbackObserverId];
                     exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
@@ -127,8 +122,6 @@
             lastUrl = strUrl || lastUrl;
 
             //TODO: Polling
-
-
             var cb = function(eventname) {
                me._eventHandler(eventname);
             };
