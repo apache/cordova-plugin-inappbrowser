@@ -29,8 +29,7 @@
 
 @class CDVInAppBrowserViewController;
 
-@interface CDVInAppBrowser : CDVPlugin {
-}
+@interface CDVInAppBrowser : CDVPlugin { }
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;

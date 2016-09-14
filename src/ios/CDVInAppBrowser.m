@@ -51,14 +51,14 @@
 #endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
     
-        if ([[UIApplication sharedApplication] canOpenURL:url]) 
+        if ([[UIApplication sharedApplication] canOpenURL:absoluteUrl]) 
         {
-            [[UIApplication sharedApplication] openURL:url];
+            [[UIApplication sharedApplication] openURL:absoluteUrl];
         } 
         else 
         { 
             // handle any custom schemes to plugins
-            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:absoluteUrl]];
         }
     
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
