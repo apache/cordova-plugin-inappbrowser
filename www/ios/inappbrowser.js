@@ -103,7 +103,7 @@
                     console.log(exitRestoreCallBackObserverId);
                     console.log('*****************************************************');
                     if(exitRestoreCallBackObserverId){
-                        this.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBackObserverId]);
+                        me.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBackObserverId]);
                     }
 
                     console.log('TODO - re-add original handlers');
