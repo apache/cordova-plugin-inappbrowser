@@ -78,6 +78,16 @@
             }
         }
 
+        function releaseListeners(){
+            for(var eventname in me.channels)
+            {
+                for(var listenerObserverId in me.channels[eventname])
+                {
+                    me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
+                }
+            }
+        }
+
         this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
@@ -134,10 +144,13 @@
                 return;
             }
 
-            preventExitListenerFireOnHide();
-            //TODO: Polling
-            //TODO: remove handlers if releaseResources
-
+            if(releaseResources){
+                me.stopPoll();
+                preventExitListenerFireOnHide();
+            } else {
+                //TODO: Polling
+                releaseListeners();
+            }
 
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
