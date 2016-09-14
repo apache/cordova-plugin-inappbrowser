@@ -56,8 +56,18 @@
             clearPolling();
         }
 
-        function preventExitListenerFireOnHide(){
-            var exitHandlersToRestore = {},
+        function releaseListeners(){
+            for(var eventname in me.channels)
+            {
+                for(var listenerObserverId in me.channels[eventname].handlers)
+                {
+                    me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
+                }
+            }
+        }
+
+        backChannels['preventexitonhide'].subscribe(function(){
+                var exitHandlersToRestore = {},
                 exitChannel = me.channels['exit'],
                 exitRestoreCallBack = function(){
                     // This cleans up the current handler
@@ -71,30 +81,14 @@
                     }
                 };
 
-            if(exitChannel.numHandlers >0){
-                for(var exitCallbackObserverId in exitChannel.handlers) {
-                    var eventHandler = exitChannel.handlers[exitCallbackObserverId];
-                    exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
-                    me.removeEventListener('exit', eventHandler);
+                if(exitChannel.numHandlers >0){
+                    for(var exitCallbackObserverId in exitChannel.handlers) {
+                        var eventHandler = exitChannel.handlers[exitCallbackObserverId];
+                        exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
+                        me.removeEventListener('exit', eventHandler);
+                    }
+                    me.addEventListener('exit', exitRestoreCallBack);
                 }
-                me.addEventListener('exit', exitRestoreCallBack);
-            }
-        }
-
-        function releaseListeners(){
-            for(var eventname in me.channels)
-            {
-                for(var listenerObserverId in me.channels[eventname].handlers)
-                {
-                    me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
-                }
-            }
-        }
-
-        console.log(backChannels);
-
-        backChannels['preventexitonhide'].subscribe(function(){
-            console.log('******************BACK CHANNEL PREVENTION*****************************');
         });
 
         this.channels = {
@@ -161,9 +155,6 @@
             if(releaseResources){
                 me.stopPoll();
                 releaseListeners();
-            } else {
-                //TODO: Polling
-                preventExitListenerFireOnHide();
             }
 
             // Release resources has no effect in native iOS - the IAB 
