@@ -52,10 +52,6 @@
             lastPollFunctionToRestore = null;
         }
 
-        function clearRestoring(){
-            clearPolling();
-        }
-
         function releaseListeners(){
             for(var eventname in me.channels)
             {
@@ -137,16 +133,17 @@
 
         this.startPoll = function(pollFunction, pollInterval){
            console.log('JS Start Polling');
-           lastPollInterval = pollInterval;
-           lastPollFunction = pollFunction;
+           lastPollIntervalToRestore = pollInterval;
+           lastPollFunctionToRestore = pollFunction;
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
            polling = true;
         }
 
         this.stopPoll = function() {
-           clearPolling();
+            console.log('Bridge stopping poll');
            exec(null, null, "InAppBrowser", "stopPoll", []);
-           polling = true;
+           clearPolling();
+           polling = false;
         }
 
         this.hide = function(releaseResources, blankPage){
@@ -173,10 +170,13 @@
             }
             lastUrl = strUrl || lastUrl;
 
-            //TODO: Polling
             var cb = function(eventname) {
                me._eventHandler(eventname);
             };
+
+            console.log('interval =' + lastPollIntervalToRestore);
+            console.log('interval =' + lastPollFunctionToRestore);
+            startPoll(lastPollFunction, lastPollInterval);
             exec(cb, cb, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
         }
