@@ -164,6 +164,7 @@
         }
 
         this.unHide = function(strUrl, eventname){
+            console.log('unhide, hidden=' hidden);
             if(!hidden){
                 return;
             }
