@@ -409,7 +409,6 @@
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
-    NSLog(@"Web View Finished Load");
     if (self.callbackId != nil) 
     {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
@@ -422,7 +421,6 @@
 
     if(unHiding)
     {
-        NSLog(@"Unhiding previous bar style = %i", _previousStatusBarStyle);
         [self showWindow];
         if (self.callbackId != nil) 
         {
@@ -432,7 +430,6 @@
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-            NSLog(@"Sent event response");
         }
         unHiding = NO;        
     }
@@ -484,7 +481,6 @@ NSString* pollJavascriptCode = nil;
 
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options
 {
-    NSLog(@"Setting the WebView's frame to %@, %@, %@", url, target, options);
     CDVPluginResult* pluginResult;
 
     if (url != nil) {
@@ -576,8 +572,6 @@ BOOL unHiding = NO;
 
 - (void)unHide:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"unHide called, previous bar style = %i", _previousStatusBarStyle);
-
     unHiding = YES;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
