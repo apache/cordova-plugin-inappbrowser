@@ -108,8 +108,9 @@
                 this.removeEventListener('exit', eventHandler);
             }
 
-            if(exitHandlersToRestore){
+            if(exitHandlersToRestore !== {} ){
                 console.log('Had functions to restore');
+                this.addEventListener('exit', exitRestoreCallBack);
                 //TODO add the restore callback to exit.
             }
 
