@@ -91,6 +91,8 @@
             }
         }
 
+        console.log(backChannels);
+
         backChannels['preventexitonhide'].subscribe(function(){
             console.log('******************BACK CHANNEL PREVENTION*****************************');
         });
