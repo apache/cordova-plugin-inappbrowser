@@ -41,7 +41,7 @@
         var me = this,
             hidden = false,
             backChannels = {
-                preventExitOnHide : channel.create('preventexitonhide')
+                preventexitonhide : channel.create('preventexitonhide')
             }
             polling = false,
             lastPollIntervalToRestore = null,
