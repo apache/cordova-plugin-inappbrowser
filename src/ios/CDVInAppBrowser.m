@@ -378,25 +378,21 @@
             {
                 NSLog(@"Has in app browser action");
                 NSString *action = (NSString *)decodedAction;
-                if(action !=nil && [action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+                if(action ==nil)
                 {
-                    //TODO: *******************************************************************
-                    //TODO: Hide **************************************************************
-                    //TODO: *******************************************************************
-                    NSLog(@"In app browser action is close");
-                    [self stopPolling];
-                    [self.inAppBrowserViewController close];
-                    return NO;
+                    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame)
+                    {
+                        NSLog(@"In app browser action is close");
+                        [self stopPolling];
+                        [self.inAppBrowserViewController close];
+                        return NO;
+                    }
+                    else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame)
+                    {
+                        [self hideView];
+                    }
                 }
-
             }
-            else 
-            {
-                //Is a valid result but does not contain an instruction intended for the IAB
-                NSLog(@"Sending result %@", scriptResult);   
-                [self sendPollResult:scriptResult];
-            }
-            return NO;
         }
         NSLog(@"Sending result %@", scriptResult);   
         [self sendPollResult:scriptResult];
@@ -536,6 +532,24 @@ NSString* pollJavascriptCode = nil;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
 }
 
+-(void)hideView
+{
+    // On iOS it seems hiding is a messy business. As startup performance is good
+    // Close. The JS will re-establish re-polling as needed.
+    [self stopPolling];
+    
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"hidden"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+    
+    [self.inAppBrowserViewController close];
+}
+
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
 {
     [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
@@ -577,20 +591,7 @@ NSString* pollJavascriptCode = nil;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
-    // On iOS it seems hiding is a messy business. As startup performance is good
-    // Close. The JS will re-establish re-polling as needed.
-    [self stopPolling];
-    
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"hidden"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-    
-    [self.inAppBrowserViewController close];
+    [self hideView];
 }
 
 BOOL unHiding = NO;
