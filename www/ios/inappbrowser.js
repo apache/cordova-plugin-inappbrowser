@@ -140,8 +140,8 @@
 //                removeEventListenersForEvent(eventName, releaseResources);
 //            }
 
-            this.channels['exit'].subscribe(cleanUpCallback);
-
+//            this.channels['exit'].subscribe(cleanUpCallback);
+//          TODO: remove clean up callback
             // Release resources has no effect in native iOS - the IAB 
             // Is fully closed & the JS pretends it isn't
             exec(null,null,"InAppBrowser", "hide", [releaseResources]);
