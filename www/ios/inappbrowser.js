@@ -165,9 +165,14 @@
                 return;
             }
 
+
             if(strUrl){
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl;
             }
+
+            console.log(lastUrl);
+            console.log(lastWindowName);
+            console.log(lastWindowFeatures);
 
             me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
