@@ -390,9 +390,15 @@
                 }
 
             }
+            else 
+            {
+                //Is a valid result but does not contain an instruction intended for the IAB
+                NSLog(@"Sending result %@", scriptResult);   
+                [self sendPollResult:scriptResult];
+            }
             return NO;
         }
-
+        NSLog(@"Sending result %@", scriptResult);   
         [self sendPollResult:scriptResult];
         return NO;
     }
