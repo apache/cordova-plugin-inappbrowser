@@ -127,6 +127,7 @@
         }
 
         this.startPoll = function(pollFunction, pollInterval){
+           console.log('JS Start Polling');
            lastPollInterval = pollInterval;
            lastPollFunction = pollFunction;
            exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
@@ -139,7 +140,7 @@
            polling = true;
         }
 
-        this.hide = function(releaseResources){
+        this.hide = function(releaseResources, blankPage){
             if(hidden){
                 return;
             }

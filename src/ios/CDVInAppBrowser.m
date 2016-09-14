@@ -470,6 +470,7 @@ NSString* pollJavascriptCode = nil;
 
 -(void)stopPolling
 {
+    NSLog(@"Native Stopping Poller");
     if(PollTimer != nil)
     {
         [PollTimer invalidate];
@@ -477,6 +478,7 @@ NSString* pollJavascriptCode = nil;
 
     PollTimer = nil;
     pollJavascriptCode = nil;
+    NSLog(@"Native Stoped Poller");
 }
 
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options
@@ -523,26 +525,32 @@ NSString* pollJavascriptCode = nil;
 }
 
 -(void)onPollTick:(NSTimer *)timer {
+    NSLog(@"Native Polling Ticl");
     if(pollJavascriptCode != nil)
     {
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
         [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
+        NSLog(@"Calling back");
     }
     else if (PollTimer != nil)
     {
+        NSLog(@"No JS code to execute");
         [self stopPolling];
     }
 }
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {
+    NSLog(@"Native Starting polling");
     if(!PollTimer)
     {
+        NSLog(@"Native Stopping pre-existing polling");
         [self stopPolling];
     }
     pollJavascriptCode = [command argumentAtIndex:0];
     NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
     PollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    NSLog(@"Native Polling started");
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
