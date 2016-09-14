@@ -83,6 +83,9 @@
             {
                 for(var listenerObserverId in me.channels[eventname])
                 {
+                    console.log(eventname);
+                    console.log(listenerObserverId);
+                    console.log(me.channels[eventname].handlers);
                     me.removeEventListener(eventname, me.channels[eventname].handlers[listenerObserverId]);
                 }
             }
