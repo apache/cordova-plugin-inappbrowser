@@ -39,7 +39,6 @@
     var InAppBrowser = function() {
 
         var me = this,
-            eventListenersToRestore = {},
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
 
@@ -50,43 +49,6 @@
 
         function clearRestoring(){
             clearPolling();
-            eventListenersToRestore = {};
-        }
-
-        function addEventListenerToRestore(eventname, f){
-            if(!f) {
-                throw 'the event handler is not defined';
-            }
-            if(!f.observer_guid) {
-                throw 'the event handler does not have an observer GUID. Has the function been subscribed?';
-            }
-
-            if(!eventListenersToRestore[eventname]){
-                eventListenersToRestore[eventname] = {};
-            }
-            eventListenersToRestore[eventname][f.observer_guid] = f;
-            console.log('Added: ' + eventname + ', ' + f.observer_guid);
-        }
-
-        function removeEventListenerToRestore(eventname, f){
-            if(!f && !f.observer_guid && !eventListenersToRestore[eventname]) {
-                return;
-            }
-            delete eventListenersToRestore[eventname][f.observer_guid];
-        }
-
-        function removeEventListenersForEvent(eventName, releaseResources)
-        {
-            console.log('Removing for event: ' + eventName + ', RELEASING=' + releaseResources);
-            for(var observer_guid in eventListenersToRestore[eventName]) {
-                var functionToRemove = eventListenersToRestore[eventName][observer_guid];
-                console.log('Removing: ' + eventName + ', ' + functionToRemove.observer_guid);
-                me.channels[eventName].unsubscribe(functionToRemove);
-                if(releaseResources){
-                    console.log('Releasing: ' + eventName + ', ' + functionToRemove.observer_guid);
-                    removeEventListenerToRestore(eventName, functionToRemove);
-                }
-            }
         }
 
         this.channels = {
@@ -140,10 +102,6 @@
 
         this.unHide = function(strUrl, eventname){
             lastUrl = strUrl || lastUrl;
-
-            //The functions need to be issued with new GUIDs so the old ones will not be valid the next time around
-            var oldListenersToRestore = eventListenersToRestore;
-            eventListenersToRestore = {};
 
             //TODO: Polling
 
