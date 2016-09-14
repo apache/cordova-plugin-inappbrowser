@@ -90,9 +90,29 @@
 
         this.hide = function(releaseResources){
 
-            //TODO: suspend and re-establish exit
+            //TODO: suspend exit
+
             //TODO: Polling
             //TODO: If release remove listeners
+            console.log(this.channels);
+            var exitListenersToRestore = {},
+                exitChannel = this.channels['exit'],
+                exitRestoreCallBack = function(){
+                    console.log('TODO');
+                    //TODO: re-establish exit
+                };
+
+            for(var exitCallbackObserverId in exitChannel.handlers) {
+                exitListenersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
+                delete exitChannel.handlers[exitCallbackObserverId];
+            }
+
+            if(exitListenersToRestore){
+                console.log('Had functions to restore');
+                //TODO add the restore callback to exit.
+            }
+
+            console.log(exitListenersToRestore);
             console.log(this.channels);
 
             // Release resources has no effect in native iOS - the IAB 
