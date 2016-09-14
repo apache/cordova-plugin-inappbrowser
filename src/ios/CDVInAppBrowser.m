@@ -378,7 +378,7 @@
             {
                 NSLog(@"Has in app browser action");
                 NSString *action = (NSString *)decodedAction;
-                if(action ==nil)
+                if(action !=nil)
                 {
                     if([action caseInsensitiveCompare:@"close"] == NSOrderedSame)
                     {
@@ -390,6 +390,7 @@
                     else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame)
                     {
                         [self hideView];
+                        return NO;
                     }
                 }
             }
