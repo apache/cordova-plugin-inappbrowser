@@ -122,6 +122,9 @@
             <feature name="InAppBrowser">
                 <param name="ios-package" value="CDVInAppBrowser" /> 
             </feature>
+            <feature name="SystemBrowser">
+                <param name="ios-package" value="CDVSystemBrowser" />
+            </feature>
         </config-file>
 
         <header-file src="src/ios/CDVInAppBrowser.h" />

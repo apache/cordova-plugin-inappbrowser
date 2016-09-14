@@ -230,7 +230,7 @@
 
         if(strWindowName === '_system') {
             //TODO: open system browser
-            exec(null, null, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+            exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
 
 
         } else {

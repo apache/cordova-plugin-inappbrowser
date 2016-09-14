@@ -47,6 +47,14 @@
 
 @end
 
+@property (nonatomic, copy) NSString* callbackId;
+
+@interface CDVSystemBrowser : CDVPlugin {
+	- (void)openSystem:(CDVInvokedUrlCommand*)command;
+}
+
+@end
+
 @interface CDVInAppBrowserOptions : NSObject {}
 
 @property (nonatomic, assign) BOOL location;

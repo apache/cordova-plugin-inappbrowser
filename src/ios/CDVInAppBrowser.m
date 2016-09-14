@@ -33,6 +33,49 @@
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
 #pragma mark CDVInAppBrowser
+@implementation CDVSystemBrowser
+
+ - (void)open:(CDVInvokedUrlCommand*)command
+{
+    NSString* url = [command argumentAtIndex:0];
+    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    self.callbackId = command.callbackId;
+        CDVPluginResult* pluginResult;
+
+    if (url != nil) {
+#ifdef __CORDOVA_4_0_0
+        NSURL* baseUrl = [self.webViewEngine URL];
+#else
+        NSURL* baseUrl = [self.webView.request URL];
+#endif
+        NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+    
+        if ([[UIApplication sharedApplication] canOpenURL:url]) 
+        {
+            [[UIApplication sharedApplication] openURL:url];
+        } 
+        else 
+        { 
+            // handle any custom schemes to plugins
+            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+        }
+    
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    } 
+    else 
+    {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
+    }
+
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
+}
+
+@end
+
+
+#pragma mark CDVInAppBrowser
 
 @interface CDVInAppBrowser () {
     NSInteger _previousStatusBarStyle;
@@ -508,6 +551,7 @@ NSString* pollJavascriptCode = nil;
         } 
         else if ([target isEqualToString:kInAppBrowserTargetSystem]) 
         {
+            //Todo: warn this should not be called - now a separate package
             [self openInSystem:absoluteUrl];
         }
         else 
