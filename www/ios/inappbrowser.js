@@ -69,6 +69,7 @@
         }
 
         this.close = function(eventname) {
+           //TODO: if hidden fire close event
            exec(null, null, "InAppBrowser", "close", []);
            this.stopPoll();
         }
@@ -89,18 +90,21 @@
         }
 
         this.hide = function(releaseResources){
-
-            //TODO: suspend exit
-
             //TODO: Polling
-            //TODO: If release remove listeners
+
             console.log(this.channels);
             var exitHandlersToRestore = {},
                 exitChannel = this.channels['exit'],
                 exitRestoreCallBack = function(){
-                    console.log('TODO');
+                    // This cleans up any handlers we've added since hide.
+                    // This should just be the function we're in
+                    for(var exitCallbackObserverId in exitChannel.handlers) {
+                        this.removeEventListener('exit', exitChannel.handlers[exitCallbackObserverId]);
+                    }
+                    console.log(exitChannel);
+                    console.log('TODO - re-add original handlers');
+
                     //TODO: re-establish exit
-                    //TODO: remove self from list
                 };
 
             if(exitChannel.numHandlers >0){
