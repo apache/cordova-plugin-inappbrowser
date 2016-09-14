@@ -94,14 +94,11 @@
 
             console.log(this.channels);
             var exitHandlersToRestore = {},
-                exitChannel = this.channels['exit'],
-                exitRestoreCallBackObserverId = null;
+                exitChannel = me.channels['exit'],
                 exitRestoreCallBack = function(){
-                    // This cleans up any handlers we've added since hide.
-                    // This should just be the function we're in
-                    console.log('*****************************************************');
-                    if(exitRestoreCallBackObserverId){
-                        me.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBackObserverId]);
+                    // This cleans up the current handler
+                    if(exitRestoreCallBack.observer_guid){
+                        me.removeEventListener('exit', exitChannel.handlers[exitRestoreCallBack.observer_guid]);
                     }
 
                     for(var exitCallbackObserverId in exitHandlersToRestore) {
@@ -118,8 +115,7 @@
                     exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
                     me.removeEventListener('exit', eventHandler);
                 }
-                this.addEventListener('exit', exitRestoreCallBack);
-                exitRestoreCallBackObserverId = exitRestoreCallBack.observer_guid;
+                me.addEventListener('exit', exitRestoreCallBack);
             }
 
             // Release resources has no effect in native iOS - the IAB 
