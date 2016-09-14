@@ -81,6 +81,9 @@
                     }
                 };
 
+                // Need to set this here as it is possible to hide via native code "directly" by calling hide via the
+                // command infrastructure and not the hide method
+                hidden = true;
                 if(exitChannel.numHandlers >0){
                     for(var exitCallbackObserverId in exitChannel.handlers) {
                         var eventHandler = exitChannel.handlers[exitCallbackObserverId];
