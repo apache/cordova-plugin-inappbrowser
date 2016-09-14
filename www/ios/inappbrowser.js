@@ -95,7 +95,7 @@
             //TODO: Polling
             //TODO: If release remove listeners
             console.log(this.channels);
-            var exitListenersToRestore = {},
+            var exitHandlersToRestore = {},
                 exitChannel = this.channels['exit'],
                 exitRestoreCallBack = function(){
                     console.log('TODO');
@@ -103,16 +103,17 @@
                 };
 
             for(var exitCallbackObserverId in exitChannel.handlers) {
-                exitListenersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
-                delete exitChannel.handlers[exitCallbackObserverId];
+                var eventHandler = exitChannel.handlers[exitCallbackObserverId];
+                exitHandlersToRestore[exitCallbackObserverId] = exitChannel.handlers[exitCallbackObserverId];
+                this.removeEventListener('exit', eventHandler);
             }
 
-            if(exitListenersToRestore){
+            if(exitHandlersToRestore){
                 console.log('Had functions to restore');
                 //TODO add the restore callback to exit.
             }
 
-            console.log(exitListenersToRestore);
+            console.log(exitHandlersToRestore);
             console.log(this.channels);
 
             // Release resources has no effect in native iOS - the IAB 
