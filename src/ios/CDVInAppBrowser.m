@@ -314,43 +314,11 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     } else if([[url scheme] isEqualToString:@"gap-iab-native"]) {
         [self handlePollResult:url];
         return NO;
-        // if(![[url host] isEqualToString:@"poll"]) {
-        //     return NO;
-        // }
-
-        // NSString* scriptResult = [url path];
-        // if ((scriptResult == nil) || ([scriptResult length] < 2)) {
-        //      return NO;
-        // }
-
-        // NSError* __autoreleasing error = nil;
-        // scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-        // NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
-
-                
-        // if (error == nil && [decodedResult isKindOfClass:[NSArray class]]) {
-        //     NSArray * array = (NSArray *) decodedResult;
-        //     NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
-        //     if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]]) {
-        //         NSString *action = (NSString *)decodedAction;
-        //         if(action !=nil) {
-        //             if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
-        //                 [self stopPolling];
-        //                 [self.inAppBrowserViewController close];
-        //                 return NO;
-        //             } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
-        //                 [self hideView];
-        //                 return NO;
-        //             }
-        //         }
-        //     }
-        // }  
-        // [self sendPollResult:scriptResult];
     } 
 
     if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
             //if is an app store link, let the system handle it, otherwise it fails to load it
-        [webView stopLoading];
+        [theWebView stopLoading];
         [self openInSystem:url];
         return NO;
     }
