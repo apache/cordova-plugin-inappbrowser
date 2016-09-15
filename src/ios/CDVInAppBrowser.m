@@ -627,11 +627,11 @@ BOOL unHiding = NO;
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {   
-    if([command argumentAtIndex:0] == nil ||  [command.arguments[1] == nil) {
+    if([command argumentAtIndex:0] == nil ||  [command argumentAtIndex:1] == nil) {
         NSLog(@"Incorrect number of arguments passed to start polling")
         return;
     }
-    
+
     NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
     [self startPolling:[command argumentAtIndex:0] interval:pollInterval];
 }
