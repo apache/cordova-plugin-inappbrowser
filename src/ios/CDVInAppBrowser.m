@@ -247,11 +247,6 @@
     }
 }
 
-
-
-
-
-
 - (BOOL)isValidCallbackId:(NSString *)callbackId {
     NSError *err = nil;
     // Initialize on first use
@@ -478,6 +473,18 @@
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
+#pragma mark utility-methods
+
+-(void)sendOKPluginResult:(NSDictionary*)messageAsDictionary {
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:messageAsDictionary];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+}
+
 #pragma mark show-hide
 
 BOOL unHiding = NO;
@@ -486,16 +493,9 @@ BOOL unHiding = NO;
     //Called back from webViewDidFinishLoad 
     if(unHiding) {
         [self showWindow];
-        if (self.callbackId != nil) {
-            // Send a loadstart event for each top-level navigation (includes redirects).
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                          messageAsDictionary:@{@"type":@"unhidden"}];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-        }        
+        [self sendOKPluginResult:@{@"type":@"unhidden"}];
+        unHiding = NO;
     }
-    unHiding = NO;
 }
 
 -(void)hideView
@@ -526,7 +526,7 @@ BOOL unHiding = NO;
     [self.inAppBrowserViewController close];
 }
 
-- (void)unHideView:(NSString*)url targets:(NSString*)url withOptions:(NSString*)options {
+- (void)unHideView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
     unHiding = YES;
     [self openUrl:url targets:target withOptions:options];
 }
