@@ -101,30 +101,12 @@ BOOL unHiding = NO;
     [self close:nil];
 }
 
-- (void)close:(CDVInvokedUrlCommand*)command {
-    if (self.inAppBrowserViewController == nil) {
-        NSLog(@"IAB.close() called but it was already closed.");
-        return;
-    }
-    [self stopPolling];
-    // Things are cleaned up in browserExit.
-    [self.inAppBrowserViewController close];
-}
-
 - (BOOL) isSystemUrl:(NSURL*)url {
 	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
 		return YES;
 	}
 
 	return NO;
-}
-
-- (void)open:(CDVInvokedUrlCommand*)command {
-    NSString* url = [command argumentAtIndex:0];
-    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
-    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-    self.callbackId = command.callbackId;
-    [self openUrl:url targets:target withOptions:options];
 }
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options {
@@ -215,19 +197,7 @@ BOOL unHiding = NO;
     }
 }
 
-- (void)show:(CDVInvokedUrlCommand*)command
-{
-    if (self.inAppBrowserViewController == nil) {
-        NSLog(@"Tried to show IAB after it was closed.");
-        return;
-    }
-    if (_previousStatusBarStyle != -1) {
-        NSLog(@"Tried to show IAB while already shown");
-        return;
-    }
 
-    [self showWindow];
-}
 
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
@@ -279,47 +249,7 @@ BOOL unHiding = NO;
     }
 }
 
-- (void)injectScriptCode:(CDVInvokedUrlCommand*)command {
-    NSString* jsWrapper = nil;
 
-    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
-        jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
-    }
-    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-}
-
-- (void)injectScriptFile:(CDVInvokedUrlCommand*)command {
-    NSString* jsWrapper;
-
-    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
-        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('script'); c.src = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
-    } else {
-        jsWrapper = @"(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document)";
-    }
-    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-}
-
-- (void)injectStyleCode:(CDVInvokedUrlCommand*)command {
-    NSString* jsWrapper;
-
-    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
-        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('style'); c.innerHTML = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
-    } else {
-        jsWrapper = @"(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document)";
-    }
-    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-}
-
-- (void)injectStyleFile:(CDVInvokedUrlCommand*)command {
-    NSString* jsWrapper;
-
-    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
-        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
-    } else {
-        jsWrapper = @"(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)";
-    }
-    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-}
 
 - (BOOL)isValidCallbackId:(NSString *)callbackId {
     NSError *err = nil;
@@ -488,18 +418,6 @@ BOOL unHiding = NO;
     }
 }
 
-
-
-
--(void)stopPolling {
-    if(pollTimer != nil) {
-        [pollTimer invalidate];
-    }
-
-    pollTimer = nil;
-    pollJavascriptCode = nil;
-}
-
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
     CDVPluginResult* pluginResult;
     //TODO: look at the nestsing, also do we want to handle system any more - new plugin for it..?
@@ -569,47 +487,6 @@ BOOL unHiding = NO;
     [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
 }
 
--(void)onPollTick:(NSTimer *)timer {
-    if(pollJavascriptCode != nil) {
-        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
-    } else if (pollTimer != nil) {
-        NSLog(@"No JS code to execute");
-        [self stopPolling];
-    }
-}
-
-- (void)startPoll:(CDVInvokedUrlCommand*)command
-{
-    if(!pollTimer) {
-        [self stopPolling];
-    }
-    pollJavascriptCode = [command argumentAtIndex:0];
-    NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
-    pollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
-}
-
-- (void)stopPoll:(CDVInvokedUrlCommand*)command
-{
-    [self stopPolling];
-} 
-
-- (void)hide:(CDVInvokedUrlCommand*)command
-{
-    [self hideView];
-}
-
-
-
-- (void)unHide:(CDVInvokedUrlCommand*)command {
-    unHiding = YES;
-    NSString* url = [command argumentAtIndex:0];
-    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
-    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-    self.callbackId = command.callbackId;
-    [self openUrl:url targets:target withOptions:options];
-}
-
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error {
     if (self.callbackId != nil) {
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
@@ -641,6 +518,141 @@ BOOL unHiding = NO;
     }
 
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
+}
+
+#pragma mark polling
+
+-(void)onPollTick:(NSTimer *)timer {
+    if(pollJavascriptCode != nil) {
+        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
+        [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
+    } else if (pollTimer != nil) {
+        NSLog(@"No JS code to execute");
+        [self stopPolling];
+    }
+}
+
+-(void)startPolling:(NSString*)script interval:(NSTimeInterval)interval {
+    if(!pollTimer) {
+        [self stopPolling];
+    }
+    pollJavascriptCode = script;
+    pollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+}
+
+-(void)stopPolling {
+    if(pollTimer != nil) {
+        [pollTimer invalidate];
+    }
+
+    pollTimer = nil;
+    pollJavascriptCode = nil;
+}
+
+#pragma mark public-methods
+
+- (void)open:(CDVInvokedUrlCommand*)command {
+    NSString* url = [command argumentAtIndex:0];
+    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    self.callbackId = command.callbackId;
+    [self openUrl:url targets:target withOptions:options];
+}
+
+- (void)close:(CDVInvokedUrlCommand*)command {
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"IAB.close() called but it was already closed.");
+        return;
+    }
+    [self stopPolling];
+    // Things are cleaned up in browserExit.
+    [self.inAppBrowserViewController close];
+}
+
+- (void)injectScriptCode:(CDVInvokedUrlCommand*)command {
+    NSString* jsWrapper = nil;
+
+    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
+        jsWrapper = [NSString stringWithFormat:@"_cdvIframeBridge.src='gap-iab://%@/'+encodeURIComponent(JSON.stringify([eval(%%@)]));", command.callbackId];
+    }
+    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+}
+
+- (void)injectScriptFile:(CDVInvokedUrlCommand*)command {
+    NSString* jsWrapper;
+
+    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
+        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('script'); c.src = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
+    } else {
+        jsWrapper = @"(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document)";
+    }
+    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+}
+
+- (void)injectStyleCode:(CDVInvokedUrlCommand*)command {
+    NSString* jsWrapper;
+
+    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
+        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('style'); c.innerHTML = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
+    } else {
+        jsWrapper = @"(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document)";
+    }
+    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+}
+
+- (void)injectStyleFile:(CDVInvokedUrlCommand*)command {
+    NSString* jsWrapper;
+
+    if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
+        jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%@; c.onload = function() { _cdvIframeBridge.src='gap-iab://%@'; }; d.body.appendChild(c); })(document)", command.callbackId];
+    } else {
+        jsWrapper = @"(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)";
+    }
+    [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
+}
+
+- (void)show:(CDVInvokedUrlCommand*)command
+{
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to show IAB after it was closed.");
+        return;
+    }
+    if (_previousStatusBarStyle != -1) {
+        NSLog(@"Tried to show IAB while already shown");
+        return;
+    }
+
+    [self showWindow];
+}
+
+- (void)startPoll:(CDVInvokedUrlCommand*)command
+{   
+    if([command argumentAtIndex:0] == nil ||  [command.arguments[1] == nil) {
+        NSLog(@"Incorrect number of arguments passed to start polling")
+        return;
+    }
+    
+    NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
+    [self startPolling:[command argumentAtIndex:0] interval:pollInterval];
+}
+
+- (void)stopPoll:(CDVInvokedUrlCommand*)command
+{
+    [self stopPolling];
+} 
+
+- (void)hide:(CDVInvokedUrlCommand*)command
+{
+    [self hideView];
+}
+
+- (void)unHide:(CDVInvokedUrlCommand*)command {
+    unHiding = YES;
+    NSString* url = [command argumentAtIndex:0];
+    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    self.callbackId = command.callbackId;
+    [self openUrl:url targets:target withOptions:options];
 }
 
 @end
