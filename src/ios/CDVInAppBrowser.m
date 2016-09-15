@@ -87,6 +87,11 @@
 
 @implementation CDVInAppBrowser
 
+#pragma mark instance-variables
+NSTimer* pollTimer;
+NSString* pollJavascriptCode = nil;
+BOOL unHiding = NO;
+
 - (void)pluginInitialize {
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
@@ -483,16 +488,15 @@
     }
 }
 
-NSTimer* PollTimer;
-NSString* pollJavascriptCode = nil;
+
 
 
 -(void)stopPolling {
-    if(PollTimer != nil) {
-        [PollTimer invalidate];
+    if(pollTimer != nil) {
+        [pollTimer invalidate];
     }
 
-    PollTimer = nil;
+    pollTimer = nil;
     pollJavascriptCode = nil;
 }
 
@@ -569,7 +573,7 @@ NSString* pollJavascriptCode = nil;
     if(pollJavascriptCode != nil) {
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
         [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
-    } else if (PollTimer != nil) {
+    } else if (pollTimer != nil) {
         NSLog(@"No JS code to execute");
         [self stopPolling];
     }
@@ -577,12 +581,12 @@ NSString* pollJavascriptCode = nil;
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {
-    if(!PollTimer) {
+    if(!pollTimer) {
         [self stopPolling];
     }
     pollJavascriptCode = [command argumentAtIndex:0];
     NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
-    PollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    pollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
 }
 
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
@@ -595,7 +599,7 @@ NSString* pollJavascriptCode = nil;
     [self hideView];
 }
 
-BOOL unHiding = NO;
+
 
 - (void)unHide:(CDVInvokedUrlCommand*)command {
     unHiding = YES;
