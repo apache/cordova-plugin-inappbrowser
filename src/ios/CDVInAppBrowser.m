@@ -66,7 +66,7 @@
 
  - (void)open:(CDVInvokedUrlCommand*)command {
     NSString* url = [command argumentAtIndex:0];
-    _weak CDVInAppBrowser* weakSelf = self;
+    __weak CDVSystemBrowser* weakSelf = self;
 
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
