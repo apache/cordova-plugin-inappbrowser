@@ -89,7 +89,6 @@
 
 #pragma mark instance-variables
 NSTimer* pollTimer;
-NSString* pollJavascriptCode = nil;
 BOOL unHiding = NO;
 
 - (void)pluginInitialize {
@@ -523,9 +522,10 @@ BOOL unHiding = NO;
 #pragma mark polling
 
 -(void)onPollTick:(NSTimer *)timer {
-    if(pollJavascriptCode != nil) {
+    NSString* pollCode = timer.userInfo;
+    if(pollCode != nil) {
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        [self injectDeferredObject:pollJavascriptCode withWrapper:jsWrapper];
+        [self injectDeferredObject:pollCode withWrapper:jsWrapper];
     } else if (pollTimer != nil) {
         NSLog(@"No JS code to execute");
         [self stopPolling];
@@ -536,17 +536,14 @@ BOOL unHiding = NO;
     if(!pollTimer) {
         [self stopPolling];
     }
-    pollJavascriptCode = script;
-    pollTimer = [NSTimer scheduledTimerWithTimeInterval:pollInterval  target:self selector:@selector(onPollTick:) userInfo:nil repeats:YES];
+    pollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:script repeats:YES];
 }
 
 -(void)stopPolling {
     if(pollTimer != nil) {
         [pollTimer invalidate];
     }
-
     pollTimer = nil;
-    pollJavascriptCode = nil;
 }
 
 #pragma mark public-methods
@@ -628,7 +625,7 @@ BOOL unHiding = NO;
 - (void)startPoll:(CDVInvokedUrlCommand*)command
 {   
     if([command argumentAtIndex:0] == nil ||  [command argumentAtIndex:1] == nil) {
-        NSLog(@"Incorrect number of arguments passed to start polling")
+        NSLog(@"Incorrect number of arguments passed to start polling");
         return;
     }
 
