@@ -36,15 +36,14 @@
 @implementation CDVSystemBrowser
 
 
--(void) openUrl:(NSString*)Url {
-        self.callbackId = command.callbackId;
+-(void) openUrl:(NSString*)url {
         CDVPluginResult* pluginResult;
 
     if (url != nil) {
     #ifdef __CORDOVA_4_0_0
-        NSURL* baseUrl = [self.webViewEngine URL];
+        NSURL* baseUrl = [self.webViewEngine url];
     #else
-        NSURL* baseUrl = [self.webView.request URL];
+        NSURL* baseUrl = [self.webView.request url];
     #endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
     
@@ -65,12 +64,14 @@
 }
 
  - (void)open:(CDVInvokedUrlCommand*)command {
+    self.callbackId = command.callbackId;
     NSString* url = [command argumentAtIndex:0];
+
     __weak CDVSystemBrowser* weakSelf = self;
 
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf.openUrl url];
+        [weakSelf openUrl:url];
     });
 }
 
