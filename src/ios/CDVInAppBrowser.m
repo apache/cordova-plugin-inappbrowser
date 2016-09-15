@@ -41,9 +41,9 @@
 
     if (url != nil) {
     #ifdef __CORDOVA_4_0_0
-        NSURL* baseUrl = [self.webViewEngine url];
+        NSURL* baseUrl = [self.webViewEngine URL];
     #else
-        NSURL* baseUrl = [self.webView.request url];
+        NSURL* baseUrl = [self.webView.request URL];
     #endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
     
