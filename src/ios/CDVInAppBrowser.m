@@ -217,12 +217,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 #pragma mark view-open-and-close
 
 
-- (void)openStoreLinkInSystem:(NSURL*) url {
-    //if is an app store link, let the system handle it, otherwise it fails to load it
-    [theWebView stopLoading];
-    [self openInSystem:url];
-}
-
 - (void)handlePollResult:(NSURL*) url {
     if(![[url host] isEqualToString:@"poll"]) {
         return;
@@ -355,7 +349,9 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     } 
 
     if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
-        [self openStoreLinkInSystem:url];
+            //if is an app store link, let the system handle it, otherwise it fails to load it
+        [webView stopLoading];
+        [self openInSystem:url];
         return NO;
     }
     if (isTopLevelNavigation) {
