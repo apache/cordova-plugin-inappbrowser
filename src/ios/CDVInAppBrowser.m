@@ -206,7 +206,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 #endif
 }
 
-- (void)openInSystem:(NSURL*)url {
+- (void)openInSystem:(NSURL*) url {
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
         [[UIApplication sharedApplication] openURL:url];
     } else { // handle any custom schemes to plugins
@@ -217,7 +217,58 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 #pragma mark view-open-and-close
 
 
-- (void)openStoreLinkInSystem:url {
+- (void)openStoreLinkInSystem:(NSURL*) url {
+    /if is an app store link, let the system handle it, otherwise it fails to load it
+    [theWebView stopLoading];
+    [self openInSystem:url];
+}
+
+- (void)handlePollResult:(NSURL*) url {
+    if(![[url host] isEqualToString:@"poll"]) {
+        return;
+    }
+
+    NSString* scriptResult = [url path];
+    if ((scriptResult == nil) || ([scriptResult length] < 2)) {
+        return;
+    }
+
+    NSError* __autoreleasing error = nil;
+    scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+    NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+
+    if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
+        [self sendPollResult:scriptResult];
+        return;
+    }
+
+    NSArray * array = (NSArray *) decodedResult;
+    NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
+    if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty or non string action) - returning json directly to JS");
+        [self sendPollResult:scriptResult];
+        return;
+    }
+
+    NSString *action = (NSString *)decodedAction;
+    if(action ==nil]) {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
+        [self sendPollResult:scriptResult];
+        return;
+    }
+
+    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
+        [self stopPolling];
+        [self.inAppBrowserViewController close];
+        return;
+    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
+        [self hideView];
+        return;
+    } else {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+        [self sendPollResult:scriptResult];
+    }
 
 }
 /**
@@ -267,51 +318,48 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
             return NO;
         }
     } else if([[url scheme] isEqualToString:@"gap-iab-native"]) {
-        if(![[url host] isEqualToString:@"poll"]) {
-            return NO;
-        }
+        [self handlePollResult:url];
+        return NO;
+        // if(![[url host] isEqualToString:@"poll"]) {
+        //     return NO;
+        // }
 
-        NSString* scriptResult = [url path];
-        if ((scriptResult == nil) || ([scriptResult length] < 2)) {
-             return NO;
-        }
+        // NSString* scriptResult = [url path];
+        // if ((scriptResult == nil) || ([scriptResult length] < 2)) {
+        //      return NO;
+        // }
 
-        NSError* __autoreleasing error = nil;
-        scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-        NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+        // NSError* __autoreleasing error = nil;
+        // scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+        // NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
                 
-        if (error == nil && [decodedResult isKindOfClass:[NSArray class]]) {
-            NSArray * array = (NSArray *) decodedResult;
-            NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
-            if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]]) {
-                NSString *action = (NSString *)decodedAction;
-                if(action !=nil) {
-                    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
-                        [self stopPolling];
-                        [self.inAppBrowserViewController close];
-                        return NO;
-                    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
-                        [self hideView];
-                        return NO;
-                    }
-                }
-            }
-        }  
-        [self sendPollResult:scriptResult];
-        return NO;
-    } else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
-        //if is an app store link, let the system handle it, otherwise it fails to load it
-        [theWebView stopLoading];
-        [self openInSystem:url];
-        return NO;
-    } else if ((self.callbackId != nil) && isTopLevelNavigation) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        // if (error == nil && [decodedResult isKindOfClass:[NSArray class]]) {
+        //     NSArray * array = (NSArray *) decodedResult;
+        //     NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
+        //     if(decodedAction != nil  && [decodedAction isKindOfClass:[NSString class]]) {
+        //         NSString *action = (NSString *)decodedAction;
+        //         if(action !=nil) {
+        //             if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
+        //                 [self stopPolling];
+        //                 [self.inAppBrowserViewController close];
+        //                 return NO;
+        //             } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
+        //                 [self hideView];
+        //                 return NO;
+        //             }
+        //         }
+        //     }
+        // }  
+        // [self sendPollResult:scriptResult];
+    } 
 
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
+        [self openStoreLinkInSystem:url];
+        return NO;
+    }
+    if (isTopLevelNavigation) {
+        [self sendOKPluginResult:@{@"type":@"loadstart", @"url":[url absoluteString]}]
     }
 
     return YES;
