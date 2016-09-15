@@ -87,10 +87,6 @@
 
 @implementation CDVInAppBrowser
 
-#pragma mark instance-variables
-NSTimer* pollTimer;
-BOOL unHiding = NO;
-
 - (void)pluginInitialize {
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
@@ -107,6 +103,9 @@ BOOL unHiding = NO;
 
 	return NO;
 }
+
+
+#pragma mark window-openers
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
@@ -250,6 +249,9 @@ BOOL unHiding = NO;
 
 
 
+
+
+
 - (BOOL)isValidCallbackId:(NSString *)callbackId {
     NSError *err = nil;
     // Initialize on first use
@@ -376,18 +378,7 @@ BOOL unHiding = NO;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
 
-    if(unHiding) {
-        [self showWindow];
-        if (self.callbackId != nil) {
-            // Send a loadstart event for each top-level navigation (includes redirects).
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                          messageAsDictionary:@{@"type":@"unhidden"}];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-        }
-        unHiding = NO;        
-    }
+    [self notifyUnhidden];
 }
 
 - (void)showWindow
@@ -409,13 +400,7 @@ BOOL unHiding = NO;
     });
 }
 
-- (void)sendPollResult:(NSString*)data {
-    if (self.callbackId != nil) {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":data}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-}
+
 
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
     CDVPluginResult* pluginResult;
@@ -453,33 +438,7 @@ BOOL unHiding = NO;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
 }
 
--(void)hideView
-{
-    // On iOS it seems hiding is a messy business. As startup performance is good
-    // Close. The JS will re-establish re-polling as needed.
-    
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"preventexitonhide"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
 
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-    [self stopPolling];
-    
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"hidden"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-
-    //This must come after the hide callback - otherwise it isn't fired
-    [self.inAppBrowserViewController close];
-}
 
 -(void)ensureIFrameBridgeForCDVInAppBrowserViewController
 {
@@ -519,7 +478,62 @@ BOOL unHiding = NO;
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
+#pragma mark show-hide
+
+BOOL unHiding = NO;
+
+-(void)notifyUnhidden {
+    //Called back from webViewDidFinishLoad 
+    if(unHiding) {
+        [self showWindow];
+        if (self.callbackId != nil) {
+            // Send a loadstart event for each top-level navigation (includes redirects).
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                          messageAsDictionary:@{@"type":@"unhidden"}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        }        
+    }
+    unHiding = NO;
+}
+
+-(void)hideView
+{
+    // On iOS it seems hiding is a messy business. As startup performance is good
+    // Close. The JS will re-establish re-polling as needed.
+    
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"preventexitonhide"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+    [self stopPolling];
+    
+    if (self.callbackId != nil) {
+        // Send a loadstart event for each top-level navigation (includes redirects).
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"hidden"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+    }
+
+    //This must come after the hide callback - otherwise it isn't fired
+    [self.inAppBrowserViewController close];
+}
+
+- (void)unHideView:(NSString*)url targets:(NSString*)url withOptions:(NSString*)options {
+    unHiding = YES;
+    [self openUrl:url targets:target withOptions:options];
+}
+
 #pragma mark polling
+
+NSTimer* pollTimer;
 
 -(void)onPollTick:(NSTimer *)timer {
     NSString* pollCode = timer.userInfo;
@@ -529,6 +543,15 @@ BOOL unHiding = NO;
     } else if (pollTimer != nil) {
         NSLog(@"No JS code to execute");
         [self stopPolling];
+    }
+}
+
+- (void)sendPollResult:(NSString*)data {
+    //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window 
+    if (self.callbackId != nil) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":data}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
 }
 
@@ -644,12 +667,13 @@ BOOL unHiding = NO;
 }
 
 - (void)unHide:(CDVInvokedUrlCommand*)command {
-    unHiding = YES;
+    
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+
     self.callbackId = command.callbackId;
-    [self openUrl:url targets:target withOptions:options];
+    [self unHideView:url targets:target withOptions:options];
 }
 
 @end
