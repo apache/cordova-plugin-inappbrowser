@@ -35,26 +35,17 @@
 #pragma mark CDVInAppBrowser
 @implementation CDVSystemBrowser
 
- // _weak CDVInAppBrowser* weakSelf = self;
 
- //    // Run later to avoid the "took a long time" log message.
- //    dispatch_async(dispatch_get_main_queue(), ^{
- //        if (weakSelf.inAppBrowserViewController != nil) {
- //            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
- //        }
- //    });
-
- - (void)open:(CDVInvokedUrlCommand*)command {
-    NSString* url = [command argumentAtIndex:0];
-    self.callbackId = command.callbackId;
+-(void) openUrl:(NSString*)Url {
+        self.callbackId = command.callbackId;
         CDVPluginResult* pluginResult;
 
     if (url != nil) {
-#ifdef __CORDOVA_4_0_0
+    #ifdef __CORDOVA_4_0_0
         NSURL* baseUrl = [self.webViewEngine URL];
-#else
+    #else
         NSURL* baseUrl = [self.webView.request URL];
-#endif
+    #endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
     
         if ([[UIApplication sharedApplication] canOpenURL:absoluteUrl]) {
@@ -71,6 +62,16 @@
 
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
+}
+
+ - (void)open:(CDVInvokedUrlCommand*)command {
+    NSString* url = [command argumentAtIndex:0];
+    _weak CDVInAppBrowser* weakSelf = self;
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf.openUrl url];
+    });
 }
 
 @end
