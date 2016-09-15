@@ -265,6 +265,33 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 
 }
+
+- (void)handleInjectedScriptCallBack:(NSURL*) url {
+    NSString* scriptCallbackId = [url host];
+    if (![self isValidCallbackId:scriptCallbackId]) {
+        return;
+    }
+
+    CDVPluginResult* pluginResult = nil;
+    NSString* scriptResult = [url path];
+    NSError* __autoreleasing error = nil;
+
+    // The message should be a JSON-encoded array of the result of the script which executed.
+    if ((scriptResult != nil) && ([scriptResult length] > 1)) {
+        scriptResult = [scriptResult substringFromIndex:1];
+        NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+        if ((error == nil) && [decodedResult isKindOfClass:[NSArray class]]) {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:(NSArray*)decodedResult];
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION];
+        }
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:@[]];
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
+    
+}
+
 /**
  * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -284,34 +311,17 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
-    //TODO: sort out the mass of nested logic....
-
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
-        NSString* scriptCallbackId = [url host];
-        CDVPluginResult* pluginResult = nil;
+        [self handleInjectedScriptCallBack: url];
+        return NO;
+    }
 
-        if ([self isValidCallbackId:scriptCallbackId]) {
-            NSString* scriptResult = [url path];
-            NSError* __autoreleasing error = nil;
-
-            // The message should be a JSON-encoded array of the result of the script which executed.
-            if ((scriptResult != nil) && ([scriptResult length] > 1)) {
-                scriptResult = [scriptResult substringFromIndex:1];
-                NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
-                if ((error == nil) && [decodedResult isKindOfClass:[NSArray class]]) {
-                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:(NSArray*)decodedResult];
-                } else {
-                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_JSON_EXCEPTION];
-                }
-            } else {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:@[]];
-            }
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
-            return NO;
-        }
-    } else if([[url scheme] isEqualToString:@"gap-iab-native"]) {
+    // See if the url uses the 'gap-iab-native' protocol. If so, the path should be a conform to
+    // gap-iab-native://actiontype/{{URL ENCODED JSON OBJECT}}
+    // Currently support: actiontype = poll, {{URL ENCODED JSON OBJECT}} = {InAppBrowserAction:'{{actionname}}'} where {{actionname}} is 'hide' or 'close'
+    if([[url scheme] isEqualToString:@"gap-iab-native"]) {
         [self handlePollResult:url];
         return NO;
     } 
@@ -322,6 +332,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         [self openInSystem:url];
         return NO;
     }
+
     if (isTopLevelNavigation) {
         [self sendOKPluginResult:@{@"type":@"loadstart", @"url":[url absoluteString]}];
     }
