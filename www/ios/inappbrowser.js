@@ -229,13 +229,10 @@
         strWindowFeatures = strWindowFeatures || "";
 
         if(strWindowName === '_system') {
-            //TODO: open system browser
+            console.log('*************SYSTEM BROWSER *************')
             exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-
-
         } else {
-            var instance = new InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks || {});
-            return instance
+            return new InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks || {});
         }
     };
 })();
