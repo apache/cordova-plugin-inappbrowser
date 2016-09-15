@@ -144,11 +144,7 @@
         }
 
         me.hide = function(releaseResources, blankPage){
-            //blankPage has no effect in iOS - the view is destroyed
-            if(hidden){
-                return;
-            }
-
+            
             if(releaseResources){
                 me.stopPoll();
                 releaseListeners();
@@ -161,18 +157,10 @@
         }
 
         me.unHide = function(strUrl, eventname){
-            if(!hidden){
-                return;
-            }
-
 
             if(strUrl){
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl;
             }
-
-            console.log(lastUrl);
-            console.log(lastWindowName);
-            console.log(lastWindowFeatures);
 
             me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
@@ -229,7 +217,8 @@
         strWindowFeatures = strWindowFeatures || "";
 
         if(strWindowName === '_system') {
-            console.log('*************SYSTEM BROWSER *************')
+            // This is now separate as more-or-less fire and forget system browser was re-utilising 
+            // Code for blank/self. This caused problems with browser crashes etc.
             exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
         } else {
             return new InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks || {});
