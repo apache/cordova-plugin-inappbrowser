@@ -35,6 +35,8 @@
 #pragma mark CDVInAppBrowser
 @implementation CDVSystemBrowser
 
+const int INITIAL_STATUS_BAR_STYLE = -1;
+
 
 -(void) openUrl:(NSString*)url {
         CDVPluginResult* pluginResult;
@@ -88,22 +90,13 @@
 @implementation CDVInAppBrowser
 
 - (void)pluginInitialize {
-    _previousStatusBarStyle = -1;
+    _previousStatusBarStyle = INITIAL_STATUS_BAR_STYLE;
     _callbackIdPattern = nil;
 }
 
 - (void)onReset {
     [self close:nil];
 }
-
-- (BOOL) isSystemUrl:(NSURL*)url {
-	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
-		return YES;
-	}
-
-	return NO;
-}
-
 
 #pragma mark window-openers
 
@@ -221,48 +214,6 @@
     }
 }
 
-// This is a helper method for the inject{Script|Style}{Code|File} API calls, which
-// provides a consistent method for injecting JavaScript code into the document.
-//
-// If a wrapper string is supplied, then the source string will be JSON-encoded (adding
-// quotes) and wrapped using string formatting. (The wrapper string should have a single
-// '%@' marker).
-//
-// If no wrapper is supplied, then the source string is executed directly.
-
-- (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper {
-    // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
-    [self ensureIFrameBridgeForCDVInAppBrowserViewController];
-    
-    if (jsWrapper != nil) {
-        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
-        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        if (sourceArrayString) {
-            NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
-            NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
-            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
-        }
-    } else {
-        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
-    }
-}
-
-- (BOOL)isValidCallbackId:(NSString *)callbackId {
-    NSError *err = nil;
-    // Initialize on first use
-    if (self.callbackIdPattern == nil) {
-        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^InAppBrowser[0-9]{1,10}$" options:0 error:&err];
-        if (err != nil) {
-            // Couldn't initialize Regex; No is safer than Yes.
-            return NO;
-        }
-    }
-    if ([self.callbackIdPattern firstMatchInString:callbackId options:0 range:NSMakeRange(0, [callbackId length])]) {
-        return YES;
-    }
-    return NO;
-}
-
 /**
  * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -360,21 +311,7 @@
     return YES;
 }
 
-- (void)webViewDidStartLoad:(UIWebView*)theWebView {
-}
 
-- (void)webViewDidFinishLoad:(UIWebView*)theWebView {
-    if (self.callbackId != nil)  {
-        // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
-        NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-
-    [self notifyUnhidden];
-}
 
 - (void)showWindow
 {
@@ -395,49 +332,46 @@
     });
 }
 
-
-
 - (void)openUrl:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
+    //NOTE this no longer handles system directly - done in a different plugin in this package
     CDVPluginResult* pluginResult;
-    //TODO: look at the nestsing, also do we want to handle system any more - new plugin for it..?
-    if (url != nil) {
-#ifdef __CORDOVA_4_0_0
-        NSURL* baseUrl = [self.webViewEngine URL];
-#else
-        NSURL* baseUrl = [self.webView.request URL];
-#endif
-        NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
-
-        if ([self isSystemUrl:absoluteUrl]) {
-            target = kInAppBrowserTargetSystem;
-        }
-
-        if ([target isEqualToString:kInAppBrowserTargetSelf]) {
-            [self openInCordovaWebView:absoluteUrl withOptions:options];
-        } 
-        else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
-            //Todo: warn this should not be called - now a separate package
-            [self openInSystem:absoluteUrl];
-        }
-        else { 
-            // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
-        }
-
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    } else {
+    if (url == nil) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
+        return;
     }
 
+#ifdef __CORDOVA_4_0_0
+    NSURL* baseUrl = [self.webViewEngine URL];
+#else
+    NSURL* baseUrl = [self.webView.request URL];
+#endif
+    NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+
+    if ([self isSystemUrl:absoluteUrl]) {
+        [self openInSystem:absoluteUrl];
+    }   else if ([target isEqualToString:kInAppBrowserTargetSelf]) {
+        [self openInCordovaWebView:absoluteUrl withOptions:options];
+    } else { 
+        // _blank or anything else
+        [self openInInAppBrowser:absoluteUrl withOptions:options];
+    }
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:[self callbackId]];
 }
 
+#pragma mark callback-methods
 
+- (void)webViewDidStartLoad:(UIWebView*)theWebView {
+}
 
--(void)ensureIFrameBridgeForCDVInAppBrowserViewController
-{
-    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
+- (void)webViewDidFinishLoad:(UIWebView*)theWebView {
+    NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
+    [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
+    [self notifyUnhidden];
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error {
@@ -465,15 +399,54 @@
     self.inAppBrowserViewController = nil;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
-        if (_previousStatusBarStyle != -1) {
+        if (_previousStatusBarStyle != INITIAL_STATUS_BAR_STYLE) {
             [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
         }
     }
 
-    _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
+    _previousStatusBarStyle = INITIAL_STATUS_BAR_STYLE; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
 #pragma mark utility-methods
+
+- (BOOL) isSystemUrl:(NSURL*)url {
+    if ([[url host] isEqualToString:@"itunes.apple.com"]) {
+        return YES;
+    }
+
+    return NO;
+}
+
+// This is a helper method for the inject{Script|Style}{Code|File} API calls, which
+// provides a consistent method for injecting JavaScript code into the document.
+//
+// If a wrapper string is supplied, then the source string will be JSON-encoded (adding
+// quotes) and wrapped using string formatting. (The wrapper string should have a single
+// '%@' marker).
+//
+// If no wrapper is supplied, then the source string is executed directly.
+
+- (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper {
+    // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
+    [self ensureIFrameBridgeForCDVInAppBrowserViewController];
+    
+    if (jsWrapper != nil) {
+        NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
+        NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        if (sourceArrayString) {
+            NSString* sourceString = [sourceArrayString substringWithRange:NSMakeRange(1, [sourceArrayString length] - 2)];
+            NSString* jsToInject = [NSString stringWithFormat:jsWrapper, sourceString];
+            [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:jsToInject];
+        }
+    } else {
+        [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:source];
+    }
+}
+
+-(void)ensureIFrameBridgeForCDVInAppBrowserViewController
+{
+    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
+}
 
 -(void)sendOKPluginResult:(NSDictionary*)messageAsDictionary {
     if (self.callbackId != nil) {
@@ -483,6 +456,22 @@
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+}
+
+- (BOOL)isValidCallbackId:(NSString *)callbackId {
+    NSError *err = nil;
+    // Initialize on first use
+    if (self.callbackIdPattern == nil) {
+        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^InAppBrowser[0-9]{1,10}$" options:0 error:&err];
+        if (err != nil) {
+            // Couldn't initialize Regex; No is safer than Yes.
+            return NO;
+        }
+    }
+    if ([self.callbackIdPattern firstMatchInString:callbackId options:0 range:NSMakeRange(0, [callbackId length])]) {
+        return YES;
+    }
+    return NO;
 }
 
 #pragma mark show-hide
@@ -500,30 +489,10 @@ BOOL unHiding = NO;
 
 -(void)hideView
 {
-    // On iOS it seems hiding is a messy business. As startup performance is good
-    // Close. The JS will re-establish re-polling as needed.
-    
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"preventexitonhide"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
+    [self sendOKPluginResult:@{@"type":@"preventexitonhide"}];
     [self stopPolling];
-    
-    if (self.callbackId != nil) {
-        // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                      messageAsDictionary:@{@"type":@"hidden"}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
-
-    //This must come after the hide callback - otherwise it isn't fired
-    [self.inAppBrowserViewController close];
+    [self sendOKPluginResult:@{@"type":@"hidden"}];
+    [self.inAppBrowserViewController close]; //This must come after the hide callback - otherwise it isn't fired
 }
 
 - (void)unHideView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
@@ -548,11 +517,7 @@ NSTimer* pollTimer;
 
 - (void)sendPollResult:(NSString*)data {
     //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window 
-    if (self.callbackId != nil) {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:@{@"type":@"pollresult", @"data":data}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-    }
+    [self sendOKPluginResult:@{@"type":@"pollresult", @"data":data}];
 }
 
 -(void)startPolling:(NSString*)script interval:(NSTimeInterval)interval {
@@ -637,7 +602,7 @@ NSTimer* pollTimer;
         NSLog(@"Tried to show IAB after it was closed.");
         return;
     }
-    if (_previousStatusBarStyle != -1) {
+    if (_previousStatusBarStyle != INITIAL_STATUS_BAR_STYLE) {
         NSLog(@"Tried to show IAB while already shown");
         return;
     }
