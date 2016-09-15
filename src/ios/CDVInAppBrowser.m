@@ -218,7 +218,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 
 - (void)openStoreLinkInSystem:(NSURL*) url {
-    /if is an app store link, let the system handle it, otherwise it fails to load it
+    //if is an app store link, let the system handle it, otherwise it fails to load it
     [theWebView stopLoading];
     [self openInSystem:url];
 }
@@ -252,7 +252,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 
     NSString *action = (NSString *)decodedAction;
-    if(action ==nil]) {
+    if(action ==nil) {
         NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
         [self sendPollResult:scriptResult];
         return;
@@ -359,7 +359,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         return NO;
     }
     if (isTopLevelNavigation) {
-        [self sendOKPluginResult:@{@"type":@"loadstart", @"url":[url absoluteString]}]
+        [self sendOKPluginResult:@{@"type":@"loadstart", @"url":[url absoluteString]}];
     }
 
     return YES;
