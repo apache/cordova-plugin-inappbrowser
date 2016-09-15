@@ -214,6 +214,12 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 }
 
+#pragma mark view-open-and-close
+
+
+- (void)openStoreLinkInSystem:url {
+
+}
 /**
  * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -310,8 +316,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
     return YES;
 }
-
-
 
 - (void)showWindow
 {
