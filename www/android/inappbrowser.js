@@ -34,12 +34,16 @@
     function InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks) {
         var me = this,
             polling = false,
-            hidden = false;
+            hidden = false,
+            backChannels = { };
 
         function eventCallback (event) {
-            if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
-            }
+                    if (event && (event.type in backChannels)) {
+                        backChannels[event.type].fire(event);
+                    }
+                    if (event && (event.type in me.channels)) {
+                        me.channels[event.type].fire(event);
+                    }
         }
 
         me.channels = {
@@ -80,14 +84,14 @@
         }
 
         me.addEventListener = function (eventname,f) {
-            if (eventname in this.channels) {
-                this.channels[eventname].subscribe(f);
+            if (eventname in me.channels) {
+                me.channels[eventname].subscribe(f);
             }
         }
 
         me.removeEventListener = function(eventname, f) {
-            if (eventname in this.channels) {
-                this.channels[eventname].unsubscribe(f);
+            if (eventname in me.channels) {
+                me.channels[eventname].unsubscribe(f);
             }
         }
 
@@ -113,7 +117,7 @@
 
 
        for (var callbackName in callbacks) {
-           this.addEventListener(callbackName, callbacks[callbackName]);
+           me.addEventListener(callbackName, callbacks[callbackName]);
        }
 
        exec(eventCallback, eventCallback, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
