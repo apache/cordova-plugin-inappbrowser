@@ -176,13 +176,13 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
         if (action.equals("injectScriptCode")) {
-            final string injectable = args.getString(0);
+            final String injectable = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
             injectScriptCode(injectable, hasCallBack, callbackContext);
             return true;
         }
         if (action.equals("injectScriptFile")) {
-            final string injectable = args.getString(0);
+            final String injectable = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
 
             String jsWrapper;
@@ -196,7 +196,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         if (action.equals("injectStyleCode")) {
-            final string injectable = args.getString(0);
+            final String injectable = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
 
             String jsWrapper;
@@ -209,7 +209,7 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
         if (action.equals("injectStyleFile")) {
-            final string injectable = args.getString(0);
+            final String injectable = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
 
             String jsWrapper;
@@ -262,7 +262,7 @@ public class InAppBrowser extends CordovaPlugin {
         return false;
     }
 
-    private void injectScriptCode(string injectable, boolean hasCallBack, CallbackContext callbackContext) {
+    private void injectScriptCode(String injectable, boolean hasCallBack, CallbackContext callbackContext) {
         String jsWrapper = hasCallBack ? String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId()) : null;
         injectDeferredObject(injectable, jsWrapper);
     }
