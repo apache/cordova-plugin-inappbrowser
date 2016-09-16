@@ -134,7 +134,6 @@
         strWindowFeatures = strWindowFeatures || "";
 
         if(strWindowName === '_system') {
-            console.log('TODO System browser does not exist natively yet');
             // This is now separate as more-or-less fire and forget system browser was re-utilising
             // Code for blank/self. This caused problems with browser crashes etc.
             exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
