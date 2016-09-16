@@ -42,6 +42,9 @@
             <feature name="InAppBrowser"> 
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
             </feature>
+            <feature name="SystemBrowser">
+                <param name="android-package" value="org.apache.cordova.inappbrowser.SystemBrowser"/>
+            </feature>
         </config-file>
 
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
