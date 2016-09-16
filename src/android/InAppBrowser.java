@@ -118,6 +118,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+            final HashMap<String, String> headers = parseHeader(args.optString(3));
 
             Log.d(LOG_TAG, "target = " + target);
 
@@ -183,7 +184,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in InAppBrowser
                         else {
                             Log.d(LOG_TAG, "loading in InAppBrowser");
-                            result = showWebPage(url, features);
+                            result = showWebPage(url, features, headers);
                         }
                     }
                     // SYSTEM
@@ -194,7 +195,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // BLANK - or anything else
                     else {
                         Log.d(LOG_TAG, "in blank");
-                        result = showWebPage(url, features);
+                        result = showWebPage(url, features, headers);
                     }
 
                     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
@@ -341,6 +342,32 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * Put the list of headers into a hash map
+     *
+     * @param headerString
+     * @return
+     */
+    private HashMap<String, String> parseHeader(String headerString) {
+        Log.d(LOG_TAG, "parserHeader: "+headerString);
+        if (headerString.equals(NULL)) {
+            return null;
+        } else {
+            HashMap<String, String> map = new HashMap<String, String>();
+            StringTokenizer headers = new StringTokenizer(headerString, ",");
+            StringTokenizer option;
+            while(headers.hasMoreElements()) {
+                option = new StringTokenizer(headers.nextToken(), "=");
+                if (option.hasMoreElements()) {
+                    String key = option.nextToken();
+                    String value = option.nextToken();
+                    map.put(key, value);
+                }
+            }
+            return map;
+        }
+    }
+
+    /**
      * Display a new browser with the specified URL.
      *
      * @param url the url to load.
@@ -477,7 +504,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param url the url to load.
      * @param features jsonObject
      */
-    public String showWebPage(final String url, HashMap<String, Boolean> features) {
+    public String showWebPage(final String url, HashMap<String, Boolean> features, final HashMap<String, String> headers) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
         showZoomControls = true;
@@ -711,7 +738,12 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
-                inAppWebView.loadUrl(url);
+                if (headers != null) {
+                    Log.d(LOG_TAG, "Load url with headers: " + headers.toString());
+                    inAppWebView.loadUrl(url, headers);
+                } else {
+                    inAppWebView.loadUrl(url);
+                }
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(true);
