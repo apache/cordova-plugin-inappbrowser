@@ -104,21 +104,20 @@ public class SystemBrowser extends CordovaPlugin {
         if(!action.equals("open")){
             return false;
         }
-        if (action.equals("open")) {
-            final String url = args.getString(0);
 
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(LOG_TAG, "Opening System Browser");
-                    String result = openExternal(url);
+        final String url = args.getString(0);
 
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-                    pluginResult.setKeepCallback(true);
-                    callbackContext.sendPluginResult(pluginResult);
-                }
-            });
-            return true;
-        }
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(LOG_TAG, "Opening System Browser");
+                String result = openExternal(url);
+
+                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+                pluginResult.setKeepCallback(true);
+                callbackContext.sendPluginResult(pluginResult);
+            }
+        });
+        return true;
     }
 }
