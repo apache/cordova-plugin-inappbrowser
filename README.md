@@ -220,6 +220,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __message__: (Android Only) event fires when the `InAppBrowser` window receive data from Javascript Bridge
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -336,6 +337,7 @@ function executeScriptCallBack(params) {
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __message__: (Android Only) event fires when the `InAppBrowser` window receive data from Javascript Bridge
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
@@ -671,3 +673,8 @@ iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in th
 iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```
+
+## Javascript Bridge
+Javascript Bridge support on Android is developed based on the latest master (commit b5a7124) from https://github.com/jesse01/WebViewJavascriptBridge.
+Please refer to the repository for more details.
+
