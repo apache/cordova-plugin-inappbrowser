@@ -211,7 +211,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (action.equals("injectStyleFile")) {
             final String sourceFile = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
-            final Srting callbackContextId = callbackContext.getCallbackId();
+            final String callbackContextId = callbackContext.getCallbackId();
 
             String jsWrapper;
             if (hasCallBack) {
