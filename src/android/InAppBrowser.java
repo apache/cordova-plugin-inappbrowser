@@ -169,18 +169,22 @@ public class InAppBrowser extends CordovaPlugin {
                     sendOKUpdate(result);
                 }
             });
+            return true;
         }
-        else if (action.equals("close")) {
+        if (action.equals("close")) {
             closeDialog();
+            return true;
         }
-        else if (action.equals("injectScriptCode")) {
-            String jsWrapper = null;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
-            }
-            injectDeferredObject(args.getString(0), jsWrapper);
+        if (action.equals("injectScriptCode")) {
+            final string injectable = args.getString(0);
+            final boolean hasCallBack = args.getBoolean(1);
+            injectScriptCode(injectable, hasCallBack, callbackContext);
+            return true;
         }
-        else if (action.equals("injectScriptFile")) {
+        if (action.equals("injectScriptFile")) {
+            final string injectable = args.getString(0);
+            final boolean hasCallBack = args.getBoolean(1);
+
             String jsWrapper;
             if (args.getBoolean(1)) {
                 jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
@@ -188,8 +192,13 @@ public class InAppBrowser extends CordovaPlugin {
                 jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
             }
             injectDeferredObject(args.getString(0), jsWrapper);
+            return true;
         }
-        else if (action.equals("injectStyleCode")) {
+
+        if (action.equals("injectStyleCode")) {
+            final string injectable = args.getString(0);
+            final boolean hasCallBack = args.getBoolean(1);
+
             String jsWrapper;
             if (args.getBoolean(1)) {
                 jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
@@ -197,8 +206,12 @@ public class InAppBrowser extends CordovaPlugin {
                 jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
             }
             injectDeferredObject(args.getString(0), jsWrapper);
+            return true;
         }
-        else if (action.equals("injectStyleFile")) {
+        if (action.equals("injectStyleFile")) {
+            final string injectable = args.getString(0);
+            final boolean hasCallBack = args.getBoolean(1);
+
             String jsWrapper;
             if (args.getBoolean(1)) {
                 jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
@@ -206,33 +219,52 @@ public class InAppBrowser extends CordovaPlugin {
                 jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
             }
             injectDeferredObject(args.getString(0), jsWrapper);
+            return true;
         }
-        else if (action.equals("show")) {
+        if (action.equals("show")) {
             showDialogue();
             sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
-        }
-        else if (action.equals("hide")) {
-            final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
-            hideDialog(goToBlank);
-            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
-        }
-        else if (action.equals("unHide")) {
-            final String url = args.isNull(0) ? null : args.getString(0);
-            unHideDialog(url);
-            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            return true;
         }
 
-        else if (action.equals("startPoll")) {
+        if (action.equals("hide")) {
+            //TODO: Release==true resources (blanks listeners and poll)
+            final boolean releaseResources = args.isNull(1) ? false : args.getBoolean(1);
+            final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
+            //TODO: Stop polling if not release listeners - do not destroy though
+            hideDialog(goToBlank);
+            //TODO: notify at some point
+            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            return true;
+        }
+
+        if (action.equals("unHide")) {
+            final String url = args.isNull(0) ? null : args.getString(0);
+            //TODO: notify
+            unHideDialog(url);
+            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            return true;
+        }
+
+        if (action.equals("startPoll")) {
             //Params will be [pollFunction, pollInterval])
             Log.d(LOG_TAG, "TODO: startPoll");
+            sendOKUpdate();
+            return true;
         }
-        else if (action.equals("stopPoll")){
+
+        if (action.equals("stopPoll")){
             Log.d(LOG_TAG, "TODO: stopPoll");
+            sendOKUpdate();
+            return true;
         }
-        else {
-            return false;
-        }
-        return true;
+
+        return false;
+    }
+
+    private void injectScriptCode(string injectable, boolean hasCallBack, CallbackContext callbackContext) {
+        String jsWrapper = hasCallBack ? String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId()) : null;
+        injectDeferredObject(injectable, jsWrapper);
     }
 
     /**
@@ -241,14 +273,6 @@ public class InAppBrowser extends CordovaPlugin {
     @Override
     public void onReset() {
         closeDialog();
-
-    /**
-     * Called when the system is about to start resuming a previous activity.
-     */
-
-    /**
-     * Called when the activity will start interacting with the user.
-     */
     }
 
     /**
