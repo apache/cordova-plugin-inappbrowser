@@ -87,6 +87,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+    private static final String MESSAGE = "message";
+
+    private static final String kCustomProtocolScheme = "wvjbscheme";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -544,6 +547,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         final CordovaWebView thatWebView = this.webView;
+        final CallbackContext callbackContext = this.callbackContext;
 
         // Create dialog in new thread
         Runnable runnable = new Runnable() {
@@ -700,7 +704,21 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
-                WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
+                InAppBrowserClient client = new InAppBrowserClient(inAppWebView, thatWebView, edittext);
+                client.setWVJBResponseListener(new InAppBrowser.WVJBResponseListener(){
+                    @Override
+                    public void onDataReceived(Object data) {
+                        Log.d(LOG_TAG, "onDataReceived: " + data);
+                        try {
+                            JSONObject obj = new JSONObject();
+                            obj.put("type", MESSAGE);
+                            obj.put("data", data);
+                            sendUpdate(obj, true, PluginResult.Status.OK);
+                        } catch (JSONException ex) {
+                            LOG.e(LOG_TAG, "Data received from Javascript Bridge has caused a JSON error.");
+                        }
+                    }
+                });
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -814,11 +832,20 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * The listener that gets called when InAppBrowserClient receives a message from JavascriptBridge
+     */
+    public interface WVJBResponseListener {
+        // or when data has been loaded
+        public void onDataReceived(Object data);
+    }
+
+    /**
      * The webview client receives notifications about appView
      */
-    public class InAppBrowserClient extends WebViewClient {
+    public class InAppBrowserClient extends WVJBWebViewClient {
         EditText edittext;
         CordovaWebView webView;
+        WVJBResponseListener wvjbResponseListener;
 
         /**
          * Constructor.
@@ -826,9 +853,24 @@ public class InAppBrowser extends CordovaPlugin {
          * @param webView
          * @param mEditText
          */
-        public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
-            this.webView = webView;
+        public InAppBrowserClient(WebView webView, CordovaWebView cordovaWebView, EditText mEditText) {
+            super(webView);
+            super.registerDefaultHandler(new WVJBWebViewClient.WVJBHandler() {
+                @Override
+                public void request(Object data, WVJBResponseCallback callback) {
+                    Log.d(LOG_TAG, "Received message from JS:" + data);
+                    if (wvjbResponseListener != null)
+                        wvjbResponseListener.onDataReceived(data);
+                    callback.callback("InAppBrowser received message: " + data);
+                }
+            });
+            wvjbResponseListener = null;
+            this.webView = cordovaWebView;
             this.edittext = mEditText;
+        }
+
+        public void setWVJBResponseListener(WVJBResponseListener listener) {
+            wvjbResponseListener = listener;
         }
 
         /**
@@ -890,6 +932,9 @@ public class InAppBrowser extends CordovaPlugin {
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
+            }
+            else if (url.startsWith(kCustomProtocolScheme)) {
+                return super.shouldOverrideUrlLoading(webView, url);
             }
             return false;
         }
