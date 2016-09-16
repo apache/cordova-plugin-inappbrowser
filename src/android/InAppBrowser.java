@@ -176,49 +176,50 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
         if (action.equals("injectScriptCode")) {
-            final String injectable = args.getString(0);
-            final boolean hasCallBack = args.getBoolean(1);
-            injectScriptCode(injectable, hasCallBack, callbackContext);
+            injectScriptCode(args.getString(0),  args.getBoolean(1), callbackContext.getCallbackId());
             return true;
         }
         if (action.equals("injectScriptFile")) {
-            final String injectable = args.getString(0);
+            final String sourceFile = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
+            final Srting callbackContextId = callbackContext.getCallbackId();
 
             String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContext.getCallbackId());
+            if (hasCallBack) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('script'); c.src = %%s; c.onload = function() { prompt('', 'gap-iab://%s'); }; d.body.appendChild(c); })(document)", callbackContextId);
             } else {
                 jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
             }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectDeferredObject(sourceFile, jsWrapper);
             return true;
         }
 
         if (action.equals("injectStyleCode")) {
-            final String injectable = args.getString(0);
+            final String cssCode = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
+            final Srting callbackContextId = callbackContext.getCallbackId();
 
             String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+            if (hasCallBack) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('style'); c.innerHTML = %%s; d.body.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContextId));
             } else {
                 jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
             }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectDeferredObject(cssCode, jsWrapper);
             return true;
         }
         if (action.equals("injectStyleFile")) {
-            final String injectable = args.getString(0);
+            final String sourceFile = args.getString(0);
             final boolean hasCallBack = args.getBoolean(1);
+            final Srting callbackContextId = callbackContext.getCallbackId();
 
             String jsWrapper;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContext.getCallbackId());
+            if (hasCallBack) {
+                jsWrapper = String.format("(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%s; d.head.appendChild(c); prompt('', 'gap-iab://%s');})(document)", callbackContextId);
             } else {
                 jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
             }
-            injectDeferredObject(args.getString(0), jsWrapper);
+            injectDeferredObject(sourceFile, jsWrapper);
             return true;
         }
         if (action.equals("show")) {
@@ -262,9 +263,9 @@ public class InAppBrowser extends CordovaPlugin {
         return false;
     }
 
-    private void injectScriptCode(String injectable, boolean hasCallBack, CallbackContext callbackContext) {
-        String jsWrapper = hasCallBack ? String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId()) : null;
-        injectDeferredObject(injectable, jsWrapper);
+    private void injectScriptCode(String jsCode, boolean hasCallBack, String callbackContextId) {
+        String jsWrapper = hasCallBack ? String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContextId) : null;
+        injectDeferredObject(jsCode, jsWrapper);
     }
 
     /**
