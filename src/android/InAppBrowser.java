@@ -842,7 +842,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     private void sendOKUpdate() {
-        sendUpdate("");
+        sendOKUpdate("");
     }
 
     private void sendOKUpdate(String response) {
