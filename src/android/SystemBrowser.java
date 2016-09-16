@@ -110,7 +110,6 @@ public class SystemBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    "";
                     Log.d(LOG_TAG, "Opening System Browser");
                     String result = openExternal(url);
 
