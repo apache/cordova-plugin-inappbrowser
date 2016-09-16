@@ -67,8 +67,6 @@
         }
 
         me.unhide = function(strUrl, eventname){
-            //TODO: unhide does not exist in the native code
-            console.log('No native unhide yet...')
             exec(null,null,"InAppBrowser", "unHide", [strUrl]);
             hidden = false;
         }
