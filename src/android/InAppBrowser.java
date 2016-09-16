@@ -851,7 +851,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     private void sendUpdate(String response, boolean keepCallback, PluginResult.Status status) {
         if (callbackContext != null) {
-            PluginResult pluginResult = new PluginResult(status, result);
+            PluginResult pluginResult = new PluginResult(status, response);
             pluginResult.setKeepCallback(keepCallback);
             this.callbackContext.sendPluginResult(pluginResult);
         }
