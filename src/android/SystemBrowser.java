@@ -71,6 +71,7 @@ import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class SystemBrowser extends CordovaPlugin {
+    protected static final String LOG_TAG = "InAppBrowser";
 
     /**
      * Display a new browser with the specified URL.
@@ -104,7 +105,6 @@ public class SystemBrowser extends CordovaPlugin {
             return false;
         }
         if (action.equals("open")) {
-            this.callbackContext = callbackContext;
             final String url = args.getString(0);
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
