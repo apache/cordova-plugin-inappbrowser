@@ -166,9 +166,7 @@ public class InAppBrowser extends CordovaPlugin {
                         result = showWebPage(url, features);
                     }
 
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-                    pluginResult.setKeepCallback(true);
-                    callbackContext.sendPluginResult(pluginResult);
+                    sendOKUpdate(result);
                 }
             });
         }
@@ -211,23 +209,25 @@ public class InAppBrowser extends CordovaPlugin {
         }
         else if (action.equals("show")) {
             showDialogue();
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
         }
         else if (action.equals("hide")) {
             final boolean goToBlank = args.isNull(0) ? false : args.getBoolean(0);
             hideDialog(goToBlank);
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
         }
-        else if (action.equals("reveal")) {
+        else if (action.equals("unHide")) {
             final String url = args.isNull(0) ? null : args.getString(0);
-            revealDialog(url);
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            unHideDialog(url);
+            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+        }
+
+        else if (action.equals("startPoll")) {
+            //Params will be [pollFunction, pollInterval])
+            Log.d(LOG_TAG, "TODO: startPoll");
+        }
+        else if (action.equals("stopPoll")){
+            Log.d(LOG_TAG, "TODO: stopPoll");
         }
         else {
             return false;
@@ -335,7 +335,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void hideDialog(final boolean goToBlank) throws JSONException {
-
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -364,7 +363,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param url
      * @return
      */
-    private void revealDialog(final String url) throws JSONException {
+    private void unHideDialog(final String url) throws JSONException {
 
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
@@ -457,34 +456,6 @@ public class InAppBrowser extends CordovaPlugin {
         return shouldAllowNavigation;
     }
 
-
-    /**
-     * Display a new browser with the specified URL.
-     *
-     * @param url the url to load.
-     * @return "" if ok, or error message.
-     */
-    public String openExternal(String url) {
-        try {
-            Intent intent = null;
-            intent = new Intent(Intent.ACTION_VIEW);
-            // Omitting the MIME type for file: URLs causes "No Activity found to handle Intent".
-            // Adding the MIME type to http: URLs causes them to not be handled by the downloader.
-            Uri uri = Uri.parse(url);
-            if ("file".equals(uri.getScheme())) {
-                intent.setDataAndType(uri, webView.getResourceApi().getMimeType(uri));
-            } else {
-                intent.setData(uri);
-            }
-            intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
-            this.cordova.getActivity().startActivity(intent);
-            return "";
-        } catch (android.content.ActivityNotFoundException e) {
-            Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
-            return e.toString();
-        }
-    }
-
     /**
      * Closes the dialog
      */
@@ -518,7 +489,7 @@ public class InAppBrowser extends CordovaPlugin {
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("type", EXIT_EVENT);
-                    sendUpdate(obj, false);
+                    sendClosingUpdate(obj);
                 } catch (JSONException ex) {
                     Log.d(LOG_TAG, "Should never happen");
                 }
@@ -576,7 +547,6 @@ public class InAppBrowser extends CordovaPlugin {
         }
         this.inAppWebView.requestFocus();
     }
-
 
     /**
      * Should we show the location bar?
@@ -863,13 +833,37 @@ public class InAppBrowser extends CordovaPlugin {
         return "";
     }
 
+    private void sendClosingUpdate(JSONObject obj) {
+        sendUpdate(obj, false, PluginResult.Status.OK);
+    }
+
+    private void sendErrorUpdate(JSONObject obj) {
+        sendUpdate(obj, true, PluginResult.Status.ERROR);
+    }
+
+    private void sendOKUpdate() {
+        sendUpdate("");
+    }
+
+    private void sendOKUpdate(String response) {
+        sendUpdate(response, true, PluginResult.Status.OK);
+    }
+
+    private void sendUpdate(String response, boolean keepCallback, , PluginResult.Status status) {
+        if (callbackContext != null) {
+            PluginResult pluginResult = new PluginResult(status, result);
+            pluginResult.setKeepCallback(keepCallback);
+            this.callbackContext.sendPluginResult(pluginResult);
+        }
+    }
+
     /**
      * Create a new plugin success result and send it back to JavaScript
      *
      * @param obj a JSONObject contain event payload information
      */
-    private void sendUpdate(JSONObject obj, boolean keepCallback) {
-        sendUpdate(obj, keepCallback, PluginResult.Status.OK);
+    private void sendOKUpdate(JSONObject obj) {
+        sendUpdate(obj, true, PluginResult.Status.OK);
     }
 
     /**
@@ -1002,7 +996,7 @@ public class InAppBrowser extends CordovaPlugin {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_START_EVENT);
                 obj.put("url", newloc);
-                sendUpdate(obj, true);
+                sendOKUpdate(obj);
             } catch (JSONException ex) {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
@@ -1032,7 +1026,7 @@ public class InAppBrowser extends CordovaPlugin {
                 obj.put("type", LOAD_STOP_EVENT);
                 obj.put("url", url);
 
-                sendUpdate(obj, true);
+                sendOKUpdate(obj);
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
             }
@@ -1047,8 +1041,7 @@ public class InAppBrowser extends CordovaPlugin {
                 obj.put("url", failingUrl);
                 obj.put("code", errorCode);
                 obj.put("message", description);
-
-                sendUpdate(obj, true, PluginResult.Status.ERROR);
+                sendErrorUpdate(obj);
             } catch (JSONException ex) {
                 Log.d(LOG_TAG, "Should never happen");
             }
