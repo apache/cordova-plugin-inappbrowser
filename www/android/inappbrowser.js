@@ -66,7 +66,7 @@
             hidden = true;
         }
 
-        me.unhide = function(strUrl, eventname){
+        me.unHide = function(strUrl, eventname){
             exec(null,null,"InAppBrowser", "unHide", [strUrl]);
             hidden = false;
         }
