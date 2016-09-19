@@ -211,7 +211,7 @@ public class InAppBrowser extends CordovaPlugin {
                 //(function()  { prompt(  JSON.stringify(  [eval("(function (){ return \"YAY\" })()")]   )   ) }) ()
 
 
-                final String jsWrapper = "(function(){prompt(JSON.stringify( eval(%s) )                         )})()";
+                  final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)])                         )})()";
                 //final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
                 injectDeferredObject(pollFunction, jsWrapper);
             }
@@ -220,31 +220,6 @@ public class InAppBrowser extends CordovaPlugin {
         Timer currentTimer = new Timer();
         currentTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
 
-
-//        this.cordova.getActivity().runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                if(null == inAppWebView  || null == inAppWebView.getUrl()){
-//                    return;
-//                }
-//
-//                if(inAppWebView.getUrl().equals(url)){
-//                    showDialogue();
-//                }
-//                else {
-//                    reOpenOnNextPageFinished = true;
-//                    navigate(url);
-//                }
-//                try {
-//                    JSONObject obj = new JSONObject();
-//                    obj.put("type", UNHIDDEN_EVENT);
-//                    sendOKUpdate(obj);
-//                } catch (JSONException ex) {
-//                    Log.d(LOG_TAG, "Should never happen");
-//                }
-//            }
-//        });
         Log.d(LOG_TAG, "POLL STARTED");
         sendOKUpdate();
     }
