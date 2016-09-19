@@ -78,7 +78,7 @@ import java.util.TimerTask;
 //of delegates, this is the way to do it.
 public interface NativeScriptResultHandler
 {
-    void handle(String scriptResult);
+    public boolean handle(String scriptResult)
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -116,7 +116,10 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
 
     private PollResultHandler pollResultHandler = new PollResultHandler(){
-        public boolean handle(String scriptResult);
+        public boolean handle(String scriptResult) {
+            Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
+            return false;
+        }
     }
 
     /**
@@ -205,13 +208,6 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         return false;
-    }
-
-    public void handlePollResult(string jsonResult){
-        boolean handle(String scriptResult) {
-            Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
-            return false;
-        }
     }
 
     private void startPoll(final long pollInterval, final String pollFunction) {
