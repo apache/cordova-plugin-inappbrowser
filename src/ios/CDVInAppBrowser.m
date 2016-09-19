@@ -238,7 +238,14 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
+            CGRect frame = [[UIScreen mainScreen] bounds];
+            UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            UIViewController *tmpController = [[UIViewController alloc] init];
+            [tmpWindow setRootViewController:tmpController];
+            [tmpWindow setWindowLevel:UIWindowLevelAlert];
+
+            [tmpWindow makeKeyAndVisible];
+            [tmpController presentViewController:nav animated:YES completion:nil];
         }
     });
 }
@@ -401,7 +408,7 @@
             [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
             return NO;
         }
-    } 
+    }
     //if is an app store link, let the system handle it, otherwise it fails to load it
     else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
         [theWebView stopLoading];
@@ -492,7 +499,7 @@
 #else
         _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
 #endif
-        
+
         [self createViews];
     }
 
