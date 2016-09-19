@@ -19,7 +19,7 @@
 package org.apache.cordova.inappbrowser;
 
 import org.apache.cordova.CordovaWebView;
-import org.apache.cordova.LOG;
+import android.util.Log;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,7 +60,7 @@ public class InAppChromeClient extends WebChromeClient {
     public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota, long estimatedSize,
             long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
     {
-        LOG.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
+        Log.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
         quotaUpdater.updateQuota(MAX_QUOTA);
     }
 
@@ -116,36 +116,36 @@ public class InAppChromeClient extends WebChromeClient {
         }
 
         if (defaultValue.startsWith(GAP_NATIVE_PROTOCOL)){
-            LOG.e(LOG_TAG, "****************************************");
+            Log.e(LOG_TAG, "****************************************");
             return handleNativeJavascriptResponse(message, defaultValue, result);
         }
 
         // Anything else with a gap: prefix should get this message
-        LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue);
+        Log.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue);
         result.cancel();
         return true;
 
     }
 
     private  boolean handleNativeJavascriptResponse(String message, String defaultValue, JsPromptResult result){
-        LOG.e(LOG_TAG, "**************************** messsage: " + message);
-        LOG.e(LOG_TAG, "************************* defaultValue: " + defaultValue);
+        Log.e(LOG_TAG, "**************************** messsage: " + message);
+        Log.e(LOG_TAG, "************************* defaultValue: " + defaultValue);
 
         String actionType = defaultValue.substring(GAP_NATIVE_PROTOCOL.length());
 
-        LOG.e(LOG_TAG, "**************************************** actionType: " + actionType);
+        Log.e(LOG_TAG, "**************************************** actionType: " + actionType);
 
         if(actionType != "poll"){
             result.confirm("");
-            LOG.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
+            Log.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
             return true;
         }
 
         if(!nativeScriptResultHandler.handle(message)){
-            LOG.w(LOG_TAG, "The action in the return of the passed poll function could not be parsed or did not have a known action");
+            Log.w(LOG_TAG, "The action in the return of the passed poll function could not be parsed or did not have a known action");
         }
 
-        LOG.e(LOG_TAG, "**************************************** TODOq: " + actionType);
+        Log.e(LOG_TAG, "**************************************** TODOq: " + actionType);
 
         //TODO: uncomment confirm and return true;
         //result.confirm("");

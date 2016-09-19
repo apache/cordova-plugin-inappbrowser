@@ -118,7 +118,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler(){
         public boolean handle(String scriptResult) {
-            Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
+            Log.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
             return false;
         }
     };
