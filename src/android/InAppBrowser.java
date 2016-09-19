@@ -134,7 +134,7 @@ public class InAppBrowser extends CordovaPlugin {
             try {
                 JSONArray returnedArray = new JSONArray(scriptResult);
                 Log.d(LOG_TAG, "Parsed OK");
-                JSONArray innerArray= returnedArray.optJSONArray();
+                JSONArray innerArray= returnedArray.optJSONArray(0);
                 if(innerArray.length() != 1) {
                     sendPollResult(scriptResult);
                     return true;
