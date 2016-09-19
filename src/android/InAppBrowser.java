@@ -154,42 +154,54 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         if (action.equals("hide")) {
-            //TODO: Release==true resources (blanks listeners and poll)
             final boolean releaseResources = args.isNull(1) ? false : args.getBoolean(1);
             final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
-            //TODO: Stop polling if not release listeners - do not destroy though
             hideDialog(goToBlank);
-
-            JSONObject obj = new JSONObject();
-            obj.put("type", HIDDEN_EVENT);
-            sendOKUpdate(obj);
             return true;
         }
 
         if (action.equals("unHide")) {
             final String url = args.isNull(0) ? null : args.getString(0);
-            //TODO: notify
             unHideDialog(url);
-            JSONObject obj = new JSONObject();
-            obj.put("type", UNHIDDEN_EVENT);
-            sendOKUpdate(obj);
             return true;
         }
 
         if (action.equals("startPoll")) {
-            //Params will be [pollFunction, pollInterval])
-            Log.d(LOG_TAG, "TODO: startPoll");
-            sendOKUpdate();
+            if (args.isNull(0) || args.isNull(1)) {
+                Log.d(LOG_TAG, "Attempt to start poll with missin function or interval");
+                return true;
+            }
+            final String pollFunction = args.getString(0);
+            final long pollInterval = args.getLong(0);
+
+            startPoll(pollInterval, pollFunction);
             return true;
         }
 
         if (action.equals("stopPoll")){
-            Log.d(LOG_TAG, "TODO: stopPoll");
-            sendOKUpdate();
+            stopPoll();
+
             return true;
         }
 
         return false;
+    }
+
+    private void startPoll(long pollInterval, String pollFunction) {
+        //TODO: If polling - stop.
+        //TODO: Set last poll function/interval
+        //TODO: call poll
+        //TODO: ensure poll result returned via correct channel. Not in this function probably.
+        Log.d(LOG_TAG, "TODO: startPoll, interval: " + pollInterval + ', fucntion =' + pollFunction );
+        sendOKUpdate();
+    }
+
+    private void stopPoll() {
+        //TODO: Cancel Timer
+        //TODO: Destroy timer object
+        //TODO: Clear last poll interval/function
+        Log.d(LOG_TAG, "TODO: stopPoll");
+        sendOKUpdate();
     }
 
     private void OpenOnNewThread(final String url, final String target, final HashMap<String, Boolean> features) {
@@ -382,6 +394,9 @@ public class InAppBrowser extends CordovaPlugin {
                         inAppWebView.loadUrl(BLANK_PAGE_URL);
                     }
                 }
+                JSONObject obj = new JSONObject();
+                obj.put("type", HIDDEN_EVENT);
+                sendOKUpdate(obj);
             }
         });
     }
@@ -399,6 +414,9 @@ public class InAppBrowser extends CordovaPlugin {
 
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
+            JSONObject obj = new JSONObject();
+            obj.put("type", UNHIDDEN_EVENT);
+            sendOKUpdate(obj);
             return;
         }
 
@@ -421,6 +439,9 @@ public class InAppBrowser extends CordovaPlugin {
                     reOpenOnNextPageFinished = true;
                     navigate(url);
                 }
+                JSONObject obj = new JSONObject();
+                obj.put("type", UNHIDDEN_EVENT);
+                sendOKUpdate(obj);
             }
         });
     }
