@@ -206,7 +206,7 @@ public class InAppBrowser extends CordovaPlugin {
         TimerTask currentTask = new TimerTask(){
             @Override
             public void run() {
-                Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis() / 1000L );
+                Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis());
                 //TODO: ensure poll result returned via correct channel. Not in this function probably.
             }
         };
