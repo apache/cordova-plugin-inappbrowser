@@ -146,8 +146,7 @@ public class InAppChromeClient extends WebChromeClient {
 
     private boolean handleJavascriptExecute(String message, String defaultValue, JsPromptResult result) {
         PluginResult scriptResult;
-        //TODO use length of GAP_PROTOCOL const
-        String scriptCallbackId = defaultValue.substring(10);
+        String scriptCallbackId = defaultValue.substring(GAP_PROTOCOL.length());
         if (!scriptCallbackId.startsWith("InAppBrowser")) {
             return false;
         }
