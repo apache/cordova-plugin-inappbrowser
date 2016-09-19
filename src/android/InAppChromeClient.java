@@ -133,7 +133,7 @@ public class InAppChromeClient extends WebChromeClient {
 
         String actionType = defaultValue.substring(GAP_NATIVE_PROTOCOL.length());
 
-        Log.e(LOG_TAG, "**************************************** actionType: " + actionType);
+        Log.e(LOG_TAG, "**************************************** actionType: '" + actionType + "'");
 
         if(actionType != "poll"){
             result.confirm("");
