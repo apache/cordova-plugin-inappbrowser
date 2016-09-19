@@ -80,7 +80,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN_EVENT = "hidden";
-    private static final String UN_HIDDEN_EVENT = "unhidden";
+    private static final String UNHIDDEN_EVENT = "unhidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
