@@ -110,6 +110,7 @@ public class InAppChromeClient extends WebChromeClient {
         }
 
         if (defaultValue.startsWith(GAP_PROTOCOL)) {
+            Log.e(LOG_TAG, "****************************************")
             return handleJavascriptExecute(message, defaultValue, result);
         }
 
@@ -125,12 +126,12 @@ public class InAppChromeClient extends WebChromeClient {
     }
 
     private  boolean handleNativeJavascriptResponse(String message, String defaultValue, JsPromptResult result){
-        LOG.e(LOG_TAG, "messsage: " + message);
-        LOG.e(LOG_TAG, "defaultValue: " + defaultValue);
+        LOG.e(LOG_TAG, "**************************** messsage: " + message);
+        LOG.e(LOG_TAG, "************************* defaultValue: " + defaultValue);
 
         String actionType = defaultValue.substring(GAP_NATIVE_PROTOCOL.length());
 
-        LOG.e(LOG_TAG, "actionType: " + actionType);
+        LOG.e(LOG_TAG, "**************************************** actionType: " + actionType);
 
         if(actionType != "poll"){
             result.confirm("");
@@ -138,7 +139,7 @@ public class InAppChromeClient extends WebChromeClient {
             return true;
         }
 
-
+        LOG.e(LOG_TAG, "**************************************** TODOq: " + actionType);
 
         //TODO: result.confirm and return true where appropiate
         return false;
