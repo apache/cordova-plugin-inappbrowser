@@ -118,7 +118,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler(){
-        private void sendPollResult(string scriptResult){
+        private void sendPollResult(String scriptResult){
             try {
                 JSONObject responseObject = new JSONObject();
                 responseObject.put("type", "pollresult");
@@ -136,12 +136,9 @@ public class InAppBrowser extends CordovaPlugin {
                 Log.d(LOG_TAG, "Parsed OK");
                 JSONArray innerArray= returnedArray.optJSONArray();
                 if(innerArray.length() != 1) {
-                    sendPollResult(string scriptResult)
+                    sendPollResult(string scriptResult);
                     return true;
                 }
-
-
-
             }
             catch(JSONException ex){
                 Log.d(LOG_TAG, "Parse Error = " + ex.getMessage());
