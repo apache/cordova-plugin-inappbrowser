@@ -36,14 +36,14 @@ public class InAppChromeClient extends WebChromeClient {
     private final String GAP_PROTOCOL = "gap-iab://";
     private final String GAP_NATIVE_PROTOCOL = "gap-iab-native://";
 
-    private PollResultHandler pollResultHandler;
+    private NativeScriptResultHandler nativeScriptResultHandler;
     private CordovaWebView webView;
     private String LOG_TAG = "InAppChromeClient";
     private long MAX_QUOTA = 100 * 1024 * 1024;
 
-    public InAppChromeClient(PollResultHandler pollResultHandler, CordovaWebView webView) {
+    public InAppChromeClient(NativeScriptResultHandler nativeScriptResultHandler, CordovaWebView webView) {
         super();
-        this.pollResultHandler =pollResultHandler;
+        this.nativeScriptResultHandler =nativeScriptResultHandler;
         this.webView = webView;
     }
     /**
@@ -141,7 +141,7 @@ public class InAppChromeClient extends WebChromeClient {
             return true;
         }
 
-        if(!pollResultHandler.handle(message)){
+        if(!nativeScriptResultHandler.handle(message)){
             LOG.w(LOG_TAG, "The action in the return of the passed poll function could not be parsed or did not have a known action");
         }
 

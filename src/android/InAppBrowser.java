@@ -116,7 +116,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean destroyHistoryOnNextPageFinished = false;
     private boolean reOpenOnNextPageFinished = false;
 
-    private PollResultHandler pollResultHandler = new PollResultHandler(){
+    private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler(){
         public boolean handle(String scriptResult) {
             Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
             return false;
@@ -868,7 +868,7 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 //TODO
-                inAppWebView.setWebChromeClient(new InAppChromeClient(this, thatWebView));
+                inAppWebView.setWebChromeClient(new InAppChromeClient(nativeScriptResultHandler, thatWebView));
                 WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
