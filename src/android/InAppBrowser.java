@@ -79,7 +79,8 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
-    private static final String HIDDEN = "hidden";
+    private static final String HIDDEN_EVENT = "hidden";
+    private static final String UN_HIDDEN_EVENT = "unhidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -151,7 +152,11 @@ public class InAppBrowser extends CordovaPlugin {
         }
         if (action.equals("show")) {
             showDialogue();
-            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+
+            //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            JSONObject obj = new JSONObject();
+            obj.put("type", HIDDEN_EVENT);
+            sendOKUpdate(obj);
             return true;
         }
 
@@ -161,8 +166,10 @@ public class InAppBrowser extends CordovaPlugin {
             final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
             //TODO: Stop polling if not release listeners - do not destroy though
             hideDialog(goToBlank);
-            //TODO: notify at some point
-            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+
+            JSONObject obj = new JSONObject();
+            obj.put("type", UNHIDDEN_EVENT);
+            sendOKUpdate(UNHIDDEN_EVENT); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
             return true;
         }
 
@@ -170,6 +177,7 @@ public class InAppBrowser extends CordovaPlugin {
             final String url = args.isNull(0) ? null : args.getString(0);
             //TODO: notify
             unHideDialog(url);
+            //UN_HIDDEN_EVENT
             sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
             return true;
         }
