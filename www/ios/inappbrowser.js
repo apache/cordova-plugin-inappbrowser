@@ -146,7 +146,7 @@
         me.unHide = function(strUrl, eventname){
 
             if(strUrl){
-                lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl;
+                lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
             }
 
             me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
