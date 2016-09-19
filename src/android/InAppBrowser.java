@@ -163,7 +163,7 @@ public class InAppBrowser extends CordovaPlugin {
                     return true;
                 }
 
-                Log.d("The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+                Log.d(LOG_TAG, "The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
                 sendPollResult(scriptResult);
 
                 return true;
