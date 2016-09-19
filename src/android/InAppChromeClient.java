@@ -33,8 +33,8 @@ import android.webkit.GeolocationPermissions.Callback;
 
 public class InAppChromeClient extends WebChromeClient {
 
-    private final string GAP_PROTOCOL = "gap-iab://";
-    private final string GAP_NATIVE_PROTOCOL = "gap-iab-native://";
+    private final String GAP_PROTOCOL = "gap-iab://";
+    private final String GAP_NATIVE_PROTOCOL = "gap-iab-native://";
 
     private CordovaWebView webView;
     private String LOG_TAG = "InAppChromeClient";
