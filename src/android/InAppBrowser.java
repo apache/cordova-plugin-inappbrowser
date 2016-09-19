@@ -212,7 +212,7 @@ public class InAppBrowser extends CordovaPlugin {
         };
 
         Timer currentTimer = new Timer();
-        curtrenTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
+        currentTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
 
 
 //        this.cordova.getActivity().runOnUiThread(new Runnable() {
