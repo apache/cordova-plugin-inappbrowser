@@ -60,7 +60,7 @@ public class InAppChromeClient extends WebChromeClient {
     public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota, long estimatedSize,
             long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
     {
-        Log.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
+        Log.d(LOG_TAG, String.format("onExceededDatabaseQuota estimatedSize: %1$d  currentQuota: %2$d  totalUsedQuota: %3$d", estimatedSize, currentQuota, totalUsedQuota));
         quotaUpdater.updateQuota(MAX_QUOTA);
     }
 
