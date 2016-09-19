@@ -211,7 +211,7 @@ public class InAppBrowser extends CordovaPlugin {
                 //(function()  { prompt(  JSON.stringify(  [eval("(function (){ return \"YAY\" })()")]   )   ) }) ()
 
 
-                  final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)])                         )})()";
+                  final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'TEST'                 )})()";
                 //final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
                 injectDeferredObject(pollFunction, jsWrapper);
             }

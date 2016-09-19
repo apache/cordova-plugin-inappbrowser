@@ -100,7 +100,7 @@ public class InAppChromeClient extends WebChromeClient {
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
-        LOG.d(LOG_TAG, "***********************************************    response: " + defaultValue);
+        LOG.e(LOG_TAG, "***********************************************    response: " + defaultValue);
 
         if (defaultValue == null || !defaultValue.startsWith("gap")) {
             return false;
@@ -111,9 +111,9 @@ public class InAppChromeClient extends WebChromeClient {
         }
 
         if (defaultValue.startsWith("gap-iab-native://")){
-            LOG.d(LOG_TAG, "Poll has responded");
+            LOG.e(LOG_TAG, "Poll has responded");
             //TODO: ensure poll result returned via correct channel.
-            return true;
+            return false;
         }
 
         // Anything else with a gap: prefix should get this message
