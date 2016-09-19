@@ -208,7 +208,7 @@ public class InAppBrowser extends CordovaPlugin {
             public void run() {
                 Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis());
                 String jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab-native://poll/%s')})()");
-                injectDeferredObject(jsCode, jsWrapper);
+                injectDeferredObject(pollFunction, jsWrapper);
             }
         };
 
