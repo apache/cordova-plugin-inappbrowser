@@ -161,8 +161,8 @@ public class InAppBrowser extends CordovaPlugin {
             hideDialog(goToBlank);
 
             JSONObject obj = new JSONObject();
-            obj.put("type", UNHIDDEN_EVENT);
-            sendOKUpdate(obj); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            obj.put("type", HIDDEN_EVENT);
+            sendOKUpdate(obj);
             return true;
         }
 
@@ -170,10 +170,9 @@ public class InAppBrowser extends CordovaPlugin {
             final String url = args.isNull(0) ? null : args.getString(0);
             //TODO: notify
             unHideDialog(url);
-            //UN_HIDDEN_EVENT
             JSONObject obj = new JSONObject();
-            obj.put("type", HIDDEN_EVENT);
-            sendOKUpdate(obj); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            obj.put("type", UNHIDDEN_EVENT);
+            sendOKUpdate(obj);
             return true;
         }
 
