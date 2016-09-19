@@ -118,7 +118,25 @@ public class InAppBrowser extends CordovaPlugin {
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler(){
         public boolean handle(String scriptResult) {
-            Log.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
+            Log.d(LOG_TAG, "Result = " + scriptResult);
+            try {
+                JSONArray returnedArray = new JSONArray (scriptResult);
+                Log.d("Parsed OK");
+
+            }
+            catch(JSONException ex){
+                Log.d(LOG_TAG, "Parse Error = " + error.getMessage());
+                try {
+                    JSONObject error = new JSONObject();
+                    error.put("message", error.getMessage());
+                    sendErrorUpdate(error);
+                    return false;
+                }
+                catch(JSONException ex2) {
+                    Log.d(LOG_TAG, "Should never happen");
+                }
+            }
+
             return false;
         }
     };
