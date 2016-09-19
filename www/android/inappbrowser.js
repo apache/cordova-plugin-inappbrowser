@@ -50,6 +50,9 @@
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
+            'hidden' : channel.create('hidden'),
+            'unhidden' : channel.create('unhidden'),
+            'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
         }
 
