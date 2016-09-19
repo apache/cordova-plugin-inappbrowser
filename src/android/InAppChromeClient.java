@@ -108,6 +108,7 @@ public class InAppChromeClient extends WebChromeClient {
             handleJavascriptExecute(message, defaultValue, result);
         } else if (defaultValue.startsWith("gap-iab-native")){
             LOG.d("InAppBrowser", "Poll has responded");
+            //TODO: ensure poll result returned via correct channel.
         }
         else
         {
