@@ -195,7 +195,7 @@ public class InAppBrowser extends CordovaPlugin {
         return false;
     }
 
-    private void startPoll(long pollInterval, String pollFunction) {
+    private void startPoll(final long pollInterval, final String pollFunction) {
         Log.d(LOG_TAG, "START POLL METHOD");
         //TODO: If polling - stop.
         //TODO: Set last poll function/interval
