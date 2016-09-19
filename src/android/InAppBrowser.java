@@ -135,10 +135,39 @@ public class InAppBrowser extends CordovaPlugin {
                 JSONArray returnedArray = new JSONArray(scriptResult);
                 Log.d(LOG_TAG, "Parsed OK");
                 JSONArray innerArray= returnedArray.optJSONArray(0);
-                if(innerArray.length() != 1) {
+                if(innerArray == null || innerArray.length() != 1) {
                     sendPollResult(scriptResult);
                     return true;
                 }
+
+                JSONObject commandObject = innerArray.optJSONObject(0);
+                if(commandObject == null) {
+                    sendPollResult(scriptResult);
+                    return true;
+                }
+
+                String action = commandObject.optString("InAppBrowserAction");
+
+                if(action == null){
+                    sendPollResult(scriptResult);
+                    return true;
+                }
+
+                if(action.equalsIgnoreCase("close")) {
+                    stopPoll();
+                    closeDialog();
+                    return;
+                }
+                if(action.equalsIgnoreCase("hide")) {
+                    hideDialog(true);
+                    return;
+                }
+                else {
+                    Log.d("The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+                    sendPollResult(scriptResult);
+
+                }
+                return true;
             }
             catch(JSONException ex){
                 Log.d(LOG_TAG, "Parse Error = " + ex.getMessage());
