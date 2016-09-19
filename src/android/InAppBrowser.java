@@ -386,11 +386,11 @@ public class InAppBrowser extends CordovaPlugin {
             @Override
             public void run() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    Log.d(LOG_TAG, 'Running KitKat or below');
+                    Log.d(LOG_TAG, "Running KitKat or below");
                     // This action will have the side-effect of blurring the currently focused element
                     inAppWebView.loadUrl("javascript:" + finalScriptToInject);
                 } else {
-                    Log.d(LOG_TAG, 'Running above kitkat);
+                    Log.d(LOG_TAG, "Running above kitkat");
                     inAppWebView.evaluateJavascript(finalScriptToInject, null);
                 }
             }
