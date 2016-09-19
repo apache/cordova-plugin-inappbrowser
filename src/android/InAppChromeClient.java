@@ -132,7 +132,7 @@ public class InAppChromeClient extends WebChromeClient {
 
         LOG.e(LOG_TAG, "actionType: " + actionType);
 
-        if(actionType != 'poll'){
+        if(actionType != "poll"){
             LOG.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
             return true;
         }
