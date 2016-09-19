@@ -77,18 +77,16 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
     private static final String EXIT_EVENT = "exit";
-    private static final String LOCATION = "location";
-    private static final String ZOOM = "zoom";
-    private static final String HIDDEN = "hidden";
+
+
+
     private static final String HIDDEN_EVENT = "hidden";
     private static final String UNHIDDEN_EVENT = "unhidden";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
-    private static final String CLEAR_ALL_CACHE = "clearcache";
-    private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
-    private static final String HARDWARE_BACK_BUTTON = "hardwareback";
-    private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+
+
     private static final String BLANK_PAGE_URL = "about:blank";
 
     private InAppBrowserDialog dialog;
@@ -147,17 +145,11 @@ public class InAppBrowser extends CordovaPlugin {
         }
         if (action.equals("injectStyleFile")) {
             final String callbackContextId = callbackContext.getCallbackId();
-
             injectStyleFile(args.getString(0), args.getBoolean(1), callbackContext.getCallbackId());
             return true;
         }
         if (action.equals("show")) {
             showDialogue();
-
-            //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
-            JSONObject obj = new JSONObject();
-            obj.put("type", HIDDEN_EVENT);
-            sendOKUpdate(obj);
             return true;
         }
 
@@ -170,7 +162,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             JSONObject obj = new JSONObject();
             obj.put("type", UNHIDDEN_EVENT);
-            sendOKUpdate(UNHIDDEN_EVENT); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            sendOKUpdate(obj); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
             return true;
         }
 
@@ -179,7 +171,9 @@ public class InAppBrowser extends CordovaPlugin {
             //TODO: notify
             unHideDialog(url);
             //UN_HIDDEN_EVENT
-            sendOKUpdate(); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
+            JSONObject obj = new JSONObject();
+            obj.put("type", HIDDEN_EVENT);
+            sendOKUpdate(obj); //TODO: DOES THIS NEED TO HAPPEN ON CALLBACK?
             return true;
         }
 
@@ -612,6 +606,14 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+
+        final String LOCATION = "location";
+        final String ZOOM = "zoom";
+        final String HIDDEN = "hidden";
+        final String HARDWARE_BACK_BUTTON = "hardwareback";
+        final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+        final String CLEAR_ALL_CACHE = "clearcache";
+        final String CLEAR_SESSION_CACHE = "clearsessioncache";
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
