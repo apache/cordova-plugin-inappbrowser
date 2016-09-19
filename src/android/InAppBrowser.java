@@ -167,10 +167,12 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         if (action.equals("startPoll")) {
+            Log.d(LOG_TAG, "START POLL ACTION");
             if (args.isNull(0) || args.isNull(1)) {
                 Log.d(LOG_TAG, "Attempt to start poll with missin function or interval");
                 return true;
             }
+            Log.d(LOG_TAG, "HAS FUNCTION AND INTERVAL");
             final String pollFunction = args.getString(0);
             final long pollInterval = args.getLong(0);
 
@@ -188,6 +190,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     private void startPoll(long pollInterval, String pollFunction) {
+        Log.d(LOG_TAG, "START POLL METHOD");
         //TODO: If polling - stop.
         //TODO: Set last poll function/interval
         //TODO: call poll
@@ -469,7 +472,6 @@ public class InAppBrowser extends CordovaPlugin {
             @Override
             public void run() {
                 if(dialog != null) {
-                    Log.d(LOG_TAG, "*********************************************************");
                     dialog.show();
                 }
             }
