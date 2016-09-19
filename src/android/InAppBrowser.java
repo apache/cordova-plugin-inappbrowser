@@ -67,10 +67,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import java.util;
+
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
