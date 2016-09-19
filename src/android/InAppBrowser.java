@@ -66,8 +66,11 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import java.util;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -196,8 +199,46 @@ public class InAppBrowser extends CordovaPlugin {
         //TODO: If polling - stop.
         //TODO: Set last poll function/interval
         //TODO: call poll
-        //TODO: ensure poll result returned via correct channel. Not in this function probably.
+
         Log.d(LOG_TAG, "TODO: startPoll, interval: " + pollInterval + ", fucntion =" + pollFunction );
+
+        TimerTask currentTask = new TimerTask(){
+            @Override
+            public void run() {
+                Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis() / 1000L; );
+                //TODO: ensure poll result returned via correct channel. Not in this function probably.
+            }
+        }
+
+        Timer currentTimer = new Timer();
+        curtrenTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
+
+
+//        this.cordova.getActivity().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                if(null == inAppWebView  || null == inAppWebView.getUrl()){
+//                    return;
+//                }
+//
+//                if(inAppWebView.getUrl().equals(url)){
+//                    showDialogue();
+//                }
+//                else {
+//                    reOpenOnNextPageFinished = true;
+//                    navigate(url);
+//                }
+//                try {
+//                    JSONObject obj = new JSONObject();
+//                    obj.put("type", UNHIDDEN_EVENT);
+//                    sendOKUpdate(obj);
+//                } catch (JSONException ex) {
+//                    Log.d(LOG_TAG, "Should never happen");
+//                }
+//            }
+//        });
+        Log.d(LOG_TAG, "POLL STARTED");
         sendOKUpdate();
     }
 
