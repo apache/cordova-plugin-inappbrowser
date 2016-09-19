@@ -116,7 +116,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
 
     private PollResultHandler pollResultHandler = new PollResultHandler(){
-        public void bool handle(String scriptResult);
+        public boolean handle(String scriptResult);
     }
 
     /**
@@ -208,8 +208,9 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public void handlePollResult(string jsonResult){
-        bool handle(String scriptResult) {
+        boolean handle(String scriptResult) {
             Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
+            return false;
         }
     }
 
