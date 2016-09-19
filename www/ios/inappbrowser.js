@@ -155,10 +155,12 @@
         }
 
         me.startPoll = function(pollFunction, pollInterval){
-           lastPollIntervalToRestore = pollInterval;
-           lastPollFunctionToRestore = pollFunction;
-           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-           polling = true;
+            if(pollFunction && pollInterval){
+               lastPollIntervalToRestore = pollInterval;
+               lastPollFunctionToRestore = pollFunction;
+               exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+               polling = true;
+            }
         }
 
         me.stopPoll = function() {
