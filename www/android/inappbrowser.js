@@ -46,6 +46,14 @@
                     }
         }
 
+        me.isHidden = function(){
+            return hidden;
+        }
+
+        me.isPolling = function(){
+            return polling;
+        }
+
         me.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
@@ -58,10 +66,12 @@
 
         me.close = function (eventname) {
             exec(null, null, "InAppBrowser", "close", []);
+            hidden = false;
         }
 
         me.show = function (eventname) {
             exec(null, null, "InAppBrowser", "show", []);
+            hidden = false;
         }
 
         me.hide = function(boolGoToBlank, eventname){

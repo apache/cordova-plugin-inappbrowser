@@ -130,19 +130,6 @@
             hidden = false;
         }
 
-        me.startPoll = function(pollFunction, pollInterval){
-           lastPollIntervalToRestore = pollInterval;
-           lastPollFunctionToRestore = pollFunction;
-           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-           polling = true;
-        }
-
-        me.stopPoll = function() {
-           exec(null, null, "InAppBrowser", "stopPoll", []);
-           clearPolling();
-           polling = false;
-        }
-
         me.hide = function(releaseResources, blankPage){
             
             if(releaseResources){
@@ -165,6 +152,19 @@
             me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
+        }
+
+        me.startPoll = function(pollFunction, pollInterval){
+           lastPollIntervalToRestore = pollInterval;
+           lastPollFunctionToRestore = pollFunction;
+           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+           polling = true;
+        }
+
+        me.stopPoll = function() {
+           exec(null, null, "InAppBrowser", "stopPoll", []);
+           clearPolling();
+           polling = false;
         }
 
         me.addEventListener = function (eventname,f) {
