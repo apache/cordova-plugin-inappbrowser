@@ -113,7 +113,7 @@ public class InAppChromeClient extends WebChromeClient {
             return handleJavascriptExecute(message, defaultValue, result);
         }
 
-        if (defaultValue.startsWith(NATIVE_CALL_PROTOCOL)){
+        if (defaultValue.startsWith(GAP_NATIVE_PROTOCOL)){
             return handleJavascriptExecute(message, defaultValue, result);
         }
 
@@ -133,6 +133,7 @@ public class InAppChromeClient extends WebChromeClient {
         LOG.e(LOG_TAG, "actionType: " + actionType);
 
         if(actionType != "poll"){
+            result.confirm("");
             LOG.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
             return true;
         }
