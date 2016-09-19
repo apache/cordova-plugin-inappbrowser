@@ -375,18 +375,22 @@ public class InAppBrowser extends CordovaPlugin {
             String jsonRepr = jsonEsc.toString();
             String jsonSourceString = jsonRepr.substring(1, jsonRepr.length()-1);
             scriptToInject = String.format(jsWrapper, jsonSourceString);
+
         } else {
             scriptToInject = source;
         }
         final String finalScriptToInject = scriptToInject;
+        Log.d(LOG_TAG, 'Script To Inject=' finalScriptToInject);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @SuppressLint("NewApi")
             @Override
             public void run() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                    Log.d(LOG_TAG, 'Running KitKat or below');
                     // This action will have the side-effect of blurring the currently focused element
                     inAppWebView.loadUrl("javascript:" + finalScriptToInject);
                 } else {
+                    Log.d(LOG_TAG, 'Running above kitkat);
                     inAppWebView.evaluateJavascript(finalScriptToInject, null);
                 }
             }
