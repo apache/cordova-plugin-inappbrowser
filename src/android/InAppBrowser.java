@@ -156,17 +156,16 @@ public class InAppBrowser extends CordovaPlugin {
                 if(action.equalsIgnoreCase("close")) {
                     stopPoll();
                     closeDialog();
-                    return;
+                    return true;
                 }
                 if(action.equalsIgnoreCase("hide")) {
                     hideDialog(true);
-                    return;
+                    return true
                 }
-                else {
-                    Log.d("The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-                    sendPollResult(scriptResult);
 
-                }
+                Log.d("The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+                sendPollResult(scriptResult);
+
                 return true;
             }
             catch(JSONException ex){
