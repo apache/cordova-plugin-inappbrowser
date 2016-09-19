@@ -380,7 +380,7 @@ public class InAppBrowser extends CordovaPlugin {
             scriptToInject = source;
         }
         final String finalScriptToInject = scriptToInject;
-        Log.d(LOG_TAG, 'Script To Inject=' finalScriptToInject);
+        Log.d(LOG_TAG, 'Script To Inject=' + finalScriptToInject);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @SuppressLint("NewApi")
             @Override
