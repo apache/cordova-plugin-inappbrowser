@@ -77,7 +77,7 @@ import java.util.TimerTask;
 //This looks weird. Java doesn't have the equivalent
 //of delegates, this is the way to do it.
 //default is like internal in c#
-package-private interface NativeScriptResultHandler
+interface NativeScriptResultHandler
 {
     public boolean handle(String scriptResult);
 }
