@@ -134,15 +134,8 @@ public class InAppBrowser extends CordovaPlugin {
             try {
                 JSONArray returnedArray = new JSONArray(scriptResult);
                 Log.d(LOG_TAG, "Parsed OK");
-                JSONArray innerArray= returnedArray.optJSONArray(0);
-                if(innerArray == null || innerArray.length() != 1) {
-                    Log.d(LOG_TAG, "***************** arraysize !=1");
-                    sendPollResult(scriptResult);
-                    return true;
-                }
 
-
-                JSONObject commandObject = innerArray.optJSONObject(0);
+                JSONObject commandObject = returnedArray.optJSONObject(0);
                 if(commandObject == null) {
                     Log.d(LOG_TAG, "***************** first array element not a object");
                     sendPollResult(scriptResult);
