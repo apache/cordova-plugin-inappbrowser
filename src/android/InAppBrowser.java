@@ -124,7 +124,7 @@ public class InAppBrowser extends CordovaPlugin {
                 responseObject.put("type", "pollresult");
                 responseObject.put("data", scriptResult);
                 sendOKUpdate(responseObject);
-            } catch (JSONExcepton ex){
+            } catch (JSONException ex){
                 Log.d(LOG_TAG, "Should never happen");
             }
         }
