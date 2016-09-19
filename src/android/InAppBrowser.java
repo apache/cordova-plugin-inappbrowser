@@ -62,6 +62,7 @@ import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
@@ -120,15 +121,15 @@ public class InAppBrowser extends CordovaPlugin {
         public boolean handle(String scriptResult) {
             Log.d(LOG_TAG, "Result = " + scriptResult);
             try {
-                JSONArray returnedArray = new JSONArray (scriptResult);
-                Log.d("Parsed OK");
+                JSONArray returnedArray = new JSONArray(scriptResult);
+                Log.d(LOG_TAG, "Parsed OK");
 
             }
             catch(JSONException ex){
-                Log.d(LOG_TAG, "Parse Error = " + error.getMessage());
+                Log.d(LOG_TAG, "Parse Error = " + ex.getMessage());
                 try {
                     JSONObject error = new JSONObject();
-                    error.put("message", error.getMessage());
+                    error.put("message", ex.getMessage());
                     sendErrorUpdate(error);
                     return false;
                 }
