@@ -110,7 +110,7 @@ public class InAppChromeClient extends WebChromeClient {
         }
 
         if (defaultValue.startsWith(GAP_PROTOCOL)) {
-            Log.e(LOG_TAG, "****************************************");
+            LOG.e(LOG_TAG, "****************************************");
             return handleJavascriptExecute(message, defaultValue, result);
         }
 
