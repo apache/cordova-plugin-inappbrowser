@@ -100,7 +100,7 @@ public class InAppChromeClient extends WebChromeClient {
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
-        LOG.d(LOG_TAG, "response": defaultValue);
+        LOG.d(LOG_TAG, "response: " + defaultValue);
 
         if (defaultValue == null || !defaultValue.startsWith("gap")) {
             return false;
