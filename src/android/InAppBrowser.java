@@ -469,6 +469,7 @@ public class InAppBrowser extends CordovaPlugin {
             @Override
             public void run() {
                 if(dialog != null) {
+                    Log.d(LOG_TAG, "*********************************************************");
                     dialog.show();
                 }
             }
