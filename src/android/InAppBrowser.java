@@ -175,7 +175,7 @@ public class InAppBrowser extends CordovaPlugin {
             Log.d(LOG_TAG, "HAS FUNCTION AND INTERVAL");
             final String pollFunction = args.getString(0);
             final long pollInterval = args.getLong(0);
-
+            Log.d(LOG_TAG, "PARSED POLL PARAMETERS");
             startPoll(pollInterval, pollFunction);
             return true;
         }
