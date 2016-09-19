@@ -208,7 +208,7 @@ public class InAppBrowser extends CordovaPlugin {
                 Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis() / 1000L );
                 //TODO: ensure poll result returned via correct channel. Not in this function probably.
             }
-        }
+        };
 
         Timer currentTimer = new Timer();
         curtrenTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
