@@ -201,12 +201,14 @@ public class InAppBrowser extends CordovaPlugin {
         //TODO: Set last poll function/interval
         //TODO: call poll
 
-        Log.d(LOG_TAG, "TODO: startPoll, interval: " + pollInterval + ", fucntion =" + pollFunction );
+        Log.d(LOG_TAG, "TODO: startPoll, interval: " + pollInterval + ", function =" + pollFunction );
 
         TimerTask currentTask = new TimerTask(){
             @Override
             public void run() {
                 Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis());
+                String jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab-native://poll/%s')})()", callbackContextId);
+                injectDeferredObject(jsCode, jsWrapper);
                 //TODO: ensure poll result returned via correct channel. Not in this function probably.
             }
         };

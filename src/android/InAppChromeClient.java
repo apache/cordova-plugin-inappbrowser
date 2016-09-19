@@ -100,34 +100,43 @@ public class InAppChromeClient extends WebChromeClient {
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
-        if (defaultValue != null && defaultValue.startsWith("gap")) {
-            if(defaultValue.startsWith("gap-iab://")) {
-                PluginResult scriptResult;
-                String scriptCallbackId = defaultValue.substring(10);
-                if (scriptCallbackId.startsWith("InAppBrowser")) {
-                    if(message == null || message.length() == 0) {
-                        scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray());
-                    } else {
-                        try {
-                            scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray(message));
-                        } catch(JSONException e) {
-                            scriptResult = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
-                        }
-                    }
-                    this.webView.sendPluginResult(scriptResult, scriptCallbackId);
-                    result.confirm("");
-                    return true;
-                }
-            }
-            else
-            {
-                // Anything else with a gap: prefix should get this message
-                LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue); 
-                result.cancel();
-                return true;
+        if (defaultValue == null || !defaultValue.startsWith("gap")) {
+            return false;
+        }
+
+        if (defaultValue.startsWith("gap-iab://")) {
+            handleJavascriptExecute(message, defaultValue, result);
+        } else if (defaultValue.startsWith("gap-iab-native")){
+            LOG.d("InAppBrowser", "Poll has responded");
+        }
+        else
+        {
+            // Anything else with a gap: prefix should get this message
+            LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue);
+            result.cancel();
+            return true;
+        }
+    }
+
+    private boolean handleJavascriptExecute(String message, String defaultValue, JsPromptResult result) {
+        PluginResult scriptResult;
+        String scriptCallbackId = defaultValue.substring(10);
+        if (!scriptCallbackId.startsWith("InAppBrowser")) {
+            return false;
+        }
+        if(message == null || message.length() == 0) {
+            scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray());
+        } else {
+            try {
+                scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray(message));
+            } catch(JSONException e) {
+                scriptResult = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
             }
         }
-        return false;
+        this.webView.sendPluginResult(scriptResult, scriptCallbackId);
+        result.confirm("");
+        return true;
+
     }
 
 }
