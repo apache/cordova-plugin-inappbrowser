@@ -145,7 +145,7 @@ public class InAppChromeClient extends WebChromeClient {
             LOG.w(LOG_TAG, "The action in the return of the passed poll function could not be parsed or did not have a known action");
         }
 
-        LOG.e(LOG_TAG, "**************************************** TODOq: " + actionType);ß
+        LOG.e(LOG_TAG, "**************************************** TODOq: " + actionType);
 
         //TODO: uncomment confirm and return true;
         //result.confirm("");
