@@ -73,6 +73,14 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//Note to future devs - if you have any c# experience
+//This looks weird. Java doesn't have the equivalent
+//of delegates, this is the way to do it.
+public interface NativeScriptResultHandler
+{
+    void handle(String scriptResult);
+}
+
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -106,6 +114,10 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean destroyHistoryOnNextPageFinished = false;
     private boolean reOpenOnNextPageFinished = false;
+
+    private PollResultHandler pollResultHandler = new PollResultHandler(){
+        public void bool handle(String scriptResult);
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -195,6 +207,12 @@ public class InAppBrowser extends CordovaPlugin {
         return false;
     }
 
+    public void handlePollResult(string jsonResult){
+        bool handle(String scriptResult) {
+            Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
+        }
+    }
+
     private void startPoll(final long pollInterval, final String pollFunction) {
         Log.d(LOG_TAG, "START POLL METHOD");
         //TODO: If polling - stop.
@@ -207,12 +225,7 @@ public class InAppBrowser extends CordovaPlugin {
             @Override
             public void run() {
                 Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis());
-
-                //(function()  { prompt(  JSON.stringify(  [eval("(function (){ return \"YAY\" })()")]   )   ) }) ()
-
-
-                  final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
-                //final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
+                final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
                 injectDeferredObject(pollFunction, jsWrapper);
             }
         };
@@ -856,7 +869,8 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
-                inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
+                //TODO
+                inAppWebView.setWebChromeClient(new InAppChromeClient(this, thatWebView));
                 WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
