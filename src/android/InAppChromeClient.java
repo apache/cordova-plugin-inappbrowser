@@ -33,6 +33,9 @@ import android.webkit.GeolocationPermissions.Callback;
 
 public class InAppChromeClient extends WebChromeClient {
 
+    private final string GAP_PROTOCOL = "gap-iab://";
+    private final string GAP_NATIVE_PROTOCOL = "gap-iab-native://";
+
     private CordovaWebView webView;
     private String LOG_TAG = "InAppChromeClient";
     private long MAX_QUOTA = 100 * 1024 * 1024;
@@ -100,20 +103,18 @@ public class InAppChromeClient extends WebChromeClient {
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
-        LOG.e(LOG_TAG, "response: " + defaultValue);
+
 
         if (defaultValue == null || !defaultValue.startsWith("gap")) {
             return false;
         }
 
-        if (defaultValue.startsWith("gap-iab://")) {
+        if (defaultValue.startsWith(GAP_PROTOCOL)) {
             return handleJavascriptExecute(message, defaultValue, result);
         }
 
-        if (defaultValue.startsWith("gap-iab-native://")){
-            LOG.e(LOG_TAG, "Poll has responded");
-            //TODO: ensure poll result returned via correct channel.
-            return false;
+        if (defaultValue.startsWith(NATIVE_CALL_PROTOCOL)){
+            return handleJavascriptExecute(message, defaultValue, result);
         }
 
         // Anything else with a gap: prefix should get this message
@@ -123,8 +124,28 @@ public class InAppChromeClient extends WebChromeClient {
 
     }
 
+    private  boolean handleNativeJavascriptResponse(String message, String defaultValue, JsPromptResult result){
+        LOG.e(LOG_TAG, "messsage: " + message);
+        LOG.e(LOG_TAG, "defaultValue: " + defaultValue);
+
+        String actionType = defaultValue.substring(GAP_NATIVE_PROTOCOL.length());
+
+        LOG.e(LOG_TAG, "actionType: " + actionType);
+
+        if(actionType != 'poll'){
+            LOG.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
+            return true;
+        }
+
+
+
+        //TODO: result.confirm and return true where appropiate
+        return false;
+    }
+
     private boolean handleJavascriptExecute(String message, String defaultValue, JsPromptResult result) {
         PluginResult scriptResult;
+        //TODO use length of GAP_PROTOCOL const
         String scriptCallbackId = defaultValue.substring(10);
         if (!scriptCallbackId.startsWith("InAppBrowser")) {
             return false;
