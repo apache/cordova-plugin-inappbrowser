@@ -216,7 +216,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark view-open-and-close
 
-
+//TODO: rename to handleNativeResult
 - (void)handlePollResult:(NSURL*) url {
     if(![[url host] isEqualToString:@"poll"]) {
         return;
