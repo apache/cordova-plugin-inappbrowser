@@ -127,12 +127,17 @@ public class InAppChromeClient extends WebChromeClient {
     }
 
     private  boolean handleNativeJavascriptResponse(String message, String defaultValue, JsPromptResult result){
+        if(message == null || message.length() == 0) {
+            result.confirm("");
+            return true;
+        }
 
         String actionType = defaultValue.substring(GAP_NATIVE_PROTOCOL.length());
 
         if(!actionType.equals("poll")) {
             result.confirm("");
             Log.w(LOG_TAG, "InAppBrowser calls from native code with action type other than 'poll'" );
+            result.confirm("");
             return true;
         }
 

@@ -99,7 +99,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
-
+    private static final String POLL_RESULT_EVENT = "pollresult";
 
     private static final String BLANK_PAGE_URL = "about:blank";
 
@@ -118,11 +118,29 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler(){
+        private void sendPollResult(string scriptResult){
+            try {
+                JSONObject responseObject = new JSONObject();
+                responseObject.put("type", "pollresult");
+                responseObject.put("data", scriptResult);
+                sendOKUpdate(responseObject);
+            } catch (JSONExcepton ex){
+                Log.d(LOG_TAG, "Should never happen");
+            }
+        }
+
         public boolean handle(String scriptResult) {
             Log.d(LOG_TAG, "Result = " + scriptResult);
             try {
                 JSONArray returnedArray = new JSONArray(scriptResult);
                 Log.d(LOG_TAG, "Parsed OK");
+                JSONArray innerArray= returnedArray.optJSONArray();
+                if(innerArray.length() != 1) {
+                    sendPollResult(string scriptResult)
+                    return true;
+                }
+
+
 
             }
             catch(JSONException ex){
@@ -206,24 +224,19 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         if (action.equals("startPoll")) {
-            Log.d(LOG_TAG, "START POLL ACTION");
             if (args.isNull(0) || args.isNull(1)) {
-                Log.d(LOG_TAG, "Attempt to start poll with missin function or interval");
+                Log.w(LOG_TAG, "Attempt to start poll with missin function or interval");
                 return true;
             }
-            Log.d(LOG_TAG, "HAS FUNCTION AND INTERVAL");
+
             final String pollFunction = args.getString(0);
             final long pollInterval = args.getLong(1);
-            Log.d(LOG_TAG, "PARSED POLL PARAMETERS");
             startPoll(pollInterval, pollFunction);
-
-            Log.d(LOG_TAG, "POLL STARTED");
             return true;
         }
 
         if (action.equals("stopPoll")){
             stopPoll();
-
             return true;
         }
 
@@ -231,17 +244,13 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     private void startPoll(final long pollInterval, final String pollFunction) {
-        Log.d(LOG_TAG, "START POLL METHOD");
         //TODO: If polling - stop.
         //TODO: Set last poll function/interval
         //TODO: call poll
 
-        Log.d(LOG_TAG, "TODO: startPoll, interval: " + pollInterval + ", function =" + pollFunction );
-
         TimerTask currentTask = new TimerTask(){
             @Override
             public void run() {
-                Log.d(LOG_TAG, "POLL: " + System.currentTimeMillis());
                 final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
                 injectDeferredObject(pollFunction, jsWrapper);
             }
@@ -249,8 +258,6 @@ public class InAppBrowser extends CordovaPlugin {
 
         Timer currentTimer = new Timer();
         currentTimer.scheduleAtFixedRate(currentTask, 0L, pollInterval);
-
-        Log.d(LOG_TAG, "POLL STARTED");
         sendOKUpdate();
     }
 
