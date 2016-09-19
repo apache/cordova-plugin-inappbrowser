@@ -78,7 +78,7 @@ import java.util.TimerTask;
 //of delegates, this is the way to do it.
 public interface NativeScriptResultHandler
 {
-    public boolean handle(String scriptResult)
+    public boolean handle(String scriptResult);
 }
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -120,7 +120,7 @@ public class InAppBrowser extends CordovaPlugin {
             Lod.d(LOG_TAG, "+++++++++++++++++++++++++++++++++ IT WORKED!!! " + scriptResult);
             return false;
         }
-    }
+    };
 
     /**
      * Executes the request and returns PluginResult.
