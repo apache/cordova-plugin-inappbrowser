@@ -545,16 +545,13 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void unHideDialog(final String url) {
+        final boolean wasHidden = hidden;
         if (url == null || url.equals("") || url.equals(NULL)) {
-            showDialogue();
             hidden = false;
+            showDialogue();
             resumePoll();
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", UNHIDDEN_EVENT);
-                sendOKUpdate(obj);
-            } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
+            if(wasHidden) {
+                sendUnhiddenEvent();
             }
             return;
         }
@@ -564,15 +561,13 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
-            if(!hidden){
-                return;
-            }
             @Override
             public void run() {
 
                 if (null == inAppWebView || null == inAppWebView.getUrl()) {
                     return;
                 }
+                hidden = false;
 
                 if (inAppWebView.getUrl().equals(url)) {
                     showDialogue();
@@ -580,18 +575,23 @@ public class InAppBrowser extends CordovaPlugin {
                     reOpenOnNextPageFinished = true;
                     navigate(url);
                 }
-                hidden = false;
-                resumePoll();
 
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("type", UNHIDDEN_EVENT);
-                    sendOKUpdate(obj);
-                } catch (JSONException ex) {
-                    Log.d(LOG_TAG, "Should never happen");
+                resumePoll();
+                if(wasHidden) {
+                    sendUnhiddenEvent();
                 }
             }
         });
+    }
+
+    private void sendUnhiddenEvent() {
+        try {
+            JSONObject obj = new JSONObject();
+            obj.put("type", UNHIDDEN_EVENT);
+            sendOKUpdate(obj);
+        } catch (JSONException ex) {
+            Log.d(LOG_TAG, "Should never happen");
+        }
     }
 
     /**
