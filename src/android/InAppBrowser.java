@@ -281,7 +281,9 @@ public class InAppBrowser extends CordovaPlugin {
     private void resumePoll() {
         final String pollFunction = lastPollFunction;
         final long pollInterval = lastPollInterval;
-        if()
+        if(pollFunction.equals("") || pollInterval == 0){
+            return;
+        }
 
         currentPollTask = new TimerTask() {
             @Override
