@@ -106,8 +106,6 @@
             'exit' : channel.create('exit')
         }
 
-
-
         me.isHidden = function(){
             return hidden;
         }
