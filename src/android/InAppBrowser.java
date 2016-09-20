@@ -114,6 +114,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean destroyHistoryOnNextPageFinished = false;
     private boolean reOpenOnNextPageFinished = false;
+    private boolean hidden = false;
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler() {
         private void sendPollResult(String scriptResult) {
@@ -496,6 +497,9 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void hideDialog(final boolean releaseResources, final boolean goToBlank) {
+        if(hidden){
+            return;
+        }
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -503,7 +507,7 @@ public class InAppBrowser extends CordovaPlugin {
                 if (null == inAppWebView || null == dialog) {
                     return;
                 }
-
+                hidden = true;
                 if (releaseResources) {
                     stopPoll();
 
@@ -543,6 +547,7 @@ public class InAppBrowser extends CordovaPlugin {
     private void unHideDialog(final String url) {
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
+            hidden = false;
             resumePoll();
             try {
                 JSONObject obj = new JSONObject();
@@ -572,6 +577,7 @@ public class InAppBrowser extends CordovaPlugin {
                     reOpenOnNextPageFinished = true;
                     navigate(url);
                 }
+                hidden = false;
                 resumePoll();
                 try {
                     JSONObject obj = new JSONObject();
