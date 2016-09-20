@@ -564,6 +564,9 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
+            if(!hidden){
+                return;
+            }
             @Override
             public void run() {
 
@@ -579,6 +582,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 hidden = false;
                 resumePoll();
+
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("type", UNHIDDEN_EVENT);
