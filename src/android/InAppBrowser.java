@@ -740,7 +740,6 @@ public class InAppBrowser extends CordovaPlugin {
         }
         this.inAppWebView.requestLayout();
         this.inAppWebView.requestFocus();
-        this.inAppWebView.requestLayout();
     }
 
     /**
