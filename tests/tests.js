@@ -444,7 +444,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openHardwareBackYes"></div>' +
         'Expected result: hardwareback=yes pressing back button should navigate backwards in history then close InAppBrowser' +
         '<p/> <div id="openHardwareBackNo"></div>' +
-        'Expected result: hardwareback=no pressing back button should close InAppBrowser regardless history';
+        'Expected result: hardwareback=no pressing back button should close InAppBrowser regardless history' + 
+        '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
+        'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
 
     // CB-7490 We need to wrap this code due to Windows security restrictions
     // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
@@ -651,4 +653,19 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('hardwareback=no', function () {
         doOpen('http://cordova.apache.org', '_blank', 'hardwareback=no');
     }, 'openHardwareBackNo');
+    createActionButton('no hardwareback -> hardwareback=no -> no hardwareback', function() {
+        var ref = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes');
+        ref.addEventListener('loadstop', function() {
+            ref.close();
+        });
+        ref.addEventListener('exit', function() {
+            var ref2 = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes,hardwareback=no');
+            ref2.addEventListener('loadstop', function() {
+                ref2.close();
+            });
+            ref2.addEventListener('exit', function() {
+                cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes');
+            });
+        });
+    }, 'openHardwareBackDefaultAfterNo');
 };
