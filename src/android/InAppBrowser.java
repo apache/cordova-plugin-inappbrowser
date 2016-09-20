@@ -738,7 +738,7 @@ public class InAppBrowser extends CordovaPlugin {
         } else {
             this.inAppWebView.loadUrl(url);
         }
-        inAppWebView.invalidate();
+        this.inAppWebView.requestLayout();
         this.inAppWebView.requestFocus();
     }
 
