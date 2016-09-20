@@ -129,39 +129,31 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         public boolean handle(String scriptResult) {
-            Log.d(LOG_TAG, "Result = " + scriptResult);
             try {
                 JSONArray returnedArray = new JSONArray(scriptResult);
-                Log.d(LOG_TAG, "Parsed OK");
 
                 JSONObject commandObject = returnedArray.optJSONObject(0);
                 if (commandObject == null) {
-                    Log.d(LOG_TAG, "***************** first array element not a object");
                     sendPollResult(scriptResult);
                     return true;
                 }
 
                 String action = commandObject.optString("InAppBrowserAction");
-                Log.d(LOG_TAG, "***************** action " + action);
 
                 if (action == null) {
-                    Log.d(LOG_TAG, "***************** action null");
                     sendPollResult(scriptResult);
                     return true;
                 }
 
                 if (action.equalsIgnoreCase("close")) {
-                    Log.d(LOG_TAG, "***************** close");
                     stopPoll();
                     closeDialog();
                     return true;
                 }
                 if (action.equalsIgnoreCase("hide")) {
-                    Log.d(LOG_TAG, "***************** hide");
                     hideDialog(false, true);
                     return true;
                 }
-                Log.d(LOG_TAG, "***************** action not recognsed");
 
                 Log.d(LOG_TAG, "The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
                 sendPollResult(scriptResult);
@@ -446,17 +438,14 @@ public class InAppBrowser extends CordovaPlugin {
             scriptToInject = source;
         }
         final String finalScriptToInject = scriptToInject;
-        Log.d(LOG_TAG, "Script To Inject=" + finalScriptToInject);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @SuppressLint("NewApi")
             @Override
             public void run() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    Log.d(LOG_TAG, "Running KitKat or below");
                     // This action will have the side-effect of blurring the currently focused element
                     inAppWebView.loadUrl("javascript:" + finalScriptToInject);
                 } else {
-                    Log.d(LOG_TAG, "Running above kitkat");
                     inAppWebView.evaluateJavascript(finalScriptToInject, null);
                 }
             }
