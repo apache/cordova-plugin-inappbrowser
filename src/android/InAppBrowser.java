@@ -251,9 +251,9 @@ public class InAppBrowser extends CordovaPlugin {
                 return true;
             }
 
-            lastPollFunction = args.getString(0);
-            lastPollInterval = args.getLong(1);
-            startPoll();
+            String pollFunction = args.getString(0);
+            long pollInterval = args.getLong(1);
+            startPoll(pollFunction, pollInterval);
             return true;
         }
 
@@ -268,17 +268,19 @@ public class InAppBrowser extends CordovaPlugin {
     private TimerTask currentPollTask;
     private Timer currentTimer;
     private long lastPollInterval;
-    private string lastPollFunction;
+    private String lastPollFunction;
 
 
-    private void startPoll() {
+    private void startPoll(String pollFunction, long pollInterval) {
+        pausePoll();
+        lastPollFunction = pollFunction;
+        lastPollInterval = pollInterval;
+        resumePoll();
+    }
+
+    private void resumePoll() {
         final String pollFunction = lastPollFunction;
         final long pollInterval = lastPollInterval;
-
-
-        //TODO: If polling - stop.
-        //TODO: Set last poll function/interval
-        //TODO: call poll
 
         currentPollTask = new TimerTask() {
             @Override
@@ -288,7 +290,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
         };
 
-         =new Timer();
+        currentTimer = new Timer();
         currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
         sendOKUpdate();
     }
@@ -309,7 +311,6 @@ public class InAppBrowser extends CordovaPlugin {
         pausePoll();
         lastPollFunction = null;
         lastPollInterval = null;
-
         sendOKUpdate();
     }
 
@@ -649,6 +650,7 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                stopPoll();
                 final WebView childView = inAppWebView;
                 // The JS protects against multiple calls, so this should happen only when
                 // closeDialog() is called by other native code.
