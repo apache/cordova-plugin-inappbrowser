@@ -157,7 +157,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 if (action.equalsIgnoreCase("hide")) {
                     Log.d(LOG_TAG, "***************** hide");
-                    hideDialog(true, true);
+                    hideDialog(false, true);
                     return true;
                 }
                 Log.d(LOG_TAG, "***************** action not recognsed");
@@ -281,6 +281,7 @@ public class InAppBrowser extends CordovaPlugin {
     private void resumePoll() {
         final String pollFunction = lastPollFunction;
         final long pollInterval = lastPollInterval;
+        if()
 
         currentPollTask = new TimerTask() {
             @Override
@@ -538,9 +539,9 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void unHideDialog(final String url) {
-
         if (url == null || url.equals("") || url.equals(NULL)) {
             showDialogue();
+            resumePoll();
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", UNHIDDEN_EVENT);
@@ -569,6 +570,7 @@ public class InAppBrowser extends CordovaPlugin {
                     reOpenOnNextPageFinished = true;
                     navigate(url);
                 }
+                resumePoll();
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("type", UNHIDDEN_EVENT);
