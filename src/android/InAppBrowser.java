@@ -19,7 +19,9 @@
 package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.Browser;
 import android.content.res.Resources;
@@ -100,6 +102,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    private String username;
+    private String password;
 
     /**
      * Executes the request and returns PluginResult.
@@ -998,8 +1002,56 @@ public class InAppBrowser extends CordovaPlugin {
                 return;
             }
 
+            final Context applicationContext = cordova.getActivity();
+            final AlertDialog.Builder usernameBuilder = new AlertDialog.Builder(applicationContext);
+            final AlertDialog.Builder passwordBuilder = new AlertDialog.Builder(applicationContext);
+
+            usernameBuilder.setTitle("username");
+            passwordBuilder.setTitle("password");
+
+            final EditText inputUser = new EditText(applicationContext);
+            inputUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            usernameBuilder.setView(inputUser);
+
+            final EditText inputPassword = new EditText(applicationContext);
+            inputPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            passwordBuilder.setView(inputPassword);
+
+            usernameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    username = inputUser.getText().toString();
+                    dialog.cancel();
+                    passwordBuilder.show();
+                }
+            });
+            usernameBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.cancel();
+
+                }
+            });
+
+            passwordBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    password = inputPassword.getText().toString();
+                    dialog.cancel();
+                    handler.proceed(username, password);
+                }
+            });
+            passwordBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    handler.cancel();
+                }
+            });
+
+            usernameBuilder.show();
+
             // By default handle 401 like we'd normally do!
-            super.onReceivedHttpAuthRequest(view, handler, host, realm);
+ //           super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
     }
 }
