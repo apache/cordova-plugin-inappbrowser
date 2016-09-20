@@ -267,8 +267,8 @@ public class InAppBrowser extends CordovaPlugin {
 
     private TimerTask currentPollTask;
     private Timer currentTimer;
-    private long lastPollInterval;
-    private String lastPollFunction;
+    private long lastPollInterval = 0;
+    private String lastPollFunction = "";
 
 
     private void startPoll(String pollFunction, long pollInterval) {
@@ -309,8 +309,8 @@ public class InAppBrowser extends CordovaPlugin {
 
     private void stopPoll() {
         pausePoll();
-        lastPollFunction = null;
-        lastPollInterval = null;
+        lastPollFunction = "";
+        lastPollInterval = 0;
         sendOKUpdate();
     }
 
