@@ -562,6 +562,7 @@ public class InAppBrowser extends CordovaPlugin {
                     showDialogue();
                 } else {
                     reOpenOnNextPageFinished = true;
+                    inAppWebView.invalidate();
                     navigate(url);
                     inAppWebView.invalidate();
                 }
