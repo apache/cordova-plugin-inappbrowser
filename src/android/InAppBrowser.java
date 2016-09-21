@@ -19,9 +19,8 @@
 package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.Browser;
 import android.content.res.Resources;
@@ -975,7 +974,7 @@ public class InAppBrowser extends CordovaPlugin {
          * On received http auth request.
          */
         @Override
-        public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+        public void onReceivedHttpAuthRequest(WebView view, final HttpAuthHandler handler, String host, String realm) {
 
             // Check if there is some plugin which can resolve this auth challenge
             PluginManager pluginManager = null;
