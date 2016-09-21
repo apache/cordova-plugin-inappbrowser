@@ -35,6 +35,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -46,12 +47,13 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
+import android.widget.TextView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
@@ -61,6 +63,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.capriza.local.store.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -1003,52 +1006,37 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             final Context applicationContext = cordova.getActivity();
-            final AlertDialog.Builder usernameBuilder = new AlertDialog.Builder(applicationContext);
-            final AlertDialog.Builder passwordBuilder = new AlertDialog.Builder(applicationContext);
+            final Dialog dialog = new Dialog(applicationContext);
+            dialog.setContentView(R.layout.ntlm_dialog);
+            dialog.setTitle("Authentication");
 
-            usernameBuilder.setTitle("username");
-            passwordBuilder.setTitle("password");
+            // setting the custom dialog components - text, image and button
+            final TextView usernameTextView = (TextView) dialog.findViewById(R.id.username);
+            usernameTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            final TextView passwordTextView = (TextView) dialog.findViewById(R.id.password);
+            passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-            final EditText inputUser = new EditText(applicationContext);
-            inputUser.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            usernameBuilder.setView(inputUser);
-
-            final EditText inputPassword = new EditText(applicationContext);
-            inputPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            passwordBuilder.setView(inputPassword);
-
-            usernameBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            Button okDialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+            okDialogButton.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    username = inputUser.getText().toString();
-                    dialog.cancel();
-                    passwordBuilder.show();
-                }
-            });
-            usernameBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    handler.cancel();
-
+                public void onClick(View v) {
+                    username = usernameTextView.getText().toString();
+                    password = passwordTextView.getText().toString();
+                    dialog.dismiss();
+                    handler.proceed(username,password);
                 }
             });
 
-            passwordBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            Button cancelDialogButton = (Button) dialog.findViewById(R.id.dialogButtonCancel);
+            cancelDialogButton.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    password = inputPassword.getText().toString();
-                    dialog.cancel();
-                    handler.proceed(username, password);
-                }
-            });
-            passwordBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(View v) {
+                    dialog.dismiss();
                     handler.cancel();
                 }
             });
 
-            usernameBuilder.show();
+            dialog.show();
 
             // By default handle 401 like we'd normally do!
  //           super.onReceivedHttpAuthRequest(view, handler, host, realm);
