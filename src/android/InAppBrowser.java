@@ -1233,7 +1233,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             Log.d(LOG_TAG, "************************************" + url);
 
-            if(url == BLANK_PAGE_URL) {
+            if(url.equal(BLANK_PAGE_URL)) {
                 destroyHistoryOnNextPageFinished = true;
                 Log.d(LOG_TAG, "************************************ Don't show about blank in history");
             }
