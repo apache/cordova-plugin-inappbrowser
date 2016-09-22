@@ -1214,12 +1214,13 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieSyncManager.getInstance().sync();
             }
 
+            if (destroyHistoryOnNextPageFinished) {
+                destroyHistoryOnNextPageFinished = false;
+                view.clearHistory();
+            }
+
             if (reOpenOnNextPageFinished) {
                 reOpenOnNextPageFinished = false;
-                if (destroyHistoryOnNextPageFinished) {
-                    destroyHistoryOnNextPageFinished = false;
-                    view.clearHistory();
-                }
                 showDialogue();
             }
 
