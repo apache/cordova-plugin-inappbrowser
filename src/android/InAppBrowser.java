@@ -228,7 +228,6 @@ public class InAppBrowser extends CordovaPlugin {
         if (action.equals("hide")) {
             final boolean releaseResources = args.isNull(0) ? false : args.getBoolean(0);
             final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
-            Log.d(LOG_TAG, "******************************* Hiding Dialog from poll");
             hideDialog(releaseResources, goToBlank);
             return true;
         }
@@ -487,8 +486,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void hideDialog(final boolean releaseResources, final boolean goToBlank) {
-        Log.d(LOG_TAG, "******************************* Hiding Dialog release" + releaseResources);
-        Log.d(LOG_TAG, "******************************* Hiding Dialog goToBlank" + goToBlank);
         if(hidden){
             return;
         }
@@ -513,7 +510,6 @@ public class InAppBrowser extends CordovaPlugin {
 
                 dialog.hide();
                 if (goToBlank) {
-                    destroyHistoryOnNextPageFinished = true;
                     inAppWebView.loadUrl(BLANK_PAGE_URL);
                 }
 
@@ -1209,7 +1205,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
+
 
             // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -1219,6 +1215,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             if (destroyHistoryOnNextPageFinished) {
+                Log.d(LOG_TAG, "************************************ Clearing the history");
                 destroyHistoryOnNextPageFinished = false;
                 view.clearHistory();
             }
@@ -1230,6 +1227,13 @@ public class InAppBrowser extends CordovaPlugin {
 
             if(url == BLANK_PAGE_URL) {
                 destroyHistoryOnNextPageFinished = false;
+            }
+
+            super.onPageFinished(view, url);
+
+            if(url == BLANK_PAGE_URL) {
+                destroyHistoryOnNextPageFinished = true;
+                Log.d(LOG_TAG, "************************************ Don't show about blank in history");
             }
 
             try {
