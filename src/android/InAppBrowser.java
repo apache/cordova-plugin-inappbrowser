@@ -487,7 +487,7 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void hideDialog(final boolean releaseResources, final boolean goToBlank) {
         Log.d(LOG_TAG, "******************************* Hiding Dialog release" + releaseResources);
-        Log.d(LOG_TAG, "******************************* Hiding Dialog goToBlank" + goToBlank);ß
+        Log.d(LOG_TAG, "******************************* Hiding Dialog goToBlank" + goToBlank);
         if(hidden){
             return;
         }
