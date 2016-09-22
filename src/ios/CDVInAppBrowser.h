@@ -20,6 +20,7 @@
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
+#define kDefaultToken @"NoHeaderToken"
 
 #ifdef __CORDOVA_4_0_0
 #import <Cordova/CDVUIWebViewDelegate.h>
@@ -111,7 +112,7 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
-
+@property (nonatomic, strong) NSString *tokenString;
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;

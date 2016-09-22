@@ -36,6 +36,7 @@
 
 @interface CDVInAppBrowser () {
 	NSInteger _previousStatusBarStyle;
+	NSString* receivedHeaderToken;
 }
 @end
 
@@ -85,7 +86,10 @@
 	NSString* url = [command argumentAtIndex:0];
 	NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
 	NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-	
+	NSString *defaultTokenString = [command argumentAtIndex:3 withDefault:kDefaultToken];
+
+	receivedHeaderToken = [[NSString alloc]initWithString:defaultTokenString];
+
 	self.callbackId = command.callbackId;
 	
 	if (url != nil) 
@@ -171,7 +175,7 @@
 	
 	[self.inAppBrowserViewController showLocationBar:browserOptions.location];
 	[self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
-	[self.inAppBrowserViewController showNavigationBtns:browserOptions.shownavigationbtns]; //PATCH - prev forward buttons
+//	[self.inAppBrowserViewController showNavigationBtns:browserOptions.shownavigationbtns]; //PATCH - prev forward buttons
 	[self.inAppBrowserViewController setToolbarFlatColor:browserOptions.toolbarbgcolor]; //PATCH - toolbar flat background colour
 	[self.inAppBrowserViewController setToolbarGradientColor:browserOptions.gradient1 :browserOptions.gradient2 :browserOptions.alphagradient1 :browserOptions.alphagradient2]; //PATCH - set gradient color
 	
@@ -230,7 +234,7 @@
 		self.inAppBrowserViewController.webView.keyboardDisplayRequiresUserAction = browserOptions.keyboarddisplayrequiresuseraction;
 		self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
 	}
-	
+	[self.inAppBrowserViewController setTokenString:receivedHeaderToken];
 	[self.inAppBrowserViewController navigateTo:url];
 	if (!browserOptions.hidden) 
 		[self show:nil];
@@ -413,6 +417,52 @@
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
 	NSURL* url = request.URL;
+	BOOL isStringSet = ![receivedHeaderToken isEqualToString:kDefaultToken] && receivedHeaderToken.length > 0;
+	if (isStringSet)
+	{
+		NSArray *array  = [receivedHeaderToken componentsSeparatedByString:@"="];
+		NSString *tokenKey = [array firstObject];
+		if (![[[request allHTTPHeaderFields]allKeys]containsObject:tokenKey])
+		{
+			NSMutableString *valueString = [[NSMutableString alloc]init];
+			if (array.count>2)
+			{
+				for (int i = 1; i<array.count; i++)
+				{
+					if (i != array.count - 1)
+					{
+						NSString *stringToRet = [[array objectAtIndex:i] stringByAppendingString:@"="];
+						[valueString appendString:stringToRet];
+					}
+					else
+					{
+						[valueString appendString:[array objectAtIndex:i]];
+					}
+				}
+			}
+			else if (array.count==2)
+			{
+				[valueString setString:array.lastObject];
+			}
+			
+			if (array.count<2)
+			{
+				//Don't do anything, no token was passed for the link
+				//Or PAss on a message as error
+			}
+			else
+			{
+				NSMutableURLRequest *mutable_request= [request mutableCopy];
+				[mutable_request setValue:[valueString copy] forHTTPHeaderField:tokenKey];
+				request = [mutable_request copy];
+			}
+			
+		}
+	}
+	NSLog(@"all Headers: %@",[request allHTTPHeaderFields]);
+	NSLog(@"all url: %@",[[request URL]absoluteString]);
+	NSLog(@"request base / relative path: %@", [[request URL]parameterString] );
+
 	BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 	
 	// See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
@@ -521,9 +571,16 @@
 
 #pragma mark CDVInAppBrowserViewController
 
+@interface CDVInAppBrowserViewController ()
+{
+	NSMutableDictionary *webViewRequestMap;
+
+}
+@end
+
 @implementation CDVInAppBrowserViewController
 
-@synthesize currentURL;
+@synthesize currentURL,tokenString;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions
 {
@@ -975,7 +1032,48 @@
 - (void)navigateTo:(NSURL*)url
 {
 	NSURLRequest* request = [NSURLRequest requestWithURL:url];
-	
+	NSString *defaultString = kDefaultToken;
+	if (![self.tokenString isEqualToString:defaultString])
+	{
+		NSArray *array  = [self.tokenString componentsSeparatedByString:@"="];
+		NSMutableString *keyString = [[NSMutableString alloc]init];
+		NSMutableString *valueString = [[NSMutableString alloc]init];
+		if (array.count>2)
+		{
+			[keyString setString:[array objectAtIndex:0]];
+			for (int i = 1; i<array.count; i++)
+			{
+				if (i != array.count - 1)
+				{
+					NSString *stringToRet = [[array objectAtIndex:i] stringByAppendingString:@"="];
+					[valueString appendString:stringToRet];
+				}
+				else
+				{
+					[valueString appendString:[array objectAtIndex:i]];
+				}
+			}
+		}
+		else if (array.count==2)
+		{
+			[keyString setString:[array objectAtIndex:0]];
+			[valueString setString:array.lastObject];
+		}
+		
+		if (array.count<2)
+		{
+			//Don't do anything, no token was passed for the link
+			//Or PAss on a message as error
+		}
+		else
+		{
+			NSMutableURLRequest *mutable_request= [request mutableCopy];
+			[mutable_request addValue:[valueString copy] forHTTPHeaderField:keyString];
+			request = [mutable_request copy];
+			NSLog(@"headers: %@",[request allHTTPHeaderFields]);
+		}
+	}
+
 	if (_userAgentLockToken != 0) 
 	{
 		[self.webView loadRequest:request];
@@ -1043,7 +1141,20 @@
 	
 	if (isTopLevelNavigation) 
 		self.currentURL = request.URL;
-	return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
+	
+	BOOL toRet = [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
+	if (toRet)
+	{
+		NSMutableDictionary* mapObject = [NSMutableDictionary dictionary];
+		mapObject[@"headers"] = request.allHTTPHeaderFields;
+		mapObject[@"navigationType"] = @(navigationType);
+		if (!webViewRequestMap)
+		{
+			webViewRequestMap = [[NSMutableDictionary alloc]init];
+		}
+		[webViewRequestMap setObject:mapObject forKey:request.URL.absoluteString];
+	}
+	return toRet;
 }
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
