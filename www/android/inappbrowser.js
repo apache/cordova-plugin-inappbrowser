@@ -74,8 +74,8 @@
             hidden = false;
         }
 
-        me.hide = function(boolGoToBlank, eventname){
-            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
+        me.hide = function(releaseResources, boolGoToBlank, eventname){
+            exec(null,null,"InAppBrowser", "hide", [releaseResources, boolGoToBlank]);
             hidden = true;
         }
 
