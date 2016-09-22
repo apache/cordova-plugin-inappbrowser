@@ -499,6 +499,7 @@ public class InAppBrowser extends CordovaPlugin {
                 hidden = true;
                 if (releaseResources) {
                     stopPoll();
+                    destroyHistoryOnNextPageFinished = true;
 
                 } else {
                     // Technically we don't need to do this -
@@ -1222,6 +1223,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (reOpenOnNextPageFinished) {
                 reOpenOnNextPageFinished = false;
                 showDialogue();
+            }
+
+            if(url == BLANK_PAGE_URL) {
+                destroyHistoryOnNextPageFinished = false;
             }
 
             try {
