@@ -1215,7 +1215,6 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             if (destroyHistoryOnNextPageFinished) {
-                Log.d(LOG_TAG, "************************************ Clearing the history");
                 destroyHistoryOnNextPageFinished = false;
                 view.clearHistory();
             }
@@ -1231,11 +1230,8 @@ public class InAppBrowser extends CordovaPlugin {
 
             super.onPageFinished(view, url);
 
-            Log.d(LOG_TAG, "************************************" + url);
-
             if(url.equals(BLANK_PAGE_URL)) {
                 destroyHistoryOnNextPageFinished = true;
-                Log.d(LOG_TAG, "************************************ Don't show about blank in history");
             }
 
             try {
