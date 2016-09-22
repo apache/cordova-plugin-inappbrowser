@@ -228,6 +228,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (action.equals("hide")) {
             final boolean releaseResources = args.isNull(0) ? false : args.getBoolean(0);
             final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
+            Log.d(LOG_TAG, "******************************* Hiding Dialog from poll");
             hideDialog(releaseResources, goToBlank);
             return true;
         }
