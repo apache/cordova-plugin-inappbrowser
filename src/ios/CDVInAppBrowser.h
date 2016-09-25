@@ -34,6 +34,7 @@
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
+@property (nonatomic, assign) BOOL isAuthenticated;
 @property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
 
 - (void)open:(CDVInvokedUrlCommand*)command;
@@ -67,7 +68,7 @@
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, NSURLConnectionDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
@@ -93,6 +94,8 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
+@property (nonatomic) BOOL isAuthenticated;
+@property (nonatomic) NSURLAuthenticationChallenge* challenge;
 
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
