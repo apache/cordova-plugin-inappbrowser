@@ -48,14 +48,14 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         NSURL* baseUrl = [self.webView.request URL];
     #endif
         NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
-    
+
         if ([[UIApplication sharedApplication] canOpenURL:absoluteUrl]) {
             [[UIApplication sharedApplication] openURL:absoluteUrl];
-        } else { 
+        } else {
             // handle any custom schemes to plugins
             [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:absoluteUrl]];
         }
-    
+
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
@@ -240,7 +240,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     NSArray * array = (NSArray *) decodedResult;
     NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
     if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty or non string action) - returning json directly to JS");
         [self sendPollResult:scriptResult];
         return;
     }
@@ -289,7 +288,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:@[]];
     }
     [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
-    
+
 }
 
 /**
@@ -324,7 +323,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     if([[url scheme] isEqualToString:@"gap-iab-native"]) {
         [self handlePollResult:url];
         return NO;
-    } 
+    }
 
     if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
             //if is an app store link, let the system handle it, otherwise it fails to load it
@@ -380,7 +379,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         [self openInSystem:absoluteUrl];
     }   else if ([target isEqualToString:kInAppBrowserTargetSelf]) {
         [self openInCordovaWebView:absoluteUrl withOptions:options];
-    } else { 
+    } else {
         // _blank or anything else
         [self openInInAppBrowser:absoluteUrl withOptions:options];
     }
@@ -398,6 +397,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView {
     NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
+    showing = NO;
     [self notifyUnhidden];
 }
 
@@ -456,7 +456,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 - (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper {
     // Ensure an iframe bridge is created to communicate with the CDVInAppBrowserViewController
     [self ensureIFrameBridgeForCDVInAppBrowserViewController];
-    
+
     if (jsWrapper != nil) {
         NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -503,19 +503,26 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark show-hide
 
-BOOL unHiding = NO;
+BOOL unhiding = NO;
+BOOL showing = NO;
+BOOL hiding = NO;
+bool closing = NO;
 
 -(void)notifyUnhidden {
-    //Called back from webViewDidFinishLoad 
-    if(unHiding) {
+    //Called back from webViewDidFinishLoad
+    if(unhiding) {
         [self showWindow];
         [self sendOKPluginResult:@{@"type":@"unhidden"}];
-        unHiding = NO;
+        unhiding = NO;
     }
 }
 
 -(void)hideView
 {
+    if(showing || unhiding || hiding) {
+        return;
+    }
+    hiding = YES;
     [self sendOKPluginResult:@{@"type":@"preventexitonhide"}];
     [self stopPolling];
     [self sendOKPluginResult:@{@"type":@"hidden"}];
@@ -523,7 +530,7 @@ BOOL unHiding = NO;
 }
 
 - (void)unHideView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
-    unHiding = YES;
+    unhiding = YES;
     [self openUrl:url targets:target withOptions:options];
 }
 
@@ -532,6 +539,10 @@ BOOL unHiding = NO;
 NSTimer* pollTimer;
 
 -(void)onPollTick:(NSTimer *)timer {
+    if(hiding || closing) {
+        [self stopPolling];
+        return;
+    }
     NSString* pollCode = timer.userInfo;
     if(pollCode != nil) {
         NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
@@ -543,21 +554,21 @@ NSTimer* pollTimer;
 }
 
 - (void)sendPollResult:(NSString*)data {
-    //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window 
+    //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window
     [self sendOKPluginResult:@{@"type":@"pollresult", @"data":data}];
 }
 
 -(void)startPolling:(NSString*)script interval:(NSTimeInterval)interval {
-    if(!pollTimer) {
-        [self stopPolling];
+    [self stopPolling];
+    if(hiding || closing){
+        return;
     }
     pollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:script repeats:YES];
 }
 
+
 -(void)stopPolling {
-    if(pollTimer != nil) {
-        [pollTimer invalidate];
-    }
+    [pollTimer invalidate];
     pollTimer = nil;
 }
 
@@ -572,6 +583,7 @@ NSTimer* pollTimer;
 }
 
 - (void)close:(CDVInvokedUrlCommand*)command {
+    closing = true;
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"IAB.close() called but it was already closed.");
         return;
@@ -638,7 +650,7 @@ NSTimer* pollTimer;
 }
 
 - (void)startPoll:(CDVInvokedUrlCommand*)command
-{   
+{
     if([command argumentAtIndex:0] == nil ||  [command argumentAtIndex:1] == nil) {
         NSLog(@"Incorrect number of arguments passed to start polling");
         return;
@@ -651,7 +663,7 @@ NSTimer* pollTimer;
 - (void)stopPoll:(CDVInvokedUrlCommand*)command
 {
     [self stopPolling];
-} 
+}
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
@@ -659,7 +671,6 @@ NSTimer* pollTimer;
 }
 
 - (void)unHide:(CDVInvokedUrlCommand*)command {
-    
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
@@ -687,7 +698,7 @@ NSTimer* pollTimer;
 #else
         _webViewDelegate = [[CDVWebViewDelegate alloc] initWithDelegate:self];
 #endif
-        
+
         [self createViews];
     }
 
@@ -977,6 +988,11 @@ NSTimer* pollTimer;
         } else {
             [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
         }
+        unhiding = NO;
+        showing = NO;
+        hiding = NO;
+        closing = NO;
+        pollTimer = nil;
     });
 }
 

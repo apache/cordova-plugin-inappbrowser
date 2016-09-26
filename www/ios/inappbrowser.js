@@ -129,20 +129,19 @@
         }
 
         me.hide = function(releaseResources, blankPage){
-            
+
             if(releaseResources){
                 me.stopPoll();
                 releaseListeners();
             }
 
-            // Release resources has no effect in native iOS - the IAB 
+            // Release resources has no effect in native iOS - the IAB
             // Is fully closed & the JS pretends it isn't
             exec(null,null,"InAppBrowser", "hide", [releaseResources]);
             hidden = true;
         }
 
         me.unHide = function(strUrl, eventname){
-
             if(strUrl){
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
             }
@@ -217,7 +216,7 @@
         strWindowFeatures = strWindowFeatures || "";
 
         if(strWindowName === '_system') {
-            // This is now separate as more-or-less fire and forget system browser was re-utilising 
+            // This is now separate as more-or-less fire and forget system browser was re-utilising
             // Code for blank/self. This caused problems with browser crashes etc.
             exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
         } else {
