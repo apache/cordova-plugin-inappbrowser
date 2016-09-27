@@ -29,8 +29,7 @@
 
 @class CDVInAppBrowserViewController;
 
-@interface CDVInAppBrowser : CDVPlugin {
-}
+@interface CDVInAppBrowser : CDVPlugin { }
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
@@ -40,6 +39,19 @@
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
+- (void)startPoll:(CDVInvokedUrlCommand*)command;
+- (void)stopPoll:(CDVInvokedUrlCommand*)command;
+- (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)unHide:(CDVInvokedUrlCommand*)command;
+
+@end
+
+
+@interface CDVSystemBrowser : CDVPlugin { }
+
+@property (nonatomic, copy) NSString* callbackId;
+
+- (void)open:(CDVInvokedUrlCommand*)command;
 
 @end
 

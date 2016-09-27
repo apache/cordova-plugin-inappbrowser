@@ -42,11 +42,15 @@
             <feature name="InAppBrowser"> 
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
             </feature>
+            <feature name="SystemBrowser">
+                <param name="android-package" value="org.apache.cordova.inappbrowser.SystemBrowser"/>
+            </feature>
         </config-file>
 
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/SystemBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
 
         <!--  drawable src/android/resources -->
         <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
@@ -68,7 +72,7 @@
 
     <!-- amazon-fireos -->
     <platform name="amazon-fireos">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -101,7 +105,7 @@
     
     <!-- ubuntu -->
     <platform name="ubuntu">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -114,7 +118,7 @@
 
     <!-- ios -->
     <platform name="ios">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/ios/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>  
@@ -122,11 +126,13 @@
             <feature name="InAppBrowser">
                 <param name="ios-package" value="CDVInAppBrowser" /> 
             </feature>
+            <feature name="SystemBrowser">
+                <param name="ios-package" value="CDVSystemBrowser" />
+            </feature>
         </config-file>
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
 	    <source-file src="src/ios/CDVInAppBrowser.m" />
-	    
 	    <framework src="CoreGraphics.framework" />
     </platform>
 
@@ -136,7 +142,7 @@
             <Capability Name="ID_CAP_NETWORKING"/>
         </config-file>
 
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -159,7 +165,7 @@
             <Capability Name="ID_CAP_NETWORKING"/>
         </config-file>
                 
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -178,7 +184,7 @@
 
     <!-- windows8 -->
     <platform name="windows8">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -189,7 +195,7 @@
 
     <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
     <platform name="windows">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -204,7 +210,7 @@
         <config-file target="config.xml" parent="/*">
             <permission name="browser" description="Enables the app to implement a browser in an iframe." privileged="true"/>
         </config-file>
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
@@ -215,7 +221,7 @@
 
     <!-- browser -->
     <platform name="browser">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
+        <js-module src="www/original/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>

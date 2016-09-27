@@ -31,45 +31,82 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    function InAppBrowser() {
-       this.channels = {
+    function InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks) {
+        var me = this,
+            polling = false,
+            hidden = false,
+            backChannels = { };
+
+        function eventCallback (event) {
+                    if (event && (event.type in backChannels)) {
+                        backChannels[event.type].fire(event);
+                    }
+                    if (event && (event.type in me.channels)) {
+                        me.channels[event.type].fire(event);
+                    }
+        }
+
+        me.isHidden = function(){
+            return hidden;
+        }
+
+        me.isPolling = function(){
+            return polling;
+        }
+
+        me.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
+            'hidden' : channel.create('hidden'),
+            'unhidden' : channel.create('unhidden'),
+            'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
-       };
-    }
+        }
 
-    InAppBrowser.prototype = {
-        _eventHandler: function (event) {
-            if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
-            }
-        },
-        close: function (eventname) {
+        me.close = function (eventname) {
             exec(null, null, "InAppBrowser", "close", []);
-        },
-        show: function (eventname) {
-            exec(null, null, "InAppBrowser", "show", []);
-        },
-        hide: function(boolGoToBlank, eventname){
-            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
-	    },
-        reveal: function(strUrl, eventname){
-            exec(null,null,"InAppBrowser", "reveal", [strUrl]);
-        },
-        addEventListener: function (eventname,f) {
-            if (eventname in this.channels) {
-                this.channels[eventname].subscribe(f);
-            }
-        },
-        removeEventListener: function(eventname, f) {
-            if (eventname in this.channels) {
-                this.channels[eventname].unsubscribe(f);
-            }
-        },
+            hidden = false;
+        }
 
-        executeScript: function(injectDetails, cb) {
+        me.show = function (eventname) {
+            exec(null, null, "InAppBrowser", "show", []);
+            hidden = false;
+        }
+
+        me.hide = function(releaseResources, boolGoToBlank, eventname){
+            exec(null,null,"InAppBrowser", "hide", [releaseResources, boolGoToBlank]);
+            hidden = true;
+        }
+
+        me.unHide = function(strUrl, eventname){
+            exec(null,null,"InAppBrowser", "unHide", [strUrl]);
+            hidden = false;
+        }
+
+        me.startPoll = function(pollFunction, pollInterval){
+           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+           polling = true;
+        }
+
+        me.stopPoll = function() {
+           exec(null, null, "InAppBrowser", "stopPoll", []);
+           polling = false;
+        }
+
+        me.addEventListener = function (eventname,f) {
+            if (eventname in me.channels) {
+                me.channels[eventname].subscribe(f);
+            }
+        }
+
+        me.removeEventListener = function(eventname, f) {
+            if (eventname in me.channels) {
+                me.channels[eventname].unsubscribe(f);
+            }
+        }
+
+        me.executeScript = function(injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -77,9 +114,9 @@
             } else {
                 throw new Error('executeScript requires exactly one of code or file to be specified');
             }
-        },
+        }
 
-        insertCSS: function(injectDetails, cb) {
+        me.insertCSS = function(injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -88,7 +125,14 @@
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
         }
-    };
+
+
+       for (var callbackName in callbacks) {
+           me.addEventListener(callbackName, callbacks[callbackName]);
+       }
+
+       exec(eventCallback, eventCallback, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+    }
 
     module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
@@ -98,20 +142,14 @@
         }
 
         strUrl = urlutil.makeAbsolute(strUrl);
-        var iab = new InAppBrowser();
-
-        callbacks = callbacks || {};
-        for (var callbackName in callbacks) {
-            iab.addEventListener(callbackName, callbacks[callbackName]);
-        }
-
-        var cb = function(eventname) {
-           iab._eventHandler(eventname);
-        };
-
         strWindowFeatures = strWindowFeatures || "";
 
-        exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
-        return iab;
+        if(strWindowName === '_system') {
+            // This is now separate as more-or-less fire and forget system browser was re-utilising
+            // Code for blank/self. This caused problems with browser crashes etc.
+            exec(null, null, "SystemBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+        } else {
+            return new InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks || {});
+        }
     };
 })();

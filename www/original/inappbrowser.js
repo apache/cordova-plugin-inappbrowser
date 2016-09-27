@@ -36,9 +36,6 @@
             'loadstart': channel.create('loadstart'),
             'loadstop' : channel.create('loadstop'),
             'loaderror' : channel.create('loaderror'),
-            'hidden' : channel.create('hidden'),
-            'unhidden' : channel.create('unhidden'),
-            'pollresult' : channel.create('pollresult'),
             'exit' : channel.create('exit')
        };
     }
@@ -54,18 +51,6 @@
         },
         show: function (eventname) {
           exec(null, null, "InAppBrowser", "show", []);
-        },
-        startPoll(pollingFunction, pollInterval){
-            exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
-        },
-        stopPoll(){
-            exec(null, null, "InAppBrowser", "stopPoll", [])
-        },
-        hide: function(boolGoToBlank, eventname){
-            exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);
-        },
-        unHide: function(strUrl, eventname){
-            exec(null,null,"InAppBrowser", "unHide", [strUrl]);
         },
         addEventListener: function (eventname,f) {
             if (eventname in this.channels) {
