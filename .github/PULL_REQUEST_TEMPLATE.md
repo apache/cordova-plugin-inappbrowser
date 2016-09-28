@@ -17,7 +17,6 @@ Thanks!
 
 
 ### Checklist
-- [ ] [ICLA](http://www.apache.org/licenses/icla.txt) has been signed and submitted to secretary@apache.org.
 - [ ] [Reported an issue](http://cordova.apache.org/contribute/issues.html) in the JIRA database
 - [ ] Commit message follows the format: "CB-3232: (android) Fix bug with resolving file paths", where CB-xxxx is the JIRA ID & "android" is the platform affected.
 - [ ] Added automated test coverage as appropriate for this change.
