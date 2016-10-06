@@ -69,7 +69,7 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
 
 
-## <a id="reference">Reference
+## <a id="reference">Reference</a>
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
@@ -145,6 +145,7 @@ instance, or the system browser.
 - BlackBerry 10
 - Firefox OS
 - iOS
+- OSX
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
 - Browser
@@ -184,6 +185,12 @@ opened with `target='_blank'`. The rules might look like these
 	color: #777;
 }
 ```
+
+### OSX Quirks
+
+At the moment the only supported target in OSX is `_system`.
+
+`_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
 
 ### Windows Quirks
 
