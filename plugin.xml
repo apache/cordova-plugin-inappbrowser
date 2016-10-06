@@ -131,6 +131,22 @@
 	    <framework src="CoreGraphics.framework" />
     </platform>
 
+    <!-- osx -->
+    <platform name="osx">
+        <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <config-file target="config.xml" parent="/*">
+            <feature name="InAppBrowser">
+                <param name="osx-package" value="CDVInAppBrowser" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/osx/CDVInAppBrowser.h" />
+        <source-file src="src/osx/CDVInAppBrowser.m" />
+    </platform>
+
     <!-- wp7 -->
     <platform name="wp7">
         <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">

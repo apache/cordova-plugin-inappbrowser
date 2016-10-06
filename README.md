@@ -145,6 +145,7 @@ instance, or the system browser.
 - BlackBerry 10
 - Firefox OS
 - iOS
+- OSX
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
 - Browser
@@ -184,6 +185,12 @@ opened with `target='_blank'`. The rules might look like these
 	color: #777;
 }
 ```
+
+### OSX Quirks
+
+At the moment the only supported target in OSX is `_system`.
+
+`_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
 
 ### Windows Quirks
 
