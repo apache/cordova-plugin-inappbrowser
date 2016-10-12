@@ -264,7 +264,9 @@ public class InAppBrowser extends CordovaPlugin {
 //                    Log.d(LOG_TAG, "**************************** Bridging");
 //                }
 //            });
-            inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
+            });
         }
         //TODO: Unbridge?
 
