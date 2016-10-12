@@ -3,9 +3,9 @@ package org.apache.cordova.inappbrowser;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
-
 import org.apache.cordova.LOG;
 
+import android.widget.Toast; //****************************************************************
 
 
 public class JavaScriptBridgeInterface {
