@@ -74,12 +74,12 @@
             hidden = false;
         }
 
-        me.hide = function(releaseResources, boolGoToBlank, eventname){
+        me.hide = function (releaseResources, boolGoToBlank, eventname) {
             exec(null,null,"InAppBrowser", "hide", [releaseResources, boolGoToBlank]);
             hidden = true;
         }
 
-        me.unHide = function(strUrl, eventname){
+        me.unHide = function (strUrl, eventname) {
             exec(null,null,"InAppBrowser", "unHide", [strUrl]);
             hidden = false;
         }
@@ -94,7 +94,7 @@
 //           polling = false;
 //        }
 
-        me.bridge(objectName, bridgeFunction){
+        me.bridge = function (objectName, bridgeFunction) {
             exec(null, null, "InAppBrowser", "Bridge", [objectName, bridgeFunction]);
         }
 
@@ -104,13 +104,13 @@
             }
         }
 
-        me.removeEventListener = function(eventname, f) {
+        me.removeEventListener = function (eventname, f) {
             if (eventname in me.channels) {
                 me.channels[eventname].unsubscribe(f);
             }
         }
 
-        me.executeScript = function(injectDetails, cb) {
+        me.executeScript = function (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -120,7 +120,7 @@
             }
         }
 
-        me.insertCSS = function(injectDetails, cb) {
+        me.insertCSS = function (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
@@ -138,7 +138,7 @@
        exec(eventCallback, eventCallback, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
     }
 
-    module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
+    module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
         if (window.frames && window.frames[strWindowName]) {
             var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
