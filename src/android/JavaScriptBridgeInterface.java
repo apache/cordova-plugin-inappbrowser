@@ -14,14 +14,14 @@ public class JavaScriptBridgeInterface {
     private Activity _parentActivity;
     private NativeScriptResultHandler _nativeScriptResultHandler;
 
-    public void JavaScriptBridgeInterface(Activity parentActivity,
+    public JavaScriptBridgeInterface(Activity parentActivity,
                                           NativeScriptResultHandler nativeScriptResultHandler) {
         _parentActivity = parentActivity;
         _nativeScriptResultHandler = nativeScriptResultHandler;
     }
 
     @JavascriptInterface
-    public String respond(String response, NativeScriptResultHandler _nativeScriptResultHandler) {
+    public String respond(final String response, NativeScriptResultHandler _nativeScriptResultHandler) {
         //TODO: get response back to the client...
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
