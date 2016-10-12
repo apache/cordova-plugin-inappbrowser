@@ -265,7 +265,10 @@ public class InAppBrowser extends CordovaPlugin {
 //                }
 //            });
             cordova.getActivity().runOnUiThread(new Runnable() {
-                inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
+                @Override
+                public void run() {
+                    inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
+                }
             });
         }
         //TODO: Unbridge?
