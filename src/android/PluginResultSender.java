@@ -1,3 +1,7 @@
+import android.util.Log;
+
+import org.apache.cordova.LOG;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 

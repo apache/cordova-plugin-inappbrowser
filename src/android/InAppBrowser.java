@@ -89,15 +89,6 @@ public class InAppBrowser extends CordovaPlugin {
     protected static final String LOG_TAG = "InAppBrowser";
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
-    private static final String EXIT_EVENT = "exit";
-
-
-    private static final String HIDDEN_EVENT = "hidden";
-    private static final String UNHIDDEN_EVENT = "unhidden";
-    private static final String LOAD_START_EVENT = "loadstart";
-    private static final String LOAD_STOP_EVENT = "loadstop";
-    private static final String LOAD_ERROR_EVENT = "loaderror";
-    private static final String POLL_RESULT_EVENT = "pollresult";
 
     private static final String BLANK_PAGE_URL = "about:blank";
 
@@ -507,7 +498,7 @@ public class InAppBrowser extends CordovaPlugin {
                     inAppWebView.loadUrl(BLANK_PAGE_URL);
                 }
 
-                browserEventSender.sendHiddenEvent()
+                browserEventSender.sendHiddenEvent();
             }
         });
     }
@@ -1116,14 +1107,7 @@ public class InAppBrowser extends CordovaPlugin {
                 edittext.setText(newloc);
             }
 
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_START_EVENT);
-                obj.put("url", newloc);
-                sendOKUpdate(obj);
-            } catch (JSONException ex) {
-                LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
-            }
+            browserEventSender.sendLoadStart(newloc);
         }
 
         public void onPageFinished(WebView view, String url) {
@@ -1156,30 +1140,12 @@ public class InAppBrowser extends CordovaPlugin {
                 destroyHistoryOnNextPageFinished = true;
             }
 
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_STOP_EVENT);
-                obj.put("url", url);
-
-                sendOKUpdate(obj);
-            } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
-            }
+            browserEventSender.sendLoadStop(url)
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_ERROR_EVENT);
-                obj.put("url", failingUrl);
-                obj.put("code", errorCode);
-                obj.put("message", description);
-                sendErrorUpdate(obj);
-            } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
-            }
+            browserEventSender.sendError(failingUrl, errorCode, description);
         }
 
         /**
