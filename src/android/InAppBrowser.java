@@ -248,6 +248,7 @@ public class InAppBrowser extends CordovaPlugin {
                 @Override
                 public void run() {
                     Log.d(LOG_TAG, "**************************** Bridging");
+                    Log.d(LOG_TAG, objectName);
                     inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
