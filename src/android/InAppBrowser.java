@@ -645,7 +645,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl(BLANK_PAGE_URL);
-                sendExitEvent();
+                browserEventSender.sendExitEvent();
             }
         });
     }
