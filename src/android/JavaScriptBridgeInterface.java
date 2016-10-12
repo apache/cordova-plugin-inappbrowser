@@ -20,8 +20,10 @@ public class JavaScriptBridgeInterface {
     @JavascriptInterface
     public void respond(String response) {
         //TODO: get response back to the client...
-        Log.d(LOG_TAG, "respond called *************************************************************************");
-        Log.d(LOG_TAG, response);
-        Log.d(LOG_TAG, "respond called *************************************************************************");
+        Toast toast = Toast.makeText(_context, "It Worked!", Toast.LENGTH_LONG);
+        toast.show();
+//        Log.d(LOG_TAG, "respond called *************************************************************************");
+//        Log.d(LOG_TAG, response);
+//        Log.d(LOG_TAG, "respond called *************************************************************************");
     }
 }
