@@ -251,23 +251,24 @@ public class InAppBrowser extends CordovaPlugin {
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
 
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(LOG_TAG, "**************************** Bridging");
-                    Log.d(LOG_TAG, objectName);
-
-                    //inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
-                    //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
-
-
-                    //TODO - fix name
-
-                    inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
-
-                    Log.d(LOG_TAG, "**************************** Bridging");
-                }
-            });
+//            this.cordova.getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Log.d(LOG_TAG, "**************************** Bridging");
+////                   /Log.d(LOG_TAG, objectName);
+//
+//                    //inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
+//                    //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
+//
+//
+//                    //TODO - fix name
+//
+//
+//
+//                    Log.d(LOG_TAG, "**************************** Bridging");
+//                }
+//            });
+            inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
         }
         //TODO: Unbridge?
 
