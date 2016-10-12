@@ -30,7 +30,7 @@ public class JavaScriptBridgeInterface {
             public void run(){
                 _nativeScriptResultHandler.handle(response);
             }
-        })
+        });
 
         return response;
     }
