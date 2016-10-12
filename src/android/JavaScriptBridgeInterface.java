@@ -7,16 +7,22 @@ import org.apache.cordova.LOG;
 
 
 public class JavaScriptBridgeInterface {
-    private Context _context;
     protected static final String LOG_TAG = "InAppBrowser.JavaScriptBridgeInterface";
     public static final String JAVASCRIPT_OBJECT_NAME = "JavaScriptBridgeInterfaceObject";
 
+    private NativeScriptResultHandler _nativeScriptResultHandler;
+
+    public void JavaScriptBridgeInterface(NativeScriptResultHandler nativeScriptResultHandler) {
+        _nativeScriptResultHandler = nativeScriptResultHandler;
+    }
+
     @JavascriptInterface
-    public String respond(String response) {
+    public String respond(String response, NativeScriptResultHandler _nativeScriptResultHandler) {
         //TODO: get response back to the client...
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
         Log.d(LOG_TAG, "respond called *************************************************************************");
-        return "Responded...";
+        _nativeScriptResultHandler.handle(response);
+        return response;
     }
 }
