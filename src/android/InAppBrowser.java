@@ -117,14 +117,14 @@ public class InAppBrowser extends CordovaPlugin {
 
                 JSONObject commandObject = returnedArray.optJSONObject(0);
                 if (commandObject == null) {
-                    browserEventSender.sendPollResult(scriptResult);
+                    browserEventSender.pollResult(scriptResult);
                     return true;
                 }
 
                 String action = commandObject.optString("InAppBrowserAction");
 
                 if (action == null) {
-                    browserEventSender.sendPollResult(scriptResult);
+                    browserEventSender.pollResult(scriptResult);
                     return true;
                 }
 
@@ -139,7 +139,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 Log.d(LOG_TAG, "The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-                browserEventSender.sendPollResult(scriptResult);
+                browserEventSender.pollResult(scriptResult);
 
                 return true;
             } catch (JSONException ex) {
@@ -170,7 +170,6 @@ public class InAppBrowser extends CordovaPlugin {
         if (action.equals("open")) {
             pluginResultSender = new PluginResultSender(callbackContext);
             browserEventSender = new BrowserEventSender(pluginResultSender);
-            //this.callbackContext = callbackContext;
             final String url = args.getString(0);
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
@@ -498,7 +497,7 @@ public class InAppBrowser extends CordovaPlugin {
                     inAppWebView.loadUrl(BLANK_PAGE_URL);
                 }
 
-                browserEventSender.sendHiddenEvent();
+                browserEventSender.hidden();
             }
         });
     }
@@ -519,7 +518,7 @@ public class InAppBrowser extends CordovaPlugin {
             showDialogue();
             resumePoll();
             if(wasHidden) {
-                browserEventSender.sendUnhiddenEvent();
+                browserEventSender.unhidden();
             }
             return;
         }
@@ -546,7 +545,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 resumePoll();
                 if(wasHidden) {
-                    browserEventSender.sendUnhiddenEvent();
+                    browserEventSender.unhidden();
                 }
             }
         });
@@ -1107,7 +1106,7 @@ public class InAppBrowser extends CordovaPlugin {
                 edittext.setText(newloc);
             }
 
-            browserEventSender.sendLoadStart(newloc);
+            browserEventSender.loadStart(newloc);
         }
 
         public void onPageFinished(WebView view, String url) {
@@ -1140,12 +1139,12 @@ public class InAppBrowser extends CordovaPlugin {
                 destroyHistoryOnNextPageFinished = true;
             }
 
-            browserEventSender.sendLoadStop(url)
+            browserEventSender.loadStop(url);
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            browserEventSender.sendError(failingUrl, errorCode, description);
+            browserEventSender.error(failingUrl, errorCode, description);
         }
 
         /**

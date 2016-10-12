@@ -20,11 +20,11 @@ public class BrowserEventSender {
 
     private PluginResultSender pluginResultSender;
 
-    public PluginResultSender(final PluginResultSender foo) {
+    public BrowserEventSender(final PluginResultSender foo) {
         pluginResultSender = foo;
     }
 
-    public void sendLoadStart(string newLocation){
+    public void loadStart(string newLocation){
         try {
             JSONObject response = CreateResponse(LOAD_START_EVENT);
             response.put("url", newLocation);
@@ -34,7 +34,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendLoadStop(String url){
+    public void loadStop(String url){
         try {
             JSONObject response = CreateResponse(LOAD_STOP_EVENT);
             response.put("url", url);
@@ -44,7 +44,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendPollResult(String scriptResult) {
+    public void pollResult(String scriptResult) {
         try {
             JSONObject responseObject = CreateResponse(POLL_RESULT_EVENT);
             responseObject.put("data", scriptResult);
@@ -54,7 +54,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendError(String failingUrl, String errorCode, String description){
+    public void error(String failingUrl, String errorCode, String description){
         try {
             JSONObject response = CreateResponse(LOAD_ERROR_EVENT);
             response.put("url", failingUrl);
@@ -66,7 +66,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendHiddenEvent(){
+    public void hidden(){
         try {
             JSONObject response = CreateResponse(HIDDEN_EVENT);
             pluginResultSender.sendOKUpdate(response);
@@ -75,7 +75,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendUnhiddenEvent() {
+    public void unhidden() {
         try {
             JSONObject response = CreateResponse(UNHIDDEN_EVENT);
             pluginResultSender.sendOKUpdate(response);
@@ -84,7 +84,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void sendExitEvent() {
+    public void exit() {
         try {
             JSONObject response = CreateResponse(EXIT_EVENT);
             pluginResultSender.sendClosingUpdate(response);
