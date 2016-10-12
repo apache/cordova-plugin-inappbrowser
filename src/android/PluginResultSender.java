@@ -5,6 +5,8 @@ import org.apache.cordova.LOG;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 
+import org.json.JSONObject;
+
 public class PluginResultSender {
 
     private CallbackContext callbackContext;

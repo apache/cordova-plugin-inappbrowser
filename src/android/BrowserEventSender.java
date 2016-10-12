@@ -24,7 +24,7 @@ public class BrowserEventSender {
         pluginResultSender = foo;
     }
 
-    public void loadStart(string newLocation){
+    public void loadStart(String newLocation){
         try {
             JSONObject response = CreateResponse(LOAD_START_EVENT);
             response.put("url", newLocation);
