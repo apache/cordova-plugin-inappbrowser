@@ -179,6 +179,11 @@ public class InAppBrowser extends CordovaPlugin {
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
 
             Log.d(LOG_TAG, "target = " + target);
+
+            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity().getApplicationContext());
+            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
+
+
             OpenOnNewThread(url, target, features);
             return true;
         }
@@ -242,6 +247,7 @@ public class InAppBrowser extends CordovaPlugin {
         if(action.equals("bridge")){
             final String objectName = args.getString(0);
             final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity().getApplicationContext());
+            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
 
@@ -256,7 +262,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
                     //TODO - fix name
-                    inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
+
                     inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
 
                     Log.d(LOG_TAG, "**************************** Bridging");
