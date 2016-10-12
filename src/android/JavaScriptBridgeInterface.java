@@ -22,7 +22,13 @@ public class JavaScriptBridgeInterface {
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
         Log.d(LOG_TAG, "respond called *************************************************************************");
-        _nativeScriptResultHandler.handle(response);
+        Activity.runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                _nativeScriptResultHandler.handle(response);
+            }
+        })
+
         return response;
     }
 }
