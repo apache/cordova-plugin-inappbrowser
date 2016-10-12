@@ -243,7 +243,6 @@ public class InAppBrowser extends CordovaPlugin {
             final Context applicationContext = cordova.getActivity().getApplicationContext();
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
-            //final String
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -251,7 +250,7 @@ public class InAppBrowser extends CordovaPlugin {
                     Log.d(LOG_TAG, "**************************** Bridging");
                     Log.d(LOG_TAG, objectName);
                     inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
-                    inAppWebView.loadUrl("javascript:tombolaBridgeXXXXX.respond('foo;);");
+                    inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo;);");
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
             });
