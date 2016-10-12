@@ -446,6 +446,7 @@ public class InAppBrowser extends CordovaPlugin {
         final boolean wasHidden = hidden;
         if (url == null || url.equals("") || url.equals(NULL)) {
             hidden = false;
+            addBridgeInterface();
             showDialogue();
             //resumePoll(); ********************************************************************************************
             if(wasHidden) {
@@ -457,6 +458,8 @@ public class InAppBrowser extends CordovaPlugin {
         if (!shouldAllowNavigation(url, "shouldAllowRequest")) {
             return;
         }
+
+        addBridgeInterface();
 
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -888,7 +891,7 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
-                AddBridgeInterface();
+                addBridgeInterface();
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
@@ -935,7 +938,7 @@ public class InAppBrowser extends CordovaPlugin {
         return "";
     }
 
-    private void AddBridgeInterface() {
+    private void addBridgeInterface() {
         inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(cordova.getActivity(),
                         nativeScriptResultHandler),
                 JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
