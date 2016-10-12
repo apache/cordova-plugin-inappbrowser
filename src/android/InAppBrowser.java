@@ -989,7 +989,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
 
-            this.cordova.getActivity().runOnUiThread(new Runnable() {
+            cordova.getActivity().runOnUiThread(new Runnable() {
                                                          @Override
                                                          public void run() {
                                                              inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
