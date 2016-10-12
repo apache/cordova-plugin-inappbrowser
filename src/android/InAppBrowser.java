@@ -59,7 +59,6 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
-//import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -240,27 +239,21 @@ public class InAppBrowser extends CordovaPlugin {
 //        }
 
         if(action.equals("bridge")){
-            final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
+            final String objectName = args.getString(0);
+            Context applicationContext = cordova.getActivity().getApplicationContext();
+            //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
+            //TODO: wrapper in method....
+            inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
             injectScriptCode(args.getString(1), false, callbackContext.getCallbackId());
+
         }
+        //TODO: Unbridge?
 
         return false;
     }
 
 
-    class JavaScriptBridgeInterface {
-        Context _context;
 
-        JavaScriptBridgeInterface (Context context) {
-            _context = context;
-        }
-
-        @JavascriptInterface
-        public void foo(String eventName, String response) {
-            //TODO: get this back to the client....
-            //Toast.makeText(_context, message, Toast.LENGTH_SHORT).show();
-        }
-    }
 
 //    private TimerTask currentPollTask;
 //    private Timer currentTimer;
