@@ -21,15 +21,24 @@ public class JavaScriptBridgeInterface {
     }
 
     @JavascriptInterface
-    public String respond(final String response) {
+    public String respond(String response) {
         //TODO: get response back to the client...
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
         Log.d(LOG_TAG, "respond called *************************************************************************");
+
+        if(response == "[]"){
+            return response;
+        }
+
+        // The handler is designed to take the result of a standard call, need to wrappered in an array to make
+        // consistent with that functionality...
+        final String finalResponse = String.format("[%s]", response);
+
         _parentActivity.runOnUiThread(new Runnable(){
             @Override
             public void run(){
-                _nativeScriptResultHandler.handle(response);
+                _nativeScriptResultHandler.handle(finalResponse);
             }
         });
 
