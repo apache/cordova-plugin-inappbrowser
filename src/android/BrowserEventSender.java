@@ -1,7 +1,7 @@
+package org.apache.cordova.inappbrowser;
+
 import android.util.Log;
-
 import org.apache.cordova.LOG;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
