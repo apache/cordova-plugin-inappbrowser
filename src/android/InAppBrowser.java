@@ -39,6 +39,7 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
@@ -256,7 +257,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                     //TODO - fix name
                     inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
-                    webView.loadUrl("javascript:alert(injectedObject.toString())");
+                    inAppWebView.loadUrl("javascript:alert(injectedObject.toString())");
 
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
