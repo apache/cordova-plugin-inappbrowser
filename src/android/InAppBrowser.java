@@ -180,7 +180,7 @@ public class InAppBrowser extends CordovaPlugin {
 
             Log.d(LOG_TAG, "target = " + target);
 
-            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity().getApplicationContext());
+            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
             inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
 
 
