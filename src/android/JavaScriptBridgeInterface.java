@@ -27,7 +27,7 @@ public class JavaScriptBridgeInterface {
         Log.d(LOG_TAG, response);
         Log.d(LOG_TAG, "respond called *************************************************************************");
 
-        if(response == "[]"){
+        if(response.equals("[]")){
             return response;
         }
 
