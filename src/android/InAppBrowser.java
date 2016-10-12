@@ -251,7 +251,7 @@ public class InAppBrowser extends CordovaPlugin {
     class JavaScriptBridgeInterface {
         Context _context;
 
-        BridgeJavaScriptInterface (Context context) {
+        JavaScriptBridgeInterface (Context context) {
             _context = context;
         }
 
