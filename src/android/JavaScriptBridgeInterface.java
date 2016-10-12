@@ -22,10 +22,8 @@ public class JavaScriptBridgeInterface {
 
     @JavascriptInterface
     public String respond(String response) {
-        //TODO: get response back to the client...
-        Log.d(LOG_TAG, "respond called *************************************************************************");
-        Log.d(LOG_TAG, response);
-        Log.d(LOG_TAG, "respond called *************************************************************************");
+        //TODO: Remove Log *********************************************************************************************
+        Log.d(LOG_TAG, "*************Response: " + response);
 
         if(response.equals("[]")){
             return response;
