@@ -16,19 +16,19 @@ public class PluginResultSender {
     }
 
     public void closing(JSONObject obj) {
-        sendUpdate(obj, false, PluginResult.Status.OK);
+        update(obj, false, PluginResult.Status.OK);
     }
 
     public void error(JSONObject obj) {
-        sendUpdate(obj, true, PluginResult.Status.ERROR);
+        update(obj, true, PluginResult.Status.ERROR);
     }
 
     public void ok() {
-        sendOKUpdate("");
+        ok("");
     }
 
     public void ok(String response) {
-        sendUpdate(response, true, PluginResult.Status.OK);
+        update(response, true, PluginResult.Status.OK);
     }
 
     public void update(String response, boolean keepCallback, PluginResult.Status status) {
@@ -45,7 +45,7 @@ public class PluginResultSender {
      * @param obj a JSONObject contain event payload information
      */
     public void ok(JSONObject obj) {
-        sendUpdate(obj, true, PluginResult.Status.OK);
+        update(obj, true, PluginResult.Status.OK);
     }
 
     /**
