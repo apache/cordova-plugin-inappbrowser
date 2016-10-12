@@ -73,8 +73,8 @@
             exec(null, null, "InAppBrowser", "show", []);
             hidden = false;
         }
-
-        me.hide = function(releaseResources, boolGoToBlank, eventname){
+releaseResources
+        me.hide = function(, boolGoToBlank, eventname){
             exec(null,null,"InAppBrowser", "hide", [releaseResources, boolGoToBlank]);
             hidden = true;
         }
@@ -84,14 +84,18 @@
             hidden = false;
         }
 
-        me.startPoll = function(pollFunction, pollInterval){
-           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-           polling = true;
-        }
+//        me.startPoll = function(pollFunction, pollInterval){
+//           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+//           polling = true;
+//        }
+//
+//        me.stopPoll = function() {
+//           exec(null, null, "InAppBrowser", "stopPoll", []);
+//           polling = false;
+//        }
 
-        me.stopPoll = function() {
-           exec(null, null, "InAppBrowser", "stopPoll", []);
-           polling = false;
+        me.bridge(returnEventName, bridgeFunction){
+            exec(null, null, "InAppBrowser", "Bridge", [returnEventName, bridgeFunction]);
         }
 
         me.addEventListener = function (eventname,f) {

@@ -129,7 +129,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 if (action.equalsIgnoreCase("close")) {
-                    stopPoll();
+                    //stopPoll(); *************************************************************************************
                     closeDialog();
                     return true;
                 }
@@ -222,77 +222,97 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
 
-        if (action.equals("startPoll")) {
-            if (args.isNull(0) || args.isNull(1)) {
-                Log.w(LOG_TAG, "Attempt to start poll with missin function or interval");
-                return true;
-            }
+//        if (action.equals("startPoll")) {
+//            if (args.isNull(0) || args.isNull(1)) {
+//                Log.w(LOG_TAG, "Attempt to start poll with missin function or interval");
+//                return true;
+//            }
+//
+//            String pollFunction = args.getString(0);
+//            long pollInterval = args.getLong(1);
+//            startPoll(pollFunction, pollInterval);
+//            return true;
+//        }
+//
+//        if (action.equals("stopPoll")) {
+//            stopPoll();
+//            return true;
+//        }
 
-            String pollFunction = args.getString(0);
-            long pollInterval = args.getLong(1);
-            startPoll(pollFunction, pollInterval);
-            return true;
-        }
-
-        if (action.equals("stopPoll")) {
-            stopPoll();
-            return true;
+        if(action.equals("bridge")){
+            final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
+            injectScriptCode(args.getString(1), false, callbackContext.getCallbackId());
         }
 
         return false;
     }
 
-    private TimerTask currentPollTask;
-    private Timer currentTimer;
-    private long lastPollInterval = 0;
-    private String lastPollFunction = "";
 
+    class JavaScriptBridgeInterface {
+        Context _context;
 
-    private void startPoll(String pollFunction, long pollInterval) {
-        pausePoll();
-        lastPollFunction = pollFunction;
-        lastPollInterval = pollInterval;
-        resumePoll();
-    }
-
-    private void resumePoll() {
-        final String pollFunction = lastPollFunction;
-        final long pollInterval = lastPollInterval;
-        if(pollFunction.equals("") || pollInterval == 0){
-            return;
+        BridgeJavaScriptInterface (Context context) {
+            _context = context;
         }
 
-        currentPollTask = new TimerTask() {
-            @Override
-            public void run() {
-                final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
-                injectDeferredObject(pollFunction, jsWrapper);
-            }
-        };
-
-        currentTimer = new Timer();
-        currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
-        pluginResultSender.ok();
-    }
-
-    private void pausePoll() {
-        if (currentPollTask != null) {
-            currentPollTask.cancel();
-            currentPollTask = null;
-        }
-
-        if (currentTimer != null) {
-            currentTimer.cancel();
-            currentTimer = null;
+        @JavascriptInterface
+        public void foo(String eventName, String response) {
+            //TODO: get this back to the client....
+            //Toast.makeText(_context, message, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void stopPoll() {
-        pausePoll();
-        lastPollFunction = "";
-        lastPollInterval = 0;
-        pluginResultSender.ok();
-    }
+//    private TimerTask currentPollTask;
+//    private Timer currentTimer;
+//    private long lastPollInterval = 0;
+//    private String lastPollFunction = "";
+//
+//
+//    private void startPoll(String pollFunction, long pollInterval) {
+//        pausePoll();
+//        lastPollFunction = pollFunction;
+//        lastPollInterval = pollInterval;
+//        resumePoll();
+//    }
+//
+//    private void resumePoll() {
+//        final String pollFunction = lastPollFunction;
+//        final long pollInterval = lastPollInterval;
+//        if(pollFunction.equals("") || pollInterval == 0){
+//            return;
+//        }
+//
+//        currentPollTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
+//                injectDeferredObject(pollFunction, jsWrapper);
+//            }
+//        };
+//
+//        currentTimer = new Timer();
+//        currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
+//        pluginResultSender.ok();
+//    }
+//
+//    private void pausePoll() {
+//        if (currentPollTask != null) {
+//            currentPollTask.cancel();
+//            currentPollTask = null;
+//        }
+//
+//        if (currentTimer != null) {
+//            currentTimer.cancel();
+//            currentTimer = null;
+//        }
+//    }
+//
+//    private void stopPoll() {
+//        pausePoll();
+//        lastPollFunction = "";
+//        lastPollInterval = 0;
+//        pluginResultSender.ok();
+//    }
 
     private void OpenOnNewThread(final String url, final String target, final HashMap<String, Boolean> features) {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -482,14 +502,14 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 hidden = true;
                 if (releaseResources) {
-                    stopPoll();
+                    //stopPoll(); **************************************************************************************
                     destroyHistoryOnNextPageFinished = true;
 
                 } else {
                     // Technically we don't need to do this -
                     // could keep polling. This would be inconsistent with
                     // iOS behaviour
-                    pausePoll();
+                    //pausePoll(); *************************************************************************************
                 }
 
                 dialog.hide();
@@ -516,7 +536,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (url == null || url.equals("") || url.equals(NULL)) {
             hidden = false;
             showDialogue();
-            resumePoll();
+            //resumePoll(); ********************************************************************************************
             if(wasHidden) {
                 browserEventSender.unhidden();
             }
@@ -543,7 +563,7 @@ public class InAppBrowser extends CordovaPlugin {
                     navigate(url);
                 }
 
-                resumePoll();
+                //resumePoll();*****************************************************************************************
                 if(wasHidden) {
                     browserEventSender.unhidden();
                 }
@@ -623,7 +643,7 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                stopPoll();
+                //stopPoll(); *****************************************************************************************
                 final WebView childView = inAppWebView;
                 // The JS protects against multiple calls, so this should happen only when
                 // closeDialog() is called by other native code.
