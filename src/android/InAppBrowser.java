@@ -413,14 +413,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 hidden = true;
                 if (releaseResources) {
-                    //stopPoll(); **************************************************************************************
                     destroyHistoryOnNextPageFinished = true;
-
-                } else {
-                    // Technically we don't need to do this -
-                    // could keep polling. This would be inconsistent with
-                    // iOS behaviour
-                    //pausePoll(); *************************************************************************************
                 }
 
                 dialog.hide();
@@ -448,7 +441,7 @@ public class InAppBrowser extends CordovaPlugin {
             hidden = false;
             addBridgeInterface();
             showDialogue();
-            //resumePoll(); ********************************************************************************************
+
             if(wasHidden) {
                 browserEventSender.unhidden();
             }
@@ -477,7 +470,6 @@ public class InAppBrowser extends CordovaPlugin {
                     navigate(url);
                 }
 
-                //resumePoll();*****************************************************************************************
                 if(wasHidden) {
                     browserEventSender.unhidden();
                 }
