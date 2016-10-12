@@ -73,8 +73,8 @@
             exec(null, null, "InAppBrowser", "show", []);
             hidden = false;
         }
-releaseResources
-        me.hide = function(, boolGoToBlank, eventname){
+
+        me.hide = function(releaseResources, boolGoToBlank, eventname){
             exec(null,null,"InAppBrowser", "hide", [releaseResources, boolGoToBlank]);
             hidden = true;
         }
@@ -94,8 +94,8 @@ releaseResources
 //           polling = false;
 //        }
 
-        me.bridge(returnEventName, bridgeFunction){
-            exec(null, null, "InAppBrowser", "Bridge", [returnEventName, bridgeFunction]);
+        me.bridge(objectName, bridgeFunction){
+            exec(null, null, "InAppBrowser", "Bridge", [objectName, bridgeFunction]);
         }
 
         me.addEventListener = function (eventname,f) {
