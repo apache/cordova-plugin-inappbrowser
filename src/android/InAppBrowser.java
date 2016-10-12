@@ -251,7 +251,7 @@ public class InAppBrowser extends CordovaPlugin {
 //                @Override
 //                public void run() {
 //                    Log.d(LOG_TAG, "**************************** Bridging");
-////                   /Log.d(LOG_TAG, objectName);
+//                   /Log.d(LOG_TAG, objectName);
 //
 //                    //inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
 //                    //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
@@ -264,12 +264,12 @@ public class InAppBrowser extends CordovaPlugin {
 //                    Log.d(LOG_TAG, "**************************** Bridging");
 //                }
 //            });
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    inAppWebView.loadUrl("javascript:alert(injectedObject.respond('My Response9999999999999999999'))");
-                }
-            });
+//            cordova.getActivity().runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    inAppWebView.loadUrl("javascript:alert(injectedObject.respond('My Response9999999999999999999'))");
+//                }
+//            });
         }
         //TODO: Unbridge?
 
@@ -980,7 +980,9 @@ public class InAppBrowser extends CordovaPlugin {
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
                 boolean enableDatabase = appSettings == null ? true : appSettings.getBoolean("InAppBrowserStorageEnabled", true);
                 if (enableDatabase) {
-                    String databasePath = cordova.getActivity().getApplicationContext().getDir("inAppBrowserDB", Context.MODE_PRIVATE).getPath();
+                    String databasePath = cordova.getActivity()
+                            .getApplicationContext()
+                            .getDir("inAppBrowserDB", Context.MODE_PRIVATE).getPath();
                     settings.setDatabasePath(databasePath);
                     settings.setDatabaseEnabled(true);
                 }
@@ -995,7 +997,8 @@ public class InAppBrowser extends CordovaPlugin {
                 final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
 
 
-                inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
+                inAppWebView.addJavascriptInterface(javaScriptBridgeInterface,
+                        JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
