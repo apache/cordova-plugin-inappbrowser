@@ -991,19 +991,16 @@ public class InAppBrowser extends CordovaPlugin {
 
                 final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
 
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                                                         @Override
-                                                         public void run() {
-                                                             inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
 
-                                                             inAppWebView.loadUrl(url);
-                                                             inAppWebView.setId(Integer.valueOf(6));
-                                                             inAppWebView.getSettings().setLoadWithOverviewMode(true);
-                                                             inAppWebView.getSettings().setUseWideViewPort(true);
-                                                             inAppWebView.requestFocus();
-                                                             inAppWebView.requestFocusFromTouch();
-                                                         }
-                                                     });
+                inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
+
+                inAppWebView.loadUrl(url);
+                inAppWebView.setId(Integer.valueOf(6));
+                inAppWebView.getSettings().setLoadWithOverviewMode(true);
+                inAppWebView.getSettings().setUseWideViewPort(true);
+                inAppWebView.requestFocus();
+                inAppWebView.requestFocusFromTouch();
+
 
                 // Add the back and forward buttons to our action button container layout
                 actionButtonContainer.addView(back);
