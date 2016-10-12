@@ -15,23 +15,23 @@ public class PluginResultSender {
         callbackContext = foo;
     }
 
-    public void sendClosingUpdate(JSONObject obj) {
+    public void closing(JSONObject obj) {
         sendUpdate(obj, false, PluginResult.Status.OK);
     }
 
-    public void sendErrorUpdate(JSONObject obj) {
+    public void error(JSONObject obj) {
         sendUpdate(obj, true, PluginResult.Status.ERROR);
     }
 
-    public void sendOKUpdate() {
+    public void ok() {
         sendOKUpdate("");
     }
 
-    public void sendOKUpdate(String response) {
+    public void ok(String response) {
         sendUpdate(response, true, PluginResult.Status.OK);
     }
 
-    public void sendUpdate(String response, boolean keepCallback, PluginResult.Status status) {
+    public void update(String response, boolean keepCallback, PluginResult.Status status) {
         if (callbackContext != null) {
             PluginResult pluginResult = new PluginResult(status, response);
             pluginResult.setKeepCallback(keepCallback);
@@ -44,7 +44,7 @@ public class PluginResultSender {
      *
      * @param obj a JSONObject contain event payload information
      */
-    public void sendOKUpdate(JSONObject obj) {
+    public void ok(JSONObject obj) {
         sendUpdate(obj, true, PluginResult.Status.OK);
     }
 
@@ -54,7 +54,7 @@ public class PluginResultSender {
      * @param obj    a JSONObject contain event payload information
      * @param status the status code to return to the JavaScript environment
      */
-    public void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
+    public void update(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
         if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(keepCallback);

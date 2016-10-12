@@ -51,7 +51,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-//import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaHttpAuthHandler;
@@ -147,7 +147,7 @@ public class InAppBrowser extends CordovaPlugin {
                 try {
                     JSONObject error = new JSONObject();
                     error.put("message", ex.getMessage());
-                    pluginResultSender.sendErrorUpdate(error);
+                    pluginResultSender.error(error);
                     return false;
                 } catch (JSONException ex2) {
                     Log.d(LOG_TAG, "Should never happen");
@@ -272,7 +272,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         currentTimer = new Timer();
         currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
-        pluginResultSender.sendOKUpdate();
+        pluginResultSender.ok();
     }
 
     private void pausePoll() {
@@ -291,7 +291,7 @@ public class InAppBrowser extends CordovaPlugin {
         pausePoll();
         lastPollFunction = "";
         lastPollInterval = 0;
-        pluginResultSender.sendOKUpdate();
+        pluginResultSender.ok();
     }
 
     private void OpenOnNewThread(final String url, final String target, final HashMap<String, Boolean> features) {
@@ -336,7 +336,7 @@ public class InAppBrowser extends CordovaPlugin {
                     result = showWebPage(url, features);
                 }
 
-                pluginResultSender.sendOKUpdate(result);
+                pluginResultSender.ok(result);
             }
         });
     }

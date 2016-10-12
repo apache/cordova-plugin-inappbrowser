@@ -28,7 +28,7 @@ public class BrowserEventSender {
         try {
             JSONObject response = CreateResponse(LOAD_START_EVENT);
             response.put("url", newLocation);
-            sendOKUpdate(response);
+            pluginResultSender.ok(response);
         } catch (JSONException ex) {
             LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
         }
@@ -38,7 +38,7 @@ public class BrowserEventSender {
         try {
             JSONObject response = CreateResponse(LOAD_STOP_EVENT);
             response.put("url", url);
-            sendOKUpdate(response);
+            pluginResultSender.ok(response);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build loadstop response object");
         }
@@ -48,7 +48,7 @@ public class BrowserEventSender {
         try {
             JSONObject responseObject = CreateResponse(POLL_RESULT_EVENT);
             responseObject.put("data", scriptResult);
-            pluginResultSender.sendOKUpdate(responseObject);
+            pluginResultSender.ok(responseObject);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build poll result response object");
         }
@@ -60,7 +60,7 @@ public class BrowserEventSender {
             response.put("url", failingUrl);
             response.put("code", errorCode);
             response.put("message", description);
-            sendErrorUpdate(response);
+            pluginResultSender.error(response);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build error response object");
         }
@@ -69,7 +69,7 @@ public class BrowserEventSender {
     public void hidden(){
         try {
             JSONObject response = CreateResponse(HIDDEN_EVENT);
-            pluginResultSender.sendOKUpdate(response);
+            pluginResultSender.ok(response);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build Hidden event object");
         }
@@ -78,7 +78,7 @@ public class BrowserEventSender {
     public void unhidden() {
         try {
             JSONObject response = CreateResponse(UNHIDDEN_EVENT);
-            pluginResultSender.sendOKUpdate(response);
+            pluginResultSender.ok(response);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build Unhidden event object");
         }
@@ -87,7 +87,7 @@ public class BrowserEventSender {
     public void exit() {
         try {
             JSONObject response = CreateResponse(EXIT_EVENT);
-            pluginResultSender.sendClosingUpdate(response);
+            pluginResultSender.closing(response);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Failed to build exit event object");
         }
