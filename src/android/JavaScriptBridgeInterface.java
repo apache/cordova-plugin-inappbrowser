@@ -10,9 +10,12 @@ public class JavaScriptBridgeInterface {
     protected static final String LOG_TAG = "InAppBrowser.JavaScriptBridgeInterface";
     public static final String JAVASCRIPT_OBJECT_NAME = "JavaScriptBridgeInterfaceObject";
 
+    private Activity _parentActivity;
     private NativeScriptResultHandler _nativeScriptResultHandler;
 
-    public void JavaScriptBridgeInterface(NativeScriptResultHandler nativeScriptResultHandler) {
+    public void JavaScriptBridgeInterface(Activity parentActivity,
+                                          NativeScriptResultHandler nativeScriptResultHandler) {
+        _parentActivity = parentActivity;
         _nativeScriptResultHandler = nativeScriptResultHandler;
     }
 
@@ -22,7 +25,7 @@ public class JavaScriptBridgeInterface {
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
         Log.d(LOG_TAG, "respond called *************************************************************************");
-        Activity.runOnUiThread(new Runnable(){
+        _parentActivity.runOnUiThread(new Runnable(){
             @Override
             public void run(){
                 _nativeScriptResultHandler.handle(response);

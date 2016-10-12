@@ -110,7 +110,6 @@ public class InAppBrowser extends CordovaPlugin {
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler() {
 
-
         public boolean handle(String scriptResult) {
             try {
                 JSONArray returnedArray = new JSONArray(scriptResult);
@@ -994,9 +993,9 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
-                final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
-
-
+                //TODO Tidy? ******************************************************************************************
+                final JavaScriptBridgeInterface javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity(),
+                        nativeScriptResultHandler);
                 inAppWebView.addJavascriptInterface(javaScriptBridgeInterface,
                         JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
 
