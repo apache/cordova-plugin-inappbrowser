@@ -95,7 +95,7 @@
 //        }
 
         me.bridge = function (objectName, bridgeFunction) {
-            exec(null, null, "InAppBrowser", "Bridge", [objectName, bridgeFunction]);
+            exec(null, null, "InAppBrowser", "bridge", [objectName, bridgeFunction]);
         }
 
         me.addEventListener = function (eventname,f) {
