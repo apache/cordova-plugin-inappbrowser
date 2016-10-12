@@ -267,7 +267,7 @@ public class InAppBrowser extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    inAppWebView.loadUrl("javascript:alert(injectedObject.getResponse('My Response23287362'))");
+                    inAppWebView.loadUrl("javascript:alert(injectedObject.respond('My Response9999999999999999999'))");
                 }
             });
         }
