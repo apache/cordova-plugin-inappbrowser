@@ -180,10 +180,6 @@ public class InAppBrowser extends CordovaPlugin {
 
             Log.d(LOG_TAG, "target = " + target);
 
-            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
-            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
-
-
             OpenOnNewThread(url, target, features);
             return true;
         }
@@ -990,6 +986,9 @@ public class InAppBrowser extends CordovaPlugin {
                 } else if (clearSessionCache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
+
+                final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
+                inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
