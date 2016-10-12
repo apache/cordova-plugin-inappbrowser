@@ -250,6 +250,7 @@ public class InAppBrowser extends CordovaPlugin {
                     Log.d(LOG_TAG, "**************************** Bridging");
                     Log.d(LOG_TAG, objectName);
                     inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
+                    inAppWebView.loadUrl("javascript:" + args.getString(0));
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
             });
