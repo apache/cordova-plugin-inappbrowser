@@ -461,7 +461,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         addBridgeInterface();
 
-        this.cordova.getActivity().runOnUiThread(new Runnable() {
+        this.cordova.getActivity().(new Runnable() {
             @Override
             public void run() {
 
@@ -939,9 +939,14 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     private void addBridgeInterface() {
-        inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(cordova.getActivity(),
-                        nativeScriptResultHandler),
-                JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
+        cordova.getActivity().runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(cordova.getActivity(),
+                                nativeScriptResultHandler),
+                        JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
+            }
+        });
     }
 
     /**
