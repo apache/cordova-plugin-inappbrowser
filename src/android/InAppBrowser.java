@@ -1066,6 +1066,9 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @param obj a JSONObject contain event payload information
      */
+    private void sendOKUpdate(JSONObject obj) {
+        sendUpdate(obj, true, PluginResult.Status.OK);
+    }
 
     /**
      * Create a new plugin result and send it back to JavaScript
