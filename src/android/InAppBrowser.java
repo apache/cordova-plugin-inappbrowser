@@ -249,9 +249,15 @@ public class InAppBrowser extends CordovaPlugin {
                 public void run() {
                     Log.d(LOG_TAG, "**************************** Bridging");
                     Log.d(LOG_TAG, objectName);
-                    inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, objectName);
-                    inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
+
+                    //inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
                     //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
+
+
+                    //TODO - fix name
+                    inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, 'injectedObject');
+                    webView.loadUrl("javascript:alert(injectedObject.toString())");
+
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
             });
