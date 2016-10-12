@@ -461,7 +461,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         addBridgeInterface();
 
-        this.cordova.getActivity().(new Runnable() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
 
