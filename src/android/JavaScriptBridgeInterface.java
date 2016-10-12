@@ -11,7 +11,7 @@ public class JavaScriptBridgeInterface {
     protected static final String LOG_TAG = "InAppBrowser.JavaScriptBridgeInterface";
 
     @JavascriptInterface
-    public String toString(String response) {
+    public String getResponse(String response) {
         //TODO: get response back to the client...
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
