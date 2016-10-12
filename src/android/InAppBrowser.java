@@ -243,8 +243,9 @@ public class InAppBrowser extends CordovaPlugin {
             Context applicationContext = cordova.getActivity().getApplicationContext();
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
+            Log.d(LOG_TAG "**************************** Bridging");
             inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
-            injectScriptCode(args.getString(1), false, callbackContext.getCallbackId());
+            Log.d(LOG_TAG "**************************** Bridging");
 
         }
         //TODO: Unbridge?

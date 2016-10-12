@@ -10,7 +10,7 @@ import org.apache.cordova.LOG;
 
 public class JavaScriptBridgeInterface {
     private Context _context;
-    protected static final String LOG_TAG = "InAppBrowser.BrowserEventSender";
+    protected static final String LOG_TAG = "InAppBrowser.JavaScriptBridgeInterface";
 
     JavaScriptBridgeInterface (Context context) {
         _context = context;
