@@ -9,7 +9,7 @@ import org.apache.cordova.LOG;
 public class JavaScriptBridgeInterface {
     private Context _context;
     protected static final String LOG_TAG = "InAppBrowser.JavaScriptBridgeInterface";
-    public static final String JAVASCRIPT_OBJECT_NAME = "JavaScriptBridgeInterfaceObject"
+    public static final String JAVASCRIPT_OBJECT_NAME = "JavaScriptBridgeInterfaceObject";
 
     @JavascriptInterface
     public String respond(String response) {
