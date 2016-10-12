@@ -240,7 +240,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         if(action.equals("bridge")){
             final String objectName = args.getString(0);
-            final Context applicationContext = cordova.getActivity().getApplicationContext();
+            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity().getApplicationContext());
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
 
@@ -249,8 +249,9 @@ public class InAppBrowser extends CordovaPlugin {
                 public void run() {
                     Log.d(LOG_TAG, "**************************** Bridging");
                     Log.d(LOG_TAG, objectName);
-                    inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(applicationContext), objectName);
+                    inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, objectName);
                     inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
+                    //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
                     Log.d(LOG_TAG, "**************************** Bridging");
                 }
             });
