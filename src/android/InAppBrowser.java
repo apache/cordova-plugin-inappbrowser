@@ -222,113 +222,8 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
 
-//        if (action.equals("startPoll")) {
-//            if (args.isNull(0) || args.isNull(1)) {
-//                Log.w(LOG_TAG, "Attempt to start poll with missin function or interval");
-//                return true;
-//            }
-//
-//            String pollFunction = args.getString(0);
-//            long pollInterval = args.getLong(1);
-//            startPoll(pollFunction, pollInterval);
-//            return true;
-//        }
-//
-//        if (action.equals("stopPoll")) {
-//            stopPoll();
-//            return true;
-//        }
-
-        if(action.equals("bridge")){
-//            final String objectName = args.getString(0);
-//            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
-//            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
-            //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
-            //TODO: wrapper in method....
-
-//            this.cordova.getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Log.d(LOG_TAG, "**************************** Bridging");
-//                   /Log.d(LOG_TAG, objectName);
-//
-//                    //inAppWebView.loadUrl("javascript:" + objectName + ".respond('foo');");
-//                    //inAppWebView.loadUrl("javascript:;"); //Force a re-load for the bridge to work
-//
-//
-//                    //TODO - fix name
-//
-//
-//
-//                    Log.d(LOG_TAG, "**************************** Bridging");
-//                }
-//            });
-//            cordova.getActivity().runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    inAppWebView.loadUrl("javascript:alert(injectedObject.respond('My Response9999999999999999999'))");
-//                }
-//            });
-        }
-        //TODO: Unbridge?
-
         return false;
     }
-
-
-
-
-//    private TimerTask currentPollTask;
-//    private Timer currentTimer;
-//    private long lastPollInterval = 0;
-//    private String lastPollFunction = "";
-//
-//
-//    private void startPoll(String pollFunction, long pollInterval) {
-//        pausePoll();
-//        lastPollFunction = pollFunction;
-//        lastPollInterval = pollInterval;
-//        resumePoll();
-//    }
-//
-//    private void resumePoll() {
-//        final String pollFunction = lastPollFunction;
-//        final long pollInterval = lastPollInterval;
-//        if(pollFunction.equals("") || pollInterval == 0){
-//            return;
-//        }
-//
-//        currentPollTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                final String jsWrapper = "(function(){prompt(JSON.stringify([eval(%s)]), 'gap-iab-native://poll')})()";
-//                injectDeferredObject(pollFunction, jsWrapper);
-//            }
-//        };
-//
-//        currentTimer = new Timer();
-//        currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
-//        pluginResultSender.ok();
-//    }
-//
-//    private void pausePoll() {
-//        if (currentPollTask != null) {
-//            currentPollTask.cancel();
-//            currentPollTask = null;
-//        }
-//
-//        if (currentTimer != null) {
-//            currentTimer.cancel();
-//            currentTimer = null;
-//        }
-//    }
-//
-//    private void stopPoll() {
-//        pausePoll();
-//        lastPollFunction = "";
-//        lastPollInterval = 0;
-//        pluginResultSender.ok();
-//    }
 
     private void OpenOnNewThread(final String url, final String target, final HashMap<String, Boolean> features) {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -993,11 +888,7 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().removeSessionCookie();
                 }
 
-                //TODO Tidy? ******************************************************************************************
-                final JavaScriptBridgeInterface javaScriptBridgeInterface = new JavaScriptBridgeInterface(cordova.getActivity(),
-                        nativeScriptResultHandler);
-                inAppWebView.addJavascriptInterface(javaScriptBridgeInterface,
-                        JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
+                AddBridgeInterface();
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
@@ -1042,6 +933,12 @@ public class InAppBrowser extends CordovaPlugin {
         };
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
+    }
+
+    private void AddBridgeInterface() {
+        inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(cordova.getActivity(),
+                        nativeScriptResultHandler),
+                JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
     }
 
     /**
