@@ -8,6 +8,8 @@ import org.json.JSONArray;
 
 public class BrowserEventSender {
 
+    protected static final String LOG_TAG = "InAppBrowser.BrowserEventSender";
+
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
