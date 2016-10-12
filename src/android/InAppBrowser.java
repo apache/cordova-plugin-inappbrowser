@@ -245,9 +245,9 @@ public class InAppBrowser extends CordovaPlugin {
 //        }
 
         if(action.equals("bridge")){
-            final String objectName = args.getString(0);
-            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
-            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
+//            final String objectName = args.getString(0);
+//            final JavaScriptBridgeInterface  javaScriptBridgeInterface = new JavaScriptBridgeInterface();
+//            inAppWebView.addJavascriptInterface(javaScriptBridgeInterface, "injectedObject");
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
 
