@@ -1,5 +1,6 @@
 package org.apache.cordova.inappbrowser;
 
+import android.app.Activity
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;

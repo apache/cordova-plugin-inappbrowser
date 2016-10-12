@@ -108,7 +108,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
     private boolean hidden = false;
 
-    private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler() {
+    private final NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler() {
 
         public boolean handle(String scriptResult) {
             try {
