@@ -240,7 +240,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         if(action.equals("bridge")){
             final String objectName = args.getString(0);
-            Context applicationContext = cordova.getActivity().getApplicationContext();
+            final Context applicationContext = cordova.getActivity().getApplicationContext();
             //final String eventName = args.isNull(0) ? "bridgeEvent" : args.getString(0);
             //TODO: wrapper in method....
 
