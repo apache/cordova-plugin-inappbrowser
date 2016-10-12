@@ -54,7 +54,7 @@ public class BrowserEventSender {
         }
     }
 
-    public void error(String failingUrl, String errorCode, String description){
+    public void error(String failingUrl, int errorCode, String description){
         try {
             JSONObject response = CreateResponse(LOAD_ERROR_EVENT);
             response.put("url", failingUrl);
