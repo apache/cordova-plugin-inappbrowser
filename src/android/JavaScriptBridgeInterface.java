@@ -21,7 +21,7 @@ public class JavaScriptBridgeInterface {
     }
 
     @JavascriptInterface
-    public String respond(final String response, NativeScriptResultHandler _nativeScriptResultHandler) {
+    public String respond(final String response) {
         //TODO: get response back to the client...
         Log.d(LOG_TAG, "respond called *************************************************************************");
         Log.d(LOG_TAG, response);
