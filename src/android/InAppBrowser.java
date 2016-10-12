@@ -51,7 +51,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import org.apache.cordova.CallbackContext;
+//import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaHttpAuthHandler;
@@ -59,7 +59,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
-import org.apache.cordova.PluginResult;
+//import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -104,7 +104,8 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
-    private CallbackContext callbackContext;
+    private PluginResultSender pluginResultSender;
+    private BrowserEventSender browserEventSender;
     private boolean showLocationBar = true;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
@@ -117,16 +118,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hidden = false;
 
     private NativeScriptResultHandler nativeScriptResultHandler = new NativeScriptResultHandler() {
-        private void sendPollResult(String scriptResult) {
-            try {
-                JSONObject responseObject = new JSONObject();
-                responseObject.put("type", "pollresult");
-                responseObject.put("data", scriptResult);
-                sendOKUpdate(responseObject);
-            } catch (JSONException ex) {
-                Log.d(LOG_TAG, "Should never happen");
-            }
-        }
+
 
         public boolean handle(String scriptResult) {
             try {
@@ -134,14 +126,14 @@ public class InAppBrowser extends CordovaPlugin {
 
                 JSONObject commandObject = returnedArray.optJSONObject(0);
                 if (commandObject == null) {
-                    sendPollResult(scriptResult);
+                    browserEventSender.sendPollResult(scriptResult);
                     return true;
                 }
 
                 String action = commandObject.optString("InAppBrowserAction");
 
                 if (action == null) {
-                    sendPollResult(scriptResult);
+                    browserEventSender.sendPollResult(scriptResult);
                     return true;
                 }
 
@@ -156,7 +148,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 Log.d(LOG_TAG, "The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-                sendPollResult(scriptResult);
+                browserEventSender.sendPollResult(scriptResult);
 
                 return true;
             } catch (JSONException ex) {
@@ -164,7 +156,7 @@ public class InAppBrowser extends CordovaPlugin {
                 try {
                     JSONObject error = new JSONObject();
                     error.put("message", ex.getMessage());
-                    sendErrorUpdate(error);
+                    pluginResultSender.sendErrorUpdate(error);
                     return false;
                 } catch (JSONException ex2) {
                     Log.d(LOG_TAG, "Should never happen");
@@ -185,7 +177,9 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
-            this.callbackContext = callbackContext;
+            pluginResultSender = new PluginResultSender(callbackContext);
+            browserEventSender = new BrowserEventSender(pluginResultSender);
+            //this.callbackContext = callbackContext;
             final String url = args.getString(0);
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
@@ -288,7 +282,7 @@ public class InAppBrowser extends CordovaPlugin {
 
         currentTimer = new Timer();
         currentTimer.scheduleAtFixedRate(currentPollTask, 0L, pollInterval);
-        sendOKUpdate();
+        pluginResultSender.sendOKUpdate();
     }
 
     private void pausePoll() {
@@ -307,7 +301,7 @@ public class InAppBrowser extends CordovaPlugin {
         pausePoll();
         lastPollFunction = "";
         lastPollInterval = 0;
-        sendOKUpdate();
+        pluginResultSender.sendOKUpdate();
     }
 
     private void OpenOnNewThread(final String url, final String target, final HashMap<String, Boolean> features) {
@@ -352,7 +346,7 @@ public class InAppBrowser extends CordovaPlugin {
                     result = showWebPage(url, features);
                 }
 
-                sendOKUpdate(result);
+                pluginResultSender.sendOKUpdate(result);
             }
         });
     }
@@ -513,13 +507,7 @@ public class InAppBrowser extends CordovaPlugin {
                     inAppWebView.loadUrl(BLANK_PAGE_URL);
                 }
 
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("type", HIDDEN_EVENT);
-                    sendOKUpdate(obj);
-                } catch (JSONException ex) {
-                    Log.d(LOG_TAG, "Should never happen");
-                }
+                browserEventSender.sendHiddenEvent()
             }
         });
     }
@@ -540,7 +528,7 @@ public class InAppBrowser extends CordovaPlugin {
             showDialogue();
             resumePoll();
             if(wasHidden) {
-                sendUnhiddenEvent();
+                browserEventSender.sendUnhiddenEvent();
             }
             return;
         }
@@ -567,21 +555,13 @@ public class InAppBrowser extends CordovaPlugin {
 
                 resumePoll();
                 if(wasHidden) {
-                    sendUnhiddenEvent();
+                    browserEventSender.sendUnhiddenEvent();
                 }
             }
         });
     }
 
-    private void sendUnhiddenEvent() {
-        try {
-            JSONObject obj = new JSONObject();
-            obj.put("type", UNHIDDEN_EVENT);
-            sendOKUpdate(obj);
-        } catch (JSONException ex) {
-            Log.d(LOG_TAG, "Should never happen");
-        }
-    }
+
 
     /**
      * Shows the dialog in the standard way
@@ -675,15 +655,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
                 childView.loadUrl(BLANK_PAGE_URL);
-
-
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("type", EXIT_EVENT);
-                    sendClosingUpdate(obj);
-                } catch (JSONException ex) {
-                    Log.d(LOG_TAG, "Should never happen");
-                }
+                sendExitEvent();
             }
         });
     }
@@ -1035,56 +1007,6 @@ public class InAppBrowser extends CordovaPlugin {
         };
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
-    }
-
-    private void sendClosingUpdate(JSONObject obj) {
-        sendUpdate(obj, false, PluginResult.Status.OK);
-    }
-
-    private void sendErrorUpdate(JSONObject obj) {
-        sendUpdate(obj, true, PluginResult.Status.ERROR);
-    }
-
-    private void sendOKUpdate() {
-        sendOKUpdate("");
-    }
-
-    private void sendOKUpdate(String response) {
-        sendUpdate(response, true, PluginResult.Status.OK);
-    }
-
-    private void sendUpdate(String response, boolean keepCallback, PluginResult.Status status) {
-        if (callbackContext != null) {
-            PluginResult pluginResult = new PluginResult(status, response);
-            pluginResult.setKeepCallback(keepCallback);
-            this.callbackContext.sendPluginResult(pluginResult);
-        }
-    }
-
-    /**
-     * Create a new plugin success result and send it back to JavaScript
-     *
-     * @param obj a JSONObject contain event payload information
-     */
-    private void sendOKUpdate(JSONObject obj) {
-        sendUpdate(obj, true, PluginResult.Status.OK);
-    }
-
-    /**
-     * Create a new plugin result and send it back to JavaScript
-     *
-     * @param obj    a JSONObject contain event payload information
-     * @param status the status code to return to the JavaScript environment
-     */
-    private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
-        if (callbackContext != null) {
-            PluginResult result = new PluginResult(status, obj);
-            result.setKeepCallback(keepCallback);
-            callbackContext.sendPluginResult(result);
-            if (!keepCallback) {
-                callbackContext = null;
-            }
-        }
     }
 
     /**

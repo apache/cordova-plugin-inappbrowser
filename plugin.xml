@@ -46,7 +46,8 @@
                 <param name="android-package" value="org.apache.cordova.inappbrowser.SystemBrowser"/>
             </feature>
         </config-file>
-
+        <source-file src="src/android/PluginResultSender.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/BrowserEventSender.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
