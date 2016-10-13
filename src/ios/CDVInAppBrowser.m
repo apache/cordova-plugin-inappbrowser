@@ -418,7 +418,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
     jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
     	//The callback is expecting a string as per inject script, this is wrapped in an outer array.
-    	NSString* canonicalisedResponse  - [NSString stringWithFormat:@"[%@]", response];
+    	NSString* canonicalisedResponse  = [NSString stringWithFormat:@"[%@]", response];
     	[self handleNativeResultWithString: canonicalisedResponse];
     }]; 
 
