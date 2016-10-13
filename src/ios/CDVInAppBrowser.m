@@ -396,7 +396,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark CDVInAppBrowser
 @implementation JavaScriptBridgeInterfaceObject 
-	NSString respond (NSString* response){
+	(NSString*) respond: (NSString*) response {
 		NSLog(@"****** Response %s", response);
 		return response;
 	}
