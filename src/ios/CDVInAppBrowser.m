@@ -1233,7 +1233,7 @@ bool closing = NO;
 	}
 
 	- (NSString*)respond:(NSString*)response {
-		if([response isEqualToString:@"[]"){
+		if([response isEqualToString:@"[]"]){
 			return response;
 		}
 		NSLog(@"****************************");
