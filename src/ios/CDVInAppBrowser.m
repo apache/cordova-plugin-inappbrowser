@@ -216,8 +216,45 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark view-open-and-close
 
+- (void)sendBridgeResult:(NSString*) scriptResult {
+		[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
+	}
+
+- (void)handleInAppBrowserResult:(NSString*) jsonData {
+	if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
+        [self sendBridgeResult:scriptResult];
+        return;
+    }
+
+    NSArray * array = (NSArray *) decodedResult;
+    NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
+    if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
+        [self sendBridgeResult:scriptResult];
+        return;
+    }
+
+    NSString *action = (NSString *)decodedAction;
+    if(action ==nil) {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
+        [self sendBridgeResult:scriptResult];
+        return;
+    }
+
+    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
+        [self.inAppBrowserViewController close];
+        return;
+    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
+        [self hideView];
+        return;
+    } else {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+        [self sendBridgeResult:scriptResult];
+    }
+}
+
 //TODO: rename to handleNativeResult
-- (void)handlePollResult:(NSURL*) url {
+- (void)handleInAppBrowserResult:(NSURL*) url {
     if(![[url host] isEqualToString:@"poll"]) {
         return;
     }
@@ -231,37 +268,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
     NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
-    if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    NSArray * array = (NSArray *) decodedResult;
-    NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
-    if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    NSString *action = (NSString *)decodedAction;
-    if(action ==nil) {
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
-        [self.inAppBrowserViewController close];
-        return;
-    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
-        [self hideView];
-        return;
-    } else {
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-    }
-
+    [self handleInAppBrowserResult:decodedResult];
 }
 
 - (void)handleInjectedScriptCallBack:(NSURL*) url {
@@ -320,7 +327,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     // gap-iab-native://actiontype/{{URL ENCODED JSON OBJECT}}
     // Currently support: actiontype = poll, {{URL ENCODED JSON OBJECT}} = {InAppBrowserAction:'{{actionname}}'} where {{actionname}} is 'hide' or 'close'
     if([[url scheme] isEqualToString:@"gap-iab-native"]) {
-        [self handlePollResult:url];
+        [self handleInAppBrowserResult:url];
         return NO;
     }
 
