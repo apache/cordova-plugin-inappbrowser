@@ -1228,8 +1228,14 @@ bool closing = NO;
 @implementation JavaScriptBridgeInterfaceObject 
 	NSString* callbackFunction;
 
-	- (void)initWithCallback:(NSString*)callback {
-		callbackFunction = callback;
+	- (id)initWithCallback:(NSString*)callback {
+	 	self = [super init];
+	    if (self) {
+	        // Any custom setup work goes here
+	        callbackFunction = callback;
+	    }
+
+    	return self;
 	}
 
 	- (NSString*)respond:(NSString*)response {
