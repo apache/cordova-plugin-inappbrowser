@@ -1283,7 +1283,7 @@ NSTimer* pollTimer;
 
 #pragma mark CDVInAppBrowser
 @implementation JavaScriptBridgeInterfaceObject 
-	(NSString)respond:(NSString*)response {
+	- (NSString*)respond:(NSString*)response {
 		NSLog(@"****** Response %s", response);
 		return response;
 	}
