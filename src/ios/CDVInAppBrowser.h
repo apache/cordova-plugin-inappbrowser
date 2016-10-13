@@ -125,4 +125,5 @@
 @end
 
 @interface JavaScriptBridgeInterfaceObject : NSObject<JavaScriptBridgeInterface>
+- (void)initWithCallback:(NSString*)callback;
 @end
