@@ -231,8 +231,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         return;
     }
 
-    [self handleNativeResultWithString:jsonData];
-    NSArray * array = (NSArray *) jsonData;
+    NSArray * array = (NSArray*) jsonData;
     NSData* inAppBrowserAction = [array[0] valueForKey: @"InAppBrowserAction"];
     if(inAppBrowserAction == nil  || ![inAppBrowserAction isKindOfClass:[NSString class]]) {
         [self sendBridgeResult:jsonString];
@@ -270,7 +269,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
     
     NSString* jsonString = [jsonData substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-    [self handleNativeResultWithString:jsonString];
+    [self handleNativeResultWithString:scriptResult];
 
 }
 
