@@ -1,5 +1,6 @@
 package org.apache.cordova.inappbrowser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Build;
 import android.webkit.WebView;
@@ -22,7 +23,7 @@ public final class ResourceInjector {
      *                  is properly injected, or null if the source string is JavaScript text
      *                  which should be executed directly.
      */
-    private static void injectDeferredObject(WebView webView, Activity parentActivity, String source, String jsWrapper) {
+    private static void injectDeferredObject(final WebView webView, Activity parentActivity, String source, String jsWrapper) {
         String scriptToInject;
         if (jsWrapper != null) {
             org.json.JSONArray jsonEsc = new org.json.JSONArray();

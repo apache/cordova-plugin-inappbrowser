@@ -1,6 +1,7 @@
 package org.apache.cordova.inappbrowser;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import org.apache.cordova.Config;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.CordovaWebView;

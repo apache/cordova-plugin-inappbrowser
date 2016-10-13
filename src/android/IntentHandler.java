@@ -1,6 +1,6 @@
 package org.apache.cordova.inappbrowser;
 
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -49,7 +49,7 @@ public final class IntentHandler {
             intent.setData(Uri.parse("sms:" + address));
             intent.putExtra("address", address);
             intent.setType("vnd.android-dir/mms-sms");
-            cordova.getActivity().startActivity(intent);
+            parentActivity.startActivity(intent);
             return true;
         } catch (android.content.ActivityNotFoundException e) {
             LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
@@ -61,7 +61,7 @@ public final class IntentHandler {
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(url));
-            cordova.getActivity().startActivity(intent);
+            parentActivity.startActivity(intent);
             return true;
         } catch (android.content.ActivityNotFoundException e) {
             LOG.e(LOG_TAG, "Error with " + url + ": " + e.toString());
