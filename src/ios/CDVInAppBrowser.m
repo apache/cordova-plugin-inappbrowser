@@ -412,7 +412,11 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
             NSLog(@"WEB JS Error: %@", value);
         }];
-    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:@"MyFakeyCallback"]; 
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^((NSString*) response){
+		NSLog(@"++++++++++++++++++++++++++++");
+		NSLog(@"+++++ Response %@", response);
+		NSLog(@"++++++++++++++++++++++++++++");
+    }]; 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
     showing = NO;
@@ -1226,13 +1230,13 @@ bool closing = NO;
 
 #pragma mark JavaScriptBridgeInterfaceObject
 @implementation JavaScriptBridgeInterfaceObject 
-	NSString* callbackFunction;
+	void (^callbackFunction) (NSString*);
 
-	- (id)initWithCallback:(NSString*)callback {
+	- (id)initWithCallback:(void (^)(NSString*))callbackBlock; {
 	 	self = [super init];
 	    if (self) {
 	        // Any custom setup work goes here
-	        callbackFunction = callback;
+	        callbackFunction = callbackBlock;
 	    }
 
     	return self;
@@ -1242,12 +1246,12 @@ bool closing = NO;
 		if([response isEqualToString:@"[]"]){
 			return response;
 		}
+
 		NSLog(@"****************************");
 		NSLog(@"****** Response %@", response);
-		NSLog(callbackFunction);
 		NSLog(@"****************************");
-		//TODO: Something like this:
-		//[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
+
+		[self callbackFunction:response];
 		return response;
 	}
 @end
