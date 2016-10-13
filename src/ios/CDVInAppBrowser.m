@@ -542,36 +542,6 @@ bool closing = NO;
     [self openUrl:url targets:target withOptions:options];
 }
 
-#pragma mark polling
-
-NSTimer* pollTimer;
-
--(void)onPollTick:(NSTimer *)timer {
-    if(hiding || closing) {
-        return;
-    }
-    NSString* pollCode = timer.userInfo;
-    if(pollCode != nil) {
-        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        [self injectDeferredObject:pollCode withWrapper:jsWrapper];
-    } else if (pollTimer != nil) {
-        NSLog(@"No JS code to execute");
-        [self stopPolling];
-    }
-}
-
-- (void)sendPollResult:(NSString*)data {
-    //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window
-    [self sendOKPluginResult:@{@"type":@"pollresult", @"data":data}];
-}
-
--(void)startPolling:(NSString*)script interval:(NSTimeInterval)interval {
-    [self stopPolling];
-    if(hiding || closing){
-        return;
-    }
-    pollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:script repeats:YES];
-}
 
 #pragma mark public-methods
 
@@ -1251,6 +1221,8 @@ NSTimer* pollTimer;
 		NSLog(@"****************************");
 		NSLog(@"****** Response %@", response);
 		NSLog(@"****************************");
+		//TODO: Something like this:
+		//[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
 		return response;
 	}
 @end
