@@ -1227,7 +1227,7 @@ bool closing = NO;
 #pragma mark CDVInAppBrowser
 @implementation JavaScriptBridgeInterfaceObject 
 	- (NSString*)respond:(NSString*)response {
-		if(response == "[]"){
+		if(response == @"[]"){
 			return response;
 		}
 		NSLog(@"****************************");
