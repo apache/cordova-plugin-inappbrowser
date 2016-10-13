@@ -2,6 +2,7 @@ package org.apache.cordova.inappbrowser;
 
 import android.app.Activity;
 import android.os.Build;
+import android.webkit.WebView;
 import org.json.JSONArray;
 
 public final class ResourceInjector {
