@@ -221,12 +221,17 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	}
 
 - (void)handleNativeResultWithString:(NSString*) jsonData {
+	
+	NSError* __autoreleasing error = nil;
+    NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+
 	if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
         NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
         [self sendBridgeResult:scriptResult];
         return;
     }
 
+    [self handleNativeResultWithString:decodedResult];
     NSArray * array = (NSArray *) decodedResult;
     NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
     if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
@@ -263,11 +268,10 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         return;
     }
 
-    NSError* __autoreleasing error = nil;
-    scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-    NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+    
+    NSString* scriptResult = [jsonData substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+    
 
-    [self handleNativeResultWithString:decodedResult];
 }
 
 - (void)handleInjectedScriptCallBack:(NSURL*) url {
