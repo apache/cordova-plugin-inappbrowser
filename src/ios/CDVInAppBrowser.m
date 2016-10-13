@@ -268,8 +268,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 
     
-    NSString* jsonString = [jsonData substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-    [self handleNativeResultWithString:scriptResult];
+    NSString* jsonString = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+    [self handleNativeResultWithString:jsonString];
 
 }
 
