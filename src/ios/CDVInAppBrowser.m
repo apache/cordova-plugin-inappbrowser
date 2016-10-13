@@ -1276,7 +1276,7 @@ NSTimer* pollTimer;
 @implementation JavaScriptBridgeInterfaceObject 
 	- (NSString*)respond:(NSString*)response {
 		NSLog(@"****************************");
-		NSLog(@"****** Response %s", response);
+		NSLog(@"****** Response %@", response);
 		NSLog(@"****************************");
 		return response;
 	}
