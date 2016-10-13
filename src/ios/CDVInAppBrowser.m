@@ -1284,7 +1284,9 @@ NSTimer* pollTimer;
 #pragma mark CDVInAppBrowser
 @implementation JavaScriptBridgeInterfaceObject 
 	- (NSString*)respond:(NSString*)response {
+		NSLog(@"****************************");
 		NSLog(@"****** Response %s", response);
+		NSLog(@"****************************");
 		return response;
 	}
 @end
