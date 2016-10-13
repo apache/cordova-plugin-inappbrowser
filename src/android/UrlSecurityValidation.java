@@ -1,5 +1,6 @@
 package org.apache.cordova.inappbrowser;
 
+import android.webkit.WebView;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.cordova.Config;
