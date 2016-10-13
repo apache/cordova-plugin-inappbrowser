@@ -220,7 +220,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 		[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
 	}
 
-- (void)handleInAppBrowserResult:(NSString*) jsonData {
+- (void)handleNativeResultWithString:(NSString*) jsonData {
 	if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
         NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
         [self sendBridgeResult:scriptResult];
@@ -253,8 +253,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 }
 
-//TODO: rename to handleNativeResult
-- (void)handleInAppBrowserResult:(NSURL*) url {
+- (void)handleNativeResult:(NSURL*) url {
     if(![[url host] isEqualToString:@"poll"]) {
         return;
     }
@@ -268,7 +267,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
     NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
-    [self handleInAppBrowserResult:decodedResult];
+    [self handleNativeResultWithString:decodedResult];
 }
 
 - (void)handleInjectedScriptCallBack:(NSURL*) url {
@@ -327,7 +326,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     // gap-iab-native://actiontype/{{URL ENCODED JSON OBJECT}}
     // Currently support: actiontype = poll, {{URL ENCODED JSON OBJECT}} = {InAppBrowserAction:'{{actionname}}'} where {{actionname}} is 'hide' or 'close'
     if([[url scheme] isEqualToString:@"gap-iab-native"]) {
-        [self handleInAppBrowserResult:url];
+        [self handleNativeResult:url];
         return NO;
     }
 
