@@ -122,3 +122,10 @@
 
 @end
 
+@protocol JavaScriptBridgeInterface <JSExport>
+// JavaScriptBridgeInterfaceObject
+- (NSString)respond(NSString* response); 
+@end
+
+@interface JavaScriptBridgeInterfaceObject : NSObject<JavaScriptBridgeInterface>
+@end

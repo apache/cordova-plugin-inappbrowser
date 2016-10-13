@@ -394,16 +394,34 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 - (void)webViewDidStartLoad:(UIWebView*)theWebView {
 }
 
+#pragma mark CDVInAppBrowser
+@implementation JavaScriptBridgeInterfaceObject 
+	NSString respond (NSString* response){
+		NSLog(@"****** Response %s", response);
+		return response;
+	}
+@end
+
+
+
+
+
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView {
     NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
 
 
     JSContext *jsContext = [theWebView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"]; // Undocumented access to UIWebView's JSContext
+	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
+            NSLog(@"WEB JS Error: %@", value);
+        }];
+
 	[jsContext evaluateScript:@"var num = 5 + 5"];
 	[jsContext evaluateScript:@"var triple = function(value) { return value * 3 }"];
     JSValue *tripleNum = [jsContext evaluateScript:@"triple(num)"];
-    
     NSLog(@"Tripled: %d", [tripleNum toInt32]);
+
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [JavaScriptBridgeInterfaceObject alloc];
+
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
     showing = NO;
