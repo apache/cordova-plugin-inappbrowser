@@ -1,6 +1,5 @@
 package org.apache.cordova.inappbrowser;
 
-import android.webkit.WebView;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.cordova.Config;
@@ -15,7 +14,7 @@ public final class UrlSecurityValidation {
      * @param url
      * @return true if navigable, otherwise false or null
      */
-    private static Boolean shouldAllowNavigation(final WebView webView, final String url, final String pluginManagerMethod) {
+    private static Boolean shouldAllow(final CordovaWebView webView, final String url, final String pluginManagerMethod) {
         Boolean shouldAllowNavigation = null;
 
         if (url.startsWith("javascript:")) {
@@ -50,10 +49,10 @@ public final class UrlSecurityValidation {
     }
 
     public static Boolean shouldAllowRequest(CordovaWebView webView, String url) {
-        return shouldAllowNavigation(webView, url, "shouldAllowRequest");
+        return shouldAllow(webView, url, "shouldAllowRequest");
     }
 
     public static Boolean shouldNavigation(CordovaWebView webView, String url) {
-        return shouldAllowNavigation(webView, url, "shouldAllowRequest");
+        return shouldAllow(webView, url, "shouldAllowRequest");
     }
 }
