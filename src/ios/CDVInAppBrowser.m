@@ -225,7 +225,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	NSError* __autoreleasing error = nil;
     NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
-	if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
+	if(error != nil || ![jsonData isKindOfClass:[NSArray class]]){
         NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
         [self sendBridgeResult:jsonString];
         return;
@@ -269,8 +269,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 
     
-    NSString* scriptResult = [jsonData substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-    
+    NSString* jsonString = [jsonData substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+    [self handleNativeResultWithString:jsonString];
 
 }
 
