@@ -416,6 +416,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
             NSLog(@"WEB JS Error: %@", value);
         }];
 
+	 NSLog(@"*********** Adding object to context");
+
     jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
     	//The callback is expecting a string as per inject script, this is wrapped in an outer array.
     	NSString* canonicalisedResponse  = [NSString stringWithFormat:@"[%@]", response];
