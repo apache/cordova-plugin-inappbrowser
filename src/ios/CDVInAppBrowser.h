@@ -16,7 +16,7 @@
  specific language governing permissions and limitations
  under the License.
  */
-
+#import <JavaScriptCore/JavaScriptCore.h>
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
