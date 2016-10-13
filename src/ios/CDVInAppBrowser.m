@@ -221,7 +221,10 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	}
 
 - (void)handleNativeResultWithString:(NSString*) jsonString {
-	
+	NSLog(@"****************************");
+	NSLog(@"****** Response %@", response);
+	NSLog(@"****************************");
+		
 	NSError* __autoreleasing error = nil;
     NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
@@ -414,9 +417,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         }];
 
     jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
-		NSLog(@"++++++++++++++++++++++++++++");
-		NSLog(@"+++++ Response %@", response);
-		NSLog(@"++++++++++++++++++++++++++++");
+    	handleNativeResultWithString(response);
     }]; 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
@@ -1247,10 +1248,6 @@ bool closing = NO;
 		if([response isEqualToString:@"[]"]){
 			return response;
 		}
-
-		NSLog(@"****************************");
-		NSLog(@"****** Response %@", response);
-		NSLog(@"****************************");
 
 		callbackFunction(response);
 		return response;
