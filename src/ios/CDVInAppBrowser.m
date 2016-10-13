@@ -396,10 +396,10 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView {
     NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
-    JSContext *context = [[JSContext alloc] init];
-	[context evaluateScript:@"var num = 5 + 5"];
-	[context evaluateScript:@"var triple = function(value) { return value * 3 }"];
-    JSValue *tripleNum = [context evaluateScript:@"triple(num)"];
+    JSContext *jsContext = [view valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"]; // Undocumented access to UIWebView's JSContext
+	[jsContext evaluateScript:@"var num = 5 + 5"];
+	[jsContext evaluateScript:@"var triple = function(value) { return value * 3 }"];
+    JSValue *tripleNum = [jsContext evaluateScript:@"triple(num)"];
     NSLog(@"Tripled: %d", [tripleNum toInt32]);
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
