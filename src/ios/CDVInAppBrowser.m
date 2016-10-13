@@ -412,7 +412,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
             NSLog(@"WEB JS Error: %@", value);
         }];
-    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] init]; 
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:@"MyFakeyCallback"]; 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
     showing = NO;
@@ -1224,14 +1224,21 @@ bool closing = NO;
 
 @end
 
-#pragma mark CDVInAppBrowser
+#pragma mark JavaScriptBridgeInterfaceObject
 @implementation JavaScriptBridgeInterfaceObject 
+	NSString* callbackFunction;
+
+	- (void)initWithCallback:(NSString*)callback {
+		callbackFunction = callback;
+	}
+
 	- (NSString*)respond:(NSString*)response {
-		if(response == @"[]"){
+		if([response isEqualToString:@"[]"){
 			return response;
 		}
 		NSLog(@"****************************");
 		NSLog(@"****** Response %@", response);
+		NSLog(callbackFunction);
 		NSLog(@"****************************");
 		//TODO: Something like this:
 		//[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
