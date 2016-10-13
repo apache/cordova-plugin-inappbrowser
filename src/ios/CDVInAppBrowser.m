@@ -1252,7 +1252,7 @@ bool closing = NO;
 		NSLog(@"****** Response %@", response);
 		NSLog(@"****************************");
 
-		[self callbackFunction:response];
+		callbackFunction(response);
 		return response;
 	}
 @end
