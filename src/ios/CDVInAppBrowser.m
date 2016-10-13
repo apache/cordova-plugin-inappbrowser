@@ -216,7 +216,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark view-open-and-close
 
-- (void)sendBridgeResult:(NSString*) scriptResult {
+- (void)sendBridgeResult:(NSString*) data {
 		[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
 	}
 
