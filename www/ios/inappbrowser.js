@@ -39,9 +39,7 @@
             },
             lastUrl = url,
             lastWindowName = windowName,
-            lastWindowFeatures = windowFeatures
-            lastPollIntervalToRestore = null,
-            lastPollFunctionToRestore = null;
+            lastWindowFeatures = windowFeatures;
 
         function releaseListeners(){
             for(var eventname in me.channels)
@@ -106,7 +104,6 @@
 
         me.close = function(eventname) {
             exec(null, null, "InAppBrowser", "close", []);
-            me.stopPoll();
             if(hidden){
                 me.channels['exit'].fire();
             }
@@ -121,7 +118,6 @@
         me.hide = function(releaseResources, blankPage){
 
             if(releaseResources){
-                me.stopPoll();
                 releaseListeners();
             }
 
@@ -136,7 +132,6 @@
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
             }
 
-            me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
         }
