@@ -37,17 +37,17 @@
             backChannels = {
                 preventexitonhide : channel.create('preventexitonhide')
             }
-            polling = false,
+            //polling = false,
             lastUrl = url,
             lastWindowName = windowName,
             lastWindowFeatures = windowFeatures
             lastPollIntervalToRestore = null,
             lastPollFunctionToRestore = null;
 
-        function clearPolling () {
-            lastPollIntervalToRestore = null;
-            lastPollFunctionToRestore = null;
-        }
+//        function clearPolling () {
+//            lastPollIntervalToRestore = null;
+//            lastPollFunctionToRestore = null;
+//        }
 
         function releaseListeners(){
             for(var eventname in me.channels)
@@ -110,9 +110,9 @@
             return hidden;
         }
 
-        me.isPolling = function(){
-            return polling;
-        }
+//        me.isPolling = function(){
+//            return polling;
+//        }
 
         me.close = function(eventname) {
             exec(null, null, "InAppBrowser", "close", []);
@@ -152,20 +152,20 @@
         }
 
         //TODO: Remove start/stop methods ********************************************************************
-        me.startPoll = function(pollFunction, pollInterval){
-            if(pollFunction && pollInterval){
-               lastPollIntervalToRestore = pollInterval;
-               lastPollFunctionToRestore = pollFunction;
-               exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-               polling = true;
-            }
-        }
-
-        me.stopPoll = function() {
-           exec(null, null, "InAppBrowser", "stopPoll", []);
-           clearPolling();
-           polling = false;
-        }
+//        me.startPoll = function(pollFunction, pollInterval){
+//            if(pollFunction && pollInterval){
+//               lastPollIntervalToRestore = pollInterval;
+//               lastPollFunctionToRestore = pollFunction;
+//               exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
+//               polling = true;
+//            }
+//        }
+//
+//        me.stopPoll = function() {
+//           exec(null, null, "InAppBrowser", "stopPoll", []);
+//           clearPolling();
+//           polling = false;
+//        }
 
         me.addEventListener = function (eventname,f) {
             if (eventname in me.channels) {
