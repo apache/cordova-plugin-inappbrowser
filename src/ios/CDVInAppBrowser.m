@@ -404,16 +404,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
             NSLog(@"WEB JS Error: %@", value);
         }];
-
-	[jsContext evaluateScript:@"var num = 5 + 5"];
-	[jsContext evaluateScript:@"var triple = function(value) { return value * 3 }"];
-    JSValue *tripleNum = [jsContext evaluateScript:@"triple(num)"];
-    NSLog(@"Tripled: %d", [tripleNum toInt32]);
-
-    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[CDVInAppBrowser alloc] init]; //TODO - needs to be obeject instance!
-
-
-
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] init]; 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
     showing = NO;
