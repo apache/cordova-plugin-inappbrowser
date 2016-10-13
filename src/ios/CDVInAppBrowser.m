@@ -222,9 +222,9 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 - (void)handleNativeResultWithString:(NSString*) jsonString {
 	NSLog(@"****************************");
-	NSLog(@"****** Response %@", response);
+	NSLog(@"****** Response %@", jsonString);
 	NSLog(@"****************************");
-		
+
 	NSError* __autoreleasing error = nil;
     NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
@@ -417,7 +417,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         }];
 
     jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
-    	handleNativeResultWithString(response);
+    	//todo: wrapper in [] as the original would be.
+    	[self handleNativeResultWithString: response];
     }]; 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
