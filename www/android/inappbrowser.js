@@ -33,7 +33,6 @@
 
     function InAppBrowser(strUrl, strWindowName, strWindowFeatures, callbacks) {
         var me = this,
-            polling = false,
             hidden = false,
             backChannels = { };
 
@@ -48,10 +47,6 @@
 
         me.isHidden = function(){
             return hidden;
-        }
-
-        me.isPolling = function(){
-            return polling;
         }
 
         me.channels = {
