@@ -102,7 +102,7 @@
             'loaderror' : channel.create('loaderror'),
             'hidden' : channel.create('hidden'),
             'unhidden' : channel.create('unhidden'),
-            'pollresult' : channel.create('pollresult'),
+            'bridgeresponse' : channel.create('bridgeresponse'),
             'exit' : channel.create('exit')
         }
 
@@ -151,6 +151,7 @@
             hidden = false;
         }
 
+        //TODO: Remove start/stop methods ********************************************************************
         me.startPoll = function(pollFunction, pollInterval){
             if(pollFunction && pollInterval){
                lastPollIntervalToRestore = pollInterval;

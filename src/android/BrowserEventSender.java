@@ -16,7 +16,7 @@ public class BrowserEventSender {
     private static final String EXIT_EVENT = "exit";
     private static final String HIDDEN_EVENT = "hidden";
     private static final String UNHIDDEN_EVENT = "unhidden";
-    private static final String POLL_RESULT_EVENT = "pollresult";
+    private static final String BRIDGE_RESPONSE_EVENT = "bridgeresponse";
 
     private PluginResultSender pluginResultSender;
 
@@ -44,9 +44,9 @@ public class BrowserEventSender {
         }
     }
 
-    public void pollResult(String scriptResult) {
+    public void bridgeResponse(String scriptResult) {
         try {
-            JSONObject responseObject = CreateResponse(POLL_RESULT_EVENT);
+            JSONObject responseObject = CreateResponse(BRIDGE_RESPONSE_EVENT);
             responseObject.put("data", scriptResult);
             pluginResultSender.ok(responseObject);
         } catch (JSONException ex) {

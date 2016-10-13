@@ -116,19 +116,18 @@ public class InAppBrowser extends CordovaPlugin {
 
                 JSONObject commandObject = returnedArray.optJSONObject(0);
                 if (commandObject == null) {
-                    browserEventSender.pollResult(scriptResult);
+                    browserEventSender.bridgeResponse(scriptResult);
                     return true;
                 }
 
                 String action = commandObject.optString("InAppBrowserAction");
 
                 if (action == null) {
-                    browserEventSender.pollResult(scriptResult);
+                    browserEventSender.bridgeResponse(scriptResult);
                     return true;
                 }
 
                 if (action.equalsIgnoreCase("close")) {
-                    //stopPoll(); *************************************************************************************
                     closeDialog();
                     return true;
                 }
@@ -138,7 +137,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 Log.d(LOG_TAG, "The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-                browserEventSender.pollResult(scriptResult);
+                browserEventSender.bridgeResponse(scriptResult);
 
                 return true;
             } catch (JSONException ex) {
@@ -549,7 +548,6 @@ public class InAppBrowser extends CordovaPlugin {
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //stopPoll(); *****************************************************************************************
                 final WebView childView = inAppWebView;
                 // The JS protects against multiple calls, so this should happen only when
                 // closeDialog() is called by other native code.

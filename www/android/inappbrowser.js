@@ -60,7 +60,7 @@
             'loaderror' : channel.create('loaderror'),
             'hidden' : channel.create('hidden'),
             'unhidden' : channel.create('unhidden'),
-            'pollresult' : channel.create('pollresult'),
+            'bridgeresponse' : channel.create('bridgeresponse'),
             'exit' : channel.create('exit')
         }
 
@@ -83,16 +83,6 @@
             exec(null,null,"InAppBrowser", "unHide", [strUrl]);
             hidden = false;
         }
-
-//        me.startPoll = function(pollFunction, pollInterval){
-//           exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-//           polling = true;
-//        }
-//
-//        me.stopPoll = function() {
-//           exec(null, null, "InAppBrowser", "stopPoll", []);
-//           polling = false;
-//        }
 
         me.bridge = function (objectName, bridgeFunction) {
             exec(null, null, "InAppBrowser", "bridge", [objectName, bridgeFunction]);
