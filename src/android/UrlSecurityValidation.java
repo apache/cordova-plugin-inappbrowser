@@ -13,7 +13,7 @@ public final class UrlSecurityValidation {
      * @param url
      * @return true if navigable, otherwise false or null
      */
-    private static Boolean shouldAllowNavigation(final webView, final String url, final String pluginManagerMethod) {
+    private static Boolean shouldAllowNavigation(final WebView webView, final String url, final String pluginManagerMethod) {
         Boolean shouldAllowNavigation = null;
 
         if (url.startsWith("javascript:")) {
