@@ -220,29 +220,29 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 		[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
 	}
 
-- (void)handleNativeResultWithString:(NSString*) jsonData {
+- (void)handleNativeResultWithString:(NSString*) jsonString {
 	
 	NSError* __autoreleasing error = nil;
-    NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+    NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
 	if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
         NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
-        [self sendBridgeResult:scriptResult];
+        [self sendBridgeResult:jsonString];
         return;
     }
 
-    [self handleNativeResultWithString:decodedResult];
-    NSArray * array = (NSArray *) decodedResult;
-    NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
-    if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
-        [self sendBridgeResult:scriptResult];
+    [self handleNativeResultWithString:jsonData];
+    NSArray * array = (NSArray *) jsonData;
+    NSData* inAppBrowserAction = [array[0] valueForKey: @"InAppBrowserAction"];
+    if(inAppBrowserAction == nil  || ![inAppBrowserAction isKindOfClass:[NSString class]]) {
+        [self sendBridgeResult:jsonString];
         return;
     }
 
-    NSString *action = (NSString *)decodedAction;
+    NSString *action = (NSString *)inAppBrowserAction;
     if(action ==nil) {
         NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
-        [self sendBridgeResult:scriptResult];
+        [self sendBridgeResult:jsonString];
         return;
     }
 
@@ -254,7 +254,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         return;
     } else {
         NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-        [self sendBridgeResult:scriptResult];
+        [self sendBridgeResult:jsonString];
     }
 }
 
