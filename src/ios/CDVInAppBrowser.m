@@ -252,7 +252,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     }
 
     if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
-        [self stopPolling];
         [self.inAppBrowserViewController close];
         return;
     } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
@@ -534,7 +533,6 @@ bool closing = NO;
     }
     hiding = YES;
     [self sendOKPluginResult:@{@"type":@"preventexitonhide"}];
-    [self stopPolling];
     [self sendOKPluginResult:@{@"type":@"hidden"}];
     [self.inAppBrowserViewController close]; //This must come after the hide callback - otherwise it isn't fired
 }
@@ -550,7 +548,6 @@ NSTimer* pollTimer;
 
 -(void)onPollTick:(NSTimer *)timer {
     if(hiding || closing) {
-        [self stopPolling];
         return;
     }
     NSString* pollCode = timer.userInfo;
@@ -576,12 +573,6 @@ NSTimer* pollTimer;
     pollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:script repeats:YES];
 }
 
-
--(void)stopPolling {
-    [pollTimer invalidate];
-    pollTimer = nil;
-}
-
 #pragma mark public-methods
 
 - (void)open:(CDVInvokedUrlCommand*)command {
@@ -598,7 +589,6 @@ NSTimer* pollTimer;
         NSLog(@"IAB.close() called but it was already closed.");
         return;
     }
-    [self stopPolling];
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -657,22 +647,6 @@ NSTimer* pollTimer;
     }
 
     [self showWindow];
-}
-
-- (void)startPoll:(CDVInvokedUrlCommand*)command
-{
-    if([command argumentAtIndex:0] == nil ||  [command argumentAtIndex:1] == nil) {
-        NSLog(@"Incorrect number of arguments passed to start polling");
-        return;
-    }
-
-    NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
-    [self startPolling:[command argumentAtIndex:0] interval:pollInterval];
-}
-
-- (void)stopPoll:(CDVInvokedUrlCommand*)command
-{
-    [self stopPolling];
 }
 
 - (void)hide:(CDVInvokedUrlCommand*)command
@@ -1002,7 +976,6 @@ NSTimer* pollTimer;
         showing = NO;
         hiding = NO;
         closing = NO;
-        pollTimer = nil;
     });
 }
 
