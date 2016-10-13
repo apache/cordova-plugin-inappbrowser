@@ -394,13 +394,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 - (void)webViewDidStartLoad:(UIWebView*)theWebView {
 }
 
-#pragma mark CDVInAppBrowser
-@implementation JavaScriptBridgeInterfaceObject 
-	(NSString*) respond: (NSString*) response {
-		NSLog(@"****** Response %s", response);
-		return response;
-	}
-@end
+
 
 
 
@@ -1286,5 +1280,12 @@ NSTimer* pollTimer;
     return YES;
 }
 
+@end
 
+#pragma mark CDVInAppBrowser
+@implementation JavaScriptBridgeInterfaceObject 
+	(NSString*) respond: (NSString*) response {
+		NSLog(@"****** Response %s", response);
+		return response;
+	}
 @end
