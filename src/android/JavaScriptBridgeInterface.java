@@ -22,9 +22,6 @@ public class JavaScriptBridgeInterface {
 
     @JavascriptInterface
     public String respond(String response) {
-        //TODO: Remove Log *********************************************************************************************
-        Log.d(LOG_TAG, "*************Response: " + response);
-
         if(response.equals("[]")){
             return response;
         }
