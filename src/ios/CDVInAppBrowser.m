@@ -412,7 +412,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
             NSLog(@"WEB JS Error: %@", value);
         }];
-    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^((NSString*) response){
+
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
 		NSLog(@"++++++++++++++++++++++++++++");
 		NSLog(@"+++++ Response %@", response);
 		NSLog(@"++++++++++++++++++++++++++++");
