@@ -123,7 +123,7 @@
 @end
 
 @protocol JavaScriptBridgeInterface <JSExport>
-- (NSString*)respond:(NSString*) response; 
+- (NSString *)respond:(NSString*)response; 
 @end
 
 @interface JavaScriptBridgeInterfaceObject : NSObject<JavaScriptBridgeInterface>

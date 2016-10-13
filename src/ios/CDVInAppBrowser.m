@@ -396,10 +396,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 
 
-
-
-
-
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView {
     NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
 
@@ -414,7 +410,9 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     JSValue *tripleNum = [jsContext evaluateScript:@"triple(num)"];
     NSLog(@"Tripled: %d", [tripleNum toInt32]);
 
-    jsContext[@"JavaScriptBridgeInterfaceObject"] = [JavaScriptBridgeInterfaceObject alloc];
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[CDVInAppBrowser alloc] init]; //TODO - needs to be obeject instance!
+
+
 
 
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
@@ -1279,6 +1277,7 @@ NSTimer* pollTimer;
 
     return YES;
 }
+
 
 @end
 
