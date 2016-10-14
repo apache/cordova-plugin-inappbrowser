@@ -103,6 +103,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean reOpenOnNextPageFinished = false;
     private boolean hidden = false;
     private boolean hideGoToBlank = false;
+    private boolean canOpen = true;
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -169,6 +170,10 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
+            if(!canOpen){
+                return true;
+            }
+            canOpen = false;
             pluginResultSender = new PluginResultSender(callbackContext);
             browserEventSender = new BrowserEventSender(pluginResultSender);
             final String url = args.getString(0);
@@ -235,6 +240,10 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         if (action.equals("unHide")) {
+            if(!canOpen){
+                return true;
+            }
+            canOpen = false;
             final String url = args.isNull(0) ? null : args.getString(0);
             unHideDialog(url);
             return true;
@@ -941,11 +950,13 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             hideGoToBlank = false;
+            canOpen = true;
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             browserEventSender.error(failingUrl, errorCode, description);
+            canOpen = true;
         }
 
         /**
