@@ -366,15 +366,9 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private void unHideDialog(final String url) {
-        final boolean wasHidden = hidden;
         if (url == null || url.equals("") || url.equals(NULL)) {
-            hidden = false;
             addBridgeInterface();
             showDialogue();
-
-            if(wasHidden) {
-                browserEventSender.unhidden();
-            }
             return;
         }
 
@@ -391,17 +385,14 @@ public class InAppBrowser extends CordovaPlugin {
                 if (null == inAppWebView || null == inAppWebView.getUrl()) {
                     return;
                 }
-                hidden = false;
 
                 if (inAppWebView.getUrl().equals(url)) {
+                    //unhidden event & reset of hidden flag done in this method ...
                     showDialogue();
                 } else {
+                    //unhidden event & reset of hidden flag done in onPageFinished which results from this navigate ...
                     reOpenOnNextPageFinished = true;
                     navigate(url);
-                }
-
-                if(wasHidden) {
-                    browserEventSender.unhidden();
                 }
             }
         });
@@ -421,6 +412,10 @@ public class InAppBrowser extends CordovaPlugin {
             public void run() {
                 if (dialog != null) {
                     dialog.show();
+                }
+                hidden = false;
+                if(hidden) {
+                    browserEventSender.unhidden();
                 }
             }
         });
@@ -934,6 +929,10 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             browserEventSender.loadStop(url);
+            if(hidden){
+                browserEventSender.unhidden();
+                hidden = false;
+            }
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
