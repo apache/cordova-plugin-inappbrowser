@@ -22,7 +22,6 @@ public class JavaScriptBridgeInterface {
 
     @JavascriptInterface
     public String respond(String response) {
-        Log.d(LOG_TAG, "Response at " + System.currentTimeMillis());
         if(response.equals("[]")){
             return response;
         }
