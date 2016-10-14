@@ -1249,7 +1249,7 @@ bool closing = NO;
 	}
 
 	- (NSString*)respond:(NSString*)response {
-		NSLog(@"Response: %d", (long)NSDate.date.timeIntervalSince1970);
+		NSLog(@"Response: %d", (long)(NSDate.date.timeIntervalSince1970 * 1000.0));
 		if([response isEqualToString:@"[]"]){
 			return response;
 		}
