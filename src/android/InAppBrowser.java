@@ -114,15 +114,10 @@ public class InAppBrowser extends CordovaPlugin {
 
         public boolean handle(String scriptResult) {
             try {
-
-                Log.d(LOG_TAG, "Handling");
-                Log.d(LOG_TAG, scriptResult);
                 JSONArray returnedArray = new JSONArray(scriptResult);
-
-
                 JSONObject commandObject = returnedArray.optJSONObject(0);
+
                 if (commandObject == null) {
-                    Log.d(LOG_TAG, "Command object is null");
                     browserEventSender.bridgeResponse(scriptResult);
                     return true;
                 }
@@ -130,18 +125,15 @@ public class InAppBrowser extends CordovaPlugin {
                 String action = commandObject.optString("InAppBrowserAction");
 
                 if (action == null) {
-                    Log.d(LOG_TAG, "Action is null");
                     browserEventSender.bridgeResponse(scriptResult);
                     return true;
                 }
 
                 if (action.equalsIgnoreCase("close")) {
-                    Log.d(LOG_TAG, "Closing *********");
                     closeDialog();
                     return true;
                 }
                 if (action.equalsIgnoreCase("hide")) {
-                    Log.d(LOG_TAG, "Hiding *********");
                     hideGoToBlank = true;
                     hideDialog(false);
                     return true;
