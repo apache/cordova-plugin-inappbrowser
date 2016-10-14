@@ -413,9 +413,9 @@ public class InAppBrowser extends CordovaPlugin {
                 if (dialog != null) {
                     dialog.show();
                 }
-                hidden = false;
                 if(hidden) {
                     browserEventSender.unhidden();
+                    hidden = false;
                 }
             }
         });
