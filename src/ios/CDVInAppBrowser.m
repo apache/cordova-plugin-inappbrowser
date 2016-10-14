@@ -534,7 +534,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 BOOL unhiding = NO;
 BOOL showing = NO;
 BOOL hiding = NO;
-bool closing = NO;
+BOOL closing = NO;
+BOOL canOpen = NO;
 
 -(void)notifyUnhidden {
     //Called back from webViewDidFinishLoad
@@ -557,6 +558,10 @@ bool closing = NO;
 }
 
 - (void)unHideView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
+	if(!canOpen){
+		return;
+	}
+	canOpen = NO;
     unhiding = YES;
     [self openUrl:url targets:target withOptions:options];
 }
@@ -565,6 +570,10 @@ bool closing = NO;
 #pragma mark public-methods
 
 - (void)open:(CDVInvokedUrlCommand*)command {
+	if(!canOpen){
+		return;
+	}
+	canOpen = NO;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
@@ -1067,6 +1076,7 @@ bool closing = NO;
     }
 
     [self.navigationDelegate webViewDidFinishLoad:theWebView];
+    canOpen = YES;
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error {
@@ -1080,6 +1090,7 @@ bool closing = NO;
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
 
     [self.navigationDelegate webView:theWebView didFailLoadWithError:error];
+    canOpen = YES;
 }
 
 #pragma mark CDVScreenOrientationDelegate
