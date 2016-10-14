@@ -98,6 +98,7 @@ exports.defineAutoTests = function () {
             expect(iabInstance.removeEventListener).toEqual(jasmine.any(Function));
             expect(iabInstance.close).toEqual(jasmine.any(Function));
             expect(iabInstance.show).toEqual(jasmine.any(Function));
+            expect(iabInstance.hide).toEqual(jasmine.any(Function));
             expect(iabInstance.executeScript).toEqual(jasmine.any(Function));
             expect(iabInstance.insertCSS).toEqual(jasmine.any(Function));
         });
@@ -421,7 +422,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="closeHidden"></div>' +
         'Expected result: no output. But click on "show hidden" again and nothing should be shown.' +
         '<p/> <div id="openHiddenShow"></div>' +
-        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk';
+        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk' +
+        '<p/> <div id="openVisibleAndHide"></div>' +
+        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk. Hide after 2 seconds';
 
     var clearing_cache_tests = '<h1>Clearing Cache</h1>' +
         '<div id="openClearCache"></div>' +
@@ -449,7 +452,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openHardwareBackYes"></div>' +
         'Expected result: hardwareback=yes pressing back button should navigate backwards in history then close InAppBrowser' +
         '<p/> <div id="openHardwareBackNo"></div>' +
-        'Expected result: hardwareback=no pressing back button should close InAppBrowser regardless history' + 
+        'Expected result: hardwareback=no pressing back button should close InAppBrowser regardless history' +
         '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
         'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
 
@@ -620,6 +623,12 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('google.co.uk Not Hidden', function () {
         openHidden('https://www.google.co.uk', false);
     }, 'openHiddenShow');
+    createActionButton('google.co.uk shown for 2 seconds than hidden', function () {
+        var iab = doOpen(url, 'random_sting');
+        setTimeout(function () {
+            iab.hide();
+        }, 2000);
+    }, 'openVisibleAndHide');
 
     //Clearing cache
     createActionButton('Clear Browser Cache', function () {

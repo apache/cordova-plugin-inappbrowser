@@ -243,6 +243,23 @@
     });
 }
 
+- (void)hide:(CDVInvokedUrlCommand*)command
+{
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to hide IAB after it was closed.");
+        return;
+    }
+    if (_previousStatusBarStyle == -1) {
+        NSLog(@"Tried to hide IAB while already hidden");
+        return;
+    }
+
+    if (self.inAppBrowserViewController != nil) {
+        [[self.inAppBrowserViewController presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+        _previousStatusBarStyle = -1;
+    }
+}
+
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
