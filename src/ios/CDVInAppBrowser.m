@@ -221,10 +221,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	}
 
 - (void)handleNativeResultWithString:(NSString*) jsonString {
-	NSLog(@"****************************");
-	NSLog(@"****** Response %@", jsonString);
-	NSLog(@"****************************");
-
 	NSError* __autoreleasing error = nil;
     NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
 
@@ -415,8 +411,6 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
             NSLog(@"WEB JS Error: %@", value);
         }];
-
-	 NSLog(@"*********** Adding object to context");
 
     jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
     	//The callback is expecting a string as per inject script, this is wrapped in an outer array.
@@ -1260,7 +1254,6 @@ BOOL canOpen = YES;
 	}
 
 	- (NSString*)respond:(NSString*)response {
-		NSLog(@"Response: %f", (NSDate.date.timeIntervalSince1970 * 1000.0));
 		if([response isEqualToString:@"[]"]){
 			return response;
 		}
