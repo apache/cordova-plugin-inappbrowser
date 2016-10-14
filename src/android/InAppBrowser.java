@@ -101,8 +101,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean destroyHistoryOnNextPageFinished = false;
     private boolean reOpenOnNextPageFinished = false;
+    private boolean hidden = false;
     private boolean hideGoToBlank = false;
-    private boolean releasing = false;
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
