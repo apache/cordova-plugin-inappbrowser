@@ -114,9 +114,12 @@ public class InAppBrowser extends CordovaPlugin {
 
         public boolean handle(String scriptResult) {
             try {
-                JSONArray returnedArray = new JSONArray(scriptResult);
 
                 Log.d(LOG_TAG, "Handling");
+                Log.d(LOG_TAG, scriptResult);
+                JSONArray returnedArray = new JSONArray(scriptResult);
+
+
                 JSONObject commandObject = returnedArray.optJSONObject(0);
                 if (commandObject == null) {
                     Log.d(LOG_TAG, "Command object is null");
@@ -830,8 +833,6 @@ public class InAppBrowser extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable(){
             @Override
             public void run(){
-                Log.d(LOG_TAG, "Addding Bridge *********************************************");
-                LOG.d(LOG_TAG, "Addding Bridge *********************************************");
                 inAppWebView.addJavascriptInterface(new JavaScriptBridgeInterface(cordova.getActivity(),
                                 nativeScriptResultHandler),
                         JavaScriptBridgeInterface.JAVASCRIPT_OBJECT_NAME);
