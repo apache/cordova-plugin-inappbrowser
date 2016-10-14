@@ -535,7 +535,7 @@ BOOL unhiding = NO;
 BOOL showing = NO;
 BOOL hiding = NO;
 BOOL closing = NO;
-BOOL canOpen = NO;
+BOOL canOpen = YES;
 
 -(void)notifyUnhidden {
     //Called back from webViewDidFinishLoad
