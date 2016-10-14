@@ -101,7 +101,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean destroyHistoryOnNextPageFinished = false;
     private boolean reOpenOnNextPageFinished = false;
-    private boolean hidden = false;
+    private boolean hideGoToBlank = false;
+    private boolean releasing = false;
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -133,7 +134,8 @@ public class InAppBrowser extends CordovaPlugin {
                     return true;
                 }
                 if (action.equalsIgnoreCase("hide")) {
-                    hideDialog(false, true);
+                    hideGoToBlank = true;
+                    hideDialog(false);
                     return true;
                 }
 
@@ -227,8 +229,8 @@ public class InAppBrowser extends CordovaPlugin {
 
         if (action.equals("hide")) {
             final boolean releaseResources = args.isNull(0) ? false : args.getBoolean(0);
-            final boolean goToBlank = args.isNull(1) ? false : args.getBoolean(1);
-            hideDialog(releaseResources, goToBlank);
+            hideGoToBlank = args.isNull(1) ? false : args.getBoolean(1);
+            hideDialog(releaseResources);
             return true;
         }
 
@@ -330,10 +332,11 @@ public class InAppBrowser extends CordovaPlugin {
      * @param goToBlank
      * @return
      */
-    private void hideDialog(final boolean releaseResources, final boolean goToBlank) {
+    private void hideDialog(final boolean releaseResources) {
         if(hidden){
             return;
         }
+
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -347,7 +350,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 dialog.hide();
-                if (goToBlank) {
+                if (hideGoToBlank) {
                     inAppWebView.loadUrl(BLANK_PAGE_URL);
                 }
 
@@ -928,11 +931,16 @@ public class InAppBrowser extends CordovaPlugin {
                 destroyHistoryOnNextPageFinished = true;
             }
 
-            browserEventSender.loadStop(url);
-            if(hidden){
-                browserEventSender.unhidden();
-                hidden = false;
+            if(!hideGoToBlank) {
+                //Don't notify about loading blank page or being unhidden
+                browserEventSender.loadStop(url);
+                if (hidden) {
+                    browserEventSender.unhidden();
+                    hidden = false;
+                }
             }
+
+            hideGoToBlank = false;
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
