@@ -47,6 +47,12 @@
             </feature>
         </config-file>
 
+        <source-file src="src/android/IntentHandler.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/ResourceInjector.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/UrlSecurityValidation.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/PluginResultSender.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/BrowserEventSender.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/JavaScriptBridgeInterface.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />

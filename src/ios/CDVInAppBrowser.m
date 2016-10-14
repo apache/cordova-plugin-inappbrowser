@@ -216,8 +216,47 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 
 #pragma mark view-open-and-close
 
-//TODO: rename to handleNativeResult
-- (void)handlePollResult:(NSURL*) url {
+- (void)sendBridgeResult:(NSString*) data {
+		[self sendOKPluginResult:@{@"type":@"bridgeresponse", @"data":data}];
+	}
+
+- (void)handleNativeResultWithString:(NSString*) jsonString {
+	NSError* __autoreleasing error = nil;
+    NSData* jsonData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+
+	if(error != nil || ![jsonData isKindOfClass:[NSArray class]]){
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
+        [self sendBridgeResult:jsonString];
+        return;
+    }
+
+    NSArray * array = (NSArray*) jsonData;
+    NSData* inAppBrowserAction = [array[0] valueForKey: @"InAppBrowserAction"];
+    if(inAppBrowserAction == nil  || ![inAppBrowserAction isKindOfClass:[NSString class]]) {
+        [self sendBridgeResult:jsonString];
+        return;
+    }
+
+    NSString *action = (NSString *)inAppBrowserAction;
+    if(action ==nil) {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
+        [self sendBridgeResult:jsonString];
+        return;
+    }
+
+    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
+        [self.inAppBrowserViewController close];
+        return;
+    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
+        [self hideView];
+        return;
+    } else {
+        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
+        [self sendBridgeResult:jsonString];
+    }
+}
+
+- (void)handleNativeResult:(NSURL*) url {
     if(![[url host] isEqualToString:@"poll"]) {
         return;
     }
@@ -227,41 +266,9 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
         return;
     }
 
-    NSError* __autoreleasing error = nil;
-    scriptResult = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
-    NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
-
-    if(error != nil || ![decodedResult isKindOfClass:[NSArray class]]){
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but errror or was badly formed - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    NSArray * array = (NSArray *) decodedResult;
-    NSData* decodedAction = [array[0] valueForKey: @"InAppBrowserAction"];
-    if(decodedAction == nil  || ![decodedAction isKindOfClass:[NSString class]]) {
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    NSString *action = (NSString *)decodedAction;
-    if(action ==nil) {
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (empty when cast) - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-        return;
-    }
-
-    if([action caseInsensitiveCompare:@"close"] == NSOrderedSame) {
-        [self stopPolling];
-        [self.inAppBrowserViewController close];
-        return;
-    } else if ([action caseInsensitiveCompare:@"hide"] == NSOrderedSame) {
-        [self hideView];
-        return;
-    } else {
-        NSLog(@"The poll script return value looked like it shoud be handled natively, but was not formed correctly (unhandled action) - returning json directly to JS");
-        [self sendPollResult:scriptResult];
-    }
+    
+    NSString* jsonString = [scriptResult substringFromIndex:1]; //This is still the path of the URL, strip leading '/'
+    [self handleNativeResultWithString:jsonString];
 
 }
 
@@ -321,7 +328,7 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
     // gap-iab-native://actiontype/{{URL ENCODED JSON OBJECT}}
     // Currently support: actiontype = poll, {{URL ENCODED JSON OBJECT}} = {InAppBrowserAction:'{{actionname}}'} where {{actionname}} is 'hide' or 'close'
     if([[url scheme] isEqualToString:@"gap-iab-native"]) {
-        [self handlePollResult:url];
+        [self handleNativeResult:url];
         return NO;
     }
 
@@ -394,8 +401,23 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 - (void)webViewDidStartLoad:(UIWebView*)theWebView {
 }
 
+
+
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView {
     NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
+
+
+    JSContext *jsContext = [theWebView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"]; // Undocumented access to UIWebView's JSContext
+	[jsContext setExceptionHandler:^(JSContext *context, JSValue *value) {
+            NSLog(@"WEB JS Error: %@", value);
+        }];
+
+    jsContext[@"JavaScriptBridgeInterfaceObject"] = [[JavaScriptBridgeInterfaceObject alloc] initWithCallback:^(NSString* response){
+    	//The callback is expecting a string as per inject script, this is wrapped in an outer array.
+    	NSString* canonicalisedResponse  = [NSString stringWithFormat:@"[%@]", response];
+    	[self handleNativeResultWithString: canonicalisedResponse];
+    }]; 
+
     [self sendOKPluginResult:@{@"type":@"loadstop", @"url":url}];
     showing = NO;
     [self notifyUnhidden];
@@ -506,7 +528,8 @@ const int INITIAL_STATUS_BAR_STYLE = -1;
 BOOL unhiding = NO;
 BOOL showing = NO;
 BOOL hiding = NO;
-bool closing = NO;
+BOOL closing = NO;
+BOOL canOpen = YES;
 
 -(void)notifyUnhidden {
     //Called back from webViewDidFinishLoad
@@ -524,57 +547,27 @@ bool closing = NO;
     }
     hiding = YES;
     [self sendOKPluginResult:@{@"type":@"preventexitonhide"}];
-    [self stopPolling];
     [self sendOKPluginResult:@{@"type":@"hidden"}];
     [self.inAppBrowserViewController close]; //This must come after the hide callback - otherwise it isn't fired
 }
 
 - (void)unHideView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options {
+	if(!canOpen){
+		return;
+	}
+	canOpen = NO;
     unhiding = YES;
     [self openUrl:url targets:target withOptions:options];
 }
 
-#pragma mark polling
-
-NSTimer* pollTimer;
-
--(void)onPollTick:(NSTimer *)timer {
-    if(hiding || closing) {
-        [self stopPolling];
-        return;
-    }
-    NSString* pollCode = timer.userInfo;
-    if(pollCode != nil) {
-        NSString *jsWrapper = @"_cdvIframeBridge.src='gap-iab-native://poll/' + encodeURIComponent(JSON.stringify([eval(%@)]))";
-        [self injectDeferredObject:pollCode withWrapper:jsWrapper];
-    } else if (pollTimer != nil) {
-        NSLog(@"No JS code to execute");
-        [self stopPolling];
-    }
-}
-
-- (void)sendPollResult:(NSString*)data {
-    //Called from webView onload callback - the data is passed back from a hidden frame inside the browser window
-    [self sendOKPluginResult:@{@"type":@"pollresult", @"data":data}];
-}
-
--(void)startPolling:(NSString*)script interval:(NSTimeInterval)interval {
-    [self stopPolling];
-    if(hiding || closing){
-        return;
-    }
-    pollTimer = [NSTimer scheduledTimerWithTimeInterval:interval  target:self selector:@selector(onPollTick:) userInfo:script repeats:YES];
-}
-
-
--(void)stopPolling {
-    [pollTimer invalidate];
-    pollTimer = nil;
-}
 
 #pragma mark public-methods
 
 - (void)open:(CDVInvokedUrlCommand*)command {
+	if(!canOpen){
+		return;
+	}
+	canOpen = NO;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
@@ -588,7 +581,6 @@ NSTimer* pollTimer;
         NSLog(@"IAB.close() called but it was already closed.");
         return;
     }
-    [self stopPolling];
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -647,22 +639,6 @@ NSTimer* pollTimer;
     }
 
     [self showWindow];
-}
-
-- (void)startPoll:(CDVInvokedUrlCommand*)command
-{
-    if([command argumentAtIndex:0] == nil ||  [command argumentAtIndex:1] == nil) {
-        NSLog(@"Incorrect number of arguments passed to start polling");
-        return;
-    }
-
-    NSTimeInterval pollInterval = [command.arguments[1] doubleValue]/ 1000.0;
-    [self startPolling:[command argumentAtIndex:0] interval:pollInterval];
-}
-
-- (void)stopPoll:(CDVInvokedUrlCommand*)command
-{
-    [self stopPolling];
 }
 
 - (void)hide:(CDVInvokedUrlCommand*)command
@@ -992,7 +968,6 @@ NSTimer* pollTimer;
         showing = NO;
         hiding = NO;
         closing = NO;
-        pollTimer = nil;
     });
 }
 
@@ -1095,6 +1070,7 @@ NSTimer* pollTimer;
     }
 
     [self.navigationDelegate webViewDidFinishLoad:theWebView];
+    canOpen = YES;
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error {
@@ -1108,6 +1084,7 @@ NSTimer* pollTimer;
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
 
     [self.navigationDelegate webView:theWebView didFailLoadWithError:error];
+    canOpen = YES;
 }
 
 #pragma mark CDVScreenOrientationDelegate
@@ -1260,4 +1237,28 @@ NSTimer* pollTimer;
 }
 
 
+@end
+
+#pragma mark JavaScriptBridgeInterfaceObject
+@implementation JavaScriptBridgeInterfaceObject 
+	void (^callbackFunction) (NSString*);
+
+	- (id)initWithCallback:(void (^)(NSString*))callbackBlock; {
+	 	self = [super init];
+	    if (self) {
+	        // Any custom setup work goes here
+	        callbackFunction = callbackBlock;
+	    }
+
+    	return self;
+	}
+
+	- (NSString*)respond:(NSString*)response {
+		if([response isEqualToString:@"[]"]){
+			return response;
+		}
+
+		callbackFunction(response);
+		return response;
+	}
 @end

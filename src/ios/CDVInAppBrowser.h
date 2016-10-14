@@ -16,7 +16,7 @@
  specific language governing permissions and limitations
  under the License.
  */
-
+#import <JavaScriptCore/JavaScriptCore.h>
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
@@ -39,8 +39,6 @@
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
-- (void)startPoll:(CDVInvokedUrlCommand*)command;
-- (void)stopPoll:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
 - (void)unHide:(CDVInvokedUrlCommand*)command;
 
@@ -122,3 +120,10 @@
 
 @end
 
+@protocol JavaScriptBridgeInterface <JSExport>
+- (NSString *)respond: (NSString*)response; 
+@end
+
+@interface JavaScriptBridgeInterfaceObject : NSObject<JavaScriptBridgeInterface>
+- (id)initWithCallback:(void (^)(NSString*))callback;
+@end

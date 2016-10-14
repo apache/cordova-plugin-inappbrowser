@@ -38,7 +38,7 @@
             'loaderror' : channel.create('loaderror'),
             'hidden' : channel.create('hidden'),
             'unhidden' : channel.create('unhidden'),
-            'pollresult' : channel.create('pollresult'),
+            'bridgeresponse' : channel.create('bridgeresponse'),
             'exit' : channel.create('exit')
        };
     }
@@ -54,12 +54,6 @@
         },
         show: function (eventname) {
           exec(null, null, "InAppBrowser", "show", []);
-        },
-        startPoll(pollingFunction, pollInterval){
-            exec(null, null, "InAppBrowser", "startPoll", [pollingFunction, pollInterval])
-        },
-        stopPoll(){
-            exec(null, null, "InAppBrowser", "stopPoll", [])
         },
         hide: function(boolGoToBlank, eventname){
             exec(null,null,"InAppBrowser", "hide", [boolGoToBlank]);

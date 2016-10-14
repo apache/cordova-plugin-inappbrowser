@@ -36,18 +36,10 @@
             hidden = false,
             backChannels = {
                 preventexitonhide : channel.create('preventexitonhide')
-            }
-            polling = false,
+            },
             lastUrl = url,
             lastWindowName = windowName,
-            lastWindowFeatures = windowFeatures
-            lastPollIntervalToRestore = null,
-            lastPollFunctionToRestore = null;
-
-        function clearPolling () {
-            lastPollIntervalToRestore = null;
-            lastPollFunctionToRestore = null;
-        }
+            lastWindowFeatures = windowFeatures;
 
         function releaseListeners(){
             for(var eventname in me.channels)
@@ -102,7 +94,7 @@
             'loaderror' : channel.create('loaderror'),
             'hidden' : channel.create('hidden'),
             'unhidden' : channel.create('unhidden'),
-            'pollresult' : channel.create('pollresult'),
+            'bridgeresponse' : channel.create('bridgeresponse'),
             'exit' : channel.create('exit')
         }
 
@@ -110,13 +102,8 @@
             return hidden;
         }
 
-        me.isPolling = function(){
-            return polling;
-        }
-
         me.close = function(eventname) {
             exec(null, null, "InAppBrowser", "close", []);
-            me.stopPoll();
             if(hidden){
                 me.channels['exit'].fire();
             }
@@ -131,7 +118,6 @@
         me.hide = function(releaseResources, blankPage){
 
             if(releaseResources){
-                me.stopPoll();
                 releaseListeners();
             }
 
@@ -146,24 +132,8 @@
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
             }
 
-            me.startPoll(lastPollFunctionToRestore, lastPollIntervalToRestore);
             exec(eventCallback, eventCallback, "InAppBrowser", "unHide", [lastUrl, lastWindowName, lastWindowFeatures]);
             hidden = false;
-        }
-
-        me.startPoll = function(pollFunction, pollInterval){
-            if(pollFunction && pollInterval){
-               lastPollIntervalToRestore = pollInterval;
-               lastPollFunctionToRestore = pollFunction;
-               exec(null, null, "InAppBrowser", "startPoll", [pollFunction, pollInterval])
-               polling = true;
-            }
-        }
-
-        me.stopPoll = function() {
-           exec(null, null, "InAppBrowser", "stopPoll", []);
-           clearPolling();
-           polling = false;
         }
 
         me.addEventListener = function (eventname,f) {
