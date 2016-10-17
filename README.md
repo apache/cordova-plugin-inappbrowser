@@ -216,6 +216,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 - removeEventListener
 - close
 - show
+- hide (Android and iOS only)
 - executeScript
 - insertCSS
 
@@ -394,7 +395,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ## InAppBrowser.show
 
-> Displays an InAppBrowser window that was opened hidden. Calling this has no effect if the InAppBrowser was already visible.
+> Displays an InAppBrowser window that was opened hidden or was hidden manually by calling the `InAppBrowser.hide` method. Calling this has no effect if the InAppBrowser was already visible.
 
     ref.show();
 
@@ -413,6 +414,30 @@ The function is passed an `InAppBrowserEvent` object.
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
+
+## InAppBrowser.hide
+
+> Hides an InAppBrowser window. Calling this has no effect if the InAppBrowser was already hidden.
+
+    ref.hide();
+
+- __ref__: reference to the InAppBrowser window (`InAppBrowser`)
+
+### Supported Platforms
+
+- Android
+- iOS
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
+    // some time later...
+    ref.show();
+    // some time later...
+    ref.hide();
+    // some time later...
+    ref.show();
+    // and so on...
 
 ## InAppBrowser.executeScript
 
