@@ -83,7 +83,7 @@
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-
+    self.isAuthenticated = NO;
     self.callbackId = command.callbackId;
 
     if (url != nil) {
@@ -479,6 +479,7 @@
 @implementation CDVInAppBrowserViewController
 
 @synthesize currentURL;
+@synthesize isAuthenticated;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions
 {
@@ -794,6 +795,7 @@
 - (void)navigateTo:(NSURL*)url
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
+    self.isAuthenticated = NO;
 
     if (_userAgentLockToken != 0) {
         [self.webView loadRequest:request];
@@ -867,7 +869,70 @@
     if (isTopLevelNavigation) {
         self.currentURL = request.URL;
     }
+
+    if(!self.isAuthenticated) {
+        [NSURLConnection connectionWithRequest:request delegate:self];
+        return NO;
+    }
+
     return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
+{
+    self.isAuthenticated = YES;
+    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:self.currentURL];
+    [self.webView loadRequest:urlRequest];
+}
+
+- (void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    self.isAuthenticated = NO;
+    UIAlertController * alertController = [UIAlertController alertControllerWithTitle: @"Authentication"
+                                                                              message: @"Please Enter Username and Password"
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+    if ([challenge previousFailureCount] == 0) {
+        if ([challenge proposedCredential] != nil){
+            [[challenge sender] useCredential:challenge.proposedCredential forAuthenticationChallenge:challenge];
+        } else {
+            [[challenge sender] useCredential:[NSURLCredential credentialWithUser:@"" password:@""  persistence:NSURLCredentialPersistencePermanent] forAuthenticationChallenge:challenge];
+        }
+
+        return;
+    }
+
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Username";
+        textField.textColor = [UIColor blueColor];
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+    }];
+
+    [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Password";
+        textField.textColor = [UIColor blueColor];
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+        textField.secureTextEntry = YES;
+    }];
+
+    [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        NSArray * textfields = alertController.textFields;
+        UITextField * namefield = textfields[0];
+        UITextField * passwordfield = textfields[1];
+        NSString *username = namefield.text;
+        NSString *password = passwordfield.text;
+        [[challenge sender] useCredential:[NSURLCredential credentialWithUser:username password:password  persistence:NSURLCredentialPersistencePermanent] forAuthenticationChallenge:challenge];
+        //may be persistenceForSession
+    }]];
+
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+//        [self dismissViewControllerAnimated:YES completion:nil];
+        [self close];
+        [[challenge sender] cancelAuthenticationChallenge:challenge];
+    }]];
+
+    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
@@ -1070,6 +1135,4 @@
     return YES;
 }
 
-
 @end
-

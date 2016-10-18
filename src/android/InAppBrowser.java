@@ -19,6 +19,7 @@
 package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Browser;
@@ -33,6 +34,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -44,12 +46,13 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
+import android.widget.TextView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
@@ -59,6 +62,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.capriza.local.store.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -101,6 +105,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    private String username;
+    private String password;
 
     /**
      * Executes the request and returns PluginResult.
@@ -972,7 +978,7 @@ public class InAppBrowser extends CordovaPlugin {
          * On received http auth request.
          */
         @Override
-        public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+        public void onReceivedHttpAuthRequest(WebView view, final HttpAuthHandler handler, String host, String realm) {
 
             // Check if there is some plugin which can resolve this auth challenge
             PluginManager pluginManager = null;
@@ -1002,8 +1008,41 @@ public class InAppBrowser extends CordovaPlugin {
                 return;
             }
 
+            final Context applicationContext = cordova.getActivity();
+            final Dialog dialog = new Dialog(applicationContext);
+            dialog.setContentView(R.layout.ntlm_dialog);
+            dialog.setTitle("Authentication");
+
+            // setting the custom dialog components - text, image and button
+            final TextView usernameTextView = (TextView) dialog.findViewById(R.id.username);
+            usernameTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            final TextView passwordTextView = (TextView) dialog.findViewById(R.id.password);
+            passwordTextView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+            Button okDialogButton = (Button) dialog.findViewById(R.id.dialogButtonOK);
+            okDialogButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    username = usernameTextView.getText().toString();
+                    password = passwordTextView.getText().toString();
+                    dialog.dismiss();
+                    handler.proceed(username,password);
+                }
+            });
+
+            Button cancelDialogButton = (Button) dialog.findViewById(R.id.dialogButtonCancel);
+            cancelDialogButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    handler.cancel();
+                }
+            });
+
+            dialog.show();
+
             // By default handle 401 like we'd normally do!
-            super.onReceivedHttpAuthRequest(view, handler, host, realm);
+ //           super.onReceivedHttpAuthRequest(view, handler, host, realm);
         }
     }
 }
