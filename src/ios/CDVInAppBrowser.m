@@ -267,30 +267,6 @@
     });
 }
 
-- (void)hide:(CDVInvokedUrlCommand*)command
-{
-    if (self.inAppBrowserViewController == nil) {
-        NSLog(@"Tried to hide IAB after it was closed.");
-        return;
-
-
-    }
-    if (_previousStatusBarStyle == -1) {
-        NSLog(@"Tried to hide IAB while already hidden");
-        return;
-    }
-
-    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
-
-    // Run later to avoid the "took a long time" log message.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.inAppBrowserViewController != nil) {
-            _previousStatusBarStyle = -1;
-            [self.viewController dismissViewControllerAnimated:YES completion:nil];
-        }
-    });
-}
-
 - (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
