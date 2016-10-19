@@ -181,7 +181,7 @@ var IAB = {
                 }
                 popup.style.borderWidth = "0px";
                 popup.style.width = "100%";
-                popup.style.marginBottom = "-3px";
+                popup.style.marginBottom = "-5px";
 
                 browserWrap.appendChild(popup);
 
