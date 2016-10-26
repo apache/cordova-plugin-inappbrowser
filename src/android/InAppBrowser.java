@@ -763,9 +763,13 @@ public class InAppBrowser extends CordovaPlugin {
                 actionButtonContainer.addView(forward);
 
                 // Add the views to our toolbar
-                toolbar.addView(actionButtonContainer);
-                toolbar.addView(edittext);
+                toolbar.addView(actionButtonContainer); 
                 toolbar.addView(close);
+
+                //CB-6229, only display url in toolbar if the location in index.js is set to 'yes'
+                if (getShowLocationBar()) {
+                  toolbar.addView(edittext);
+                }
 
                 // Don't add the toolbar if its been disabled
                 if (getShowLocationBar()) {
