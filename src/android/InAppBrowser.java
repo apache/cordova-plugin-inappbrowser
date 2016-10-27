@@ -105,6 +105,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean validateSsl = true;
     private boolean shouldPauseInAppBrowser = false;
+    private boolean validateSsl = true;
 
     /**
      * Executes the request and returns PluginResult.
