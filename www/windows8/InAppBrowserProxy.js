@@ -38,6 +38,12 @@ var IAB = {
 
          }*/
     },
+    hide: function (win, lose) {
+        /* empty block, ran out of bacon?
+        if (browserWrap) {
+
+        }*/
+    },
     open: function (win, lose, args) {
         var strUrl = args[0],
             target = args[1],

@@ -27,6 +27,10 @@ description: Open an in-app browser window.
 
 # cordova-plugin-inappbrowser
 
+You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
+
+> To get a few ideas, check out the [sample](#sample) at the bottom of this page or go straight to the [reference](#reference) content.
+
 This plugin provides a web browser view that displays when calling `cordova.InAppBrowser.open()`.
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
@@ -65,7 +69,7 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
 
 
-
+## <a id="reference">Reference</a>
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
@@ -85,7 +89,7 @@ instance, or the system browser.
 
     var ref = cordova.InAppBrowser.open(url, target, options);
 
-- __ref__: Reference to the `InAppBrowser` window. _(InAppBrowser)_
+- __ref__: Reference to the `InAppBrowser` window when the target is set to `'_blank'`. _(InAppBrowser)_
 
 - __url__: The URL to load _(String)_. Call `encodeURI()` on this if the URL contains Unicode characters.
 
@@ -110,6 +114,7 @@ instance, or the system browser.
     - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
     - validatessl : set no to accept selfsigned certificat for https pages. The default value is 'yes'.
+    - __shouldPauseOnSuspend__: Set to `yes` to make InAppBrowser WebView to pause/resume with the app to stop background audio (this may be required to avoid Google Play issues like described in [CB-11013](https://issues.apache.org/jira/browse/CB-11013)).
 
     iOS only:
 
@@ -133,6 +138,7 @@ instance, or the system browser.
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __fullscreen__: set to `yes` to create the browser control without a border around it. Please note that if __location=no__ is also specified, there will be no control presented to user to close IAB window.
+    - __hardwareback__: works the same way as on Android platform.
 
 ### Supported Platforms
 
@@ -141,6 +147,7 @@ instance, or the system browser.
 - BlackBerry 10
 - Firefox OS
 - iOS
+- OSX
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
 - Browser
@@ -181,6 +188,12 @@ opened with `target='_blank'`. The rules might look like these
 }
 ```
 
+### OSX Quirks
+
+At the moment the only supported target in OSX is `_system`.
+
+`_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
+
 ### Windows Quirks
 
 Windows 8.0, 8.1 and Windows Phone 8.1 don't support remote urls to be opened in the Cordova WebView so remote urls are always showed in the system's web browser if opened with `target='_self'`.
@@ -197,7 +210,7 @@ Similar to Firefox OS IAB window visual behaviour can be overridden via `inAppBr
 
 ## InAppBrowser
 
-The object returned from a call to `cordova.InAppBrowser.open`.
+The object returned from a call to `cordova.InAppBrowser.open` when the target is set to `'_blank'`.
 
 ### Methods
 
@@ -205,6 +218,7 @@ The object returned from a call to `cordova.InAppBrowser.open`.
 - removeEventListener
 - close
 - show
+- hide
 - executeScript
 - insertCSS
 
@@ -229,7 +243,7 @@ The object returned from a call to `cordova.InAppBrowser.open`.
 
 ```javascript
 
-var inAppBrowserRef = undefined;
+var inAppBrowserRef;
 
 function showHelp(url) {
 
@@ -239,14 +253,11 @@ function showHelp(url) {
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
-    with (inAppBrowserRef) {
+    inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
-        addEventListener('loadstart', loadStartCallBack);
+    inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
-        addEventListener('loadstop', loadStopCallBack);
-
-        addEventListener('loaderror', loadErrorCallBack);
-    }
+    inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
 }
 
@@ -406,6 +417,27 @@ The function is passed an `InAppBrowserEvent` object.
     // some time later...
     ref.show();
 
+## InAppBrowser.hide
+
+> Hides the InAppBrowser window. Calling this has no effect if the InAppBrowser was already hidden.
+
+    ref.hide();
+
+- __ref__: reference to the InAppBrowser window (`InAppBrowser`)
+
+### Supported Platforms
+
+- Amazon Fire OS
+- Android
+- iOS
+- Windows 8 and 8.1
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank');
+    // some time later...
+    ref.hide();
+
 ## InAppBrowser.executeScript
 
 > Injects JavaScript code into the `InAppBrowser` window
@@ -548,14 +580,11 @@ function showHelp(url) {
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
-    with (inAppBrowserRef) {
+    inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
-        addEventListener('loadstart', loadStartCallBack);
+    inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
-        addEventListener('loadstop', loadStopCallBack);
-
-        addEventListener('loaderror', loadErrorCallBack);
-    }
+    inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
 }
 
@@ -631,5 +660,51 @@ function executeScriptCallBack(params) {
     }
 
 }
+
+```
+
+## More Usage Info
+
+### Local Urls ( source is in the app package )
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('local-url.html');                  // loads in the Cordova WebView
+iab.open('local-url.html', '_self');         // loads in the Cordova WebView
+iab.open('local-url.html', '_system');       // Security error: system browser, but url will not load (iOS)
+iab.open('local-url.html', '_blank');        // loads in the InAppBrowser
+iab.open('local-url.html', 'random_string'); // loads in the InAppBrowser
+iab.open('local-url.html', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+
+```
+
+
+
+### Whitelisted Content
+
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('http://whitelisted-url.com');                  // loads in the Cordova WebView
+iab.open('http://whitelisted-url.com', '_self');         // loads in the Cordova WebView
+iab.open('http://whitelisted-url.com', '_system');       // loads in the system browser
+iab.open('http://whitelisted-url.com', '_blank');        // loads in the InAppBrowser
+iab.open('http://whitelisted-url.com', 'random_string'); // loads in the InAppBrowser
+
+iab.open('http://whitelisted-url.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+
+```
+
+### Urls that are not white-listed
+
+```
+var iab = cordova.InAppBrowser;
+
+iab.open('http://url-that-fails-whitelist.com');                  // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', '_self');         // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', '_system');       // loads in the system browser
+iab.open('http://url-that-fails-whitelist.com', '_blank');        // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in the InAppBrowser
+iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```

@@ -43,6 +43,11 @@ exports.defineAutoTests = function () {
 
     describe('open method', function () {
 
+        if (cordova.platformId == 'osx') {
+            pending('Open method not fully supported on OSX.');
+            return;
+        }
+
         var iabInstance;
         var originalTimeout;
         var url = 'https://dist.apache.org/repos/dist/dev/cordova/';
@@ -93,6 +98,7 @@ exports.defineAutoTests = function () {
             expect(iabInstance.removeEventListener).toEqual(jasmine.any(Function));
             expect(iabInstance.close).toEqual(jasmine.any(Function));
             expect(iabInstance.show).toEqual(jasmine.any(Function));
+            expect(iabInstance.hide).toEqual(jasmine.any(Function));
             expect(iabInstance.executeScript).toEqual(jasmine.any(Function));
             expect(iabInstance.insertCSS).toEqual(jasmine.any(Function));
         });
@@ -416,7 +422,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="closeHidden"></div>' +
         'Expected result: no output. But click on "show hidden" again and nothing should be shown.' +
         '<p/> <div id="openHiddenShow"></div>' +
-        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk';
+        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk' +
+        '<p/> <div id="openVisibleAndHide"></div>' +
+        'Expected result: open successfully in InAppBrowser to https://www.google.co.uk. Hide after 2 seconds';
 
     var clearing_cache_tests = '<h1>Clearing Cache</h1>' +
         '<div id="openClearCache"></div>' +
@@ -438,16 +446,26 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openAnchor2"></div>' +
         'Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.';
 
+    var hardwareback_tests = '<h1>HardwareBack</h1>' +
+        '<p/> <div id="openHardwareBackDefault"></div>' +
+        'Expected result: By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser' +
+        '<p/> <div id="openHardwareBackYes"></div>' +
+        'Expected result: hardwareback=yes pressing back button should navigate backwards in history then close InAppBrowser' +
+        '<p/> <div id="openHardwareBackNo"></div>' +
+        'Expected result: hardwareback=no pressing back button should close InAppBrowser regardless history' + 
+        '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
+        'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
+
     // CB-7490 We need to wrap this code due to Windows security restrictions
     // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
     if (window.MSApp && window.MSApp.execUnsafeLocalFunction) {
         MSApp.execUnsafeLocalFunction(function() {
             contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
-                css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
+                css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests;
         });
     } else {
         contentEl.innerHTML = info_div + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
-            css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests;
+            css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests;
     }
 
     document.getElementById("user-agent").textContent = navigator.userAgent;
@@ -605,6 +623,12 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('google.co.uk Not Hidden', function () {
         openHidden('https://www.google.co.uk', false);
     }, 'openHiddenShow');
+    createActionButton('google.co.uk shown for 2 seconds than hidden', function () {
+        var iab = doOpen('https://www.google.co.uk/', 'random_sting');
+        setTimeout(function () {
+            iab.hide();
+        }, 2000);
+    }, 'openVisibleAndHide');
 
     //Clearing cache
     createActionButton('Clear Browser Cache', function () {
@@ -632,4 +656,30 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton('Anchor2', function () {
         doOpen(localhtml + '#anchor2', '_blank');
     }, 'openAnchor2');
+
+    // Hardwareback
+    createActionButton('no hardwareback (defaults to yes)', function () {
+        doOpen('http://cordova.apache.org', '_blank');
+    }, 'openHardwareBackDefault');
+    createActionButton('hardwareback=yes', function () {
+        doOpen('http://cordova.apache.org', '_blank', 'hardwareback=yes');
+    }, 'openHardwareBackYes');
+    createActionButton('hardwareback=no', function () {
+        doOpen('http://cordova.apache.org', '_blank', 'hardwareback=no');
+    }, 'openHardwareBackNo');
+    createActionButton('no hardwareback -> hardwareback=no -> no hardwareback', function() {
+        var ref = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes');
+        ref.addEventListener('loadstop', function() {
+            ref.close();
+        });
+        ref.addEventListener('exit', function() {
+            var ref2 = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes,hardwareback=no');
+            ref2.addEventListener('loadstop', function() {
+                ref2.close();
+            });
+            ref2.addEventListener('exit', function() {
+                cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes');
+            });
+        });
+    }, 'openHardwareBackDefaultAfterNo');
 };
