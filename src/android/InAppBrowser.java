@@ -105,7 +105,6 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean validateSsl = true;
     private boolean shouldPauseInAppBrowser = false;
-    private boolean validateSsl = true;
 
     /**
      * Executes the request and returns PluginResult.
@@ -996,7 +995,7 @@ public class InAppBrowser extends CordovaPlugin {
          if (this.validateSsl) {
             super.onReceivedSslError(view, handler, error);
          } else {
-            Log.d(LOG_TAG, "Ignoring SSL certificate validation");
+            LOG.d(LOG_TAG, "Ignoring SSL certificate validation");
             handler.proceed();
          }
         }
