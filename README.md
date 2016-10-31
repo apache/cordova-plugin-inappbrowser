@@ -489,27 +489,6 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
     });
 __
 
-## InAppBrowser.hide
-
-> Hides the `InAppBrowser` for non _system windows.
-
-    ref.hide(blankUrl);
-
-- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_ . Must have target '_blank' or '_self' to take effect.
-
-- __blankUrl__: Optional, If, true if the browser navigates to about:blank to preserve resources before hide. _(Boolean)_
- 
-
-### Supported Platforms
-
-- Android, iOS (see IOS ONLY section above - `blankUrl` has no effect, same as `true` under Android).
-
-### Quick Example
-
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_system', 'location=yes');
-    ref.hide();
-__
-
 ## InAppBrowser.show
 
 > Shows the `InAppBrowser` if opened with the hidden option true.
@@ -527,11 +506,56 @@ __
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_system', 'location=yes');
-    ref.hide(true);
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_system', 'location=yes, hidden=yes');
+    //Should really wait until the page loadstop event
     ref.show("http://www.google.com");
 __
 
+## InAppBrowser.hide
+
+> Hides the `InAppBrowser` for non _system windows.
+
+    ref.hide(blankUrl);
+
+- __ref__: reference to the `InAppBrowser` window _(InAppBrowser)_ . Must have target '_blank' or '_self' to take effect.
+
+- __blankUrl__: Optional, If, true if the browser navigates to about:blank to preserve resources before hide. _(Boolean)_
+ 
+
+### Supported Platforms
+
+- Does not operate with the `_system` option.
+- Android
+- iOS (see IOS ONLY section above - `blankUrl` has no effect, same as `true` under Android). 
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    ref.hide();
+__
+
+## InAppBrowser.unhide
+
+> unhides the `InAppBrowser` for non _system windows. The widow should previously have been hidden, though `uhide` also should work with IAB instances that have started with `hidden=true`.
+
+    ref.unhide(newUrl);
+
+- __newUrl__: The url to navigate to before unhiding, if using iOS, or the `hide` method was called `blankUrl` unset or set to `true` you should supply this, otherwise you will get a blank page. The page is unhidden on the new URL's loadstop event, if for any reason this is not triggered the IAB will not display.
+ 
+
+### Supported Platforms
+
+- Does not operate with the `_system` option.
+- Android
+- iOS (see IOS ONLY section above, really a new instance is opened with the same settings as it was opened with).
+
+### Quick Example
+
+    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    ref.hide();
+    //Should really do this on the 'hidden' event
+    ref.unhide('');
+__
 
 ## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
 
