@@ -557,6 +557,32 @@ __
     ref.unhide('');
 __
 
+## <a id="bridging"></a>Sample: How to bridge your InAppBrowser with the client
+A few points, first our use case is for android and iOS only - changes have only been made with these operating systems. We have provided:
+* The ability to interact with native code from the IAB javascript in a limited way (only `close` and `hide`) from the IAB JavaScript context / 'executeScript'. You can inject JavaScript from the app which returns a specific object to do this: `{InAppBrowserAction: "hide"}` where the action can be either `hide` or `close`. When processed the relevant event(s) will be raised. This provides an extensibility point for future forks, and bypasses the need for the app iteslf to respond initially - the task is backgrounded will be running slowly. If the object does not follow the structure specified it will be just returned to the main app - it is worth checking the system logs if this happens unexpectedly for mor information.
+* An object `JSBridgeObject` which has a `respond` method. If the object passed (represented as a JSON string) into this method is one of the native action ones, it is handled the same way as above. Otherwise the string is passed back through a new `bridgeresponse` event.
+
+### <a id="executeScriptBridge"></a>Using Execute Script to Bridge
+Assuming your loaded page has an object `bridge` with a value `eventName`:
+```javascript
+var pollScript = 'setInterval(function(){
+    if(bridge && bridge.eventname) {
+    	if(bridge.eventName === 'hide') {
+	    return '{ InAppBrowserAction:"hide" };'; //Note - this is a string.
+	}
+	return JSON.stringify({myEventName: bridge.eventname});
+    }
+},500)'; //Not bothering with the cleanup....
+
+var ref = cordova.InAppBrowser.open('http://mypage.org', '_blank', 'location=yes');
+    ref.executeScript(pollScript, function(data){
+        alert(JSON.parse(data).myEventName);
+    });
+```
+This method caused problems with older versions of iOS (it updates the url, refeshing the page and causing other events to fire. This also disrupted the polling, which no longer fired.). It also is less readily extensible, we suggest the next method of establishing a brdge.
+### <a id="executeScriptBridge"></a>Using the new Bridge infrastructure
+
+
 ## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
 
 You can use this plugin to show helpful documentation pages within your app. Users can view online help documents and then close them without leaving the app.
