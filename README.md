@@ -75,14 +75,10 @@ The intention is to harmonise the changes so they are available in both Android 
 We use InAppBrowser in a non-standard way. The existing infrastructure had a couple of limitations on Android which we have attempted to redress:
 * Browsers opened as _system we blanked, but not destroyed. On some devices this was enough to cause a crash
 * The show method would crash if a _system window was opened, then closed, then the `cordova.InAppBrowser.show()` method called
-* We want to keep a persistent _self window open. Open creates a new instance, close blanks (and now destroys) it so it cannot be re-used. We have introduced new functions - `cordova.InAppBrowser.hide()` and `cordova.InAppBrowser.reveal()`. These can be used as a direct replacement for `cordova.InAppBrowser.show()` and `cordova.InAppBrowser.close()` where you want to keep the instance alive - saving load time when opening the InAppBrowser, which can be substantial.  `cordova.InAppBrowser.hide()` takes an optional boolean - if set to true the browser is sent to about:blank to prevent uneccessary work on the device. Similarly `cordova.InAppBrowser.reveal()` takes an optional URL to navigate to beforehand.
+* We want to keep a persistent _self window open. Open creates a new instance, close blanks (and now destroys) it so it cannot be re-used. We have introduced new functions - `cordova.InAppBrowser.hide()` and `cordova.InAppBrowser.unhide()`. These can be used as a direct replacement for `cordova.InAppBrowser.show()` and `cordova.InAppBrowser.close()` where you want to keep the instance alive - saving load time when opening the InAppBrowser, which can be substantial.  `cordova.InAppBrowser.hide()` takes an optional boolean - if set to true the browser is sent to about:blank to prevent uneccessary work on the device. Similarly `cordova.InAppBrowser.unhide()` takes an optional URL to navigate to beforehand.
 
 ### (IOS ONLY)
-THESE CHANGES ARE CURRENTLY ONLY IN THE BRANCH add-iab-polling, unmerged.
-There is a general problem with a polling mechanism we employ to allow communication from the page in the IAB back to the app. As the IAB browser puts the app into background iOS forces it to pause. In our case the poller timer drops to at most once per second. To fix:
-* Added a new channel `pollresult` which contains the value returned by the script if the browser is not to be closed immediately.
-* Added a new method `startPoll(script, timeout)` which executes the passed script on a *native* timer. This means the poll is unaffected by the app pause as it is running in the maximised window. The `script` is as per the the method `executeScript` except: it does not return immediately, the result is passed through the `pollresult` channel; if the return result of the script is an object `{ InAppBrowserAction:"close" }` the IAB will close. It is intended that we will implement hide functionality when this is implemented in iOS.
-* `stopPoll()` which stops the poll explicitly.
+Due to time constraints we have so far been unable to get the IAB window to truly hide - hiding the IAB, or even it's direct parent resulted in a black screen. To keep the behavior consistent with Android the JavaScript side facade is retains these two methods, but opens/closes the window. 
 
 ## <a id="reference">Reference
 ## Installation
@@ -506,7 +502,7 @@ __
 
 ### Supported Platforms
 
-- Android
+- Android, iOS (see IOS ONLY section above - `blankUrl` has no effect, same as `true` under Android).
 
 ### Quick Example
 
@@ -516,7 +512,7 @@ __
 
 ## InAppBrowser.show
 
-> Shows the `InAppBrowser` if hidden.
+> Shows the `InAppBrowser` if opened with the hidden option true.
 
     ref.hide(newUrl);
 
