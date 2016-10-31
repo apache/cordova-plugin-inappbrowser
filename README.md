@@ -574,18 +574,41 @@ var innerScript = [
         '}'
     ].join(''),
   
-    pollScript = 'setInterval(function(){ return JSON.stringify(' + innerScript + '); },500);' //Need to stringify object
-
-//Not bothering with the cleanup of the setInterval....
-
-var ref = cordova.InAppBrowser.open('http://mypage.org', '_blank', 'location=yes');
-    ref.executeScript(pollScript, function(data){
-        alert(JSON.parse(data).myEventName);
-    });
+    pollScript = 'setInterval(function(){ return JSON.stringify(' + innerScript + '); },500);', 
+    ref = cordova.InAppBrowser.open('http://mypage.org', '_blank', 'location=yes');
+    
+function appEventHandler (data){
+    alert(JSON.parse(data).myEventName);
+}
+    ref.executeScript(pollScript, appEventHandler);
 ```
 This method caused problems with older versions of iOS (it updates the url, refeshing the page and causing other events to fire. This also disrupted the polling, which no longer fired.). It also is less readily extensible, we suggest the next method of establishing a brdge.
-### <a id="executeScriptBridge"></a>Using the new Bridge infrastructure
 
+### <a id="executeScriptBridge"></a>Using the new Bridge infrastructure
+```javascript
+//innerScript is the same as the previous sample
+var innerScript = [ 
+     'if (bridge && bridge.eventname) {',
+    	    'if (bridge.eventName === \'hide\') {',
+	        'return { InAppBrowserAction:"hide" };',
+	     '}',
+	    'return {myEventName: bridge.eventname};',
+        '}'
+    ].join(''),
+    //pollScript only differs in calling the bridge respond method rather than returning
+    pollScript = 'setInterval(function(){ JavaScriptBridgeInterfaceObject.respond((JSON.stringify(' + innerScript + ')); },500);', 
+    ref = cordova.InAppBrowser.open('http://mypage.org', '_blank', 'location=yes');
+
+//Again, this is the same handler as the previous example, it is just isn't passed as a callback on execute anymore.
+function appEventHandler (data){
+    alert(JSON.parse(data).myEventName);
+}
+
+ref.addEventListener('bridgeresponse', appEventHandler);
+ref.executeScript(pollScript);
+```
+
+Not that in both cases the polling script will stop if the page is navigated, if you need this to continue you can re-inject the script. The event handler does not need to be re-registered.
 
 ## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
 
