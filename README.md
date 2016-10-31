@@ -565,15 +565,16 @@ A few points, first our use case is for android and iOS only - changes have only
 ### <a id="executeScriptBridge"></a>Using Execute Script to Bridge
 Assuming your loaded page has an object `bridge` with a value `eventName`:
 ```javascript
-var pollScript = ['setInterval(function(){',
-    'if (bridge && bridge.eventname) {',
-    	'if (bridge.eventName === \'hide\') {',
-	    'return \'{ InAppBrowserAction:"hide" };\';',
-	'}',
-	'return JSON.stringify({myEventName: bridge.eventname});',
-    '}',
-'},500);']
-    .join('');
+var innerScript = [ 
+     'if (bridge && bridge.eventname) {',
+    	    'if (bridge.eventName === \'hide\') {',
+	        'return { InAppBrowserAction:"hide" };',
+	     '}',
+	    'return {myEventName: bridge.eventname};',
+        '}'
+    ].join(''),
+  
+    pollScript = 'setInterval(function(){ return JSON.stringify(' + innerScript + '); },500);' //Need to stringify object
 
 //Not bothering with the cleanup of the setInterval....
 
