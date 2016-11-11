@@ -496,6 +496,28 @@
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
+- (void)browserHide
+{
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to hide IAB after it was closed.");
+        return;
+    }
+    if (_previousStatusBarStyle == -1) {
+        NSLog(@"Tried to hide IAB while already hidden");
+        return;
+    }
+
+    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.inAppBrowserViewController != nil) {
+            _previousStatusBarStyle = -1;
+            [self.viewController dismissViewControllerAnimated:YES completion:nil];
+        }
+    });
+}
+
 @end
 
 #pragma mark CDVInAppBrowserViewController
@@ -568,7 +590,11 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    if (_browserOptions.hidenotclose != nil) {
+        self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(hide)];
+    } else {
+        self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    }
     self.closeButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -813,6 +839,13 @@
             [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
         }
     });
+}
+
+- (void)hide
+{
+    if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(browserHide)]) {
+        [self.navigationDelegate browserHide];
+    }
 }
 
 - (void)navigateTo:(NSURL*)url
