@@ -88,7 +88,8 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
     private static final String ACCEPT_THIRD_PARTY_COOKIES = "acceptThirdPartyCookies";
-
+    private static final Boolean DEFAULT_HARDWARE_BACK = true;
+       
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
