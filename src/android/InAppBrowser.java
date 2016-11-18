@@ -90,6 +90,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
+    private static final String HARDWARE_ACCELERATION = "hardwareacceleration";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -105,6 +106,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean editableLocationBar = false;
     private boolean privateSession = false;
     private boolean mediaPlaybackRequiresUserGesture = false;
+    private boolean hardwareAcceleration = false;
 
     /**
      * Executes the request and returns PluginResult.
@@ -519,6 +521,14 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowser getInAppBrowser(){
         return this;
     }
+    /**
+    * Should the Plugin use Hardware Acceleration.
+    *
+    * @return boolean
+    */
+    private boolean getHardwareAcceleration() {
+        return this.hardwareAcceleration;
+    }
 
     /**
      * Display a new browser with the specified URL.
@@ -533,6 +543,8 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+        hardwareAcceleration = true;
+
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
@@ -575,6 +587,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean privateSession = features.get(PRIVATE_SESSION);
             if(privateSession != null) {
                 this.privateSession = privateSession.booleanValue();
+            }
+            Boolean useHardwareAcceleration = features.get(HARDWARE_ACCELERATION);
+            if (useHardwareAcceleration != null) {
+                this.hardwareAcceleration = privateSession.booleanValue();
             }
         }
 
@@ -726,6 +742,9 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
+                if (getHardwareAcceleration()) {
+                    inAppWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                }
                 WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
