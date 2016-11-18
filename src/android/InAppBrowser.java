@@ -590,7 +590,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             Boolean useHardwareAcceleration = features.get(HARDWARE_ACCELERATION);
             if (useHardwareAcceleration != null) {
-                this.hardwareAcceleration = privateSession.booleanValue();
+                this.hardwareAcceleration = useHardwareAcceleration.booleanValue();
             }
         }
 
