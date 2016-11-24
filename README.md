@@ -222,7 +222,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 
 ## InAppBrowser.addEventListener
 
-> Adds a listener for an event from the `InAppBrowser`.
+> Adds a listener for an event from the `InAppBrowser`. (Only available when the target is set to `'_blank'`)
 
     ref.addEventListener(eventname, callback);
 
@@ -338,7 +338,7 @@ function executeScriptCallBack(params) {
 
 ## InAppBrowser.removeEventListener
 
-> Removes a listener for an event from the `InAppBrowser`.
+> Removes a listener for an event from the `InAppBrowser`. (Only available when the target is set to `'_blank'`)
 
     ref.removeEventListener(eventname, callback);
 
@@ -438,7 +438,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ## InAppBrowser.executeScript
 
-> Injects JavaScript code into the `InAppBrowser` window
+> Injects JavaScript code into the `InAppBrowser` window. (Only available when the target is set to `'_blank'`)
 
     ref.executeScript(details, callback);
 
@@ -480,7 +480,7 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
 
 ## InAppBrowser.insertCSS
 
-> Injects CSS into the `InAppBrowser` window.
+> Injects CSS into the `InAppBrowser` window. (Only available when the target is set to `'_blank'`)
 
     ref.insertCSS(details, callback);
 
