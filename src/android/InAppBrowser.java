@@ -34,6 +34,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -46,6 +47,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -106,7 +108,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean editableLocationBar = false;
     private boolean privateSession = false;
     private boolean mediaPlaybackRequiresUserGesture = false;
-    private boolean hardwareAcceleration = false;
+    private boolean hardwareAcceleration = true;
 
     /**
      * Executes the request and returns PluginResult.
@@ -632,7 +634,7 @@ public class InAppBrowser extends CordovaPlugin {
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
-                RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
+                final RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
                 //Please, no more black!
                 toolbar.setBackgroundColor(android.graphics.Color.LTGRAY);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
@@ -741,10 +743,42 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
-                inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
+
                 if (getHardwareAcceleration()) {
                     inAppWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 }
+
+                //ViewGroup
+                final FrameLayout fullscreenLayout = new FrameLayout(cordova.getActivity());
+                RelativeLayout.LayoutParams frameLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+                fullscreenLayout.setLayoutParams(frameLayoutParams);
+                fullscreenLayout.setId(Integer.valueOf(7));
+                fullscreenLayout.setVisibility(View.GONE);
+
+                InAppChromeClient chromeClient = new InAppChromeClient(thatWebView){
+                    @Override
+                    public void onShowCustomView(View view, CustomViewCallback callback) {
+                        super.onShowCustomView(view, callback);
+                        toolbar.setVisibility(View.GONE);
+                        fullscreenLayout.addView(view, new
+                                ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                        fullscreenLayout.setVisibility(View.VISIBLE);
+                        cordova.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+
+                    @Override
+                    public void onHideCustomView() {
+                        super.onHideCustomView();
+                        if (getShowLocationBar()) {
+                        toolbar.setVisibility(View.VISIBLE);
+                        }
+                        fullscreenLayout.setVisibility(View.GONE);
+                        fullscreenLayout.removeAllViews();
+                        cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    }
+                };
+                inAppWebView.setWebChromeClient(chromeClient);
                 WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
@@ -819,6 +853,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Add our webview to our main view/layout
+                main.addView(fullscreenLayout);
                 main.addView(inAppWebView);
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();

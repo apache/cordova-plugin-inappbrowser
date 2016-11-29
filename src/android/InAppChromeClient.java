@@ -18,18 +18,17 @@
 */
 package org.apache.cordova.inappbrowser;
 
+import android.view.View;
+import android.webkit.GeolocationPermissions.Callback;
+import android.webkit.JsPromptResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebStorage;
+import android.webkit.WebView;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import android.webkit.JsPromptResult;
-import android.webkit.WebChromeClient;
-import android.webkit.WebStorage;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.webkit.GeolocationPermissions.Callback;
 
 public class InAppChromeClient extends WebChromeClient {
 
@@ -130,4 +129,10 @@ public class InAppChromeClient extends WebChromeClient {
         return false;
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onShowCustomView(View view, int requestedOrientation, CustomViewCallback callback) // Available in API level 14+, deprecated in API level 18+
+    {
+        onShowCustomView(view, callback);
+    }
 }
