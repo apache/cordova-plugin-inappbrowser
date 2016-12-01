@@ -77,6 +77,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SYSTEM = "_system";
     private static final String EXIT_EVENT = "exit";
     private static final String LOCATION = "location";
+    private static final String HIDEWINDOW = "hidenotclose";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
@@ -95,6 +96,7 @@ public class InAppBrowser extends CordovaPlugin {
     private EditText edittext;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
+    private boolean hideNotClose = false;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
@@ -507,6 +509,15 @@ public class InAppBrowser extends CordovaPlugin {
         return this.showLocationBar;
     }
 
+    /**
+     * Should we hide instead of closing
+     *
+     * @return boolean
+     */
+    private boolean getHideNotClose() {
+        return this.hideNotClose;
+    }
+
     private InAppBrowser getInAppBrowser(){
         return this;
     }
@@ -523,11 +534,16 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+        hideNotClose = false;
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
             if (show != null) {
                 showLocationBar = show.booleanValue();
+            }
+            Boolean hideWin = features.get(HIDEWINDOW);
+            if (hideWin != null) {
+                hideNotClose = hideWin.booleanValue();
             }
             Boolean zoom = features.get(ZOOM);
             if (zoom != null) {
@@ -714,7 +730,10 @@ public class InAppBrowser extends CordovaPlugin {
 
                 close.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        closeDialog();
+                        if(getHideNotClose())
+                            dialog.hide();
+                        else
+                            closeDialog();
                     }
                 });
 
