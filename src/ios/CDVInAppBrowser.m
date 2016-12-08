@@ -560,12 +560,13 @@
     self.spinner.clearsContextBeforeDrawing = NO;
     self.spinner.clipsToBounds = NO;
     self.spinner.contentMode = UIViewContentModeScaleToFill;
-    self.spinner.frame = CGRectMake(CGRectGetMidX(self.webView.frame), CGRectGetMidY(self.webView.frame), 20.0, 20.0);
+    self.spinner.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width, self.view.bounds.size.height);
     self.spinner.hidden = NO;
     self.spinner.hidesWhenStopped = YES;
     self.spinner.multipleTouchEnabled = NO;
     self.spinner.opaque = NO;
     self.spinner.userInteractionEnabled = NO;
+    NSLog(@"UNILYDEBUG: Spinner stopping 1");
     [self.spinner stopAnimating];
 
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
@@ -879,7 +880,9 @@
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
 
+    NSLog(@"UNILYDEBUG: Spinner starting");
     [self.spinner startAnimating];
+    
 
     return [self.navigationDelegate webViewDidStartLoad:theWebView];
 }
@@ -901,7 +904,7 @@
     self.addressLabel.text = [self.currentURL absoluteString];
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
-
+NSLog(@"UNILYDEBUG: Spinner stopping 2");
     [self.spinner stopAnimating];
 
     // Work around a bug where the first time a PDF is opened, all UIWebViews
@@ -930,6 +933,7 @@
 
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
+     NSLog(@"UNILYDEBUG: Spinner stopping 3");
     [self.spinner stopAnimating];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
