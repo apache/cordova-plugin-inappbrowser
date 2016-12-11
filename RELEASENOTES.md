@@ -20,6 +20,23 @@
 -->
 # Release Notes
 
+### 1.6.0 (Dec 07, 2016)
+* [CB-12224](https://issues.apache.org/jira/browse/CB-12224) Updated version and RELEASENOTES.md for release 1.6.0
+* [CB-7608](https://issues.apache.org/jira/browse/CB-7608) (android) document useWidthViewPort
+* add option useWidthViewPort
+* [CB-12184](https://issues.apache.org/jira/browse/CB-12184) executeScript leads to a null pointer on exception on Android.
+* fix(close button): Set correct content description
+* [CB-9274](https://issues.apache.org/jira/browse/CB-9274) Adds missing methods to InAppBrowser to allow compilation for Amazon FireOS.
+* [CB-10973](https://issues.apache.org/jira/browse/CB-10973) inAppBrowser for Windows Platform: wrong height of webview with location=yes
+* Increment plugin minor version because of new hide feature
+* removed duplicate hide method in ios source and add jasmine test cases
+* [CB-8467](https://issues.apache.org/jira/browse/CB-8467)
+* [CB-12010](https://issues.apache.org/jira/browse/CB-12010) (android) Catch FileUriExposedException
+* [CB-11955](https://issues.apache.org/jira/browse/CB-11955) Added Initial OSX platform support
+* [CB-11917](https://issues.apache.org/jira/browse/CB-11917) - Remove pull request template checklist item: "iCLA has been signed and submitted to secretary@apache.org."
+* [CB-11694](https://issues.apache.org/jira/browse/CB-11694) Android: Set hadwareBackButton value according option in cordova.InAppBrowser.open
+* [CB-11832](https://issues.apache.org/jira/browse/CB-11832) Incremented plugin version.
+
 ### 1.5.1 (Dec 07, 2016)
 * [CB-7608](https://issues.apache.org/jira/browse/CB-7608) (android) document useWidthViewPort
 * add option useWidthViewPort
