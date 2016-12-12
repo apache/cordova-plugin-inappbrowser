@@ -822,7 +822,7 @@ public class InAppBrowser extends CordovaPlugin {
                   Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
                   intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
                   intent.setType("*/*");//any application,any extension
-                  Toast.makeText(cordova.getActivity().getApplicationContext(), "Descargando Archivo '" + filename + "'", Toast.LENGTH_LONG).show();
+                  Toast.makeText(cordova.getActivity().getApplicationContext(), "Downloading File '" + filename + "'", Toast.LENGTH_LONG).show();
                 }
               });
             }
