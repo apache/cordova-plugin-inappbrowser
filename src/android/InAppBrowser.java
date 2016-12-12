@@ -73,6 +73,9 @@ import android.app.DownloadManager;
 import android.os.Environment;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
+import android.widget.Toast;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
