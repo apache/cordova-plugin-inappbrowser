@@ -409,7 +409,7 @@ public class InAppBrowser extends CordovaPlugin {
             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
             this.cordova.getActivity().startActivity(intent);
             return "";
-        // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
+            // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
         } catch (java.lang.RuntimeException e) {
             LOG.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
             return e.toString();
@@ -571,7 +571,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             Boolean wideViewPort = features.get(USER_WIDE_VIEW_PORT);
             if (wideViewPort != null ) {
-		            useWideViewPort = wideViewPort.booleanValue();
+                useWideViewPort = wideViewPort.booleanValue();
             }
         }
 
@@ -586,8 +586,8 @@ public class InAppBrowser extends CordovaPlugin {
              */
             private int dpToPixels(int dipValue) {
                 int value = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
-                                                            (float) dipValue,
-                                                            cordova.getActivity().getResources().getDisplayMetrics()
+                        (float) dipValue,
+                        cordova.getActivity().getResources().getDisplayMetrics()
                 );
 
                 return value;
@@ -695,8 +695,8 @@ public class InAppBrowser extends CordovaPlugin {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                          navigate(edittext.getText().toString());
-                          return true;
+                            navigate(edittext.getText().toString());
+                            return true;
                         }
                         return false;
                     }
@@ -893,6 +893,42 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     /**
+     * Receive File Data from File Chooser
+     *
+     * @param requestCode the requested code from chromeclient
+     * @param resultCode the result code returned from android system
+     * @param intent the data from android file chooser
+     */
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // For Android >= 5.0
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Log.i("mytag", "onActivityResult (For Android >= 5.0)");
+            // If RequestCode or Callback is Invalid
+            if(requestCode != FILECHOOSER_REQUESTCODE_LOLLIPOP || mUploadCallbackLollipop == null) {
+                super.onActivityResult(requestCode, resultCode, intent);
+                return;
+            }
+            mUploadCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+            mUploadCallbackLollipop = null;
+        }
+        // For Android < 5.0
+        else {
+            Log.i("mytag", "onActivityResult (For Android < 5.0)");
+            // If RequestCode or Callback is Invalid
+            if(requestCode != FILECHOOSER_REQUESTCODE || mUploadCallback == null) {
+                super.onActivityResult(requestCode, resultCode, intent);
+                return;
+            }
+
+            if (null == mUploadCallback) return;
+            Uri result = intent == null || resultCode != cordova.getActivity().RESULT_OK ? null : intent.getData();
+
+            mUploadCallback.onReceiveValue(result);
+            mUploadCallback = null;
+        }
+    }
+
+    /**
      * The webview client receives notifications about appView
      */
     public class InAppBrowserClient extends WebViewClient {
@@ -999,7 +1035,7 @@ public class InAppBrowser extends CordovaPlugin {
             // Update the UI if we haven't already
             if (!newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
-             }
+            }
 
             try {
                 JSONObject obj = new JSONObject();
@@ -1086,36 +1122,6 @@ public class InAppBrowser extends CordovaPlugin {
 
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
-        }
-
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-            // For Android >= 5.0
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Log.i("mytag", "onActivityResult (For Android >= 5.0)");
-                // If RequestCode or Callback is Invalid
-                if(requestCode != FILECHOOSER_REQUESTCODE_LOLLIPOP || mUploadCallbackLollipop == null) {
-                    super.onActivityResult(requestCode, resultCode, intent);
-                    return;
-                }
-                mUploadCallbackLollipop.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
-                mUploadCallbackLollipop = null;
-            }
-            // For Android < 5.0
-            else {
-                Log.i("mytag", "onActivityResult (For Android < 5.0)");
-                // If RequestCode or Callback is Invalid
-                if(requestCode != FILECHOOSER_REQUESTCODE || mUploadCallback == null) {
-                    super.onActivityResult(requestCode, resultCode, intent);
-                    return;
-                }
-
-                if (null == mUploadCallback) return;
-                Uri result = intent == null || resultCode != cordova.getActivity().RESULT_OK ? null : intent.getData();
-
-                mUploadCallback.onReceiveValue(result);
-                mUploadCallback = null;
-            }
         }
     }
 }
