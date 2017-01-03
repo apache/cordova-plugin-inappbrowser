@@ -1048,7 +1048,6 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
 
-
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
