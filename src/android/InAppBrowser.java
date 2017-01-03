@@ -894,7 +894,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     /**
      * Receive File Data from File Chooser
-     *
+     * 
      * @param requestCode the requested code from chromeclient
      * @param resultCode the result code returned from android system
      * @param intent the data from android file chooser
