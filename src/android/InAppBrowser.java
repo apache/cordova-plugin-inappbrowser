@@ -29,7 +29,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -734,7 +733,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // For Android 5.0+
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        Log.d(LOG_TAG, "File Chooser 5.0+");
+                        LOG.d(LOG_TAG, "File Chooser 5.0+");
                         // If callback exists, finish it.
                         if(mUploadCallbackLollipop != null) {
                             mUploadCallbackLollipop.onReceiveValue(null);
@@ -746,16 +745,15 @@ public class InAppBrowser extends CordovaPlugin {
                         content.addCategory(Intent.CATEGORY_OPENABLE);
                         content.setType("*/*");
 
-                        // [important] Register ActvityResultCallback on Cordova
-                        cordova.setActivityResultCallback(InAppBrowser.this);
-                        cordova.getActivity().startActivityForResult(content, FILECHOOSER_REQUESTCODE_LOLLIPOP);
+                        // Run cordova startActivityForResult
+                        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE_LOLLIPOP);
                         return true;
                     }
 
                     // For Android 4.1+
                     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture)
                     {
-                        Log.d(LOG_TAG, "File Chooser 4.1+");
+                        LOG.d(LOG_TAG, "File Chooser 4.1+");
                         // Call file chooser for Android 3.0+
                         openFileChooser(uploadMsg, acceptType);
                     }
@@ -763,20 +761,13 @@ public class InAppBrowser extends CordovaPlugin {
                     // For Android 3.0+
                     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType)
                     {
-                        Log.d(LOG_TAG, "File Chooser 3.0+");
+                        LOG.d(LOG_TAG, "File Chooser 3.0+");
                         mUploadCallback = uploadMsg;
-                        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
+                        content.addCategory(Intent.CATEGORY_OPENABLE);
 
-                        cordova.setActivityResultCallback(InAppBrowser.this);
-                        cordova.getActivity().startActivityForResult( Intent.createChooser(i, "File Chooser"), FILECHOOSER_REQUESTCODE);
-                    }
-
-                    // For Android < 3.0
-                    public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-                        Log.d(LOG_TAG, "File Chooser 3.0 <");
-                        // Call file chooser for Android 3.0+
-                        openFileChooser(uploadMsg, "");
+                        // run startActivityForResult
+                        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
                     }
 
                 });
@@ -898,7 +889,7 @@ public class InAppBrowser extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         // For Android >= 5.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Log.i("mytag", "onActivityResult (For Android >= 5.0)");
+            LOG.d(LOG_TAG, "onActivityResult (For Android >= 5.0)");
             // If RequestCode or Callback is Invalid
             if(requestCode != FILECHOOSER_REQUESTCODE_LOLLIPOP || mUploadCallbackLollipop == null) {
                 super.onActivityResult(requestCode, resultCode, intent);
@@ -909,7 +900,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
         // For Android < 5.0
         else {
-            Log.i("mytag", "onActivityResult (For Android < 5.0)");
+            LOG.d(LOG_TAG, "onActivityResult (For Android < 5.0)");
             // If RequestCode or Callback is Invalid
             if(requestCode != FILECHOOSER_REQUESTCODE || mUploadCallback == null) {
                 super.onActivityResult(requestCode, resultCode, intent);
