@@ -70,11 +70,11 @@
 
 - (BOOL) isSystemUrl:(NSURL*)url
 {
-	if ([[url host] isEqualToString:@"itunes.apple.com"]) {
-		return YES;
-	}
+    if ([[url host] isEqualToString:@"itunes.apple.com"]) {
+        return YES;
+    }
 
-	return NO;
+    return NO;
 }
 
 - (void)open:(CDVInvokedUrlCommand*)command
@@ -161,7 +161,7 @@
     }
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
-    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
+    [self.inAppBrowserViewController showToolBar:browserOptions.navigationbar ? NO : browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil) {
         [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
     }
@@ -230,9 +230,6 @@
 
     __block CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
                                    initWithRootViewController:self.inAppBrowserViewController];
-    nav.orientationDelegate = self.inAppBrowserViewController;
-    nav.navigationBarHidden = YES;
-    nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
 
     __weak CDVInAppBrowser* weakSelf = self;
 
@@ -642,7 +639,14 @@
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
 
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    if(_browserOptions.navigationbar) {
+        self.navigationItem.leftBarButtonItem = self.closeButton;
+        if(_browserOptions.navigationbuttons)
+            self.navigationItem.rightBarButtonItems = @[self.backButton, fixedSpaceButton, self.forwardButton];
+        if(_browserOptions.navigationbartitle)
+            self.navigationItem.title = _browserOptions.navigationbartitle;
+    } else
+        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
@@ -664,9 +668,13 @@
     self.closeButton.enabled = YES;
     self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:0 withObject:self.closeButton];
-    [self.toolbar setItems:items];
+    if(_browserOptions.navigationbar) {
+        self.navigationItem.leftBarButtonItem = self.closeButton;
+    } else {
+        NSMutableArray* items = [self.toolbar.items mutableCopy];
+        [items replaceObjectAtIndex:0 withObject:self.closeButton];
+        [self.toolbar setItems:items];
+    }
 }
 
 - (void)showLocationBar:(BOOL)show
@@ -985,6 +993,7 @@
         self.toolbar = YES;
         self.closebuttoncaption = nil;
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
+        self.navigationbar = NO;
         self.clearcache = NO;
         self.clearsessioncache = NO;
 
@@ -1041,6 +1050,19 @@
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
+-(instancetype)initWithRootViewController:(UIViewController *)rootViewController {
+    if(self = [super initWithRootViewController:rootViewController]) {
+        if([rootViewController isMemberOfClass:[CDVInAppBrowserViewController class]]) {
+            CDVInAppBrowserViewController* browserVC = (CDVInAppBrowserViewController*)rootViewController;
+            self.orientationDelegate = browserVC;
+            self.navigationBarHidden = !browserVC.navigationItem.leftBarButtonItem;
+            self.modalPresentationStyle = browserVC.modalPresentationStyle;
+        }
+    }
+
+    return self;
+}
+
 - (void) dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
     if ( self.presentedViewController) {
         [super dismissViewControllerAnimated:flag completion:completion];
@@ -1053,10 +1075,12 @@
     statusBarFrame.size.height = STATUSBAR_HEIGHT;
     // simplified from: http://stackoverflow.com/a/25669695/219684
 
-    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
-    bgToolbar.barStyle = UIBarStyleDefault;
-    [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [self.view addSubview:bgToolbar];
+    if(self.navigationBarHidden) {
+        UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
+        bgToolbar.barStyle = UIBarStyleDefault;
+        [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        [self.view addSubview:bgToolbar];
+    }
 
     [super viewDidLoad];
 }
