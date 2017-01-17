@@ -642,7 +642,7 @@
     if(_browserOptions.navigationbar) {
         self.navigationItem.leftBarButtonItem = self.closeButton;
         if(_browserOptions.navigationbuttons)
-            self.navigationItem.rightBarButtonItems = @[self.backButton, fixedSpaceButton, self.forwardButton];
+            self.navigationItem.rightBarButtonItems = @[self.forwardButton, fixedSpaceButton, self.backButton];
         if(_browserOptions.navigationbartitle)
             self.navigationItem.title = _browserOptions.navigationbartitle;
     } else
