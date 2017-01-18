@@ -236,6 +236,7 @@
     nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
+    [nav setBgToolbarStyle:self.inAppBrowserViewController.toolbar.barStyle];
 
     __weak CDVInAppBrowser* weakSelf = self;
 
@@ -1133,13 +1134,19 @@
     statusBarFrame.size.height = STATUSBAR_HEIGHT;
     // simplified from: http://stackoverflow.com/a/25669695/219684
 
-    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
-    bgToolbar.barStyle = UIBarStyleDefault;
-    [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [self.view addSubview:bgToolbar];
+    self.bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
+    self.bgToolbar.barStyle = UIBarStyleDefault;
+    [self.bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    [self.view addSubview:self.bgToolbar];
 
     [super viewDidLoad];
 }
+
+- (void)setBgToolbarStyle:(UIBarStyle)style
+{
+    self.bgToolbar.barStyle = style;
+}
+
 
 - (CGRect) invertFrameIfNeeded:(CGRect)rect {
     // We need to invert since on iOS 7 frames are always in Portrait context
