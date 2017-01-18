@@ -28,6 +28,9 @@
 #define    kInAppBrowserToolbarBarPositionBottom @"bottom"
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
+#define    kInAppBrowserToolbarStyleDefault @"default"
+#define    kInAppBrowserToolbarStyleBlack @"black"
+
 #define    TOOLBAR_HEIGHT 44.0
 #define    STATUSBAR_HEIGHT 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
@@ -554,7 +557,7 @@
 
     [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
 
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor whiteColor];
 
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
@@ -611,6 +614,7 @@
 - (UIToolbar*)buildToolbar
 {
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarIsDark = [_browserOptions.toolbarstyle isEqualToString:kInAppBrowserToolbarStyleBlack];
     float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
 
@@ -619,7 +623,7 @@
     toolbar.alpha = 1.000;
     toolbar.autoresizesSubviews = YES;
     toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    toolbar.barStyle = UIBarStyleBlack;
+    toolbar.barStyle = toolbarIsDark ? UIBarStyleBlack : UIBarStyleDefault;
     toolbar.clearsContextBeforeDrawing = NO;
     toolbar.clipsToBounds = NO;
     toolbar.contentMode = UIViewContentModeScaleToFill;
@@ -1033,6 +1037,7 @@
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
         self.clearcache = NO;
         self.clearsessioncache = NO;
+        self.toolbarstyle = kInAppBrowserToolbarStyleDefault;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
