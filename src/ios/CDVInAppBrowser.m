@@ -682,8 +682,8 @@
 
 - (UIBarButtonItem*)buildForwardButton
 {
-    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
-    UIBarButtonItem *forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
+    UIImage *forwardArrow = [self drawForwardArrow];
+    UIBarButtonItem *forwardButton = [[UIBarButtonItem alloc] initWithImage:forwardArrow style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
     forwardButton.enabled = YES;
     forwardButton.imageInsets = UIEdgeInsetsZero;
 
@@ -692,12 +692,41 @@
 
 - (UIBarButtonItem*)buildBackButton
 {
-    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+    UIImage *backArrow = [self drawBackArrow];
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:backArrow style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     backButton.enabled = YES;
     backButton.imageInsets = UIEdgeInsetsZero;
 
     return backButton;
+}
+
+- (UIImage*)drawForwardArrow
+{
+    CGSize canvasSize = CGSizeMake(20,20);
+    CGFloat scale = [UIScreen mainScreen].scale;
+
+    canvasSize.width *= scale;
+    canvasSize.height *= scale;
+
+    UIGraphicsBeginImageContextWithOptions(canvasSize, false, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    CGContextBeginPath(context);
+    CGContextMoveToPoint(   context, canvasSize.width * 3.0/10.0, canvasSize.height * 2.8/10.0);
+    CGContextAddLineToPoint(context, canvasSize.width * 5.0/10.0, canvasSize.height * 5.0/10.0);
+    CGContextAddLineToPoint(context, canvasSize.width * 3.0/10.0, canvasSize.height * 7.2/10.0);
+
+    CGContextSetLineWidth(context, (scale > 1.0 ? 0.75 * scale : 1.0));
+    CGContextSetStrokeColorWithColor(context, [UIColor blackColor].CGColor);
+    CGContextStrokePath(context);
+
+    return UIGraphicsGetImageFromCurrentImageContext();
+}
+
+-(UIImage*)drawBackArrow
+{
+    UIImage *forwardArrow = [self drawForwardArrow];
+    return [UIImage imageWithCGImage:forwardArrow.CGImage scale:forwardArrow.scale orientation:UIImageOrientationUpMirrored];
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
