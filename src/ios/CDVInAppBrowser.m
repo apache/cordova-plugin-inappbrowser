@@ -539,46 +539,12 @@
 - (void)createViews
 {
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
-    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpaceButton.width = 20;
-
-    CGFloat labelInset = 5.0;
-    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
-
-    self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
-    self.addressLabel.adjustsFontSizeToFitWidth = NO;
-    self.addressLabel.alpha = 1.000;
-    self.addressLabel.autoresizesSubviews = YES;
-    self.addressLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    self.addressLabel.backgroundColor = [UIColor clearColor];
-    self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-    self.addressLabel.clearsContextBeforeDrawing = YES;
-    self.addressLabel.clipsToBounds = YES;
-    self.addressLabel.contentMode = UIViewContentModeScaleToFill;
-    self.addressLabel.enabled = YES;
-    self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-
-    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
-        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
-    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
-        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
-    }
-
-    self.addressLabel.multipleTouchEnabled = NO;
-    self.addressLabel.numberOfLines = 1;
-    self.addressLabel.opaque = NO;
-    self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
-    self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.addressLabel.textAlignment = NSTextAlignmentLeft;
-    self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
-    self.addressLabel.userInteractionEnabled = NO;
 
     NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
@@ -590,9 +556,9 @@
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
 
-
     self.webView = [self buildWebView];
     self.spinner = [self buildSpinner];
+    self.addressLabel = [self buildAddressLabel];
     self.toolbar = [self buildToolbar];
     [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
 
@@ -671,6 +637,45 @@
     toolbar.userInteractionEnabled = YES;
 
     return toolbar;
+}
+
+
+- (UILabel*)buildAddressLabel
+{
+    CGFloat labelInset = 5.0;
+    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
+
+    UILabel *addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
+    addressLabel.adjustsFontSizeToFitWidth = NO;
+    addressLabel.alpha = 1.000;
+    addressLabel.autoresizesSubviews = YES;
+    addressLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+    addressLabel.backgroundColor = [UIColor clearColor];
+    addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+    addressLabel.clearsContextBeforeDrawing = YES;
+    addressLabel.clipsToBounds = YES;
+    addressLabel.contentMode = UIViewContentModeScaleToFill;
+    addressLabel.enabled = YES;
+    addressLabel.hidden = NO;
+    addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+
+    if ([addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
+        [addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
+    } else if ([addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
+        [addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
+    }
+
+    addressLabel.multipleTouchEnabled = NO;
+    addressLabel.numberOfLines = 1;
+    addressLabel.opaque = NO;
+    addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
+    addressLabel.text = NSLocalizedString(@"Loading...", nil);
+    addressLabel.textAlignment = NSTextAlignmentLeft;
+    addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
+    addressLabel.userInteractionEnabled = NO;
+
+    return addressLabel;
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
