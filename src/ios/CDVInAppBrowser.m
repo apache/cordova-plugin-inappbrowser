@@ -540,20 +540,6 @@
 {
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.spinner.alpha = 1.000;
-    self.spinner.autoresizesSubviews = YES;
-    self.spinner.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin);
-    self.spinner.clearsContextBeforeDrawing = NO;
-    self.spinner.clipsToBounds = NO;
-    self.spinner.contentMode = UIViewContentModeScaleToFill;
-    self.spinner.frame = CGRectMake(CGRectGetMidX(self.webView.frame), CGRectGetMidY(self.webView.frame), 20.0, 20.0);
-    self.spinner.hidden = NO;
-    self.spinner.hidesWhenStopped = YES;
-    self.spinner.multipleTouchEnabled = NO;
-    self.spinner.opaque = NO;
-    self.spinner.userInteractionEnabled = NO;
-    [self.spinner stopAnimating];
 
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
@@ -623,6 +609,7 @@
 
 
     self.webView = [self buildWebView];
+    self.spinner = [self buildSpinner];
     [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
@@ -655,6 +642,28 @@
     webView.userInteractionEnabled = YES;
 
     return webView;
+}
+
+- (UIActivityIndicatorView*)buildSpinner
+{
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+
+    spinner.alpha = 1.000;
+    spinner.autoresizesSubviews = YES;
+    spinner.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin);
+    spinner.clearsContextBeforeDrawing = NO;
+    spinner.clipsToBounds = NO;
+    spinner.contentMode = UIViewContentModeScaleToFill;
+    spinner.frame = CGRectMake(CGRectGetMidX(self.webView.frame), CGRectGetMidY(self.webView.frame), 20.0, 20.0);
+    spinner.hidden = NO;
+    spinner.hidesWhenStopped = YES;
+    spinner.multipleTouchEnabled = NO;
+    spinner.opaque = NO;
+    spinner.userInteractionEnabled = NO;
+
+    [spinner stopAnimating];
+
+    return spinner;
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
