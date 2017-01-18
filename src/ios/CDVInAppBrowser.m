@@ -569,10 +569,7 @@
 
 - (UIWebView*)buildWebView
 {
-    CGRect webViewBounds = self.view.bounds;
-    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
-
-    UIWebView *webView = [[UIWebView alloc] initWithFrame:webViewBounds];
+    UIWebView *webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
 
     webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
 
