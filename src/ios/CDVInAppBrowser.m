@@ -549,8 +549,10 @@
 
     self.webView = [self buildWebView];
     self.spinner = [self buildSpinner];
-    self.addressLabel = [self buildAddressLabel];
     self.toolbar = [self buildToolbar];
+
+    self.addressLabel = [self buildAddressLabel];
+    self.addressBar = [self buildAddressBar:self.addressLabel];
 
     self.closeButton = [self buildCloseButton];
     self.forwardButton = [self buildForwardButton];
@@ -563,7 +565,7 @@
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
     [self.view addSubview:self.toolbar];
-    [self.view addSubview:self.addressLabel];
+    [self.view addSubview:self.addressBar];
     [self.view addSubview:self.spinner];
 }
 
@@ -639,13 +641,21 @@
     return toolbar;
 }
 
+- (UIView*)buildAddressBar:(UILabel*)addressLabel
+{
+    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
+    UIView *addressBar = [[UIView alloc] initWithFrame:CGRectMake(0, locationBarY, self.view.bounds.size.width, LOCATIONBAR_HEIGHT)];
+    addressBar.backgroundColor = [UIColor lightGrayColor];
+
+    [addressBar addSubview:addressLabel];
+    return addressBar;
+}
+
 - (UILabel*)buildAddressLabel
 {
     CGFloat labelInset = 5.0;
-    BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
-
-    UILabel *addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
+    UILabel *addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, 0, self.view.bounds.size.width - (2.0 * labelInset), LOCATIONBAR_HEIGHT)];
     addressLabel.adjustsFontSizeToFitWidth = NO;
     addressLabel.alpha = 1.000;
     addressLabel.autoresizesSubviews = YES;
@@ -671,7 +681,7 @@
     addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
     addressLabel.text = NSLocalizedString(@"Loading...", nil);
     addressLabel.textAlignment = NSTextAlignmentLeft;
-    addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
+    addressLabel.textColor = [UIColor blackColor];
     addressLabel.userInteractionEnabled = NO;
 
     return addressLabel;
@@ -754,17 +764,17 @@
 
 - (void)showLocationBar:(BOOL)show
 {
-    CGRect locationbarFrame = self.addressLabel.frame;
+    CGRect locationbarFrame = self.addressBar.frame;
 
     BOOL toolbarVisible = !self.toolbar.hidden;
 
     // prevent double show/hide
-    if (show == !(self.addressLabel.hidden)) {
+    if (show == !(self.addressBar.hidden)) {
         return;
     }
 
     if (show) {
-        self.addressLabel.hidden = NO;
+        self.addressBar.hidden = NO;
 
         if (toolbarVisible) {
             // toolBar at the bottom, leave as is
@@ -775,7 +785,7 @@
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
-            self.addressLabel.frame = locationbarFrame;
+            self.addressBar.frame = locationbarFrame;
         } else {
             // no toolBar, so put locationBar at the bottom
 
@@ -784,10 +794,10 @@
             [self setWebViewFrame:webViewBounds];
 
             locationbarFrame.origin.y = webViewBounds.size.height;
-            self.addressLabel.frame = locationbarFrame;
+            self.addressBar.frame = locationbarFrame;
         }
     } else {
-        self.addressLabel.hidden = YES;
+        self.addressBar.hidden = YES;
 
         if (toolbarVisible) {
             // locationBar is on top of toolBar, hide locationBar
@@ -806,9 +816,9 @@
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition
 {
     CGRect toolbarFrame = self.toolbar.frame;
-    CGRect locationbarFrame = self.addressLabel.frame;
+    CGRect locationbarFrame = self.addressBar.frame;
 
-    BOOL locationbarVisible = !self.addressLabel.hidden;
+    BOOL locationbarVisible = !self.addressBar.hidden;
 
     // prevent double show/hide
     if (show == !(self.toolbar.hidden)) {
@@ -824,7 +834,7 @@
             // put toolBar at the bottom
             webViewBounds.size.height -= FOOTER_HEIGHT;
             locationbarFrame.origin.y = webViewBounds.size.height;
-            self.addressLabel.frame = locationbarFrame;
+            self.addressBar.frame = locationbarFrame;
             self.toolbar.frame = toolbarFrame;
         } else {
             // no locationBar, so put toolBar at the bottom
@@ -856,7 +866,7 @@
 
             // move locationBar down
             locationbarFrame.origin.y = webViewBounds.size.height;
-            self.addressLabel.frame = locationbarFrame;
+            self.addressBar.frame = locationbarFrame;
         } else {
             // no locationBar, expand webView to screen dimensions
             [self setWebViewFrame:self.view.bounds];
