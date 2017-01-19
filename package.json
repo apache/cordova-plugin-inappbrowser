@@ -2,6 +2,7 @@
   "name": "cordova-plugin-inappbrowser",
   "version": "1.6.2-dev",
   "description": "Cordova InAppBrowser Plugin",
+  "types": "./types/index.d.ts",
   "cordova": {
     "id": "cordova-plugin-inappbrowser",
     "platforms": [
