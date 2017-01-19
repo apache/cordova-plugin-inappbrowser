@@ -56,6 +56,7 @@
 @property (nonatomic, copy) NSString* toolbarstyle;
 @property (nonatomic, copy) NSString* presentationstyle;
 @property (nonatomic, copy) NSString* transitionstyle;
+@property (nonatomic, copy) NSString* tintcolor;
 
 @property (nonatomic, assign) BOOL enableviewportscale;
 @property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;

@@ -31,6 +31,8 @@
 #define    kInAppBrowserToolbarStyleDefault @"default"
 #define    kInAppBrowserToolbarStyleBlack @"black"
 
+#define    kInAppBrowserTintColorDefault @"default"
+
 #define    TOOLBAR_HEIGHT 44.0
 #define    STATUSBAR_HEIGHT 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
@@ -562,6 +564,20 @@
 
     self.view.backgroundColor = [UIColor whiteColor];
 
+    if (IsAtLeastiOSVersion(@"7.0")) {
+        if (![_browserOptions.tintcolor isEqualToString:kInAppBrowserTintColorDefault]) {
+            unsigned hexValue = 0;
+            NSScanner *scanner = [NSScanner scannerWithString:_browserOptions.tintcolor];
+            [scanner scanHexInt:&hexValue];
+            self.view.tintColor = [UIColor colorWithRed:((hexValue & 0xFF0000) >> 16) / 255.0
+                                                  green:((hexValue & 0xFF00) >> 8) / 255.0
+                                                   blue:( hexValue & 0xFF ) / 255.0
+                                                  alpha:1.0];
+        } else if ([_browserOptions.toolbarstyle isEqualToString:kInAppBrowserToolbarStyleBlack]) {
+            self.view.tintColor = [UIColor whiteColor];
+        }
+    }
+
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
     [self.view addSubview:self.toolbar];
@@ -630,13 +646,7 @@
     toolbar.multipleTouchEnabled = NO;
     toolbar.opaque = NO;
     toolbar.userInteractionEnabled = YES;
-
-    if (toolbarIsDark) {
-        toolbar.barStyle = UIBarStyleBlack;
-        toolbar.tintColor = [UIColor whiteColor];
-    } else {
-        toolbar.barStyle = UIBarStyleDefault;
-    }
+    toolbar.barStyle = toolbarIsDark ? UIBarStyleBlack : UIBarStyleDefault;
 
     return toolbar;
 }
@@ -1082,6 +1092,7 @@
         self.clearcache = NO;
         self.clearsessioncache = NO;
         self.toolbarstyle = kInAppBrowserToolbarStyleDefault;
+        self.tintcolor = kInAppBrowserTintColorDefault;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
