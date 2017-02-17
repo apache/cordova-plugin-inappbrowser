@@ -30,14 +30,20 @@
     <issue>https://issues.apache.org/jira/browse/CB/component/12320641</issue>
 
     <engines>
-      <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
+        <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
     </engines>
 
     <!-- android -->
     <platform name="android">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <runs />
+        </js-module>
+        <js-module src="www/open.js" name="open">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
+        </js-module>
+        <js-module src="www/options.js" name="options">
+            <merges target="cordova.InAppBrowser"/>
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -70,8 +76,14 @@
     <!-- ios -->
     <platform name="ios">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <runs />
+        </js-module>
+        <js-module src="www/open.js" name="open">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
+        </js-module>
+        <js-module src="www/options.js" name="options">
+            <merges target="cordova.InAppBrowser"/>
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -80,9 +92,9 @@
         </config-file>
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
-	    <source-file src="src/ios/CDVInAppBrowser.m" />
+        <source-file src="src/ios/CDVInAppBrowser.m" />
 
-	    <framework src="CoreGraphics.framework" />
+        <framework src="CoreGraphics.framework" />
     </platform>
 
     <!-- osx -->
@@ -107,6 +119,13 @@
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
+        <js-module src="www/open.js" name="open">
+            <clobbers target="cordova.InAppBrowser.open" />
+            <clobbers target="window.open" />
+        </js-module>
+        <js-module src="www/options.js" name="options">
+            <merges target="cordova.InAppBrowser"/>
+        </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />
         </js-module>
@@ -116,8 +135,14 @@
     <!-- browser -->
     <platform name="browser">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
+            <runs />
+        </js-module>
+        <js-module src="www/open.js" name="open">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
+        </js-module>
+        <js-module src="www/options.js" name="options">
+            <merges target="cordova.InAppBrowser"/>
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />

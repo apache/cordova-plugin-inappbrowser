@@ -28,11 +28,9 @@
 
     var exec = require('cordova/exec');
     var channel = require('cordova/channel');
-    var modulemapper = require('cordova/modulemapper');
-    var urlutil = require('cordova/urlutil');
 
-    function InAppBrowser () {
-        this.channels = {
+    function InAppBrowser() {
+       this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
@@ -40,6 +38,16 @@
             'customscheme': channel.create('customscheme')
         };
     }
+
+    InAppBrowser.options = '';
+
+    InAppBrowser.setDefaultOptions = function (str) {
+        InAppBrowser.options = str || '';
+    };
+
+    InAppBrowser.getDefaultOptions = function () {
+        return InAppBrowser.options || '';
+    };
 
     InAppBrowser.prototype = {
         _eventHandler: function (event) {
@@ -88,28 +96,7 @@
         }
     };
 
-    module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
-        // Don't catch calls that write to existing frames (e.g. named iframes).
-        if (window.frames && window.frames[strWindowName]) {
-            var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
-            return origOpenFunc.apply(window, arguments);
-        }
+    InAppBrowser.prototype.constructor = InAppBrowser;
 
-        strUrl = urlutil.makeAbsolute(strUrl);
-        var iab = new InAppBrowser();
-
-        callbacks = callbacks || {};
-        for (var callbackName in callbacks) {
-            iab.addEventListener(callbackName, callbacks[callbackName]);
-        }
-
-        var cb = function (eventname) {
-            iab._eventHandler(eventname);
-        };
-
-        strWindowFeatures = strWindowFeatures || '';
-
-        exec(cb, cb, 'InAppBrowser', 'open', [strUrl, strWindowName, strWindowFeatures]);
-        return iab;
-    };
+    module.exports = InAppBrowser;
 })();
