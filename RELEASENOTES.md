@@ -20,6 +20,16 @@
 -->
 # Release Notes
 
+### 1.6.2 (Feb 28, 2017)
+* [CB-12366](https://issues.apache.org/jira/browse/CB-12366) **iOS:** Reduce `tmpWindow` level to prevent overlapping statusbar
+* [CB-12364](https://issues.apache.org/jira/browse/CB-12364) **Windows:** `Inappbrowser` inject file manual tests are not working
+* [CB-12353](https://issues.apache.org/jira/browse/CB-12353) Corrected merges usage in `plugin.xml`
+* [CB-12369](https://issues.apache.org/jira/browse/CB-12369) Add plugin typings from `DefinitelyTyped`
+* [CB-12363](https://issues.apache.org/jira/browse/CB-12363) Added build badges for **iOS 9.3** and **iOS 10.0** 
+* [CB-9148](https://issues.apache.org/jira/browse/CB-9148) **Android:** Add Support for `input[type=file]` File Chooser
+* [CB-11136](https://issues.apache.org/jira/browse/CB-11136) (ios) Fix `InAppBrowser` when closing with `WKWebView`
+* [CB-10799](https://issues.apache.org/jira/browse/CB-10799) **iOS:** fix toolbar is shown in incorrect position when in-call status bar
+
 ### 1.6.1 (Dec 14, 2016)
 * [CB-12237](https://issues.apache.org/jira/browse/CB-12237) - Update version in package.json to correct 1.6.1-dev
 * [CB-12236](https://issues.apache.org/jira/browse/CB-12236) - Fixed RELEASENOTES for cordova-plugin-inappbrowser
