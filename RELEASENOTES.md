@@ -20,7 +20,7 @@
 -->
 # Release Notes
 
-### 1.6.2 (Feb 28, 2017)
+### 1.7.0 (Feb 28, 2017)
 * [CB-12366](https://issues.apache.org/jira/browse/CB-12366) **iOS:** Reduce `tmpWindow` level to prevent overlapping statusbar
 * [CB-12364](https://issues.apache.org/jira/browse/CB-12364) **Windows:** `Inappbrowser` inject file manual tests are not working
 * [CB-12353](https://issues.apache.org/jira/browse/CB-12353) Corrected merges usage in `plugin.xml`
