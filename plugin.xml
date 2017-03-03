@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-inappbrowser"
-      version="1.6.0-dev-cust">
+      version="1.7.0-dev-cust">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -211,7 +211,7 @@
             <clobbers target="window.open" />
         </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
+            <runs />
         </js-module>
         <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
     </platform>
@@ -226,7 +226,7 @@
             <clobbers target="window.open" />
         </js-module>
         <js-module src="src/firefoxos/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
+            <runs />
         </js-module>
     </platform>
 
@@ -237,7 +237,7 @@
             <clobbers target="window.open" />
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
+            <runs />
         </js-module>
     </platform>
 </plugin>

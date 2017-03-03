@@ -29,6 +29,7 @@
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
 #define    TOOLBAR_HEIGHT 44.0
+#define    STATUSBAR_HEIGHT 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
@@ -240,7 +241,38 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            [weakSelf.viewController presentViewController:nav animated:YES completion:nil];
+            CGRect frame = [[UIScreen mainScreen] bounds];
+            UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            UIViewController *tmpController = [[UIViewController alloc] init];
+            [tmpWindow setRootViewController:tmpController];
+            [tmpWindow setWindowLevel:UIWindowLevelNormal];
+
+            [tmpWindow makeKeyAndVisible];
+            [tmpController presentViewController:nav animated:YES completion:nil];
+        }
+    });
+}
+
+- (void)hide:(CDVInvokedUrlCommand*)command
+{
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to hide IAB after it was closed.");
+        return;
+
+
+    }
+    if (_previousStatusBarStyle == -1) {
+        NSLog(@"Tried to hide IAB while already hidden");
+        return;
+    }
+
+    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
+
+    // Run later to avoid the "took a long time" log message.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.inAppBrowserViewController != nil) {
+            _previousStatusBarStyle = -1;
+            [self.viewController dismissViewControllerAnimated:YES completion:nil];
         }
     });
 }
@@ -1072,11 +1104,11 @@
 
 - (void) viewDidLoad {
 
-    CGRect frame = [UIApplication sharedApplication].statusBarFrame;
-
+    CGRect statusBarFrame = [self invertFrameIfNeeded:[UIApplication sharedApplication].statusBarFrame];
+    statusBarFrame.size.height = STATUSBAR_HEIGHT;
     // simplified from: http://stackoverflow.com/a/25669695/219684
 
-    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:[self invertFrameIfNeeded:frame]];
+    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:statusBarFrame];
     bgToolbar.barStyle = UIBarStyleDefault;
     [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     [self.view addSubview:bgToolbar];

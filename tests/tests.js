@@ -26,6 +26,10 @@ var cordova = require('cordova');
 var isWindows = cordova.platformId == 'windows';
 
 window.alert = window.alert || navigator.notification.alert;
+if (isWindows && navigator && navigator.notification && navigator.notification.alert) {
+    // window.alert is defined but not functional on UWP
+    window.alert = navigator.notification.alert;
+}
 
 exports.defineAutoTests = function () {
 
