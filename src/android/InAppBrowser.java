@@ -774,6 +774,11 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
                 }
 
+//                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+//                    settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+//                    CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, true);
+//                }
+
                 String overrideUserAgent = preferences.getString("OverrideUserAgent", null);
                 String appendUserAgent = preferences.getString("AppendUserAgent", null);
 
@@ -1106,7 +1111,6 @@ public class InAppBrowser extends CordovaPlugin {
              * Else
              */
             else {
-
                 if (url.startsWith("intent")) {
                     try {
                         Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
@@ -1123,15 +1127,19 @@ public class InAppBrowser extends CordovaPlugin {
                         return false;
                     }
                 } else {
-                    Uri uri = Uri.parse(url);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    cordova.getActivity().startActivity(intent);
-                    return true;
+                    try {
+                        LOG.e("LOAD ===>", url);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        cordova.getActivity().startActivity(intent);
+                        return true;
+                    } catch (android.content.ActivityNotFoundException e) {
+                        LOG.e("error ===>", e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             }
             return false;
         }
-
 
         /*
          * onPageStarted fires the LOAD_START_EVENT

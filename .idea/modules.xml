@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cordova-plugin-inappbrowser.iml" filepath="$PROJECT_DIR$/cordova-plugin-inappbrowser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cordova-plugin-inappbrowser.iml" filepath="$PROJECT_DIR$/.idea/modules/cordova-plugin-inappbrowser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mylibrary/mylibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/mylibrary/mylibrary.iml" />
     </modules>
   </component>
 </project>

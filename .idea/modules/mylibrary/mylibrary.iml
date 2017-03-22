@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id=":mylibrary" external.linked.project.path="$MODULE_DIR$/../../../mylibrary" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="cordova-plugin-inappbrowser" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/../../../mylibrary/build/classes/main" />
+    <output-test url="file://$MODULE_DIR$/../../../mylibrary/build/classes/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../mylibrary">
+      <excludeFolder url="file://$MODULE_DIR$/../../../mylibrary/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../mylibrary/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
