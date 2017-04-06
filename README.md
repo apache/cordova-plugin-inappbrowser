@@ -312,7 +312,7 @@ function executeScriptCallBack(params) {
 
 - __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
 
-- __url__: the URL that was loaded. _(String)_
+- __url__: the URL that was loaded. _(String or Object of Location type for browser platform)_
 
 - __code__: the error code, only in the case of `loaderror`. _(Number)_
 
