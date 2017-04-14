@@ -70,19 +70,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-//Download Files imports
-import android.app.DownloadManager;
-import android.os.Environment;
-import android.webkit.DownloadListener;
-import android.webkit.URLUtil;
-import android.widget.Toast;
-
-import static android.content.Context.DOWNLOAD_SERVICE;
-
-//Permissions
-import android.content.pm.PackageManager;
-import android.support.v4.content.ContextCompat;
-
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -106,6 +93,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
 
     private InAppBrowserDialog dialog;
+    private InAppBrowserDownloads downloads;
     private WebView inAppWebView;
     private EditText edittext;
     private CallbackContext callbackContext;
@@ -852,53 +840,24 @@ public class InAppBrowser extends CordovaPlugin {
                     dialog.hide();
                 }
 
+                if (InAppBrowser.this.downloads == null) {
+                    InAppBrowser.this.downloads = new InAppBrowserDownloads(InAppBrowser.this);
+                }
+
                 inAppWebView.setDownloadListener(
-                    new DownloadListener() {
-                        public void onDownloadStart(String url, String userAgent,
-                                                    String contentDisposition, String mimetype,
-                                                    long contentLength) {
-                            if (isStoragePermissionGranted()) {
-                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                                try {
-                                    request.allowScanningByMediaScanner();
-                                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-                                    final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-                                    request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().toString(), filename);
-                                    DownloadManager dm = (DownloadManager) cordova.getActivity().getSystemService(DOWNLOAD_SERVICE);
-                                    dm.enqueue(request);
-                                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
-                                    intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
-                                    intent.setType("*/*");//any application,any extension
-                                    Toast.makeText(cordova.getActivity().getApplicationContext(), "Downloading File '" + filename + "'", Toast.LENGTH_LONG).show();
-                                } catch (Exception exception) {
-                                    Toast.makeText(cordova.getActivity().getApplicationContext(), "Error downloading file, missing storage permissions", Toast.LENGTH_LONG).show();
-                                    exception.printStackTrace();
-                                }
-                            }
-                        }
-                    });
+                    InAppBrowser.this.downloads
+                );
             }
         };
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
     }
 
-    /**
-     * Checks if the app has storage permissions and requests them if needed
-     * By ivanrb: https://github.com/apache/cordova-plugin-inappbrowser/pull/201
-     *
-     * @return boolean  the state of storage permissions
-     */
-    public boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (cordova.getActivity().checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                android.support.v4.app.ActivityCompat.requestPermissions(cordova.getActivity(), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                return false;
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            return true;
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+         int[] grantResults) throws JSONException
+    {
+        if (InAppBrowser.this.downloads != null) {
+            InAppBrowser.this.downloads.onRequestPermissionResult(requestCode, permissions, grantResults);
         }
     }
 
