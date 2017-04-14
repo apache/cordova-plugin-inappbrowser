@@ -76,7 +76,7 @@ public class InAppBrowserDownloads implements DownloadListener{
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
             final String filename = URLUtil.guessFileName(InAppBrowserDownloads.this.url, InAppBrowserDownloads.this.contentDisposition, InAppBrowserDownloads.this.mimetype);
-            request.setDestinationInExternalPublicDir(Environment.getDownloadCacheDirectory().toString(), filename);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
             DownloadManager dm = (DownloadManager) plugin.cordova.getActivity().getSystemService(DOWNLOAD_SERVICE);
             dm.enqueue(request);
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
