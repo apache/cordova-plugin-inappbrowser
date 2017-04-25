@@ -31,15 +31,15 @@ var browserWrap,
 
 function attachNavigationEvents(element, callback) {
     var onError = function () {
-        callback({ type: "loaderror", url: this.contentWindow.location}, {keepCallback: true});
+        callback({ type: "loaderror", url: this.contentWindow.location.href}, {keepCallback: true});
     };
 
     element.addEventListener("pageshow", function () {
-        callback({ type: "loadstart", url: this.contentWindow.location}, {keepCallback: true});
+        callback({ type: "loadstart", url: this.contentWindow.location.href}, {keepCallback: true});
     });
 
     element.addEventListener("load", function () {
-        callback({ type: "loadstop", url: this.contentWindow.location}, {keepCallback: true});
+        callback({ type: "loadstop", url: this.contentWindow.location.href}, {keepCallback: true});
     });
 
     element.addEventListener("error", onError);
