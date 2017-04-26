@@ -26,6 +26,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -41,6 +42,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
+import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -84,6 +86,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
+    private static final String VALIDATE_SSL = "validatessl";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
@@ -103,6 +106,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
+    private boolean validateSsl = true;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
     private ValueCallback<Uri> mUploadCallback;
@@ -529,6 +533,7 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+        validateSsl = true;
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
@@ -542,6 +547,10 @@ public class InAppBrowser extends CordovaPlugin {
             Boolean hidden = features.get(HIDDEN);
             if (hidden != null) {
                 openWindowHidden = hidden.booleanValue();
+            }
+            Boolean sslValidation = features.get(VALIDATE_SSL);
+            if(sslValidation != null) {
+            	validateSsl = sslValidation.booleanValue();
             }
             Boolean hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
@@ -772,6 +781,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 });
                 WebViewClient client = new InAppBrowserClient(thatWebView, edittext);
+                ((InAppBrowserClient) client).setSslValidationFlag(validateSsl);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -921,6 +931,7 @@ public class InAppBrowser extends CordovaPlugin {
     public class InAppBrowserClient extends WebViewClient {
         EditText edittext;
         CordovaWebView webView;
+        boolean validateSsl = true;
 
         /**
          * Constructor.
@@ -1075,6 +1086,20 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+        }
+
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+         if (this.validateSsl) {
+            super.onReceivedSslError(view, handler, error);
+         } else {
+            LOG.d(LOG_TAG, "Ignoring SSL certificate validation");
+            handler.proceed();
+         }
+        }
+
+        public void setSslValidationFlag(boolean flag) {
+         this.validateSsl = flag;
         }
 
         /**

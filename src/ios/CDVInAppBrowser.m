@@ -208,6 +208,8 @@
         self.inAppBrowserViewController.webView.keyboardDisplayRequiresUserAction = browserOptions.keyboarddisplayrequiresuseraction;
         self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
+    // SSL certificate error option
+    [self.inAppBrowserViewController setValidateSsl:browserOptions.validatessl];
 
     [self.inAppBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
@@ -256,16 +258,16 @@
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to hide IAB after it was closed.");
         return;
-
-
+        
+        
     }
     if (_previousStatusBarStyle == -1) {
         NSLog(@"Tried to hide IAB while already hidden");
         return;
     }
-
+    
     _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
-
+    
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
@@ -511,6 +513,8 @@
 @implementation CDVInAppBrowserViewController
 
 @synthesize currentURL;
+//@synthesize urlRequest;
+@synthesize validateSsl;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions
 {
@@ -660,7 +664,7 @@
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
     self.closeButton = nil;
-    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)];
     self.closeButton.enabled = YES;
     self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
@@ -895,11 +899,22 @@
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
+    BOOL isSecuredUrl = [[request.URL scheme] isEqualToString:@"https"];
 
     if (isTopLevelNavigation) {
         self.currentURL = request.URL;
     }
-    return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
+        if (isSecuredUrl && self.validateSsl == NO) {
+            // Ignore SSL certificate validation. This option can be used for loading self-signed https URLs
+            // in the InAppBrowser. Stop the default load request and load the URL through NSURLConnection
+            self.urlRequest = request;
+            NSURLConnection* connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+            NSLog(@"Ignoring SSL certificate validation and loading URL: %@", [[connection currentRequest] URL]);
+            return NO;
+        } else {
+            return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
+        }
+
 }
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
@@ -944,7 +959,22 @@
 
     [self.navigationDelegate webView:theWebView didFailLoadWithError:error];
 }
+# pragma mark - NSURLConnectionDataDelegate methods
 
+- (void) connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
+        [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+    }
+    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+}
+
+- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    self.validateSsl = YES;
+    [connection cancel];
+    [self.webView loadRequest:self.urlRequest];
+}
 #pragma mark CDVScreenOrientationDelegate
 
 - (BOOL)shouldAutorotate
@@ -994,6 +1024,7 @@
         self.keyboarddisplayrequiresuseraction = YES;
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
+	     self.validatessl = YES;
         self.disallowoverscroll = NO;
     }
 
@@ -1104,4 +1135,3 @@
 
 
 @end
-

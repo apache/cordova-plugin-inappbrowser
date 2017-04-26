@@ -62,25 +62,26 @@
 @property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
 @property (nonatomic, assign) BOOL suppressesincrementalrendering;
 @property (nonatomic, assign) BOOL hidden;
+@property (nonatomic, assign) BOOL validatessl;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
 @end
 
-@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate>{
+@interface CDVInAppBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, NSURLConnectionDataDelegate>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
     NSInteger _userAgentLockToken;
     CDVInAppBrowserOptions *_browserOptions;
-    
+
 #ifdef __CORDOVA_4_0_0
     CDVUIWebViewDelegate* _webViewDelegate;
 #else
     CDVWebViewDelegate* _webViewDelegate;
 #endif
-    
+
 }
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
@@ -94,6 +95,8 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
+@property (nonatomic, weak) NSURLRequest* urlRequest;
+@property (nonatomic, assign) BOOL validateSsl;
 
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
@@ -110,4 +113,3 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
-
