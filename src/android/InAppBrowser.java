@@ -1046,6 +1046,10 @@ public class InAppBrowser extends CordovaPlugin {
                 CookieSyncManager.getInstance().sync();
             }
 
+            // https://issues.apache.org/jira/browse/CB-11248
+            view.clearFocus();
+            view.requestFocus();
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_STOP_EVENT);

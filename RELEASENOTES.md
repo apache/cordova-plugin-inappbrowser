@@ -20,6 +20,12 @@
 -->
 # Release Notes
 
+### 1.7.1 (Apr 27, 2017)
+* [CB-12622](https://issues.apache.org/jira/browse/CB-12622) Added **Android 6.0** build badges to `README`
+* [CB-12266](https://issues.apache.org/jira/browse/CB-12266) (browser platform) loadstop event.url is now a string instead of an object, aligning it with the other platforms.
+* [CB-12685](https://issues.apache.org/jira/browse/CB-12685) added `package.json` to tests folder
+* [CB-11248](https://issues.apache.org/jira/browse/CB-11248) `InAppBrowser` no focus on input text fields
+
 ### 1.7.0 (Feb 28, 2017)
 * [CB-12366](https://issues.apache.org/jira/browse/CB-12366) **iOS:** Reduce `tmpWindow` level to prevent overlapping statusbar
 * [CB-12364](https://issues.apache.org/jira/browse/CB-12364) **Windows:** `Inappbrowser` inject file manual tests are not working
