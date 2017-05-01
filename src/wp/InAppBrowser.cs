@@ -254,7 +254,16 @@ namespace WPCordovaClassLib.Cordova.Commands
                 return;
             }
 
-            var file = await GetFile(pathUri.AbsolutePath.Replace('/', Path.DirectorySeparatorChar));
+            // Remove x-wmapp0 protocol, making this a relative URL, keeping the original path
+            const string IsolatedStorageProtocol = "x-wmapp0://";
+            if (url.StartsWith(IsolatedStorageProtocol, StringComparison.OrdinalIgnoreCase))
+            {
+                url = url.Substring(IsolatedStorageProtocol.Length);
+            }
+            url = url.Replace('/', Path.DirectorySeparatorChar);
+            url = url.Trim(Path.DirectorySeparatorChar); // Remove trailing and leading path separator chars
+
+            var file = await GetFile(url);
             if (file != null)
             {
                 await Launcher.LaunchFileAsync(file);
