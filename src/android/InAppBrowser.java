@@ -78,7 +78,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
     private static final String EXIT_EVENT = "exit";
-    private static final String LOCATION = "location";
+    private static final String LOCATION = null;
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
     private static final String LOAD_START_EVENT = "loadstart";
@@ -96,7 +96,7 @@ public class InAppBrowser extends CordovaPlugin {
     private WebView inAppWebView;
     private EditText edittext;
     private CallbackContext callbackContext;
-    private boolean showLocationBar = true;
+    private boolean showLocationBar = false;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
