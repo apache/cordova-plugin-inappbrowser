@@ -99,9 +99,9 @@ instance, or the system browser.
     - `_blank`: Opens in the `InAppBrowser`.
     - `_system`: Opens in the system's web browser.
 
-- __options__: Options for the `InAppBrowser`. Optional, defaulting to: `location=yes`. _(String)_
+- __options__: Options for the `InAppBrowser`. Optional, defaulting to: `{ location: 'yes' }`. _(Object)_
 
-    The `options` string must not contain any blank space, and each feature's name/value pairs must be separated by a comma. Feature names are case insensitive. All platforms support the value below:
+    All platforms support the value below:
 
     - __location__: Set to `yes` or `no` to turn the `InAppBrowser`'s location bar on or off.
 
