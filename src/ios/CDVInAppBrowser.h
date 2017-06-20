@@ -41,6 +41,7 @@
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
 - (void)unHide:(CDVInvokedUrlCommand*)command;
+- (void)update:(CDVInvokedUrlCommand*)command;
 
 @end
 

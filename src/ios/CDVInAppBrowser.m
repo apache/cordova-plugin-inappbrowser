@@ -560,6 +560,20 @@ BOOL canOpen = YES;
     [self openUrl:url targets:target withOptions:options];
 }
 
+- (void)updateView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options hide:(BOOL)hide {
+	if (!canOpen) {
+		return;
+	}
+
+	canOpen = NO;
+
+	if (!hide) {
+	    unhiding = YES;
+	}
+
+    [self openUrl:url targets:target withOptions:options];
+}
+
 
 #pragma mark public-methods
 
@@ -653,6 +667,16 @@ BOOL canOpen = YES;
 
     self.callbackId = command.callbackId;
     [self unHideView:url targets:target withOptions:options];
+}
+
+- (void)update:(CDVInvokedUrlCommand*)command {
+    NSString* url = [command argumentAtIndex:0];
+    NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
+    NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    BOOL hide = [[command argumentAtIndex:3] boolValue];
+
+    self.callbackId = command.callbackId;
+    [self updateView:url targets:target withOptions:options hide:hide];
 }
 
 @end

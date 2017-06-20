@@ -249,6 +249,18 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("update")) {
+            if (!canOpen) {
+                return true;
+            }
+
+            canOpen = false;
+            final String url = args.isNull(0) ? null : args.getString(0);
+            final boolean hide = args.isNull(1) ? false : args.getBoolean(1);
+            updateDialog(url, hide);
+            return true;
+        }
+
         return false;
     }
 
@@ -410,6 +422,42 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    private void updateDialog(final String url, final boolean hide) {
+        if (url == null || url.equals("") || url.equals(NULL)) {
+            addBridgeInterface();
+            showDialogue();
+            return;
+        }
+
+        if (!UrlSecurityValidation.shouldAllowRequest(webView, url)) {
+            return;
+        }
+
+        addBridgeInterface();
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (null == inAppWebView || null == inAppWebView.getUrl()) {
+                    return;
+                }
+
+                if (inAppWebView.getUrl().equals(url)) {
+                    //unhidden event & reset of hidden flag done in this method ...
+                    showDialogue();
+                } else {
+                    //unhidden event & reset of hidden flag done in onPageFinished which results from this navigate ...
+
+                    if (!hide) {
+                        reOpenOnNextPageFinished = true;
+                    }
+
+                    navigate(url);
+                }
+            }
+        });
+    }
 
 
     /**

@@ -79,6 +79,14 @@
             hidden = false;
         }
 
+        me.update = function (strUrl, hide) {
+            exec(null,null,"InAppBrowser", "update", [strUrl, hide]);
+
+            if (!hide) {
+                hidden = false;
+            }
+        };
+
         me.bridge = function (objectName, bridgeFunction) {
             exec(null, null, "InAppBrowser", "bridge", [objectName, bridgeFunction]);
         }
