@@ -136,14 +136,14 @@
             hidden = false;
         }
 
-        me.update = function (strUrl, hide) {
+        me.update = function (strUrl, show) {
             if (strUrl) {
                 lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
             }
 
-            exec(eventCallback, eventCallback, "InAppBrowser", "update", [lastUrl, lastWindowName, lastWindowFeatures, hide]);
+            exec(eventCallback, eventCallback, "InAppBrowser", "update", [lastUrl, lastWindowName, lastWindowFeatures, show]);
 
-            if (!hide) {
+            if (show) {
                 hidden = false;
             }
         };

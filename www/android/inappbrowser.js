@@ -79,10 +79,10 @@
             hidden = false;
         }
 
-        me.update = function (strUrl, hide) {
-            exec(null,null,"InAppBrowser", "update", [strUrl, hide]);
+        me.update = function (strUrl, show) {
+            exec(null,null,"InAppBrowser", "update", [strUrl, show]);
 
-            if (!hide) {
+            if (show) {
                 hidden = false;
             }
         };

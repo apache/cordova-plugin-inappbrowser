@@ -560,14 +560,14 @@ BOOL canOpen = YES;
     [self openUrl:url targets:target withOptions:options];
 }
 
-- (void)updateView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options hide:(BOOL)hide {
+- (void)updateView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options show:(BOOL)show {
 	if (!canOpen) {
 		return;
 	}
 
 	canOpen = NO;
 
-	if (!hide) {
+	if (show) {
 	    unhiding = YES;
 	}
 
@@ -673,10 +673,10 @@ BOOL canOpen = YES;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-    BOOL hide = [[command argumentAtIndex:3] boolValue];
+    BOOL show = [[command argumentAtIndex:3] boolValue];
 
     self.callbackId = command.callbackId;
-    [self updateView:url targets:target withOptions:options hide:hide];
+    [self updateView:url targets:target withOptions:options show:show];
 }
 
 @end

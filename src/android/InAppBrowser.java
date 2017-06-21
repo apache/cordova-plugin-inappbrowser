@@ -256,8 +256,8 @@ public class InAppBrowser extends CordovaPlugin {
 
             canOpen = false;
             final String url = args.isNull(0) ? null : args.getString(0);
-            final boolean hide = args.isNull(1) ? false : args.getBoolean(1);
-            updateDialog(url, hide);
+            final boolean show = args.isNull(1) ? false : args.getBoolean(1);
+            updateDialog(url, show);
             return true;
         }
 
@@ -422,7 +422,7 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
-    private void updateDialog(final String url, final boolean hide) {
+    private void updateDialog(final String url, final boolean show) {
         if (url == null || url.equals("") || url.equals(NULL)) {
             addBridgeInterface();
             showDialogue();
@@ -449,7 +449,7 @@ public class InAppBrowser extends CordovaPlugin {
                 } else {
                     //unhidden event & reset of hidden flag done in onPageFinished which results from this navigate ...
 
-                    if (!hide) {
+                    if (show) {
                         reOpenOnNextPageFinished = true;
                     }
 
