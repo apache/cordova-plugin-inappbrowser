@@ -562,7 +562,7 @@ BOOL canOpen = YES;
 
 - (void)updateView:(NSString*)url targets:(NSString*)target withOptions:(NSString*)options show:(BOOL)show {
 	if (!canOpen) {
-		return;
+	    return;
 	}
 
 	canOpen = NO;
@@ -676,6 +676,7 @@ BOOL canOpen = YES;
     BOOL show = [[command argumentAtIndex:3] boolValue];
 
     self.callbackId = command.callbackId;
+
     [self updateView:url targets:target withOptions:options show:show];
 }
 
