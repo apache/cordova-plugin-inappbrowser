@@ -426,7 +426,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     private void updateDialog(final String url, final boolean show) {
-        if (url == null || url.equals("") || url.equals(NULL)) {
+        if (null == url || url.trim().isEmpty()) {
             addBridgeInterface();
 
             if (show) {
