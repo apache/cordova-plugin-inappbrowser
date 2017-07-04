@@ -143,7 +143,6 @@
     }
 
     if (browserOptions.clearurlcache) {
-       // clearSharedUrlCache()
         [self clearurlcache:self.webview];
     }
 
@@ -1006,8 +1005,6 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
-
-        // [[NSURLCache sharedURLCache] removeAllCachedResponses];
     }
 
     return self;
