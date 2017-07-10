@@ -25,14 +25,12 @@ matrix:
     android:
       components:
       - tools
-      - tools
   - env: PLATFORM=android-5.1
     os: linux
     language: android
     jdk: oraclejdk8
     android:
       components:
-      - tools
       - tools
   - env: PLATFORM=android-6.0
     os: linux
@@ -41,14 +39,12 @@ matrix:
     android:
       components:
       - tools
-      - tools
   - env: PLATFORM=android-7.0
     os: linux
     language: android
     jdk: oraclejdk8
     android:
       components:
-      - tools
       - tools
 before_install:
 - npm cache clean -f
