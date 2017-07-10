@@ -136,6 +136,18 @@
             hidden = false;
         }
 
+        me.update = function (strUrl, show) {
+            if (strUrl) {
+                lastUrl = urlutil.makeAbsolute(strUrl) || lastUrl || 'about:blank';
+            }
+
+            exec(eventCallback, eventCallback, "InAppBrowser", "update", [lastUrl, lastWindowName, lastWindowFeatures, show]);
+
+            if (show) {
+                hidden = false;
+            }
+        };
+
         me.addEventListener = function (eventname,f) {
             if (eventname in me.channels) {
                 me.channels[eventname].subscribe(f);

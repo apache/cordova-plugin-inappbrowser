@@ -249,6 +249,21 @@ public class InAppBrowser extends CordovaPlugin {
             return true;
         }
 
+        if (action.equals("update")) {
+            if (!canOpen) {
+                return true;
+            }
+
+            canOpen = false;
+
+            final String url = args.isNull(0) ? null : args.getString(0);
+            final boolean show = args.isNull(1) ? true : args.getBoolean(1);
+
+            updateDialog(url, show);
+
+            return true;
+        }
+
         return false;
     }
 
@@ -410,6 +425,44 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    private void updateDialog(final String url, final boolean show) {
+        if (null == url || url.trim().isEmpty()) {
+            addBridgeInterface();
+
+            if (show) {
+                showDialogue();
+            }
+
+            return;
+        }
+
+        if (!UrlSecurityValidation.shouldAllowRequest(webView, url)) {
+            return;
+        }
+
+        addBridgeInterface();
+
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (null == inAppWebView || null == inAppWebView.getUrl()) {
+                    return;
+                }
+
+                if (inAppWebView.getUrl().equals(url)) {
+                    if (show) {
+                        showDialogue();
+                    }
+                } else {
+                    if (show) {
+                        reOpenOnNextPageFinished = true;
+                    }
+
+                    navigate(url);
+                }
+            }
+        });
+    }
 
 
     /**
