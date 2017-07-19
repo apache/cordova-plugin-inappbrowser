@@ -452,6 +452,9 @@ public class InAppBrowser extends CordovaPlugin {
                 if (inAppWebView.getUrl().equals(url)) {
                     if (show) {
                         showDialogue();
+                    } else {
+                        browserEventSender.loadStop(url);
+                        canOpen = true;
                     }
                 } else {
                     if (show) {
