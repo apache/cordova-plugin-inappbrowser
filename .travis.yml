@@ -8,6 +8,22 @@ env:
   - TRAVIS_NODE_VERSION="4.2"
 matrix:
   include:
+  - env: PLATFORM=browser-chrome
+    os: linux
+    language: node_js
+    node_js: '4.2'
+  - env: PLATFORM=browser-firefox
+    os: linux
+    language: node_js
+    node_js: '4.2'
+  - env: PLATFORM=browser-safari
+    os: linux
+    language: node_js
+    node_js: '4.2'
+  - env: PLATFORM=browser-edge
+    os: linux
+    language: node_js
+    node_js: '4.2'
   - env: PLATFORM=ios-9.3
     os: osx
     osx_image: xcode7.3
