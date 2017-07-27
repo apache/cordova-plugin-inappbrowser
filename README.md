@@ -144,12 +144,12 @@ instance, or the system browser.
 - Amazon Fire OS
 - Android
 - BlackBerry 10
+- Browser
 - Firefox OS
 - iOS
 - OSX
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Example
 
@@ -323,10 +323,10 @@ function executeScriptCallBack(params) {
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Browser Quirks
 
@@ -359,10 +359,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Quick Example
 
@@ -383,11 +383,11 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - Firefox OS
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Quick Example
 
@@ -406,9 +406,9 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
-- Browser
 
 ### Quick Example
 
@@ -460,9 +460,9 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
-- Browser
 
 ### Quick Example
 
