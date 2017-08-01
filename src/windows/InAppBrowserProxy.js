@@ -135,7 +135,12 @@ var IAB = {
 
             if (target === "_system") {
                 url = new Windows.Foundation.Uri(strUrl);
-                Windows.System.Launcher.launchUriAsync(url);
+                var options = new Windows.System.LauncherOptions();
+                if (url.schemeName === 'data') {
+                    options.contentType = "text/html";
+                }
+
+                Windows.System.Launcher.launchUriAsync(url, options);
             } else if (target === "_self" || !target) {
                 window.location = strUrl;
             } else {

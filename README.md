@@ -710,3 +710,18 @@ iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in th
 iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```
+
+### Data Urls (format: data:[<mediatype>][;base64],<data>)
+
+Supported by android, windows and browser platforms 
+```
+var iab = cordova.InAppbrowser;
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E');                  // loads in the Cordova WebView (android, browser) 
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E', '_self');         // loads in the Cordova WebView (android, browser) 
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E', '_system');       // loads in the system browser
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E', '_blank');        // loads in the InAppBrowser (android, browser)
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E', 'random_string'); // loads in the InAppBrowser (android, browser)
+iab.open('data:text/html,%3Ch1%3EHello%2C%20World!%3C%2Fh1%3E', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar (android, browser)
+
+```  
+
