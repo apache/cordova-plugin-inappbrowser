@@ -31,15 +31,30 @@ var browserWrap,
 
 function attachNavigationEvents(element, callback) {
     var onError = function () {
-        callback({ type: "loaderror", url: this.contentWindow.location.href}, {keepCallback: true});
+        try {
+            callback({ type: "loaderror", url: this.contentWindow.location.href}, {keepCallback: true});
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: "loaderror", url: null}, {keepCallback: true});
+        }
     };
 
     element.addEventListener("pageshow", function () {
-        callback({ type: "loadstart", url: this.contentWindow.location.href}, {keepCallback: true});
+        try {
+            callback({ type: "loadstart", url: this.contentWindow.location.href}, {keepCallback: true});
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: "loadstart", url: null}, {keepCallback: true});
+        }
     });
 
     element.addEventListener("load", function () {
-        callback({ type: "loadstop", url: this.contentWindow.location.href}, {keepCallback: true});
+        try {
+            callback({ type: "loadstop", url: this.contentWindow.location.href}, {keepCallback: true});
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: "loadstop", url: null}, {keepCallback: true});
+        }
     });
 
     element.addEventListener("error", onError);
@@ -49,7 +64,8 @@ function attachNavigationEvents(element, callback) {
 var IAB = {
     close: function (win, lose) {
         if (browserWrap) {
-            if (win) win({ type: "exit" });
+            // use the "open" function callback so that the exit event is fired properly
+            if (IAB._win) IAB._win({ type: "exit" });
 
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
@@ -67,6 +83,8 @@ var IAB = {
         var strUrl = args[0],
             target = args[1],
             features = args[2];
+
+        IAB._win = win;
 
         if (target === "_self" || !target) {
             window.location = strUrl;
@@ -88,7 +106,7 @@ var IAB = {
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
-                        IAB.close(win);
+                        IAB.close();
                     }, 0);
                 };
 
@@ -161,7 +179,7 @@ var IAB = {
                 closeButton.innerHTML = "✖";
                 closeButton.addEventListener("click", function (e) {
                     setTimeout(function () {
-                        IAB.close(win);
+                        IAB.close();
                     }, 0);
                 });
 

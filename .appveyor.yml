@@ -15,7 +15,8 @@ environment:
   nodejs_version: "4"
   matrix:
     - PLATFORM: windows-10-store
-
+      JUST_BUILD: --justBuild
+    - PLATFORM: local\browser
 install:
   - npm cache clean -f
   - node --version
@@ -25,4 +26,4 @@ install:
 build: off
 
 test_script:
-  - cordova-paramedic --config pr\%PLATFORM% --plugin . --justBuild
+  - cordova-paramedic --config pr\%PLATFORM% --plugin . %JUST_BUILD%

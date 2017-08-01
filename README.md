@@ -21,9 +21,9 @@ description: Open an in-app browser window.
 #         under the License.
 -->
 
-|Android 4.4|Android 5.1|Android 6.0|iOS 9.3|iOS 10.0|Windows 10 Store|Travis CI|
-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=android-4.4,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=android-4.4,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=android-5.1,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=android-5.1,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=android-6.0,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=android-6.0,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=ios-9.3,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=ios-9.3,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=ios-10.0,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=ios-10.0,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](http://cordova-ci.cloudapp.net:8080/buildStatus/icon?job=cordova-periodic-build/PLATFORM=windows-10-store,PLUGIN=cordova-plugin-inappbrowser)](http://cordova-ci.cloudapp.net:8080/job/cordova-periodic-build/PLATFORM=windows-10-store,PLUGIN=cordova-plugin-inappbrowser/)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
+|AppVeyor|Travis CI|
+|:-:|:-:|
+|[![Build status](https://ci.appveyor.com/api/projects/status/github/apache/cordova-plugin-inappbrowser?branch=master)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-plugin-inappbrowser)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
 
 # cordova-plugin-inappbrowser
 
@@ -66,7 +66,7 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
         console.log("window.open works well");
     }
 
-Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Plugin%20InAppBrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
+Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22cordova-plugin-inappbrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
 
 
 ## <a id="reference">Reference</a>
@@ -147,12 +147,12 @@ instance, or the system browser.
 - Amazon Fire OS
 - Android
 - BlackBerry 10
+- Browser
 - Firefox OS
 - iOS
 - OSX
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Example
 
@@ -326,10 +326,10 @@ function executeScriptCallBack(params) {
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Browser Quirks
 
@@ -362,10 +362,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Quick Example
 
@@ -386,11 +386,11 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - Firefox OS
 - iOS
 - Windows 8 and 8.1
 - Windows Phone 7 and 8
-- Browser
 
 ### Quick Example
 
@@ -409,9 +409,9 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
-- Browser
 
 ### Quick Example
 
@@ -463,9 +463,9 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Amazon Fire OS
 - Android
+- Browser
 - iOS
 - Windows 8 and 8.1
-- Browser
 
 ### Quick Example
 

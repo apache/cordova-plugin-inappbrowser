@@ -23,7 +23,8 @@
 /* global MSApp */
 
 var cordova = require('cordova');
-var isWindows = cordova.platformId == 'windows';
+var isWindows = cordova.platformId === 'windows';
+var isBrowser = cordova.platformId === 'browser';
 
 window.alert = window.alert || navigator.notification.alert;
 if (isWindows && navigator && navigator.notification && navigator.notification.alert) {
@@ -80,7 +81,8 @@ exports.defineAutoTests = function () {
         function verifyEvent(evt, type) {
             expect(evt).toBeDefined();
             expect(evt.type).toEqual(type);
-            if (type !== 'exit') { // `exit` event does not have url field
+            // `exit` event does not have url field, browser returns null url for CORS requests
+            if (type !== 'exit' && !isBrowser) {
                 expect(evt.url).toEqual(url);
             }
         }
@@ -93,7 +95,7 @@ exports.defineAutoTests = function () {
             expect(evt.message).toEqual(jasmine.any(String));
         }
 
-        it("inappbrowser.spec.3 should retun InAppBrowser instance with required methods", function () {
+        it("inappbrowser.spec.3 should return InAppBrowser instance with required methods", function () {
             iabInstance = cordova.InAppBrowser.open(url, '_blank');
 
             expect(iabInstance).toBeDefined();
@@ -116,7 +118,11 @@ exports.defineAutoTests = function () {
             iabInstance.addEventListener('loadstart', onLoadStart);
             iabInstance.addEventListener('loadstop', function (evt) {
                 verifyEvent(evt, 'loadstop');
-                expect(onLoadStart).toHaveBeenCalled();
+                if (!isBrowser) {
+                    // according to documentation, "loadstart" event is not supported on browser
+                    // https://github.com/apache/cordova-plugin-inappbrowser#browser-quirks-1
+                    expect(onLoadStart).toHaveBeenCalled();
+                }
                 done();
             });
         });
@@ -132,6 +138,11 @@ exports.defineAutoTests = function () {
         });
 
         it("inappbrowser.spec.6 should support loaderror event", function (done) {
+            if (isBrowser) {
+                // according to documentation, "loaderror" event is not supported on browser
+                // https://github.com/apache/cordova-plugin-inappbrowser#browser-quirks-1
+                pending('Browser platform doesn\'t support loaderror event');
+            }
             iabInstance = cordova.InAppBrowser.open(badUrl, '_blank');
             iabInstance.addEventListener('loaderror', function (evt) {
                 verifyLoadErrorEvent(evt);
