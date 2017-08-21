@@ -67,7 +67,10 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -122,12 +125,30 @@ public class InAppBrowser extends CordovaPlugin {
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
+            String domain = url;
+            try {
+                domain = new URL(url).getProtocol() + "://" + new URL(url).getHost();
+            } catch (MalformedURLException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
                 t = SELF;
             }
             final String target = t;
             final HashMap<String, Boolean> features = parseFeature(args.optString(2));
+            final JSONObject cookies = args.getJSONObject(3);
+
+            if (null != cookies) {
+                Iterator<?> cookiesNames = cookies.keys();
+                while (cookiesNames.hasNext()) {
+                    String key = (String)cookiesNames.next();
+                    CookieManager.getInstance().setCookie(domain, key + "=" + cookies.get(key));
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        CookieSyncManager.getInstance().sync();
+                    }
+                }
+            }
 
             LOG.d(LOG_TAG, "target = " + target);
 
