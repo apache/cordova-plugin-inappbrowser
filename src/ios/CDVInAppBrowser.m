@@ -84,6 +84,7 @@
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    NSDictionary* cookies = [command argumentAtIndex:3];
 
     self.callbackId = command.callbackId;
 
@@ -100,11 +101,11 @@
         }
 
         if ([target isEqualToString:kInAppBrowserTargetSelf]) {
-            [self openInCordovaWebView:absoluteUrl withOptions:options];
+            [self openInCordovaWebView:absoluteUrl withOptions:options withCookies:cookies];
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
         } else { // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
+            [self openInInAppBrowser:absoluteUrl withOptions:options withCookies:cookies];
         }
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -116,7 +117,7 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
+- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options withCookies:(NSDictionary*)cookies
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
 
@@ -139,6 +140,21 @@
             if (![cookie.domain isEqual: @".^filecookies^"] && cookie.isSessionOnly) {
                 [storage deleteCookie:cookie];
             }
+        }
+    }
+    
+    if (cookies != nil) {
+        for (id key in cookies) {
+            //key = [cookies objectForKey:key];
+            NSDictionary *cookieProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        url.host, NSHTTPCookieDomain,
+                                        key, NSHTTPCookieName,
+                                        [cookies objectForKey:key], NSHTTPCookieValue,
+                                        nil];
+            NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
+            NSLog(@"\nurl: %@\ncookie: %@", url, cookie);
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            
         }
     }
 
@@ -275,7 +291,7 @@
     });
 }
 
-- (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
+- (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options withCookies:(NSDictionary*)cookies
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
 
@@ -287,7 +303,7 @@
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         [self.webView loadRequest:request];
     } else { // this assumes the InAppBrowser can be excepted from the white-list
-        [self openInInAppBrowser:url withOptions:options];
+        [self openInInAppBrowser:url withOptions:options withCookies:cookies];
     }
 #endif
 }
