@@ -148,6 +148,7 @@
             //key = [cookies objectForKey:key];
             NSDictionary *cookieProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                         url.host, NSHTTPCookieDomain,
+										@"/", NSHTTPCookiePath,
                                         key, NSHTTPCookieName,
                                         [cookies objectForKey:key], NSHTTPCookieValue,
                                         nil];
