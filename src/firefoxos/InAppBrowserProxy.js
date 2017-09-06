@@ -32,7 +32,7 @@ var IABExecs = {
         if (browserWrap) {
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
-            if (typeof(win) == "function") win({type:'exit'});
+            if (typeof (win) === 'function') win({type: 'exit'});
         }
     },
 
@@ -48,17 +48,17 @@ var IABExecs = {
     },
 
     open: function (win, lose, args) {
-        var strUrl = args[0],
-            target = args[1],
-            features_string = args[2] || "location=yes", //location=yes is default
-            features = {};
+        var strUrl = args[0];
+        var target = args[1];
+        var features_string = args[2] || 'location=yes'; // location=yes is default
+        var features = {};
 
         var features_list = features_string.split(',');
-        features_list.forEach(function(feature) {
+        features_list.forEach(function (feature) {
             var tup = feature.split('=');
-            if (tup[1] == 'yes') {
+            if (tup[1] === 'yes') {
                 tup[1] = true;
-            } else if (tup[1] == 'no') {
+            } else if (tup[1] === 'no') {
                 tup[1] = false;
             } else {
                 var number = parseInt(tup[1]);
@@ -68,8 +68,7 @@ var IABExecs = {
             }
             features[tup[0]] = tup[1];
         });
-
-        function updateIframeSizeNoLocation() {
+        function updateIframeSizeNoLocation () {
             browserWrap.style.width = window.innerWidth + 'px';
             browserWrap.style.height = window.innerHeight + 'px';
             browserWrap.style.zIndex = '999999999';
@@ -117,7 +116,7 @@ var IABExecs = {
 
             var checkForwardBackward = function () {
                 var backReq = browserElem.getCanGoBack();
-                backReq.onsuccess = function() {
+                backReq.onsuccess = function () {
                     if (this.result) {
                         back.classList.remove('disabled');
                     } else {
@@ -125,7 +124,7 @@ var IABExecs = {
                     }
                 };
                 var forwardReq = browserElem.getCanGoForward();
-                forwardReq.onsuccess = function() {
+                forwardReq.onsuccess = function () {
                     if (this.result) {
                         forward.classList.remove('disabled');
                     } else {
@@ -158,21 +157,21 @@ var IABExecs = {
             browserWrap.appendChild(browserElem);
             document.body.appendChild(browserWrap);
 
-            //we use mozbrowserlocationchange instead of mozbrowserloadstart to get the url
-            browserElem.addEventListener('mozbrowserlocationchange', function(e){
+            // we use mozbrowserlocationchange instead of mozbrowserloadstart to get the url
+            browserElem.addEventListener('mozbrowserlocationchange', function (e) {
                 win({
-                    type:'loadstart',
-                    url : e.detail
+                    type: 'loadstart',
+                    url: e.detail
                 });
             }, false);
-            browserElem.addEventListener('mozbrowserloadend', function(e){
-                win({type:'loadstop'});
+            browserElem.addEventListener('mozbrowserloadend', function (e) {
+                win({type: 'loadstop'});
             }, false);
-            browserElem.addEventListener('mozbrowsererror', function(e){
-                win({type:'loaderror'});
+            browserElem.addEventListener('mozbrowsererror', function (e) {
+                win({type: 'loaderror'});
             }, false);
-            browserElem.addEventListener('mozbrowserclose', function(e){
-                win({type:'exit'});
+            browserElem.addEventListener('mozbrowserclose', function (e) {
+                win({type: 'exit'});
             }, false);
         } else {
             window.location = strUrl;
