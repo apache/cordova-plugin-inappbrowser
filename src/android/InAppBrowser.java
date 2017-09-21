@@ -70,6 +70,15 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+//Download Files imports
+import android.app.DownloadManager;
+import android.os.Environment;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
+import android.widget.Toast;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
+
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -847,6 +856,26 @@ public class InAppBrowser extends CordovaPlugin {
                 if(openWindowHidden) {
                     dialog.hide();
                 }
+		
+		inAppWebView.setDownloadListener(new DownloadListener() {
+                public void onDownloadStart(String url, String userAgent,
+                                            String contentDisposition, String mimetype,
+                                            long contentLength) {
+                  DownloadManager.Request request = new DownloadManager.Request(
+                    Uri.parse(url));
+
+                  request.allowScanningByMediaScanner();
+                  request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+                  final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+                  request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                  DownloadManager dm = (DownloadManager) cordova.getActivity().getSystemService(DOWNLOAD_SERVICE);
+                  dm.enqueue(request);
+                  Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
+                  intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
+                  intent.setType("*/*");//any application,any extension
+                  Toast.makeText(cordova.getActivity().getApplicationContext(), "Downloading File '" + filename + "'", Toast.LENGTH_LONG).show();
+                }
+              });
             }
         };
         this.cordova.getActivity().runOnUiThread(runnable);
