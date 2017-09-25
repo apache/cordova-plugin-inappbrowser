@@ -107,6 +107,7 @@
         };
 
         strWindowFeatures = strWindowFeatures || "";
+		cookies = cookies || {};
 
         exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures, cookies]);
         return iab;
