@@ -124,11 +124,13 @@
                 <param name="ios-package" value="CDVInAppBrowser" />
             </feature>
         </config-file>
+        
+        <dependency id="cordova-plugin-wkwebview-engine" version="1" />
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
-	    <source-file src="src/ios/CDVInAppBrowser.m" />
+        <source-file src="src/ios/CDVInAppBrowser.m" />
 
-	    <framework src="CoreGraphics.framework" />
+        <framework src="CoreGraphics.framework" />
     </platform>
 
     <!-- osx -->
