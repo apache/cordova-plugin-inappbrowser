@@ -41,12 +41,16 @@ matrix:
     android:
       components:
       - tools
+      - platform-tools
+      - tools
   - env: PLATFORM=android-5.1
     os: linux
     language: android
     jdk: oraclejdk8
     android:
       components:
+      - tools
+      - platform-tools
       - tools
   - env: PLATFORM=android-6.0
     os: linux
@@ -55,12 +59,16 @@ matrix:
     android:
       components:
       - tools
+      - platform-tools
+      - tools
   - env: PLATFORM=android-7.0
     os: linux
     language: android
     jdk: oraclejdk8
     android:
       components:
+      - tools
+      - platform-tools
       - tools
 before_install:
 - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm
