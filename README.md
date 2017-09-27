@@ -57,7 +57,7 @@ plugin).  The hook of `window.open` will be removed in a future major release.
 Until the hook is removed from the plugin, apps can manually restore the default
 behaviour:
 
-    delete window.open // Reverts the call back to it's prototype's default
+    delete window.open // Reverts the call back to its prototype's default
 
 Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
 
