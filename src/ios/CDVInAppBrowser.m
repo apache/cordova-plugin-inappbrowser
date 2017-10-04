@@ -162,8 +162,8 @@
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
-    if (browserOptions.closebuttoncaption != nil) {
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
+    if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
+        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption :browserOptions.closebuttoncolor];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -599,6 +599,12 @@
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
+    if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
+      self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+    }
+    if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
+      self.toolbar.translucent = NO;
+    }
 
     CGFloat labelInset = 5.0;
     float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
@@ -642,7 +648,13 @@
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
 
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    // Filter out Navigation Buttons if user requests so
+    if (_browserOptions.hideToolbarNavigationButtons) {
+      [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+    } else {
+      [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    }
+    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
@@ -655,14 +667,16 @@
     [self.webView setFrame:frame];
 }
 
-- (void)setCloseButtonTitle:(NSString*)title
+- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString
 {
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
     self.closeButton = nil;
-    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    // Initialize with title if title is set, otherwise the title will be 'Done' localized
+    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
-    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
+    // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
+    self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:0 withObject:self.closeButton];
@@ -877,6 +891,17 @@
     }
 }
 
+// Helper function to convert hex color string to UIColor
+// Assumes input like "#00FF00" (#RRGGBB).
+// Taken from https://stackoverflow.com/questions/1560081/how-can-i-create-a-uicolor-from-a-hex-string
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
+
 #pragma mark UIWebViewDelegate
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView
@@ -995,6 +1020,10 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
+        self.hideToolbarNavigationButtons = NO;
+        self.closebuttoncolor = nil;
+        self.toolbarcolor = nil;
+        self.toolbartranslucent = YES;
     }
 
     return self;
@@ -1104,4 +1133,3 @@
 
 
 @end
-
