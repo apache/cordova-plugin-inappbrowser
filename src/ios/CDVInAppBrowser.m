@@ -649,7 +649,7 @@
     self.backButton.imageInsets = UIEdgeInsetsZero;
 
     // Filter out Navigation Buttons if user requests so
-    if (_browserOptions.hidetoolbarnavigationbuttons) {
+    if (_browserOptions.hidenavigationbuttons) {
       [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
     } else {
       [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
@@ -1020,7 +1020,7 @@
         self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
-        self.hideToolbarnavigationbuttons = NO;
+        self.hidenavigationbuttons = NO;
         self.closebuttoncolor = nil;
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
