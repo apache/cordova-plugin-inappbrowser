@@ -53,7 +53,7 @@
 @property (nonatomic, copy) NSString* toolbarposition;
 @property (nonatomic, copy) NSString* toolbarcolor;
 @property (nonatomic, assign) BOOL toolbartranslucent;
-@property (nonatomic, assign) BOOL hideToolbarNavigationButtons;
+@property (nonatomic, assign) BOOL hidetoolbarnavigationbuttons;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 
