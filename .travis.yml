@@ -77,7 +77,7 @@ before_install:
 - node --version
 - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
 - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
-- if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25;
+- if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25,android-26;
   fi
 - git clone https://github.com/apache/cordova-paramedic /tmp/paramedic && pushd /tmp/paramedic
   && npm install && popd
