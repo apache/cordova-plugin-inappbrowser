@@ -84,6 +84,24 @@
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
+        },
+
+        //Gets cookie by Domain from the inAppWebView and adds it to the cordovaWebView.
+        getCookies: function(cookieDetails, cb) {
+            if(cookieDetails.url) {
+                exec(cb, null, "InAppBrowser", "getCookies", [cookieDetails.url, !!cb])
+            } else {
+                throw new Error('getCookie requires a url to be specified')
+            }
+        },
+
+        //Gets cookie by Domain from the cordovaWebView and adds it to the inAppWebView.
+        setCookies: function(cookieDtails, cb) {
+            if(cookieDetails.url) {
+                exec(cb, null, "InAppBrowser", "setCookies", [cookieDetails.url, !!cb])
+            } else {
+                throw new Error('setCookie requires a url to be specified')
+            }
         }
     };
 
