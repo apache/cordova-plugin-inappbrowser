@@ -123,6 +123,7 @@ instance, or the system browser.
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened    
+    - __closebutton__: set to `yes` or `no` to turn the close button on or off for the InAppBrowser's toolbar (defaults to `yes`)
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
     - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
     - __toolbar__:  set to `yes` or `no` to turn the toolbar on or off for the InAppBrowser (defaults to `yes`)
