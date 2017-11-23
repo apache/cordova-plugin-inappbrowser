@@ -16,7 +16,6 @@ environment:
   matrix:
     - PLATFORM: windows-10-store
       JUST_BUILD: --justBuild
-    - PLATFORM: local\browser
 install:
   - npm cache clean -f
   - node --version
