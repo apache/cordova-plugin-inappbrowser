@@ -19,7 +19,7 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="cordova-plugin-inappbrowser"
+           id="thalys-plugin-inappbrowser"
       version="1.7.3-dev">
 
     <name>Thalys InAppBrowser</name>
