@@ -81,6 +81,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
+    private static final String THALYS_EVENT = "thalys";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -1036,6 +1037,27 @@ public class InAppBrowser extends CordovaPlugin {
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+            }
+        }
+
+        /*
+        * onLoadResource fires the THALYS_EVENT
+        *
+        * @param view
+        * @param url
+        */
+        @Override
+        public void onLoadResource(WebView view, String url) {
+            super.onLoadResource(view, url);
+            if (url.startsWith("http://cordova-thalys") || url.startsWith("https://cordova-thalys")) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", THALYS_EVENT);
+                    obj.put("url", url);
+                    sendUpdate(obj, true);
+                } catch (JSONException ex) {
+                    LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+                }
             }
         }
 
