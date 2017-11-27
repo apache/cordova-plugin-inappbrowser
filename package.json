@@ -1,10 +1,10 @@
 {
-  "name": "thalys-plugin-inappbrowser",
+  "name": "cordova-plugin-inappbrowser",
   "version": "1.7.3-dev",
   "description": "Thalys InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "thalys-plugin-inappbrowser",
+    "id": "cordova-plugin-inappbrowser",
     "platforms": [
       "android",
       "amazon-fireos",
