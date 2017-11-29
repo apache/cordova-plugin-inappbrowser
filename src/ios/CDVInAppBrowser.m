@@ -448,7 +448,7 @@
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
-    else if ((self.callbackId != nil) && ([request.URL hasPrefix:@"http://cordova-thalys"] || [request.URL hasPrefix:@"https://cordova-thalys"])) {
+    else if ((self.callbackId != nil) && ([url.absoluteString hasPrefix:@"http://cordova-thalys"] || [url.absoluteString hasPrefix:@"https://cordova-thalys"])) {
         // Send a thalys event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"thalys", @"url":[url absoluteString]}];
