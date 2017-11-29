@@ -106,6 +106,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
+    private boolean canCloseBrowser = true;
     private ValueCallback<Uri> mUploadCallback;
     private ValueCallback<Uri[]> mUploadCallbackLollipop;
     private final static int FILECHOOSER_REQUESTCODE = 1;
@@ -477,8 +478,8 @@ public class InAppBrowser extends CordovaPlugin {
     public boolean hardwareBack() {
         return hadwareBackButton;
     }
-    public boolean canClose() {
-        return canClose;
+    public boolean canCloseBrowser() {
+        return canCloseBrowser;
     }
 
     /**
@@ -575,6 +576,9 @@ public class InAppBrowser extends CordovaPlugin {
 		            useWideViewPort = wideViewPort.booleanValue();
             }
             Boolean canClose = features.get(CAN_CLOSE);
+            if(canClose != null){
+                canCloseBrowser = canClose;
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
