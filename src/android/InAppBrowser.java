@@ -87,6 +87,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
+    private static final String CAN_CLOSE    ="canclose"
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
@@ -476,6 +477,9 @@ public class InAppBrowser extends CordovaPlugin {
     public boolean hardwareBack() {
         return hadwareBackButton;
     }
+    public boolean canClose() {
+        return canClose;
+    }
 
     /**
      * Checks to see if it is possible to go forward one page in history, then does so.
@@ -570,6 +574,7 @@ public class InAppBrowser extends CordovaPlugin {
             if (wideViewPort != null ) {
 		            useWideViewPort = wideViewPort.booleanValue();
             }
+            Boolean canClose = features.get(CAN_CLOSE);
         }
 
         final CordovaWebView thatWebView = this.webView;
