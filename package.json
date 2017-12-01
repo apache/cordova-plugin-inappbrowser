@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-inappbrowser",
   "version": "1.7.3-dev",
-  "description": "Cordova InAppBrowser Plugin",
+  "description": "Thalys InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
     "id": "cordova-plugin-inappbrowser",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
+    "url": "https://github.com/THI-F/cordova-plugin-inappbrowser"
   },
   "bugs": {
     "url": "https://issues.apache.org/jira/browse/CB"

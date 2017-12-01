@@ -81,6 +81,8 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
+    private static final String THALYS_EVENT = "thalys";
+    private static final String BACK_EVENT = "back";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -456,17 +458,44 @@ public class InAppBrowser extends CordovaPlugin {
      * Checks to see if it is possible to go back one page in history, then does so.
      */
     public void goBack() {
-        if (this.inAppWebView.canGoBack()) {
+       if (this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
     }
+    
+
+    public boolean isUrlHome(String url){   
+        String[] parts = url.split("\\?"); //pour le ?mobile=android
+        String part1 = parts[0];
+        Boolean bool = false;
+        String[] languageMatrice = new String[] {"fr/fr","fr/en","be/fr","be/en","be/nl","de/de","de/en","nl/nl","nl/en"};
+        for (String language : languageMatrice) {
+             if (part1.endsWith(language)){
+                 bool = true;
+             }
+        }
+        return bool;
+    }
+    
 
     /**
      * Can the web browser go back?
      * @return boolean
      */
     public boolean canGoBack() {
-        return this.inAppWebView.canGoBack();
+        if (this.isUrlHome(this.inAppWebView.getUrl())){
+            try { //Envoi d l'évènement pour quitter l'application
+                JSONObject obj = new JSONObject();
+                 obj.put("type", BACK_EVENT);
+                 sendUpdate(obj, true);
+            } catch (JSONException ex) {
+                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+            }
+            return false;
+        }
+        else {
+           return this.inAppWebView.canGoBack();
+        } 
     }
 
     /**
@@ -1036,6 +1065,27 @@ public class InAppBrowser extends CordovaPlugin {
                 sendUpdate(obj, true);
             } catch (JSONException ex) {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+            }
+        }
+
+        /*
+        * onLoadResource fires the THALYS_EVENT
+        *
+        * @param view
+        * @param url
+        */
+        @Override
+        public void onLoadResource(WebView view, String url) {
+            super.onLoadResource(view, url);
+            if (url.startsWith("http://cordova-thalys") || url.startsWith("https://cordova-thalys")) {
+                try {
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", THALYS_EVENT);
+                    obj.put("url", url);
+                    sendUpdate(obj, true);
+                } catch (JSONException ex) {
+                    LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+                }
             }
         }
 
