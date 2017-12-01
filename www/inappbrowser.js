@@ -33,10 +33,12 @@
 
     function InAppBrowser () {
         this.channels = {
+            'back': channel.create('back'),
+            'thalys': channel.create('thalys'),
             'loadstart': channel.create('loadstart'),
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
-            'exit': channel.create('exit')
+            'exit': channel.create('exit')          
         };
     }
 
