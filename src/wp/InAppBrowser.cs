@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Windows;
@@ -254,7 +255,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 return;
             }
 
-            var file = await GetFile(pathUri.AbsolutePath.Replace('/', Path.DirectorySeparatorChar));
+            var file = await GetFile(FixUrl(url));
             if (file != null)
             {
                 await Launcher.LaunchFileAsync(file);
@@ -263,6 +264,30 @@ namespace WPCordovaClassLib.Cordova.Commands
             {
                 Debug.WriteLine("File not found.");
             }
+        }
+
+        private string FixUrl(string url)
+        {
+            const string IsolatedStorageProtocol = "x-wmapp0:/"; // NOTE: 1 slash, due to paths being screwed up (for example: x-wmapp:/tmp//test.doc, instead of x-wmapp://tmp/test.doc)
+            string DoubleSeparator = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture) + Path.DirectorySeparatorChar;
+
+            // Remove x-wmapp0 protocol, making this a relative URL, keeping the original path
+            if (url.StartsWith(IsolatedStorageProtocol, StringComparison.OrdinalIgnoreCase))
+            {
+                url = url.Substring(IsolatedStorageProtocol.Length);
+            }
+
+            // Replace forward slashes with environment slashes + strip double slashes
+            url = url.Replace('/', Path.DirectorySeparatorChar);
+            while (url.IndexOf(DoubleSeparator) != -1)
+            {
+                url = url.Replace(DoubleSeparator, Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+            }
+
+            // Remove trailing and leading path separator chars
+            url = url.Trim(Path.DirectorySeparatorChar);
+
+            return url;
         }
 
         private async Task<StorageFile> GetFile(string fileName)
