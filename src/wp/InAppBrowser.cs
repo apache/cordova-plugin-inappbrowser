@@ -159,7 +159,7 @@ namespace WPCordovaClassLib.Cordova.Commands
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    var res = browser.InvokeScript("eval", new string[] { args[0] });
+                    var res = InvokeScript(args[0]);
 
                     if (bCallback)
                     {
@@ -242,6 +242,18 @@ namespace WPCordovaClassLib.Cordova.Commands
 
                 }
             });
+        }
+
+        private object InvokeScript(string script)
+        {
+            const string functionName = "__getInvokeScriptResult";
+            if (System.Environment.OSVersion.Version.Major == 8 && System.Environment.OSVersion.Version.Minor == 0)
+            {
+                browser.InvokeScript("execScript", new string[] { String.Format("var {0} = function(){{ return ({1}); }};", functionName, script) });
+                return browser.InvokeScript(functionName);
+            }
+
+            return browser.InvokeScript("eval", new [] { script });
         }
 
 #if WP8
