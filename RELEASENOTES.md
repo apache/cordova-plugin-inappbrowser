@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 2.0.0 (Dec 15, 2017)
+* [CB-13662](https://issues.apache.org/jira/browse/CB-13662) remove deprecated platforms
+
 ### 1.7.2 (Nov 06, 2017)
 * [CB-13473](https://issues.apache.org/jira/browse/CB-13473) (CI) Removed **Browser** builds from AppVeyor
 * [CB-13472](https://issues.apache.org/jira/browse/CB-13472) (CI) Fixed Travis **Android** builds again
