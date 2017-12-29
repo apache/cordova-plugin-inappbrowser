@@ -610,7 +610,7 @@
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
     self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    self.toolbar.barTintColor = UIColor.lightGrayColor;
+    self.toolbar.barTintColor = [UIColor colorWithRed:255.0f/255.0f green:148.0f/255.0f blue:21.0f/255.0f alpha:1.0f];
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
@@ -650,6 +650,13 @@
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
+	
+	self.titleLabel = [[UILabel alloc] init];
+	[self.titleLabel setBackgroundColor:[UIColor clearColor]];
+	[self.titleLabel setTextColor:[UIColor whiteColor]];
+	[self.titleLabel setFont:[UIFont fontWithName:@"Helvetica Neue" size:18]];
+	[self.titleLabel setTextAlignment:NSTextAlignmentCenter];
+	[self.titleLabel sizeToFit];
 
     /*NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
@@ -664,7 +671,7 @@
     self.backButton.imageInsets = UIEdgeInsetsZero;*/
 
     //[self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
-    [self.toolbar setItems:@[self.closeButton]];
+    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.titleLable, flexibleSpaceButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
@@ -684,7 +691,7 @@
     self.closeButton = nil;
     self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     self.closeButton.enabled = YES;
-    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
+    self.closeButton.tintColor = UIColor.whiteColor;
 
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:0 withObject:self.closeButton];
@@ -929,6 +936,7 @@
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
+	[self.titleLabel setText:[theWebView stringByEvaluatingJavaScriptFromString:@"document.title"]];
     //self.backButton.enabled = theWebView.canGoBack;
     //self.forwardButton.enabled = theWebView.canGoForward;
 
