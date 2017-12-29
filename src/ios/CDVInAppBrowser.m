@@ -652,11 +652,11 @@
     self.addressLabel.userInteractionEnabled = NO;
 	
 	self.titleLabel = [[UILabel alloc] init];
+    [self.titleLabel setText:@"                    "];
 	[self.titleLabel setBackgroundColor:[UIColor clearColor]];
 	[self.titleLabel setTextColor:[UIColor whiteColor]];
 	[self.titleLabel setFont:[UIFont fontWithName:@"Helvetica Neue" size:18]];
 	[self.titleLabel setTextAlignment:NSTextAlignmentCenter];
-	[self.titleLabel sizeToFit];
 
     /*NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
@@ -671,7 +671,7 @@
     self.backButton.imageInsets = UIEdgeInsetsZero;*/
 
     //[self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.titleLable, flexibleSpaceButton]];
+    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, [[UIBarButtonItem alloc] initWithCustomView:self.titleLabel], flexibleSpaceButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
