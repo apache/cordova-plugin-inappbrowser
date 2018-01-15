@@ -591,9 +591,9 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 	
-	UIButton closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+	UIButton *closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
 	[closeButtonView setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
-	closeButtonView.BackgroundColor = [UIColor clearColor];
+	closeButtonView.backgroundColor = [UIColor clearColor];
 	[closeButtonView addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:closeButtonView];
     self.closeButton.enabled = YES;
