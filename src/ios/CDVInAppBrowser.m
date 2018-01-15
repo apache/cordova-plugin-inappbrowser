@@ -84,6 +84,7 @@
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    NSDictionary* cookies = [command argumentAtIndex:3];
 
     self.callbackId = command.callbackId;
 
@@ -100,11 +101,11 @@
         }
 
         if ([target isEqualToString:kInAppBrowserTargetSelf]) {
-            [self openInCordovaWebView:absoluteUrl withOptions:options];
+            [self openInCordovaWebView:absoluteUrl withOptions:options withCookies:cookies];
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
         } else { // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
+            [self openInInAppBrowser:absoluteUrl withOptions:options withCookies:cookies];
         }
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -116,7 +117,7 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
+- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options withCookies:(NSDictionary*)cookies
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
 
@@ -141,6 +142,22 @@
             }
         }
     }
+    
+    if (cookies != nil) {
+        for (id key in cookies) {
+            //key = [cookies objectForKey:key];
+            NSDictionary *cookieProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        url.host, NSHTTPCookieDomain,
+										@"/", NSHTTPCookiePath,
+                                        key, NSHTTPCookieName,
+                                        [cookies objectForKey:key], NSHTTPCookieValue,
+                                        nil];
+            NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
+            NSLog(@"\nurl: %@\ncookie: %@", url, cookie);
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            
+        }
+    }
 
     if (self.inAppBrowserViewController == nil) {
         NSString* userAgent = [CDVUserAgentUtil originalUserAgent];
@@ -162,9 +179,6 @@
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
-    if (browserOptions.closebuttoncaption != nil) {
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
-    }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
     if (browserOptions.presentationstyle != nil) {
@@ -275,7 +289,7 @@
     });
 }
 
-- (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options
+- (void)openInCordovaWebView:(NSURL*)url withOptions:(NSString*)options withCookies:(NSDictionary*)cookies
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
 
@@ -287,7 +301,7 @@
     if ([self.commandDelegate URLIsWhitelisted:url]) {
         [self.webView loadRequest:request];
     } else { // this assumes the InAppBrowser can be excepted from the white-list
-        [self openInInAppBrowser:url withOptions:options];
+        [self openInInAppBrowser:url withOptions:options withCookies:cookies];
     }
 #endif
 }
@@ -543,6 +557,7 @@
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
+    webViewBounds.origin.y = toolbarIsAtBottom ? 0 : TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -575,9 +590,14 @@
     self.spinner.opaque = NO;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
-
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+	
+	UIButton *closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+	[closeButtonView setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+	closeButtonView.backgroundColor = [UIColor clearColor];
+	[closeButtonView addTarget:self action:@selector(close) forControlEvents:UIControlEventTouchUpInside];
+    self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:closeButtonView];
     self.closeButton.enabled = YES;
+    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
@@ -591,7 +611,7 @@
     self.toolbar.alpha = 1.000;
     self.toolbar.autoresizesSubviews = YES;
     self.toolbar.autoresizingMask = toolbarIsAtBottom ? (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin) : UIViewAutoresizingFlexibleWidth;
-    self.toolbar.barStyle = UIBarStyleBlackOpaque;
+    self.toolbar.barTintColor = [UIColor colorWithRed:255.0f/255.0f green:148.0f/255.0f blue:21.0f/255.0f alpha:1.0f];
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
@@ -631,18 +651,28 @@
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
+	
+	self.titleLabel = [[UILabel alloc] init];
+    [self.titleLabel setText:@"                    "];
+	[self.titleLabel setBackgroundColor:[UIColor clearColor]];
+	[self.titleLabel setTextColor:[UIColor whiteColor]];
+	[self.titleLabel setFont:[UIFont fontWithName:@"Helvetica Neue" size:18]];
+	[self.titleLabel setTextAlignment:NSTextAlignmentCenter];
 
-    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
+    /*NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
     self.forwardButton.enabled = YES;
-    self.forwardButton.imageInsets = UIEdgeInsetsZero;
+    self.forwardButton.tintColor = UIColor.whiteColor;
+    self.forwardButton.imageInsets = UIEdgeInsetsZero;*/
 
-    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
+    /*NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
-    self.backButton.imageInsets = UIEdgeInsetsZero;
+	self.backButton.tintColor = UIColor.whiteColor;
+    self.backButton.imageInsets = UIEdgeInsetsZero;*/
 
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    //[self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, [[UIBarButtonItem alloc] initWithCustomView:self.titleLabel], flexibleSpaceButton]];
 
     self.view.backgroundColor = [UIColor grayColor];
     [self.view addSubview:self.toolbar];
@@ -653,20 +683,6 @@
 - (void) setWebViewFrame : (CGRect) frame {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
     [self.webView setFrame:frame];
-}
-
-- (void)setCloseButtonTitle:(NSString*)title
-{
-    // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
-    // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
-    self.closeButton = nil;
-    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
-    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
-
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:0 withObject:self.closeButton];
-    [self.toolbar setItems:items];
 }
 
 - (void)showLocationBar:(BOOL)show
@@ -884,8 +900,8 @@
     // loading url, start spinner, update back/forward
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+    //self.backButton.enabled = theWebView.canGoBack;
+    //self.forwardButton.enabled = theWebView.canGoForward;
 
     [self.spinner startAnimating];
 
@@ -907,8 +923,9 @@
     // update url, stop spinner, update back/forward
 
     self.addressLabel.text = [self.currentURL absoluteString];
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+	[self.titleLabel setText:[theWebView stringByEvaluatingJavaScriptFromString:@"document.title"]];
+    //self.backButton.enabled = theWebView.canGoBack;
+    //self.forwardButton.enabled = theWebView.canGoForward;
 
     [self.spinner stopAnimating];
 
@@ -936,8 +953,8 @@
     // log fail message, stop spinner, update back/forward
     NSLog(@"webView:didFailLoadWithError - %ld: %@", (long)error.code, [error localizedDescription]);
 
-    self.backButton.enabled = theWebView.canGoBack;
-    self.forwardButton.enabled = theWebView.canGoForward;
+    //self.backButton.enabled = theWebView.canGoBack;
+    //self.forwardButton.enabled = theWebView.canGoForward;
     [self.spinner stopAnimating];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
