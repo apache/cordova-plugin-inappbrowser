@@ -594,7 +594,7 @@
 	UIButton *closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
 	[closeButtonView setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
 	closeButtonView.backgroundColor = [UIColor clearColor];
-	[closeButtonView addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+	[closeButtonView addTarget:self action:@selector(close) forControlEvents:UIControlEventTouchUpInside];
     self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:closeButtonView];
     self.closeButton.enabled = YES;
     self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
