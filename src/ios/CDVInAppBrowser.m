@@ -592,7 +592,7 @@
     [self.spinner stopAnimating];
 	
 	UIButton closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
-	[closeButtonView setImage:[UIImage imageNamed:backButtonIcon] forState:UIControlStateNormal];
+	[closeButtonView setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
 	closeButtonView.BackgroundColor = [UIColor clearColor];
 	[closeButtonView addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
     self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:closeButtonView];
