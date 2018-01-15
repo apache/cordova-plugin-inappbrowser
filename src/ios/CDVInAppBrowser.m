@@ -179,9 +179,6 @@
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
-    if (browserOptions.closebuttoncaption != nil) {
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption];
-    }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
     if (browserOptions.presentationstyle != nil) {
@@ -593,10 +590,14 @@
     self.spinner.opaque = NO;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
-
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+	
+	UIButton closeButtonView = [UIButton buttonWithType:UIButtonTypeCustom];
+	[closeButtonView setImage:[UIImage imageNamed:backButtonIcon] forState:UIControlStateNormal];
+	closeButtonView.BackgroundColor = [UIColor clearColor];
+	[closeButtonView addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpInside];
+    self.closeButton = [[UIBarButtonItem alloc] initWithCustomView:closeButtonView];
     self.closeButton.enabled = YES;
-    self.closeButton.tintColor = UIColor.whiteColor;
+    self.closeButton.tintColor = [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
@@ -682,20 +683,6 @@
 - (void) setWebViewFrame : (CGRect) frame {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
     [self.webView setFrame:frame];
-}
-
-- (void)setCloseButtonTitle:(NSString*)title
-{
-    // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
-    // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
-    self.closeButton = nil;
-    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
-    self.closeButton.tintColor = UIColor.whiteColor;
-
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:0 withObject:self.closeButton];
-    [self.toolbar setItems:items];
 }
 
 - (void)showLocationBar:(BOOL)show
