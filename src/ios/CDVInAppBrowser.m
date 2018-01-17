@@ -142,6 +142,10 @@
         }
     }
 
+    if (browserOptions.clearurlcache) {
+        [self clearurlcache:self.webview];
+    }
+
     if (self.inAppBrowserViewController == nil) {
         NSString* userAgent = [CDVUserAgentUtil originalUserAgent];
         NSString* overrideUserAgent = [self settingForKey:@"OverrideUserAgent"];
@@ -450,6 +454,11 @@
     }
 
     return YES;
+}
+
+- (void)clearSharedUrlCache:(UIWebView*)theWebView
+{
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
 }
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView
@@ -1012,6 +1021,7 @@
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
         self.clearcache = NO;
         self.clearsessioncache = NO;
+        self.clearurlcache = YES;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
