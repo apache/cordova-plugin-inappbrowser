@@ -20,6 +20,18 @@
 -->
 # Release Notes
 
+### 2.0.2 (Jan 24, 2018)
+* [CB-13791](https://issues.apache.org/jira/browse/CB-13791) Add **Android** support for a footer close button
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) ignore idea folder
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) change hidetoolbarnavigationbuttons to hidenavigationbuttons in iso
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) **Android** works well now, all changes are now documented
+* [CB-13409](https://issues.apache.org/jira/browse/CB-13409) Lets user adjust color of toolbar, hide navigation buttons and set custom text on close button
+* [CB-13746](https://issues.apache.org/jira/browse/CB-13746) Add build-tools-26.0.2 to travis
+
 ### 2.0.1 (Dec 27, 2017)
 * [CB-13699](https://issues.apache.org/jira/browse/CB-13699) Fix to allow 2.0.0 version install
 
