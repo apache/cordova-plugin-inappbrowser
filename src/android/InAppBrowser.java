@@ -103,8 +103,10 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
     private static final String NAVIGATION_COLOR = "navigationbuttoncolor";
     private static final String HIDE_URL = "hideurlbar";
+    private static final String FOOTER = "footer";
+    private static final String FOOTER_COLOR = "footercolor";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -129,6 +131,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideNavigationButtons = false;
     private String navigationButtonColor = "";
     private boolean hideUrlBar = false;
+    private boolean showFooter = false;
+    private String footerColor = "";
 
     /**
      * Executes the request and returns PluginResult.
@@ -397,11 +401,9 @@ public class InAppBrowser extends CordovaPlugin {
                 option = new StringTokenizer(features.nextToken(), "=");
                 if (option.hasMoreElements()) {
                     String key = option.nextToken();
-                    String value = null;
-                    if (customizableOptions.contains(key)) value = option.nextToken();
-                    else {
-                      String token = option.nextToken();
-                      value = token.equals("yes") || token.equals("no") ? token : "yes";
+                    String value = option.nextToken();
+                    if (!customizableOptions.contains(key)){
+                        value = value.equals("yes") || value.equals("no") ? value : "yes";
                     }
                     map.put(key, value);
                 }
@@ -431,7 +433,7 @@ public class InAppBrowser extends CordovaPlugin {
             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
             this.cordova.getActivity().startActivity(intent);
             return "";
-        // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
+            // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
         } catch (java.lang.RuntimeException e) {
             LOG.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
             return e.toString();
@@ -561,10 +563,10 @@ public class InAppBrowser extends CordovaPlugin {
                 showLocationBar = show.equals("yes") ? true : false;
             }
             if(showLocationBar) {
-              String hideNavigation = features.get(HIDE_NAVIGATION);
-              String hideUrl = features.get(HIDE_URL);
-              if(hideNavigation != null) hideNavigationButtons = hideNavigation.equals("yes") ? true : false;
-              if(hideUrl != null) hideUrlBar = hideUrl.equals("yes") ? true : false;
+                String hideNavigation = features.get(HIDE_NAVIGATION);
+                String hideUrl = features.get(HIDE_URL);
+                if(hideNavigation != null) hideNavigationButtons = hideNavigation.equals("yes") ? true : false;
+                if(hideUrl != null) hideUrlBar = hideUrl.equals("yes") ? true : false;
             }
             String zoom = features.get(ZOOM);
             if (zoom != null) {
@@ -599,7 +601,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String wideViewPort = features.get(USER_WIDE_VIEW_PORT);
             if (wideViewPort != null ) {
-		            useWideViewPort = wideViewPort.equals("yes") ? true : false;
+                useWideViewPort = wideViewPort.equals("yes") ? true : false;
             }
             String closeButtonCaptionSet = features.get(CLOSE_BUTTON_CAPTION);
             if (closeButtonCaptionSet != null) {
@@ -607,7 +609,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String closeButtonColorSet = features.get(CLOSE_BUTTON_COLOR);
             if (closeButtonColorSet != null) {
-              closeButtonColor = closeButtonColorSet;
+                closeButtonColor = closeButtonColorSet;
             }
             String toolbarColorSet = features.get(TOOLBAR_COLOR);
             if (toolbarColorSet != null) {
@@ -616,6 +618,14 @@ public class InAppBrowser extends CordovaPlugin {
             String navigationButtonColorSet = features.get(NAVIGATION_COLOR);
             if (navigationButtonColorSet != null) {
                 navigationButtonColor = navigationButtonColorSet;
+            }
+            String showFooterSet = features.get(FOOTER);
+            if (showFooterSet != null) {
+                showFooter = showFooterSet.equals("yes") ? true : false;
+            }
+            String footerColorSet = features.get(FOOTER_COLOR);
+            if (footerColorSet != null) {
+                footerColor = footerColorSet;
             }
         }
 
@@ -630,11 +640,58 @@ public class InAppBrowser extends CordovaPlugin {
              */
             private int dpToPixels(int dipValue) {
                 int value = (int) TypedValue.applyDimension( TypedValue.COMPLEX_UNIT_DIP,
-                                                            (float) dipValue,
-                                                            cordova.getActivity().getResources().getDisplayMetrics()
+                        (float) dipValue,
+                        cordova.getActivity().getResources().getDisplayMetrics()
                 );
 
                 return value;
+            }
+
+            private View createCloseButton(int id){
+                View _close;
+                Resources activityRes = cordova.getActivity().getResources();
+
+                if (closeButtonCaption != "") {
+                    // Use TextView for text
+                    TextView close = new TextView(cordova.getActivity());
+                    close.setText(closeButtonCaption);
+                    close.setTextSize(20);
+                    if (closeButtonColor != "") close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
+                    close.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                    close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
+                    _close = close;
+                }
+                else {
+                    ImageButton close = new ImageButton(cordova.getActivity());
+                    int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
+                    Drawable closeIcon = activityRes.getDrawable(closeResId);
+                    if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
+                    close.setImageDrawable(closeIcon);
+                    close.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    if (Build.VERSION.SDK_INT >= 16)
+                        close.getAdjustViewBounds();
+
+                    _close = close;
+                }
+
+                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                _close.setLayoutParams(closeLayoutParams);
+
+                if (Build.VERSION.SDK_INT >= 16)
+                    _close.setBackground(null);
+                else
+                    _close.setBackgroundDrawable(null);
+
+                _close.setContentDescription("Close Button");
+                _close.setId(Integer.valueOf(id));
+                _close.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        closeDialog();
+                    }
+                });
+
+                return _close;
             }
 
             @SuppressLint("NewApi")
@@ -741,67 +798,37 @@ public class InAppBrowser extends CordovaPlugin {
                     public boolean onKey(View v, int keyCode, KeyEvent event) {
                         // If the event is a key-down event on the "enter" button
                         if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                          navigate(edittext.getText().toString());
-                          return true;
+                            navigate(edittext.getText().toString());
+                            return true;
                         }
                         return false;
                     }
                 });
 
-                // Close/Done button
-                if (closeButtonCaption != "") {
-                  // Use TextView for text
-                  TextView close = new TextView(cordova.getActivity());
-                  close.setText(closeButtonCaption);
-                  close.setTextSize(20);
-                  if (closeButtonColor != "") close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
-                  close.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                  RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                  closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                  close.setLayoutParams(closeLayoutParams);
 
-                  close.setContentDescription("Close Button");
-                  close.setId(Integer.valueOf(5));
-                  if (Build.VERSION.SDK_INT >= 16)
-                      close.setBackground(null);
-                  else
-                      close.setBackgroundDrawable(null);
-                  back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
-                  close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
-                  close.setOnClickListener(new View.OnClickListener() {
-                      public void onClick(View v) {
-                          closeDialog();
-                      }
-                  });
-                  toolbar.addView(close);
-                }
-                else {
-                  ImageButton close = new ImageButton(cordova.getActivity());
-                  RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                  closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                  close.setLayoutParams(closeLayoutParams);
-                  close.setContentDescription("Close Button");
-                  close.setId(Integer.valueOf(5));
-                  int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
-                  Drawable closeIcon = activityRes.getDrawable(closeResId);
-                  if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
-                  if (Build.VERSION.SDK_INT >= 16)
-                      close.setBackground(null);
-                  else
-                      close.setBackgroundDrawable(null);
-                  close.setImageDrawable(closeIcon);
-                  close.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                  back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
-                  if (Build.VERSION.SDK_INT >= 16)
-                      close.getAdjustViewBounds();
+                // Header Close/Done button
+                View close = createCloseButton(5);
+                toolbar.addView(close);
 
-                  close.setOnClickListener(new View.OnClickListener() {
-                      public void onClick(View v) {
-                          closeDialog();
-                      }
-                  });
-                  toolbar.addView(close);
+                // Footer
+                RelativeLayout footer = new RelativeLayout(cordova.getActivity());
+                int _footerColor;
+                if(footerColor != ""){
+                    _footerColor = Color.parseColor(footerColor);
+                }else{
+                    _footerColor = android.graphics.Color.LTGRAY;
                 }
+                footer.setBackgroundColor(_footerColor);
+                RelativeLayout.LayoutParams footerLayout = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44));
+                footerLayout.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                footer.setLayoutParams(footerLayout);
+                if (closeButtonCaption != "") footer.setPadding(this.dpToPixels(8), this.dpToPixels(8), this.dpToPixels(8), this.dpToPixels(8));
+                footer.setHorizontalGravity(Gravity.LEFT);
+                footer.setVerticalGravity(Gravity.BOTTOM);
+
+                View footerClose = createCloseButton(7);
+                footer.addView(footerClose);
+
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
@@ -915,7 +942,14 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Add our webview to our main view/layout
-                main.addView(inAppWebView);
+                RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
+                webViewLayout.addView(inAppWebView);
+                main.addView(webViewLayout);
+
+                // Don't add the footer unless it's been enabled
+                if (showFooter) {
+                    webViewLayout.addView(footer);
+                }
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
@@ -1105,7 +1139,7 @@ public class InAppBrowser extends CordovaPlugin {
             // Update the UI if we haven't already
             if (!newloc.equals(edittext.getText().toString())) {
                 edittext.setText(newloc);
-             }
+            }
 
             try {
                 JSONObject obj = new JSONObject();
