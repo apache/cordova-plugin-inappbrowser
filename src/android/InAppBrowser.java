@@ -75,7 +75,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
+import java.util.ArrayList;
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -106,7 +106,10 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final String url_schemes = "url_schemes";//android url 跳转协议
+    private static   List<String> url_schemes_arrs  = new ArrayList<String>();
+
+    private static final List customizableOptions = Arrays.asList(url_schemes,CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -133,7 +136,6 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
-
     /**
      * Executes the request and returns PluginResult.
      *
@@ -627,6 +629,11 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
+            String url_schemes_temp = features.get(url_schemes);
+            if (url_schemes_temp != null) {
+                List<String> ts = Arrays.asList( url_schemes_temp.split("\\:"));
+                url_schemes_arrs.addAll( ts);
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -1108,6 +1115,19 @@ public class InAppBrowser extends CordovaPlugin {
                     return true;
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
+                }
+            }else  {
+                try {
+                    for (String val : url_schemes_arrs) {
+                        if(url.startsWith(val+":")){
+                            Intent intent = new Intent(Intent.ACTION_VIEW ,Uri.parse(url));
+                            cordova.getActivity().startActivity(intent);
+                            return true;
+                        }
+                    }
+                } catch (android.content.ActivityNotFoundException e) {
+                    LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+//                return true;
                 }
             }
             return false;
