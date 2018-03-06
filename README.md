@@ -112,9 +112,13 @@ instance, or the system browser.
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
-    - __closebuttoncaption__: set to a string to use as the close buttons caption instead of a X. Note that you need to localize this value yourself.
+    - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
     - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
     close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
+    - __footer__: set to `yes` to show a close button in the footer similar to the iOS __Done__ button.
+    The close button will appear the same as for the header hence use __closebuttoncaption__ and __closebuttoncolor__ to set its properties.
+    - __footercolor__: set to a valid hex color string, for example `#00ff00` or `#CC00ff00` (`#aarrggbb`) , and it will change the footer color from default.
+    Only has effect if user has __footer__ set to `yes`.
     - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
     - __hidenavigationbuttons__: set to `yes` to hide the navigation buttons on the location toolbar, only has effect if user has location set to `yes`. The default value is `no`.
     - __hideurlbar__: set to `yes` to hide the url bar on the location toolbar, only has effect if user has location set to `yes`. The default value is `no`.
@@ -155,65 +159,22 @@ instance, or the system browser.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
-- BlackBerry 10
 - Browser
-- Firefox OS
 - iOS
 - OSX
-- Windows 8 and 8.1
-- Windows Phone 7 and 8
+- Windows
 
 ### Example
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
 
-### Firefox OS Quirks
-
-As plugin doesn't enforce any design there is a need to add some CSS rules if
-opened with `target='_blank'`. The rules might look like these
-
-``` css
-.inAppBrowserWrap {
-  background-color: rgba(0,0,0,0.75);
-  color: rgba(235,235,235,1.0);
-}
-.inAppBrowserWrap menu {
-  overflow: auto;
-  list-style-type: none;
-  padding-left: 0;
-}
-.inAppBrowserWrap menu li {
-  font-size: 25px;
-  height: 25px;
-  float: left;
-  margin: 0 10px;
-  padding: 3px 10px;
-  text-decoration: none;
-  color: #ccc;
-  display: block;
-  background: rgba(30,30,30,0.50);
-}
-.inAppBrowserWrap menu li.disabled {
-	color: #777;
-}
-```
-
 ### OSX Quirks
 
 At the moment the only supported target in OSX is `_system`.
 
 `_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
-
-### Windows Quirks
-
-Windows 8.0, 8.1 and Windows Phone 8.1 don't support remote urls to be opened in the Cordova WebView so remote urls are always showed in the system's web browser if opened with `target='_self'`.
-
-On Windows 10 if the URL is NOT in the white list and is opened with `target='_self'` it will be showed in the system's web browser instead of InAppBrowser popup.
-
-Similar to Firefox OS IAB window visual behaviour can be overridden via `inAppBrowserWrap`/`inAppBrowserWrapFullscreen` CSS classes
 
 ### Browser Quirks
 
@@ -335,12 +296,11 @@ function executeScriptCallBack(params) {
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - Browser
 - iOS
-- Windows 8 and 8.1
-- Windows Phone 7 and 8
+- Windows
+- OSX
 
 ### Browser Quirks
 
@@ -371,12 +331,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - Browser
 - iOS
-- Windows 8 and 8.1
-- Windows Phone 7 and 8
+- Windows
 
 ### Quick Example
 
@@ -395,13 +353,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - Browser
-- Firefox OS
 - iOS
-- Windows 8 and 8.1
-- Windows Phone 7 and 8
+- Windows
 
 ### Quick Example
 
@@ -418,11 +373,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - Browser
 - iOS
-- Windows 8 and 8.1
+- Windows
 
 ### Quick Example
 
@@ -440,10 +394,9 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - iOS
-- Windows 8 and 8.1
+- Windows
 
 ### Quick Example
 
@@ -472,11 +425,10 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - Browser
 - iOS
-- Windows 8 and 8.1
+- Windows
 
 ### Quick Example
 
@@ -509,7 +461,6 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
 
 ### Supported Platforms
 
-- Amazon Fire OS
 - Android
 - iOS
 - Windows
