@@ -106,6 +106,7 @@ instance, or the system browser.
     All platforms support:
 
     - __location__: Set to `yes` or `no` to turn the `InAppBrowser`'s location bar on or off.
+    - __lefttoright__: Set to `yes` to swap position of the navigation buttons and the close button.
 
     Android supports these additional options:
 
@@ -115,7 +116,7 @@ instance, or the system browser.
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
     - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
     close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
-    - __footer__: set to `yes` to show a close button in the footer similar to the iOS __Done__ button.
+    - __footer__: set to `yes` to show a close button in the footer similar to the iOS __Done__ button. 
     The close button will appear the same as for the header hence use __closebuttoncaption__ and __closebuttoncolor__ to set its properties.
     - __footercolor__: set to a valid hex color string, for example `#00ff00` or `#CC00ff00` (`#aarrggbb`) , and it will change the footer color from default.
     Only has effect if user has __footer__ set to `yes`.
