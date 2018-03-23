@@ -3,11 +3,11 @@
  */
 var InAppBrowser = require('cordova-plugin-inappbrowser.inappbrowser');
 module.exports = {
-    setDefaultOptions : function (options) {
+    setDefaultOptions: function (options) {
         InAppBrowser.setDefaultOptions(options);
         return InAppBrowser.getDefaultOptions();
     },
-    getDefaultOptions : function () {
+    getDefaultOptions: function () {
         return InAppBrowser.getDefaultOptions();
     }
 };

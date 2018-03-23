@@ -29,8 +29,8 @@
     var exec = require('cordova/exec');
     var channel = require('cordova/channel');
 
-    function InAppBrowser() {
-       this.channels = {
+    function InAppBrowser () {
+        this.channels = {
             'loadstart': channel.create('loadstart'),
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
