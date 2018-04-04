@@ -170,33 +170,10 @@ public class InAppBrowser extends CordovaPlugin {
                         Boolean shouldAllowNavigation = null;
                         if (url.startsWith("javascript:")) {
                             shouldAllowNavigation = true;
+                        } else {
+                            shouldAllowNavigation = isURLWhiteListed(url);
                         }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
-                                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
-                        if (shouldAllowNavigation == null) {
-                            try {
-                                Method gpm = webView.getClass().getMethod("getPluginManager");
-                                PluginManager pm = (PluginManager)gpm.invoke(webView);
-                                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
-                                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
-                            } catch (NoSuchMethodException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (IllegalAccessException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            } catch (InvocationTargetException e) {
-                                LOG.d(LOG_TAG, e.getLocalizedMessage());
-                            }
-                        }
+
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
@@ -300,6 +277,47 @@ public class InAppBrowser extends CordovaPlugin {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Is the URL or Scheme WhiteListed
+     * This code exists for compatibility between 3.x and 4.x versions of Cordova.
+     * Previously the Config class had a static method, isUrlWhitelisted(). That
+     * responsibility has been moved to the plugins, with an aggregating method in
+     * PluginManager.
+     */
+     * @param url, the URL as a String
+     * @return true if WhiteListed, otherwise null or false
+     */
+    private Boolean isURLWhiteListed(String url) {
+        Boolean shouldAllowNavigation = null;
+        if (shouldAllowNavigation == null) {
+            try {
+                Method iuw = Config.class.getMethod("isUrlWhiteListed", String.class);
+                shouldAllowNavigation = (Boolean)iuw.invoke(null, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        if (shouldAllowNavigation == null) {
+            try {
+                Method gpm = webView.getClass().getMethod("getPluginManager");
+                PluginManager pm = (PluginManager)gpm.invoke(webView);
+                Method san = pm.getClass().getMethod("shouldAllowNavigation", String.class);
+                shouldAllowNavigation = (Boolean)san.invoke(pm, url);
+            } catch (NoSuchMethodException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (IllegalAccessException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            } catch (InvocationTargetException e) {
+                LOG.d(LOG_TAG, e.getLocalizedMessage());
+            }
+        }
+        return shouldAllowNavigation;
     }
 
     /**
@@ -1110,6 +1128,24 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
             }
+            // Test for whitelisted custom scheme names, less than 20 chars long, like mycoolapp: or twitteroauthresponse: (Twitter Oauth Response)
+            else if (url.matches("^[a-z]{0,20}://.*?$")) {
+                if (Boolean.TRUE.equals(isURLWhiteListed(url))) {
+                    try {
+                        LOG.w("STEVE IN InAppBrowser.java, whiteliste url SUCCESS: ", url );
+                        JSONObject obj = new JSONObject();
+                        obj.put("type", "customscheme");
+                        obj.put("url", url);
+                        sendUpdate(obj, true);
+                        return true;
+                    } catch (JSONException ex) {
+                        LOG.e(LOG_TAG, "Custom Scheme URI passed in has caused a JSON error.");
+                    }
+                } else {
+                    LOG.w("STEVE IN InAppBrowser.java, whitelisted url FAILURE: ", url );
+                }
+            }
+
             return false;
         }
 
