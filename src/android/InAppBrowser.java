@@ -285,7 +285,7 @@ public class InAppBrowser extends CordovaPlugin {
      * Previously the Config class had a static method, isUrlWhitelisted(). That
      * responsibility has been moved to the plugins, with an aggregating method in
      * PluginManager.
-     */
+     *
      * @param url, the URL as a String
      * @return true if WhiteListed, otherwise null or false
      */
