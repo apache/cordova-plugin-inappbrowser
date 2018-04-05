@@ -1111,7 +1111,7 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
             }
-            // Test for whitelisted custom scheme names, less than 20 chars long, like mycoolapp: or twitteroauthresponse: (Twitter Oauth Response)
+            // Test for whitelisted custom scheme names, less than 20 chars long, like mycoolapp:// or twitteroauthresponse:// (Twitter Oauth Response)
             else if (!url.startsWith("http:") && !url.startsWith("https:") && url.matches("^[a-z]{0,20}://.*?$")) {
                 if (allowedSchemes == null) {
                     String allowed = preferences.getString("AllowedSchemes", "");
