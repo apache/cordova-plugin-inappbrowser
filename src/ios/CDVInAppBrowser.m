@@ -917,7 +917,10 @@
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
 
-    [self.spinner startAnimating];
+    NSLog(_browserOptions.hidespinner ? @"Yes" : @"No");
+    if(!_browserOptions.hidespinner) {
+        [self.spinner startAnimating];
+    }
 
     return [self.navigationDelegate webViewDidStartLoad:theWebView];
 }
@@ -1017,6 +1020,7 @@
         self.toolbarposition = kInAppBrowserToolbarBarPositionBottom;
         self.clearcache = NO;
         self.clearsessioncache = NO;
+        self.hidespinner = NO;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
