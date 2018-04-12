@@ -133,6 +133,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
+    private String[] allowedSchemes;
 
     /**
      * Executes the request and returns PluginResult.
@@ -1110,6 +1111,29 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
                 }
             }
+            // Test for whitelisted custom scheme names like mycoolapp:// or twitteroauthresponse:// (Twitter Oauth Response)
+            else if (!url.startsWith("http:") && !url.startsWith("https:") && url.matches("^[a-z]*://.*?$")) {
+                if (allowedSchemes == null) {
+                    String allowed = preferences.getString("AllowedSchemes", "");
+                    allowedSchemes = allowed.split(",");
+                }
+                if (allowedSchemes != null) {
+                    for (String scheme : allowedSchemes) {
+                        if (url.startsWith(scheme)) {
+                            try {
+                                JSONObject obj = new JSONObject();
+                                obj.put("type", "customscheme");
+                                obj.put("url", url);
+                                sendUpdate(obj, true);
+                                return true;
+                            } catch (JSONException ex) {
+                                LOG.e(LOG_TAG, "Custom Scheme URI passed in has caused a JSON error.");
+                            }
+                        }
+                    }
+                }
+            }
+
             return false;
         }
 
