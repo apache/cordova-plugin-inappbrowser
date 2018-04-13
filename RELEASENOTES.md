@@ -20,6 +20,13 @@
 -->
 # Release Notes
 
+### 3.0.0 (Apr 12, 2018)
+* [CB-13659](https://issues.apache.org/jira/browse/CB-13659) **iOS** Add hidespinner option
+* In file `AppBrowser.java`: New code within `shouldOverrideUrlLoading()` to check for whitelisting custom schemes via a new `AllowedSchemes` preference configuration item.  Allows custom schemes like `mycoolapp://` or `wevotetwitterscheme://`
+* `InAppBrowser.java`: New method `isURLWhileListed` to check for whitelisting of `AllowedSchemes` in a new preference configuration item. There is a new check in `shouldOverrideUrlLoading`, to allow whitelisted custom schemes like "mycoolapp://"
+* Add customisation of the navigation buttons for **iOS**
+* Fix navigation buttons on **iOS**
+
 ### 2.0.2 (Jan 24, 2018)
 * [CB-13791](https://issues.apache.org/jira/browse/CB-13791) Add **Android** support for a footer close button
 * [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
