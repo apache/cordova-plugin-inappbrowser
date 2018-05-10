@@ -408,6 +408,7 @@
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
+
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
@@ -928,6 +929,89 @@
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
+
+    // skip this for the JS Navigation handler, initial load, iFrames and non-http(s) requests
+    if(isTopLevelNavigation && !self.loading) {
+        BOOL _shouldBlock = false;
+
+        //Blocking navigation logic
+        NSString* policiesStr = [self settingForKey:@"NavigationBlockingPolicies"];
+        NSError *jsonError;
+        NSData *objectData = [policiesStr dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
+                                            options:NSJSONReadingMutableContainers 
+                                                error:&jsonError];
+        static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            navigationTypes = @{
+                                @(UIWebViewNavigationTypeLinkClicked): @"click",
+                                @(UIWebViewNavigationTypeFormSubmitted): @"formsubmit",
+                                @(UIWebViewNavigationTypeBackForward): @"backforward",
+                                @(UIWebViewNavigationTypeReload): @"reload",
+                                @(UIWebViewNavigationTypeFormResubmitted): @"formresubmit",
+                                @(UIWebViewNavigationTypeOther): @"other",
+                                };
+        });
+        
+        NSString *sourceURL = (NSString *)self.source[@"uri"];
+        NSString *requestURL = (request.URL).absoluteString;
+        NSString *namedNavigationType = navigationTypes[@(navigationType)];     
+        if(policies.count > 0) {
+        NSDictionary *currentValues = @{
+                                        @"currentURL": sourceURL,
+                                        @"url": requestURL,
+                                        @"navigationType": namedNavigationType
+                                        };
+        NSString *eventValue;
+        BOOL policyFulfilled;
+        
+        for(NSDictionary *policy in policies) {
+            
+            // policy with no rules
+            if(policy.count < 1) {
+            continue;
+            }
+            
+            policyFulfilled = YES;
+            
+            for(NSString *key in policy) {
+            // policy has failed already
+            if(!policyFulfilled) break;
+            
+            eventValue = [currentValues objectForKey:key];
+            
+            // unverifiable policy rule
+            if(!eventValue) {
+                RCTLogWarn(@"Could not verify webview loading policy named %@. Failing policy with rules %@", key, policy);
+                policyFulfilled = NO;
+                break;
+            }
+            
+            NSPredicate *rule = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [policy objectForKey:key]];
+            
+            policyFulfilled = [rule evaluateWithObject: eventValue];
+            }
+            
+            if(policyFulfilled) {
+            _shouldBlock = !_shouldBlock;
+            break;
+            }
+        }
+        }
+        
+        // call blocked callback
+        if(_shouldBlock) {
+            // Send a loadstart event for each top-level navigation (includes redirects).
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                        messageAsDictionary:@{@"type":@"on_navigation_blocked", @"url":[url absoluteString]}];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+            
+            return NO;
+        }
+    }
 
     if (isTopLevelNavigation) {
         self.currentURL = request.URL;

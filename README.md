@@ -218,6 +218,17 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 ## Example
 
 ```javascript
+const POLICY = [
+  {
+    // blocks navigation to login page
+    url: 'https://github.com/login.*',
+    schemes: 'http,https',
+  }, {
+    // blocks any navigation to url that doesn't contain github.com
+    url: '^((?!(github.com)).)*$',
+    schemes: '__ALLOWED__',
+  }
+];
 
 var inAppBrowserRef;
 
@@ -228,6 +239,8 @@ function showHelp(url) {
     var options = "location=yes,hidden=yes";
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
+    inAppBrowserRef.setNavigationBlockingPolicies(POLICY);  
+    inAppBrowserRef.addEventListener('on_navigation_blocked', function(event) { alert(event.url); });    
 
     inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
@@ -312,6 +325,9 @@ function executeScriptCallBack(params) {
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
+    ref.setNavigationBlockingPolicies(POLICY);  
+    ref.addEventListener('on_navigation_blocked', function(event) { alert(event.url); });
+
 
 ## InAppBrowser.removeEventListener
 
@@ -327,6 +343,7 @@ function executeScriptCallBack(params) {
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __on_navigation_blocked__: event fires when url is blocked and redirect is not done.
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.

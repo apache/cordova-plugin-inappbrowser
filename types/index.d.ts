@@ -166,6 +166,12 @@ interface InAppBrowser extends Window {
      *                  passed an Event object as a parameter.
      */
     removeEventListener(type: string, callback: (event: Event) => void): void;
+    /**
+     * Removes a listener for an event from the InAppBrowser.
+     * @param type      Array of policies
+     */
+     setNavigationBlockingPolicies(policies: Array<any> ): void; 
+
     /** Closes the InAppBrowser window. */
     close(): void;
     /** Hides the InAppBrowser window. Calling this has no effect if the InAppBrowser was already hidden. */
