@@ -44,6 +44,7 @@
 
 - (void)pluginInitialize
 {
+    _navigationBlockingPolicies = nil;
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
 }
@@ -388,6 +389,20 @@
     return NO;
 }
 
+- (void)setNavigationBlockingPolicies:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"setNavigationBlockingPolicies");   
+    NSString* jsWrapper = [command argumentAtIndex:0];
+    NSLog(@"setNavigationBlockingPolicies %@", jsWrapper); 
+    NSData *data = [jsWrapper dataUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"setNavigationBlockingPolicies %@", data);
+    if (data) {
+        self.navigationBlockingPolicies = [NSJSONSerialization JSONObjectWithData: data options:NSJSONReadingMutableContainers error:nil];
+    }
+    NSLog(@"setNavigationBlockingPolicies %@", self.navigationBlockingPolicies);
+    
+}
+
 /**
  * The iframe bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -408,7 +423,7 @@
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
-
+    NSLog(@"ShouldLoad %@", url);
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
@@ -442,6 +457,110 @@
         return NO;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
+        BOOL _shouldBlock = false;
+        static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            navigationTypes = @{
+                                @(UIWebViewNavigationTypeLinkClicked): @"click",
+                                @(UIWebViewNavigationTypeFormSubmitted): @"formsubmit",
+                                @(UIWebViewNavigationTypeBackForward): @"backforward",
+                                @(UIWebViewNavigationTypeReload): @"reload",
+                                @(UIWebViewNavigationTypeFormResubmitted): @"formresubmit",
+                                @(UIWebViewNavigationTypeOther): @"other",
+                                };
+        });
+        
+        NSString *sourceURL = [self.inAppBrowserViewController.currentURL absoluteString];
+        NSString *requestURL = (request.URL).absoluteString;
+        NSString *namedNavigationType = navigationTypes[@(navigationType)];
+        
+        // NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+        // [event addEntriesFromDictionary: @{
+        //                                     @"url": requestURL,
+        //                                     @"navigationType": namedNavigationType
+        // }];
+        NSLog(@"ShouldLoad isTopLevel");
+        NSLog(@"ShouldLoad source %@", sourceURL);
+        NSLog(@"ShouldLoad request %@", requestURL);
+        NSLog(@"ShouldLoad type %@", namedNavigationType);
+        NSLog(@"ShouldLoad policies %@", self.navigationBlockingPolicies);
+        if (self.navigationBlockingPolicies != nil){
+            NSDictionary *currentValues = @{
+                                            @"currentURL": sourceURL,
+                                            @"url": requestURL,
+                                            @"navigationType": namedNavigationType
+                                            };
+            NSString *eventValue;
+            BOOL policyFulfilled;
+            
+            for(NSDictionary *policy in self.navigationBlockingPolicies) {
+                // policy with no rules
+                NSLog(@"ShouldLoad,policy %@", policy);
+                if(policy.count < 1) {
+                    continue;
+                }
+                
+                policyFulfilled = YES;
+                
+                for(NSString *key in policy) {
+
+                    NSString *value = [policy objectForKey:key];
+                    NSLog(@"ShouldLoad,policy,key %@", key);
+                    NSLog(@"ShouldLoad,policy,value %@", value);
+                    // policy has failed already
+                    if(!policyFulfilled) break;
+                    
+                    // if (![currentValues objectForKey:key]) continue;
+
+                    eventValue = [currentValues objectForKey:key];
+                    // unverifiable policy rule
+                    if(!eventValue) {
+                        // policyFulfilled = NO;
+                        continue;
+                    }
+                    NSLog(@"ShouldLoad,policy,eventValue %@", eventValue);
+
+                    //NSPredicate *rule = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [policy objectForKey:key]];
+                    //policyFulfilled = [rule evaluateWithObject: eventValue];
+                    NSError* error = nil;
+                    // NSRange   searchedRange = NSMakeRange(0, [eventValue length]);
+                    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern: value options:0 error:&error];
+                    if (error != nil){
+                        continue;
+                    }
+                    // NSArray* matches = [regex matchesInString:eventValue options:0 range: searchedRange];
+                    // NSLog(@"ShouldLoad,policy,error %@", error);
+                    // NSLog(@"ShouldLoad,policy,matches %@", matches);
+                    // if(matches == nil || [matches count] == 0){
+                    //     policyFulfilled = NO;
+                    //     NSLog(@"ShouldLoad,policyFulfilled NO");
+                    // }
+                    if ([regex firstMatchInString:eventValue options:0 range:NSMakeRange(0, [eventValue length])]) {
+                        policyFulfilled = NO;
+                        NSLog(@"ShouldLoad,policyFulfilled NO");
+                    }                    
+
+                }
+                
+                if(policyFulfilled) {
+                    _shouldBlock = !_shouldBlock;
+                    break;
+                }
+            }
+    
+        }
+        // call blocked callback
+        if(_shouldBlock) {
+            NSLog(@"ShouldLoad,BLOCK");
+            // Send a loadstart event for each top-level navigation (includes redirects).
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                        messageAsDictionary:@{@"type":@"on_navigation_blocked", @"url":[url absoluteString], @"navigationType":namedNavigationType }];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];                                                        
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];            
+            return NO;       
+        }
+
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
@@ -929,89 +1048,6 @@
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
-
-    // skip this for the JS Navigation handler, initial load, iFrames and non-http(s) requests
-    if(isTopLevelNavigation && !self.loading) {
-        BOOL _shouldBlock = false;
-
-        //Blocking navigation logic
-        NSString* policiesStr = [self settingForKey:@"NavigationBlockingPolicies"];
-        NSError *jsonError;
-        NSData *objectData = [policiesStr dataUsingEncoding:NSUTF8StringEncoding];
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
-                                            options:NSJSONReadingMutableContainers 
-                                                error:&jsonError];
-        static NSDictionary<NSNumber *, NSString *> *navigationTypes;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            navigationTypes = @{
-                                @(UIWebViewNavigationTypeLinkClicked): @"click",
-                                @(UIWebViewNavigationTypeFormSubmitted): @"formsubmit",
-                                @(UIWebViewNavigationTypeBackForward): @"backforward",
-                                @(UIWebViewNavigationTypeReload): @"reload",
-                                @(UIWebViewNavigationTypeFormResubmitted): @"formresubmit",
-                                @(UIWebViewNavigationTypeOther): @"other",
-                                };
-        });
-        
-        NSString *sourceURL = (NSString *)self.source[@"uri"];
-        NSString *requestURL = (request.URL).absoluteString;
-        NSString *namedNavigationType = navigationTypes[@(navigationType)];     
-        if(policies.count > 0) {
-        NSDictionary *currentValues = @{
-                                        @"currentURL": sourceURL,
-                                        @"url": requestURL,
-                                        @"navigationType": namedNavigationType
-                                        };
-        NSString *eventValue;
-        BOOL policyFulfilled;
-        
-        for(NSDictionary *policy in policies) {
-            
-            // policy with no rules
-            if(policy.count < 1) {
-            continue;
-            }
-            
-            policyFulfilled = YES;
-            
-            for(NSString *key in policy) {
-            // policy has failed already
-            if(!policyFulfilled) break;
-            
-            eventValue = [currentValues objectForKey:key];
-            
-            // unverifiable policy rule
-            if(!eventValue) {
-                RCTLogWarn(@"Could not verify webview loading policy named %@. Failing policy with rules %@", key, policy);
-                policyFulfilled = NO;
-                break;
-            }
-            
-            NSPredicate *rule = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [policy objectForKey:key]];
-            
-            policyFulfilled = [rule evaluateWithObject: eventValue];
-            }
-            
-            if(policyFulfilled) {
-            _shouldBlock = !_shouldBlock;
-            break;
-            }
-        }
-        }
-        
-        // call blocked callback
-        if(_shouldBlock) {
-            // Send a loadstart event for each top-level navigation (includes redirects).
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                        messageAsDictionary:@{@"type":@"on_navigation_blocked", @"url":[url absoluteString]}];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
-            
-            return NO;
-        }
-    }
 
     if (isTopLevelNavigation) {
         self.currentURL = request.URL;

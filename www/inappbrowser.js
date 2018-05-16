@@ -73,7 +73,7 @@
             if (policies){
                 try {
                     if (policies instanceof Array && policies[0]){
-                        exec(null, null, 'InAppBrowser', 'setNavigationBlockingPolicies', [JSON.stringify(policies)]);
+                        exec(null, null, 'InAppBrowser', 'setNavigationBlockingPolicies', [JSON.stringify(policies),false]);
                     }
                     else{
                         throw e;

@@ -1207,25 +1207,6 @@ public class InAppBrowser extends CordovaPlugin {
                         
                         // has at least one rule
                         if (it != null && it.hasNext()) {
-                            if (policy.containsKey("schemes")){
-                                String[] schemes = policy.get("schemes").split(",");                 
-                                if (schemes[0] == "__ALLOWED__" ){
-                                    schemes=allowedSchemes;
-                                }
-                                if(schemes != null) {
-                                    Boolean s = false;     
-                                    for (String scheme : schemes) {
-                                        LOG.d(LOG_TAG, "NavigationBlocking policy scheme: "+ scheme);
-                                        if (url.startsWith(scheme)) {
-                                            s = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!s){
-                                        continue;
-                                    }
-                                }                              
-                            }                            
                             policyFulfilled = true;
 
                             // loop until there are no more rules or one has been rejected already
@@ -1235,7 +1216,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 policyValue = policy.get(policyKey);
                                 LOG.d(LOG_TAG, "NavigationBlocking policy: "+ policyKey + " - "+policyValue);
                                 if (!currentValues.containsKey(policyKey)) {
-                                    policyFulfilled = false;
+                                    // policyFulfilled = false;
                                     continue;
                                 }
 
@@ -1245,7 +1226,25 @@ public class InAppBrowser extends CordovaPlugin {
                             }
                         }
 
-
+                        if (policy.containsKey("schemes")){
+                            String[] schemes = policy.get("schemes").split(",");                 
+                            if (schemes[0] == "__ALLOWED__" ){
+                                schemes=allowedSchemes;
+                            }
+                            if(schemes != null) {
+                                Boolean s = false;     
+                                for (String scheme : schemes) {
+                                    LOG.d(LOG_TAG, "NavigationBlocking policy scheme: "+ scheme);
+                                    if (url.startsWith(scheme)) {
+                                        s = true;
+                                        break;
+                                    }
+                                }
+                                if (!s){
+                                    policyFulfilled=false;
+                                }
+                            }                              
+                        }
                         if (policyFulfilled) {
                             shouldBlock = !shouldBlock;
                             break;
