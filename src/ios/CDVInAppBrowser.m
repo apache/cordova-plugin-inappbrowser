@@ -37,6 +37,7 @@
 
 @interface CDVInAppBrowser () {
     NSInteger _previousStatusBarStyle;
+    NSArray * _navigationBlockingPolicies;
 }
 @end
 
@@ -391,15 +392,33 @@
 
 - (void)setNavigationBlockingPolicies:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"setNavigationBlockingPolicies");   
-    NSString* jsWrapper = [command argumentAtIndex:0];
-    NSLog(@"setNavigationBlockingPolicies %@", jsWrapper); 
-    NSData *data = [jsWrapper dataUsingEncoding:NSUTF8StringEncoding];
-    NSLog(@"setNavigationBlockingPolicies %@", data);
-    if (data) {
-        self.navigationBlockingPolicies = [NSJSONSerialization JSONObjectWithData: data options:NSJSONReadingMutableContainers error:nil];
+    //NSLog(@"setNavigationBlockingPolicies"); 
+    //NSLog(@"setNavigationBlockingPolicies-c %@", command);
+    NSString *jsWrapper;
+    @try {
+        jsWrapper = [command argumentAtIndex:0];
     }
-    NSLog(@"setNavigationBlockingPolicies %@", self.navigationBlockingPolicies);
+    @catch (NSException *exception) {
+        NSLog(@"setNavigationBlockingPolicies-error %@", [command class]);
+        NSLog(@"setNavigationBlockingPolicies-error %@", command);
+        NSLog(@"setNavigationBlockingPolicies-error %@", exception.reason);
+        if ([command isKindOfClass:[NSString class]]){
+            jsWrapper = (NSString * )command;
+        }else if ([command respondsToSelector:@selector(lastObject)]){
+            _navigationBlockingPolicies = (NSArray *)command;
+            return ;
+        }else{
+            return ;
+        }
+    }    
+
+    //NSLog(@"setNavigationBlockingPolicies s %@", jsWrapper); 
+    NSData *data = [jsWrapper dataUsingEncoding:NSUTF8StringEncoding];
+    //NSLog(@"setNavigationBlockingPolicies data %@", data);
+    if (data) {
+        _navigationBlockingPolicies = [NSJSONSerialization JSONObjectWithData: data options:NSJSONReadingMutableContainers error:nil];
+    }
+    //NSLog(@"setNavigationBlockingPolicies ret %@", _navigationBlockingPolicies);
     
 }
 
@@ -423,7 +442,7 @@
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
-    NSLog(@"ShouldLoad %@", url);
+    //NSLog(@"ShouldLoad %@", url);
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
@@ -480,12 +499,12 @@
         //                                     @"url": requestURL,
         //                                     @"navigationType": namedNavigationType
         // }];
-        NSLog(@"ShouldLoad isTopLevel");
-        NSLog(@"ShouldLoad source %@", sourceURL);
-        NSLog(@"ShouldLoad request %@", requestURL);
-        NSLog(@"ShouldLoad type %@", namedNavigationType);
-        NSLog(@"ShouldLoad policies %@", self.navigationBlockingPolicies);
-        if (self.navigationBlockingPolicies != nil){
+        //NSLog(@"ShouldLoad isTopLevel");
+        //NSLog(@"ShouldLoad source %@", sourceURL);
+        //NSLog(@"ShouldLoad request %@", requestURL);
+        //NSLog(@"ShouldLoad type %@", namedNavigationType);
+        //NSLog(@"ShouldLoad policies %@", _navigationBlockingPolicies);
+        if (_navigationBlockingPolicies != nil){
             NSDictionary *currentValues = @{
                                             @"currentURL": sourceURL,
                                             @"url": requestURL,
@@ -494,9 +513,9 @@
             NSString *eventValue;
             BOOL policyFulfilled;
             
-            for(NSDictionary *policy in self.navigationBlockingPolicies) {
+            for(NSDictionary *policy in _navigationBlockingPolicies) {
                 // policy with no rules
-                NSLog(@"ShouldLoad,policy %@", policy);
+                //NSLog(@"ShouldLoad,policy %@", policy);
                 if(policy.count < 1) {
                     continue;
                 }
@@ -506,8 +525,8 @@
                 for(NSString *key in policy) {
 
                     NSString *value = [policy objectForKey:key];
-                    NSLog(@"ShouldLoad,policy,key %@", key);
-                    NSLog(@"ShouldLoad,policy,value %@", value);
+                    //NSLog(@"ShouldLoad,policy,key %@", key);
+                    //NSLog(@"ShouldLoad,policy,value %@", value);
                     // policy has failed already
                     if(!policyFulfilled) break;
                     
@@ -519,7 +538,7 @@
                         // policyFulfilled = NO;
                         continue;
                     }
-                    NSLog(@"ShouldLoad,policy,eventValue %@", eventValue);
+                    //NSLog(@"ShouldLoad,policy,eventValue %@", eventValue);
 
                     //NSPredicate *rule = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [policy objectForKey:key]];
                     //policyFulfilled = [rule evaluateWithObject: eventValue];
@@ -527,6 +546,7 @@
                     // NSRange   searchedRange = NSMakeRange(0, [eventValue length]);
                     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern: value options:0 error:&error];
                     if (error != nil){
+                        NSLog(@"ShouldLoad,policy,error %@", error);
                         continue;
                     }
                     // NSArray* matches = [regex matchesInString:eventValue options:0 range: searchedRange];
@@ -536,9 +556,9 @@
                     //     policyFulfilled = NO;
                     //     NSLog(@"ShouldLoad,policyFulfilled NO");
                     // }
-                    if ([regex firstMatchInString:eventValue options:0 range:NSMakeRange(0, [eventValue length])]) {
+                    if ([regex firstMatchInString:eventValue options:0 range:NSMakeRange(0, [eventValue length])] == nil) {
                         policyFulfilled = NO;
-                        NSLog(@"ShouldLoad,policyFulfilled NO");
+                        //NSLog(@"ShouldLoad,policyFulfilled NO");
                     }                    
 
                 }
@@ -552,7 +572,7 @@
         }
         // call blocked callback
         if(_shouldBlock) {
-            NSLog(@"ShouldLoad,BLOCK");
+            //NSLog(@"ShouldLoad,BLOCK");
             // Send a loadstart event for each top-level navigation (includes redirects).
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                         messageAsDictionary:@{@"type":@"on_navigation_blocked", @"url":[url absoluteString], @"navigationType":namedNavigationType }];
