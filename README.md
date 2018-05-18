@@ -240,7 +240,7 @@ function showHelp(url) {
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
     inAppBrowserRef.setNavigationBlockingPolicies(POLICY);  
-    inAppBrowserRef.addEventListener('on_navigation_blocked', function(event) { alert(event.url); });    
+    inAppBrowserRef.addEventListener('navigation_blocked', function(event) { alert(event.url); });    
 
     inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
 
@@ -326,7 +326,7 @@ function executeScriptCallBack(params) {
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
     ref.setNavigationBlockingPolicies(POLICY);  
-    ref.addEventListener('on_navigation_blocked', function(event) { alert(event.url); });
+    ref.addEventListener('navigation_blocked', function(event) { alert(event.url); });
 
 
 ## InAppBrowser.removeEventListener
