@@ -37,7 +37,7 @@
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
             'exit': channel.create('exit'),
-            'on_navigation_blocked': channel.create('on_navigation_blocked'),
+            'navigation_blocked': channel.create('navigation_blocked'),
             'customscheme': channel.create('customscheme')
         };
     }

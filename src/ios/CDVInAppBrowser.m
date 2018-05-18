@@ -575,8 +575,9 @@
             //NSLog(@"ShouldLoad,BLOCK");
             // Send a loadstart event for each top-level navigation (includes redirects).
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
-                                                        messageAsDictionary:@{@"type":@"on_navigation_blocked", @"url":[url absoluteString], @"navigationType":namedNavigationType }];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];                                                        
+                                                        messageAsDictionary:@{@"type":@"navigation_blocked", @"url":[url absoluteString], @"navigationType":namedNavigationType }];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                                                                    
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];            
             return NO;       
         }
