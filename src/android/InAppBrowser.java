@@ -1227,7 +1227,10 @@ public class InAppBrowser extends CordovaPlugin {
                         }
 
                         if (policy.containsKey("schemes")){
-                            String[] schemes = policy.get("schemes").split(",");                 
+                            String[] schemes = policy.get("schemes").split(",");
+                            if (schemes[0].length() == 1){
+                                   schemes = {policy.get("schemes")};
+                            }
                             if (schemes[0] == "__ALLOWED__" ){
                                 schemes=allowedSchemes;
                             }
