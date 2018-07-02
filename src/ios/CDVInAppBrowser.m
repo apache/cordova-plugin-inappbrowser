@@ -33,6 +33,10 @@
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
+#if !defined(DEBUG) 
+    #define NSLogDebug(...)
+#endif
+
 #pragma mark CDVInAppBrowser
 
 @interface CDVInAppBrowser () {
@@ -392,16 +396,16 @@
 
 - (void)setNavigationBlockingPolicies:(CDVInvokedUrlCommand*)command
 {
-    //NSLog(@"setNavigationBlockingPolicies"); 
-    //NSLog(@"setNavigationBlockingPolicies-c %@", command);
+    NSLogDebug(@"setNavigationBlockingPolicies"); 
+    NSLogDebug(@"setNavigationBlockingPolicies-c %@", command);
     NSString *jsWrapper;
     @try {
         jsWrapper = [command argumentAtIndex:0];
     }
     @catch (NSException *exception) {
-        NSLog(@"setNavigationBlockingPolicies-error %@", [command class]);
-        NSLog(@"setNavigationBlockingPolicies-error %@", command);
-        NSLog(@"setNavigationBlockingPolicies-error %@", exception.reason);
+        NSLogDebug(@"setNavigationBlockingPolicies-error %@", [command class]);
+        NSLogDebug(@"setNavigationBlockingPolicies-error %@", command);
+        NSLogDebug(@"setNavigationBlockingPolicies-error %@", exception.reason);
         if ([command isKindOfClass:[NSString class]]){
             jsWrapper = (NSString * )command;
         }else if ([command respondsToSelector:@selector(lastObject)]){
@@ -412,13 +416,13 @@
         }
     }    
 
-    //NSLog(@"setNavigationBlockingPolicies s %@", jsWrapper); 
+    //NSLogDebug(@"setNavigationBlockingPolicies s %@", jsWrapper); 
     NSData *data = [jsWrapper dataUsingEncoding:NSUTF8StringEncoding];
-    //NSLog(@"setNavigationBlockingPolicies data %@", data);
+    NSLogDebug(@"setNavigationBlockingPolicies data %@", data);
     if (data) {
         _navigationBlockingPolicies = [NSJSONSerialization JSONObjectWithData: data options:NSJSONReadingMutableContainers error:nil];
     }
-    //NSLog(@"setNavigationBlockingPolicies ret %@", _navigationBlockingPolicies);
+    NSLogDebug(@"setNavigationBlockingPolicies ret %@", _navigationBlockingPolicies);
     
 }
 
@@ -441,8 +445,36 @@
 {
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
+    static NSDictionary<NSNumber *, NSString *> *navigationTypes;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+       navigationTypes = @{
+			@(UIWebViewNavigationTypeLinkClicked): @"click",
+			@(UIWebViewNavigationTypeFormSubmitted): @"formsubmit",
+			@(UIWebViewNavigationTypeBackForward): @"backforward",
+			@(UIWebViewNavigationTypeReload): @"reload",
+			@(UIWebViewNavigationTypeFormResubmitted): @"formresubmit",
+			@(UIWebViewNavigationTypeOther): @"other",
+			};
+    });
 
-    //NSLog(@"ShouldLoad %@", url);
+    NSString *sourceURL = [self.inAppBrowserViewController.currentURL absoluteString];
+    NSString *requestURL = (request.URL).absoluteString;
+    NSString *namedNavigationType = navigationTypes[@(navigationType)];
+    NSDictionary *currentValues = @{
+				    @"currentURL": sourceURL,
+				    @"url": requestURL,
+				    @"schemes": [url scheme],
+				    @"navigationType": namedNavigationType
+				    };
+	
+    NSLogDebug(@"ShouldLoad %@", url);
+
+    NSLogDebug(@"ShouldLoad source %@", sourceURL);
+    NSLogDebug(@"ShouldLoad request %@", requestURL);
+    NSLogDebug(@"ShouldLoad scheme %@", [url scheme]);
+    NSLogDebug(@"ShouldLoad type %@", namedNavigationType);
+    NSLogDebug(@"ShouldLoad policies %@", _navigationBlockingPolicies);	
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
     if ([[url scheme] isEqualToString:@"gap-iab"]) {
@@ -477,39 +509,16 @@
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         BOOL _shouldBlock = false;
-        static NSDictionary<NSNumber *, NSString *> *navigationTypes;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            navigationTypes = @{
-                                @(UIWebViewNavigationTypeLinkClicked): @"click",
-                                @(UIWebViewNavigationTypeFormSubmitted): @"formsubmit",
-                                @(UIWebViewNavigationTypeBackForward): @"backforward",
-                                @(UIWebViewNavigationTypeReload): @"reload",
-                                @(UIWebViewNavigationTypeFormResubmitted): @"formresubmit",
-                                @(UIWebViewNavigationTypeOther): @"other",
-                                };
-        });
-        
-        NSString *sourceURL = [self.inAppBrowserViewController.currentURL absoluteString];
-        NSString *requestURL = (request.URL).absoluteString;
-        NSString *namedNavigationType = navigationTypes[@(navigationType)];
-        
+
+        NSLogDebug(@"ShouldLoad isTopLevel");
         // NSMutableDictionary<NSString *, id> *event = [self baseEvent];
         // [event addEntriesFromDictionary: @{
         //                                     @"url": requestURL,
         //                                     @"navigationType": namedNavigationType
         // }];
-        //NSLog(@"ShouldLoad isTopLevel");
-        //NSLog(@"ShouldLoad source %@", sourceURL);
-        //NSLog(@"ShouldLoad request %@", requestURL);
-        //NSLog(@"ShouldLoad type %@", namedNavigationType);
-        //NSLog(@"ShouldLoad policies %@", _navigationBlockingPolicies);
+
         if (_navigationBlockingPolicies != nil){
-            NSDictionary *currentValues = @{
-                                            @"currentURL": sourceURL,
-                                            @"url": requestURL,
-                                            @"navigationType": namedNavigationType
-                                            };
+
             NSString *eventValue;
             BOOL policyFulfilled;
             
@@ -572,7 +581,7 @@
         }
         // call blocked callback
         if(_shouldBlock) {
-            //NSLog(@"ShouldLoad,BLOCK");
+            NSLogDebug(@"ShouldLoad,BLOCK");
             // Send a loadstart event for each top-level navigation (includes redirects).
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                         messageAsDictionary:@{@"type":@"navigation_blocked", @"url":[url absoluteString], @"navigationType":namedNavigationType }];
