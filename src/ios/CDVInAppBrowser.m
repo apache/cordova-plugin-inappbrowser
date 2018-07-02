@@ -38,7 +38,7 @@
 @interface CDVWindowForInAppBrowser : UIWindow
 @end
 
-@implementation CDVWindowForInAppBrowser()
+@implementation CDVWindowForInAppBrowser
 @end
 
 #pragma mark CDVInAppBrowser
