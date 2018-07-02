@@ -33,6 +33,14 @@
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
+#pragma mark CDVWindow
+
+@interface CDVWindowForInAppBrowser : UIWindow
+@end
+
+@implementation CDVWindowForInAppBrowser
+@end
+
 #pragma mark CDVInAppBrowser
 
 @interface CDVInAppBrowser () {
@@ -240,7 +248,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
             CGRect frame = [[UIScreen mainScreen] bounds];
-            UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            UIWindow *tmpWindow = [[CDVWindowForInAppBrowser alloc] initWithFrame:frame];
             UIViewController *tmpController = [[UIViewController alloc] init];
             [tmpWindow setRootViewController:tmpController];
             [tmpWindow setWindowLevel:UIWindowLevelNormal];
