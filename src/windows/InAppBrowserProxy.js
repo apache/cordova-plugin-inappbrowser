@@ -159,10 +159,12 @@ var IAB = {
                     // Save body overflow style to be able to reset it back later
                     bodyOverflowStyle = document.body.style.msOverflowStyle;
 
-                    browserWrap.onclick = function () {
-                        setTimeout(function () {
-                            IAB.close(navigationEventsCallback);
-                        }, 0);
+                    browserWrap.onclick = function (e) {
+                        if (e.target !== popup) {
+                            setTimeout(function () {
+                                IAB.close(navigationEventsCallback);
+                            }, 0);
+                        }
                     };
 
                     document.body.appendChild(browserWrap);
