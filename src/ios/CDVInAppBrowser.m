@@ -239,8 +239,10 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            CGRect frame = [[UIScreen mainScreen] bounds];
-            UIWindow *tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            if (!tmpWindow) {
+                CGRect frame = [[UIScreen mainScreen] bounds];
+                tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+            }
             UIViewController *tmpController = [[UIViewController alloc] init];
             [tmpWindow setRootViewController:tmpController];
             [tmpWindow setWindowLevel:UIWindowLevelNormal];
@@ -270,7 +272,9 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
             _previousStatusBarStyle = -1;
-            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
+          }];
         }
     });
 }
@@ -835,9 +839,13 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
-            [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:^{
+                [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
+            }];
         } else {
-            [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
+            [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:^{
+                [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
+            }];
         }
     });
 }
