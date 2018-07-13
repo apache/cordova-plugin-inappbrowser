@@ -46,6 +46,8 @@
 {
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
+    _useBeforeload = NO;
+    _waitForBeforeload = NO;
 }
 
 - (id)settingForKey:(NSString*)key
@@ -209,6 +211,10 @@
         self.inAppBrowserViewController.webView.suppressesIncrementalRendering = browserOptions.suppressesincrementalrendering;
     }
 
+    // use of beforeload event
+    _useBeforeload = browserOptions.beforeload;
+    _waitForBeforeload = browserOptions.beforeload;
+
     [self.inAppBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
         [self show:nil];
@@ -302,6 +308,27 @@
     if ([[UIApplication sharedApplication] openURL:url] == NO) {
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
     }
+}
+
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command
+{
+    NSString* urlStr = [command argumentAtIndex:0];
+
+    if (!_useBeforeload) {
+        NSLog(@"unexpected loadAfterBeforeload called without feature beforeload=yes");
+    }
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to invoke loadAfterBeforeload on IAB after it was closed.");
+        return;
+    }
+    if (urlStr == nil) {
+        NSLog(@"loadAfterBeforeload called with nil argument, ignoring.");
+        return;
+    }
+
+    NSURL* url = [NSURL URLWithString:urlStr];
+    _waitForBeforeload = NO;
+    [self.inAppBrowserViewController navigateTo:url];
 }
 
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
@@ -413,6 +440,7 @@
 {
     NSURL* url = request.URL;
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
+    BOOL shouldStart = YES;
 
     // See if the url uses the 'gap-iab' protocol. If so, the host should be the id of a callback to execute,
     // and the path, if present, should be a JSON-encoded value to pass to the callback.
@@ -440,11 +468,22 @@
             return NO;
         }
     }
+
+    // When beforeload=yes, on first URL change, initiate JS callback. Only after the beforeload event, continue.
+    if (_waitForBeforeload && isTopLevelNavigation) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        return NO;
+    }
+
     //if is an app store link, let the system handle it, otherwise it fails to load it
-    else if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
+    if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
         [theWebView stopLoading];
         [self openInSystem:url];
-        return NO;
+        shouldStart = NO;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
@@ -455,7 +494,11 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
 
-    return YES;
+    if (_useBeforeload && isTopLevelNavigation) {
+        _waitForBeforeload = YES;
+    }
+
+    return shouldStart;
 }
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView

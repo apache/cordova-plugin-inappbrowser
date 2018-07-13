@@ -30,7 +30,11 @@
 @class CDVInAppBrowserViewController;
 
 @interface CDVInAppBrowser : CDVPlugin {
-  UIWindow * tmpWindow;
+    UIWindow * tmpWindow;
+
+    @private
+    BOOL _useBeforeload;
+    BOOL _waitForBeforeload;
 }
 
 @property (nonatomic, retain) CDVInAppBrowserViewController* inAppBrowserViewController;
@@ -42,6 +46,7 @@
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command;
 
 @end
 
@@ -70,6 +75,7 @@
 @property (nonatomic, assign) BOOL suppressesincrementalrendering;
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
+@property (nonatomic, assign) BOOL beforeload;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
