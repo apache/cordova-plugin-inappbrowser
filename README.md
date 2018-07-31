@@ -28,7 +28,7 @@ description: Open an in-app browser window.
 |eslint|eslint|
 ||browser (chrome, firefox, edge)|
 ||iOS (9.3) on Xcode 7.3|
-||Android (4.4, 6.0)|
+||Android (4.4)|
 
 # cordova-plugin-inappbrowser
 

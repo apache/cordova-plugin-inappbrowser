@@ -63,17 +63,16 @@ matrix:
   #     - platform-tools
   #     - tools
   #     - build-tools-26.0.2
-  - env: PLATFORM=android-6.0
-    os: linux
-    language: android
-    jdk: oraclejdk8
-    android:
-      components:
-      - tools
-      - platform-tools
-      - tools
-      - build-tools-26.0.2
-  # TBD SKIP for now:
+  # - env: PLATFORM=android-6.0
+  #   os: linux
+  #   language: android
+  #   jdk: oraclejdk8
+  #   android:
+  #     components:
+  #     - tools
+  #     - platform-tools
+  #     - tools
+  #     - build-tools-26.0.2
   # - env: PLATFORM=android-7.0
   #   os: linux
   #   language: android
