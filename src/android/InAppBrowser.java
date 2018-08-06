@@ -65,16 +65,85 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
-import org.json.JSONException;
-import org.json.JSONObject;
+// import org.json.JSONException;
+// import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+// import java.util.Arrays;
+// import java.util.List;
+// import java.util.HashMap;
+// import java.util.StringTokenizer;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.*;
+
+class JsonHelper {
+    public static Object toJSON(Object object) throws JSONException {
+        if (object instanceof Map) {
+            JSONObject json = new JSONObject();
+            Map map = (Map) object;
+            for (Object key : map.keySet()) {
+                json.put(key.toString(), toJSON(map.get(key)));
+            }
+            return json;
+        } else if (object instanceof Iterable) {
+            JSONArray json = new JSONArray();
+            for (Object value : ((Iterable)object)) {
+                json.put(value);
+            }
+            return json;
+        } else {
+            return object;
+        }
+    }
+
+    public static boolean isEmptyObject(JSONObject object) {
+        return object.names() == null;
+    }
+
+    public static Map<String, Object> getMap(JSONObject object, String key) throws JSONException {
+        return toMap(object.getJSONObject(key));
+    }
+
+    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+        Map<String, Object> map = new HashMap();
+        Iterator keys = object.keys();
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            map.put(key, fromJson(object.get(key)));
+        }
+        return map;
+    }
+
+    public static List toList(String array) throws JSONException {
+        return toList(new JSONArray(array));
+    }
+
+    public static List toList(JSONArray array) throws JSONException {
+        List list = new ArrayList();
+        for (int i = 0; i < array.length(); i++) {
+            list.add(fromJson(array.get(i)));
+        }
+        return list;
+    }
+
+    public static Object fromJson(Object json) throws JSONException {
+        if (json == JSONObject.NULL) {
+            return null;
+        } else if (json instanceof JSONObject) {
+            return toMap((JSONObject) json);
+        } else if (json instanceof JSONArray) {
+            return toList((JSONArray) json);
+        } else {
+            return json;
+        }
+    }
+}
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -90,6 +159,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
+    private static final String ON_NAVIGATION_BLOCKED_EVENT = "navigation_blocked";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
@@ -134,6 +204,47 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showFooter = false;
     private String footerColor = "";
     private String[] allowedSchemes;
+    private ArrayList<HashMap<String,String>> blockingPolicies;
+
+    /**
+        * Set url blocking policy in JSON string
+        * @param string
+        */
+    public void setNavigationBlockingPolicies(String js) throws JSONException{
+        LOG.d(LOG_TAG, "NavigationBlocking = " + js); 
+        if (js == null || js.length() == 0) {
+            blockingPolicies = null;
+            return;
+        }                
+        blockingPolicies=new ArrayList<HashMap<String,String>>();
+        ArrayList<HashMap<String,Object>> list = (ArrayList<HashMap<String,Object>>)JsonHelper.toList(js);
+        for (int i = 0; i < list.size(); i++) {
+            HashMap<String,Object> element = ( HashMap<String,Object> ) list.get(i);
+            HashMap<String,String> policy = new HashMap<String,String>();
+            Iterator it = element.keySet().iterator();
+            while(it.hasNext()){
+                String key = (String)it.next();
+                String value = (String) element.get(key);
+                policy.put(key,value);
+                LOG.d(LOG_TAG, "NavigationBlocking. "+key+" - "+ value);
+            }
+            blockingPolicies.add(policy);
+        }        
+        // JSONArray json = parseJSONArray(js);
+        // // Get the first array of elements
+        // JSONArray values = json.getJSONArray(0);
+        
+        // for (int i = 0; i < values.size(); i++) {
+            
+        //     JSONObject item = values.getJSONObject(i); 
+
+        //     String name = item.getString("name");
+        //     boolean isFruit = item.getBoolean("isFruit");
+
+        //     println(name + ", " + isFruit);
+        // }
+                    
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -144,6 +255,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        LOG.d(LOG_TAG, "execute: "+action );
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
@@ -154,7 +266,7 @@ public class InAppBrowser extends CordovaPlugin {
             final String target = t;
             final HashMap<String, String> features = parseFeature(args.optString(2));
 
-            LOG.d(LOG_TAG, "target = " + target);
+            LOG.d(LOG_TAG, "target = " + target); 
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -297,6 +409,10 @@ public class InAppBrowser extends CordovaPlugin {
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
+        else if (action.equals("setNavigationBlockingPolicies")) {
+            LOG.d(LOG_TAG, "NavigationBlocking execute: "); 
+            setNavigationBlockingPolicies(args.getString(0));
+        }        
         else {
             return false;
         }
@@ -1049,7 +1165,8 @@ public class InAppBrowser extends CordovaPlugin {
         public InAppBrowserClient(CordovaWebView webView, EditText mEditText) {
             this.webView = webView;
             this.edittext = mEditText;
-        }
+        }     
+
 
         /**
          * Override the URL that should be loaded
@@ -1061,6 +1178,96 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+            // if (url.startsWith("http://") || url.startsWith("https://")) {
+                boolean shouldBlock = false;
+                boolean policyFulfilled = false;
+                HashMap<String,String> policy;
+                // if (blockingPolicies == null) {
+                //     String pol = preferences.getString("NavigationBlockingPolicies", "");
+                //     blockingPolicies = pol.split(",");
+                // } 
+            
+                LOG.d(LOG_TAG, "NavigationBlocking url: "+ url);
+                if (blockingPolicies != null && blockingPolicies.size() > 0) {
+                    HashMap<String,String> currentValues = new HashMap<String,String>();
+                    if (allowedSchemes == null) {
+                        String allowed = preferences.getString("AllowedSchemes", "");
+                        allowedSchemes = allowed.split(",");
+                    }
+                 
+                    currentValues.put("currentURL",webView.getUrl());
+                    currentValues.put("url",url);
+
+                    for (int i = 0; i < blockingPolicies.size(); i++) {
+                        policy = blockingPolicies.get(i);
+                        Iterator it = policy.keySet().iterator();
+                        String policyKey;
+                        String policyValue;
+
+                        
+                        // has at least one rule
+                        if (it != null && it.hasNext()) {
+                            policyFulfilled = true;
+
+                            // loop until there are no more rules or one has been rejected already
+                            while (it.hasNext() && policyFulfilled) {
+                                policyKey = (String)it.next();
+                                //policyValue = String.valueOf(policy.get(policyKey));
+                                policyValue = policy.get(policyKey);
+                                LOG.d(LOG_TAG, "NavigationBlocking policy: "+ policyKey + " - "+policyValue);
+                                if (!currentValues.containsKey(policyKey)) {
+                                    // policyFulfilled = false;
+                                    continue;
+                                }
+
+                                policyFulfilled = currentValues.get(policyKey)
+                                        .matches(policyValue);
+    
+                            }
+                        }
+
+                        if (policy.containsKey("schemes")){
+                            String[] schemes = policy.get("schemes").split(",");
+                            if (schemes[0].length() == 1){
+                                   schemes = {policy.get("schemes")};
+                            }
+                            if (schemes[0] == "__ALLOWED__" ){
+                                schemes=allowedSchemes;
+                            }
+                            if(schemes != null) {
+                                Boolean s = false;     
+                                for (String scheme : schemes) {
+                                    LOG.d(LOG_TAG, "NavigationBlocking policy scheme: "+ scheme);
+                                    if (url.startsWith(scheme)) {
+                                        s = true;
+                                        break;
+                                    }
+                                }
+                                if (!s){
+                                    policyFulfilled=false;
+                                }
+                            }                              
+                        }
+                        if (policyFulfilled) {
+                            shouldBlock = !shouldBlock;
+                            break;
+                        }
+                    }
+                }
+
+                if (shouldBlock) {
+                    try {
+                        JSONObject obj = new JSONObject();
+                        LOG.d(LOG_TAG, "NavigationBlocking policy BLOCK:");
+                        obj.put("type", ON_NAVIGATION_BLOCKED_EVENT);
+                        obj.put("url", url);
+                        sendUpdate(obj, true);
+                        return true;
+                    } catch (JSONException ex) {
+                        LOG.e(LOG_TAG, "NavigationBlocking: Custom Scheme URI passed in has caused a JSON error.");
+                    }
+                }
+       
             if (url.startsWith(WebView.SCHEME_TEL)) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -1136,7 +1343,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
 
-            return false;
+            return shouldBlock;
         }
 
 

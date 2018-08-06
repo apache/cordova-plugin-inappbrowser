@@ -37,6 +37,7 @@
             'loadstop': channel.create('loadstop'),
             'loaderror': channel.create('loaderror'),
             'exit': channel.create('exit'),
+            'navigation_blocked': channel.create('navigation_blocked'),
             'customscheme': channel.create('customscheme')
         };
     }
@@ -65,8 +66,25 @@
             if (eventname in this.channels) {
                 this.channels[eventname].unsubscribe(f);
             }
-        },
+        }, 
 
+        setNavigationBlockingPolicies: function (policies){
+            var e = new Error('setNavigationBlockingPolicies must provide a JSON list of policies'); 
+            if (policies){
+                try {
+                    if (policies instanceof Array && policies[0]){
+                        exec(null, null, 'InAppBrowser', 'setNavigationBlockingPolicies', [JSON.stringify(policies),false]);
+                    }
+                    else{
+                        throw e;
+                    }
+                } catch (e) {
+                    throw e;
+                }                
+            } else {
+                throw e;               
+            }
+        },
         executeScript: function (injectDetails, cb) {
             if (injectDetails.code) {
                 exec(cb, null, 'InAppBrowser', 'injectScriptCode', [injectDetails.code, !!cb]);
