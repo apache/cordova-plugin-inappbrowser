@@ -244,8 +244,9 @@
                 tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
+            double baseWindowLevel = [UIApplication sharedApplication].keyWindow.windowLevel;
             [tmpWindow setRootViewController:tmpController];
-            [tmpWindow setWindowLevel:UIWindowLevelNormal];
+            [tmpWindow setWindowLevel:baseWindowLevel+1];
 
             [tmpWindow makeKeyAndVisible];
             [tmpController presentViewController:nav animated:YES completion:nil];
