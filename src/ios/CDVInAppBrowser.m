@@ -299,8 +299,9 @@
 
 - (void)openInSystem:(NSURL*)url
 {
-    [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-    [[UIApplication sharedApplication] openURL:url];
+    if ([[UIApplication sharedApplication] openURL:url] == NO) {
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+    }
 }
 
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
