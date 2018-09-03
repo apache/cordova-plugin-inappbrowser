@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 3.1.0-dev (Unreleased)
+* CB-7179 (iOS): Add support to optionally use WKWebView for iOS
+
 ### 3.0.0 (Apr 12, 2018)
 * [CB-13659](https://issues.apache.org/jira/browse/CB-13659) **iOS** Add hidespinner option
 * In file `AppBrowser.java`: New code within `shouldOverrideUrlLoading()` to check for whitelisting custom schemes via a new `AllowedSchemes` preference configuration item.  Allows custom schemes like `mycoolapp://` or `wevotetwitterscheme://`
