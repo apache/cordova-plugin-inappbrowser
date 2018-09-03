@@ -29,5 +29,11 @@
     <js-module src="tests.js" name="tests">
     </js-module>
 
+    <platform name="ios">
+      <!-- The WKWebView implementation for inappbrowser requires the presence of this plugin  -->
+      <dependency id="cordova-plugin-wkwebview-engine" />
+    </platform>
+
+
     <asset src="resources" target="cdvtests/iab-resources" />
 </plugin>
