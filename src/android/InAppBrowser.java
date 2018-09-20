@@ -19,8 +19,12 @@
 package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.os.Parcelable;
 import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -71,6 +75,7 @@ import org.json.JSONObject;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
@@ -432,12 +437,53 @@ public class InAppBrowser extends CordovaPlugin {
                 intent.setData(uri);
             }
             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
-            this.cordova.getActivity().startActivity(intent);
+            // CB-10795: Avoid circular loops by preventing it from opening in the current app
+            this.openExternalExcludeCurrentApp(intent);
             return "";
             // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
         } catch (java.lang.RuntimeException e) {
             LOG.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
             return e.toString();
+        }
+    }
+
+    /**
+     * Opens the intent, providing a chooser that excludes the current app to avoid
+     * circular loops.
+     */
+    private void openExternalExcludeCurrentApp(Intent intent) {
+        String currentPackage = cordova.getActivity().getPackageName();
+        boolean hasCurrentPackage = false;
+
+        PackageManager pm = cordova.getActivity().getPackageManager();
+        List<ResolveInfo> activities = pm.queryIntentActivities(intent, 0);
+        ArrayList<Intent> targetIntents = new ArrayList<Intent>();
+
+        for (ResolveInfo ri : activities) {
+            if (!currentPackage.equals(ri.activityInfo.packageName)) {
+                Intent targetIntent = (Intent)intent.clone();
+                targetIntent.setPackage(ri.activityInfo.packageName);
+                targetIntents.add(targetIntent);
+            }
+            else {
+                hasCurrentPackage = true;
+            }
+        }
+
+        // If the current app package isn't a target for this URL, then use
+        // the normal launch behavior
+        if (hasCurrentPackage == false || targetIntents.size() == 0) {
+            this.cordova.getActivity().startActivity(intent);
+        }
+        // If there's only one possible intent, launch it directly
+        else if (targetIntents.size() == 1) {
+            this.cordova.getActivity().startActivity(targetIntents.get(0));
+        }
+        // Otherwise, show a custom chooser without the current app listed
+        else if (targetIntents.size() > 0) {
+            Intent chooser = Intent.createChooser(targetIntents.remove(targetIntents.size()-1), null);
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetIntents.toArray(new Parcelable[] {}));
+            this.cordova.getActivity().startActivity(chooser);
         }
     }
 
