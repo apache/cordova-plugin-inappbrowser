@@ -145,7 +145,15 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     if (browserOptions.clearcache) {
+        bool isAtLeastiOS11 = false;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
         if (@available(iOS 11.0, *)) {
+            isAtLeastiOS11 = true;
+        }
+#endif
+            
+        if(isAtLeastiOS11){
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
             // Deletes all cookies
             WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
             [cookieStore getAllCookies:^(NSArray* cookies) {
@@ -154,6 +162,7 @@ static CDVWKInAppBrowser* instance = nil;
                     [cookieStore deleteCookie:cookie completionHandler:nil];
                 }
             }];
+#endif
         }else{
             // https://stackoverflow.com/a/31803708/777265
             // Only deletes domain cookies (not session cookies)
@@ -172,7 +181,14 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     if (browserOptions.clearsessioncache) {
+        bool isAtLeastiOS11 = false;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
         if (@available(iOS 11.0, *)) {
+            isAtLeastiOS11 = true;
+        }
+#endif
+        if (isAtLeastiOS11) {
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
             // Deletes session cookies
             WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
             [cookieStore getAllCookies:^(NSArray* cookies) {
@@ -183,11 +199,12 @@ static CDVWKInAppBrowser* instance = nil;
                     }
                 }
             }];
+#endif
         }else{
             NSLog(@"clearsessioncache not available below iOS 11.0");
         }
     }
-    
+
     if (self.inAppBrowserViewController == nil) {
         NSString* userAgent = [CDVUserAgentUtil originalUserAgent];
         NSString* overrideUserAgent = [self settingForKey:@"OverrideUserAgent"];
