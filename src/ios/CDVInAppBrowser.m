@@ -77,6 +77,10 @@
 	return NO;
 }
 
+- (BOOL)prefersStatusBarHidden{
+    return YES;
+}
+
 - (void)open:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult;
@@ -809,6 +813,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+}
+
+- (BOOL)prefersStatusBarHidden{
+    return _browserOptions.hidestatusbar;
 }
 
 - (void)viewDidUnload
