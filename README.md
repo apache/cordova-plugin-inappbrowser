@@ -156,6 +156,7 @@ instance, or the system browser.
     - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
     - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
+    - __enablePictureInPicture__: Set to `yes` or `no` (default is `yes`). Turn on/off the [allowsPictureInPictureMediaPlayback](https://developer.apple.com/library/ios/documentation/UIKit/Reference/UIWebView_Class/#//apple_ref/occ/instp/UIWebView/allowsPictureInPictureMediaPlayback) property. Available in iOS 9.0 and later.
 
     Windows supports these additional options:
 
