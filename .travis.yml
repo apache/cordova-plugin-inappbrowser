@@ -87,7 +87,7 @@ before_install:
 - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
 - if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25,android-26,android-27;
   fi
-- git clone https://github.com/apache/cordova-paramedic /tmp/paramedic && pushd /tmp/paramedic
+- git clone -b janpio-fix_inappbrowser https://github.com/apache/cordova-paramedic /tmp/paramedic && pushd /tmp/paramedic
   && npm install && popd
 - npm install -g cordova
 
