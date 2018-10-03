@@ -19,11 +19,10 @@ matrix:
     os: linux
     language: node_js
     node_js: '4.2'
-  # TBD SKIP for now:
-  # - env: PLATFORM=browser-safari
-  #   os: linux
-  #   language: node_js
-  #   node_js: '4.2'
+  - env: PLATFORM=browser-safari
+    os: linux
+    language: node_js
+    node_js: '4.2'
   - env: PLATFORM=browser-edge
     os: linux
     language: node_js
@@ -38,9 +37,6 @@ matrix:
     osx_image: xcode8.3
     language: node_js
     node_js: '4.2'
-  # FUTURE TBD:
-  # - env: PLATFORM=ios-11.4
-  #   ...
   - env: PLATFORM=android-4.4
     os: linux
     language: android
@@ -51,40 +47,36 @@ matrix:
       - platform-tools
       - tools
       - build-tools-26.0.2
-  # TBD SKIP for now:
-  # - env: PLATFORM=android-5.1
-  #   os: linux
-  #   language: android
-  #   jdk: oraclejdk8
-  #   android:
-  #     components:
-  #     - tools
-  #     - platform-tools
-  #     - tools
-  #     - build-tools-26.0.2
-  # - env: PLATFORM=android-6.0
-  #   os: linux
-  #   language: android
-  #   jdk: oraclejdk8
-  #   android:
-  #     components:
-  #     - tools
-  #     - platform-tools
-  #     - tools
-  #     - build-tools-26.0.2
-  # - env: PLATFORM=android-7.0
-  #   os: linux
-  #   language: android
-  #   jdk: oraclejdk8
-  #   android:
-  #     components:
-  #     - tools
-  #     - platform-tools
-  #     - tools
-  #     - build-tools-26.0.2
-  # FUTURE TBD:
-  # - env: PLATFORM=android-8.?
-  #   ...
+  - env: PLATFORM=android-5.1
+    os: linux
+    language: android
+    jdk: oraclejdk8
+    android:
+      components:
+      - tools
+      - platform-tools
+      - tools
+      - build-tools-26.0.2
+  - env: PLATFORM=android-6.0
+    os: linux
+    language: android
+    jdk: oraclejdk8
+    android:
+      components:
+      - tools
+      - platform-tools
+      - tools
+      - build-tools-26.0.2
+  - env: PLATFORM=android-7.0
+    os: linux
+    language: android
+    jdk: oraclejdk8
+    android:
+      components:
+      - tools
+      - platform-tools
+      - tools
+      - build-tools-26.0.2
 
 before_install:
 - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm
@@ -93,7 +85,7 @@ before_install:
 - node --version
 - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
 - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
-- if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25,android-26;
+- if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25,android-26,android-27;
   fi
 - git clone https://github.com/apache/cordova-paramedic /tmp/paramedic && pushd /tmp/paramedic
   && npm install && popd
