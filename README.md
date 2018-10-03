@@ -115,6 +115,7 @@ instance, or the system browser.
     Android supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __beforeload__: set to `yes` to enable the `beforeload` event to modify which pages are actually loaded in the browser.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
@@ -137,6 +138,7 @@ instance, or the system browser.
     iOS supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __beforeload__: set to `yes` to enable the `beforeload` event to modify which pages are actually loaded in the browser.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened    
     - __closebuttoncolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default __Done__ button's color. Only applicable if toolbar is not disabled.
@@ -217,6 +219,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload=yes`).
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -230,7 +233,7 @@ function showHelp(url) {
 
     var target = "_blank";
 
-    var options = "location=yes,hidden=yes";
+    var options = "location=yes,hidden=yes,beforeload=yes";
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
@@ -239,6 +242,8 @@ function showHelp(url) {
     inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
     inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
+
+    inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
 
 }
 
@@ -284,6 +289,20 @@ function executeScriptCallBack(params) {
         $('#status-message').text(
            "Sorry we couldn't open that page. Message from the server is : '"
            + params.message + "'");
+    }
+
+}
+
+function beforeloadCallback(params, callback) {
+
+    if (params.url.startsWith("http://www.example.com/")) {
+
+        // Load this URL in the inAppBrowser.
+        callback(params.url);
+    } else {
+
+        // The callback is not invoked, so the page will not be loaded.
+        $('#status-message').text("This browser only opens pages on http://www.example.com/");
     }
 
 }
