@@ -115,8 +115,8 @@ instance, or the system browser.
     Android supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
-    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
+    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened.
+    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened.
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
     - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
     close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
