@@ -77,12 +77,12 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
 
 If you want all page loads in your app to go through the InAppBrowser, you can
 simply hook `window.open` during initialization.  For example:
-
+```javascript
     document.addEventListener("deviceready", onDeviceReady, false);
     function onDeviceReady() {
         window.open = cordova.InAppBrowser.open;
     }
-
+```
 ## cordova.InAppBrowser.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
@@ -201,6 +201,27 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 - executeScript
 - insertCSS
 
+## cordova.InAppBrowser.setDefaultOptions
+
+> Set default options for all instances of InAppBrowser;
+    
+    cordova.InAppBrowser.setDefaultOptions(options);
+
+## Example
+All options that have required attrinbute will be used even if another options will be provided in window.open.
+In other cases new and default will merge together
+
+```javascript
+    cordova.InAppBrowser.setDefaultOptions('location=no(required),toolbar=yes(required),closebuttoncaption=Close');
+```
+
+## cordova.InAppBrowser.setDefaultOptions
+
+> Get default options for all instances of InAppBrowser;
+    
+    cordova.InAppBrowser.getDefaultOptions();
+    
+    
 ## InAppBrowser.addEventListener
 
 > Adds a listener for an event from the `InAppBrowser`. (Only available when the target is set to `'_blank'`)
