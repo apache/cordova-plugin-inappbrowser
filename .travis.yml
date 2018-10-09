@@ -27,11 +27,12 @@ matrix:
     os: linux
     language: node_js
     node_js: '4.2'
-  - env: PLATFORM=ios-9.3
-    os: osx
-    osx_image: xcode8.3
-    language: node_js
-    node_js: '4.2'
+# iOS 9 not supported by iOS WKWebView implementation
+#  - env: PLATFORM=ios-9.3
+#    os: osx
+#    osx_image: xcode8.3
+#    language: node_js
+#    node_js: '4.2'
   - env: PLATFORM=ios-10.0
     os: osx
     osx_image: xcode8.3
