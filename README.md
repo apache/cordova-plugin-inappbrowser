@@ -71,10 +71,6 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
         console.log("window.open works well");
     }
 
-Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22cordova-plugin-inappbrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
-
-
-## <a id="reference">Reference</a>
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
@@ -115,8 +111,9 @@ instance, or the system browser.
     Android supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
-    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened.
-    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened.
+    - __beforeload__: set to `yes` to enable the `beforeload` event to modify which pages are actually loaded in the browser.
+    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
+    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
     - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
     close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
@@ -138,6 +135,7 @@ instance, or the system browser.
 
     - __usewkwebview__: set to `yes` to use WKWebView engine for the InappBrowser. Omit or set to `no` (default) to use UIWebView. Note: Using `usewkwebview=yes` requires that a WKWebView engine plugin be installed in the Cordova project (e.g. [cordova-plugin-wkwebview-engine](https://github.com/apache/cordova-plugin-wkwebview-engine) or [cordova-plugin-ionic-webview](https://github.com/ionic-team/cordova-plugin-ionic-webview)).
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __beforeload__: set to `yes` to enable the `beforeload` event to modify which pages are actually loaded in the browser.
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened. For WKWebView, requires iOS 11+ on target device.
     - __cleardata__: set to `yes` to have the browser's entire local storage cleared (cookies, HTML5 local storage, IndexedDB, etc.) before the new window is opened
@@ -219,6 +217,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload=yes`).
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -232,7 +231,7 @@ function showHelp(url) {
 
     var target = "_blank";
 
-    var options = "location=yes,hidden=yes";
+    var options = "location=yes,hidden=yes,beforeload=yes";
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
@@ -241,6 +240,8 @@ function showHelp(url) {
     inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
 
     inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
+
+    inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
 
 }
 
@@ -286,6 +287,20 @@ function executeScriptCallBack(params) {
         $('#status-message').text(
            "Sorry we couldn't open that page. Message from the server is : '"
            + params.message + "'");
+    }
+
+}
+
+function beforeloadCallback(params, callback) {
+
+    if (params.url.startsWith("http://www.example.com/")) {
+
+        // Load this URL in the inAppBrowser.
+        callback(params.url);
+    } else {
+
+        // The callback is not invoked, so the page will not be loaded.
+        $('#status-message').text("This browser only opens pages on http://www.example.com/");
     }
 
 }

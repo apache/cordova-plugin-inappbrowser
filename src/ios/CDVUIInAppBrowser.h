@@ -33,6 +33,10 @@
 
 @interface CDVUIInAppBrowser : CDVPlugin {
   UIWindow * tmpWindow;
+
+  @private
+  BOOL _useBeforeload;
+  BOOL _waitForBeforeload;
 }
 
 @property (nonatomic, retain) CDVUIInAppBrowserViewController* inAppBrowserViewController;
@@ -45,6 +49,7 @@
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command;
 
 @end
 
