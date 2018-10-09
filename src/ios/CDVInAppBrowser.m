@@ -551,6 +551,12 @@
     }
 
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
+
+    // remove temp UIWindow
+    if (tmpWindow != nil) {
+        [tmpWindow removeFromSuperview];
+        tmpWindow = nil;
+    }
 }
 
 @end
