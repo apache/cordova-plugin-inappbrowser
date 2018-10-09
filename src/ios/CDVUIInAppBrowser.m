@@ -507,6 +507,7 @@ static CDVUIInAppBrowser* instance = nil;
     }
 
     return shouldStart;
+}
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView
 {
