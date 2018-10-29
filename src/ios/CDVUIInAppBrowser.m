@@ -258,8 +258,6 @@ static CDVUIInAppBrowser* instance = nil;
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
             [tmpWindow setRootViewController:tmpController];
-            double baseWindowLevel = [UIApplication sharedApplication].keyWindow.windowLevel;
-            [tmpWindow setWindowLevel:baseWindowLevel+1];
 
             [tmpWindow makeKeyAndVisible];
             [tmpController presentViewController:nav animated:YES completion:nil];
