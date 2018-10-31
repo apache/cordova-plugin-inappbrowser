@@ -354,6 +354,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<div id="info">' +
         'Make sure http://cordova.apache.org and http://google.co.uk and https://www.google.co.uk are white listed. </br>' +
         'Make sure http://www.apple.com is not in the white list.</br>' +
+        'Make sure your config.xml contains: &lt;preference name="AllowedSchemes" value="custom" &gt;/<br/>' +
         'In iOS, starred <span style="vertical-align:super">*</span> tests will put the app in a state with no way to return. </br>' +
         '<h4>User-Agent: <span id="user-agent"> </span></hr>' +
         '</div>';
@@ -492,16 +493,20 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
         'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
 
+    var customscheme_tests = '<h1>customscheme</h1>' +
+        '<p/> <div id="openCustomscheme"></div>' +
+        'Expected result: open an alert dialog with the text "Results verified". Works only on Android and iOS.';
+
     // CB-7490 We need to wrap this code due to Windows security restrictions
     // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
     if (window.MSApp && window.MSApp.execUnsafeLocalFunction) {
         MSApp.execUnsafeLocalFunction(function () {
             contentEl.innerHTML = info_div + platform_info + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
-                css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests;
+                css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests + customscheme_tests;
         });
     } else {
         contentEl.innerHTML = info_div + platform_info + local_tests + white_listed_tests + non_white_listed_tests + page_with_redirects_tests + pdf_url_tests + invalid_url_tests +
-            css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests;
+            css_js_injection_tests + open_hidden_tests + clearing_cache_tests + video_tag_tests + local_with_anchor_tag_tests + hardwareback_tests + customscheme_tests;
     }
 
     document.getElementById('user-agent').textContent = navigator.userAgent;
@@ -732,4 +737,30 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             });
         });
     }, 'openHardwareBackDefaultAfterNo');
+
+    // Customscheme
+    createActionButton('customscheme', function () {
+
+        var ref = cordova.InAppBrowser.open('about:blank', '_blank', 'hidden=yes' + (platformOpts ? ',' + platformOpts : ''));
+        var openedCustomscheme = false;
+        ref.addEventListener('loadstop', function (e) {
+            // Avoid showing the alert twice on iOS, since loadstop is also being called after the customscheme event.
+            if (!openedCustomscheme) {
+                openedCustomscheme = true;
+                ref.executeScript({ code: 'window.location.replace("custom://test");' });
+            }
+        });
+        ref.addEventListener('customscheme', function (e) {
+            if (e && e.url === 'custom://test') {
+                alert('Results verified'); // eslint-disable-line no-undef
+            } else {
+                alert('Got: ' + e.url); // eslint-disable-line no-undef
+            }
+            ref.close();
+        });
+        ref.addEventListener('loaderror', function (e) {
+            alert('Load error: ' + e.message + '\nYou may need to set the AllowedSchemes preference'); // eslint-disable-line no-undef
+            ref.close();
+        });
+    }, 'openCustomscheme');
 };

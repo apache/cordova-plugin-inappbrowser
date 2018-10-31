@@ -58,6 +58,7 @@ cordova plugin add ../cordova-plugin-inappbrowser/tests
 cordova plugin add ../cordova-plugin-test-framework
 ```
 * edit ```config.xml``` and replace ```<content src="index.html" />``` with ```<content src="cdvtests/index.html" />```
+* edit ```config.xml``` and add ```<preference name="AllowedSchemes" value="custom" />```
 * run application
 ```
 cordova run
