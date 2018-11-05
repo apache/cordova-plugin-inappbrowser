@@ -399,7 +399,6 @@ static CDVWKInAppBrowser* instance = nil;
 
 
 //Synchronus helper for javascript evaluation
-
 - (void)evaluateJavaScript:(NSString *)script {
     __block NSString* _script = script;
     [self.inAppBrowserViewController.webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
