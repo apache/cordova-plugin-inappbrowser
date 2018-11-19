@@ -399,30 +399,17 @@ static CDVWKInAppBrowser* instance = nil;
 
 
 //Synchronus helper for javascript evaluation
-
-- (NSString *)evaluateJavaScript:(NSString *)script {
-    __block NSString *resultString = nil;
-    __block BOOL finished = NO;
+- (void)evaluateJavaScript:(NSString *)script {
     __block NSString* _script = script;
-    
     [self.inAppBrowserViewController.webView evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
         if (error == nil) {
             if (result != nil) {
-                resultString = result;
-                NSLog(@"%@", resultString);
+                NSLog(@"%@", result);
             }
         } else {
             NSLog(@"evaluateJavaScript error : %@ : %@", error.localizedDescription, _script);
         }
-        finished = YES;
     }];
-    
-    while (!finished)
-    {
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-    }
-    
-    return resultString;
 }
 
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command
