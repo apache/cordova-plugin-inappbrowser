@@ -121,5 +121,14 @@
     }
 }
 
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command
+{
+    if(self.usewkwebview){
+        [[CDVWKInAppBrowser getInstance] loadAfterBeforeload:command];
+    }else{
+        [[CDVUIInAppBrowser getInstance] loadAfterBeforeload:command];
+    }
+}
+
 
 @end

@@ -60,6 +60,8 @@ static CDVWKInAppBrowser* instance = nil;
     instance = self;
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
+    _useBeforeload = NO;
+    _waitForBeforeload = NO;
 }
 
 - (id)settingForKey:(NSString*)key
@@ -263,6 +265,9 @@ static CDVWKInAppBrowser* instance = nil;
         }
     }
     
+    // use of beforeload event
+    _useBeforeload = browserOptions.beforeload;
+    _waitForBeforeload = browserOptions.beforeload;
     
     [self.inAppBrowserViewController navigateTo:url];
     [self show:nil withNoAnimate:browserOptions.hidden];
@@ -368,6 +373,27 @@ static CDVWKInAppBrowser* instance = nil;
 {
     [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
     [[UIApplication sharedApplication] openURL:url];
+}
+
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command
+{
+    NSString* urlStr = [command argumentAtIndex:0];
+
+    if (!_useBeforeload) {
+        NSLog(@"unexpected loadAfterBeforeload called without feature beforeload=yes");
+    }
+    if (self.inAppBrowserViewController == nil) {
+        NSLog(@"Tried to invoke loadAfterBeforeload on IAB after it was closed.");
+        return;
+    }
+    if (urlStr == nil) {
+        NSLog(@"loadAfterBeforeload called with nil argument, ignoring.");
+        return;
+    }
+
+    NSURL* url = [NSURL URLWithString:urlStr];
+    _waitForBeforeload = NO;
+    [self.inAppBrowserViewController navigateTo:url];
 }
 
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
@@ -480,16 +506,29 @@ static CDVWKInAppBrowser* instance = nil;
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
  * other code execution is possible.
  */
-- (BOOL)webView:(WKWebView*)theWebView decidePolicyForNavigationAction:(NSURLRequest*)request
-{
-    NSURL* url = request.URL;
-    BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
+- (void)webView:(WKWebView *)theWebView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    
+    NSURL* url = navigationAction.request.URL;
+    NSURL* mainDocumentURL = navigationAction.request.mainDocumentURL;
+    BOOL isTopLevelNavigation = [url isEqual:mainDocumentURL];
+    BOOL shouldStart = YES;
+
+    // When beforeload=yes, on first URL change, initiate JS callback. Only after the beforeload event, continue.
+    if (_waitForBeforeload && isTopLevelNavigation) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+    }
     
     //if is an app store link, let the system handle it, otherwise it fails to load it
     if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
         [theWebView stopLoading];
         [self openInSystem:url];
-        return NO;
+        shouldStart = NO;
     }
     else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
@@ -499,8 +538,16 @@ static CDVWKInAppBrowser* instance = nil;
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+
+    if (_useBeforeload && isTopLevelNavigation) {
+        _waitForBeforeload = YES;
+    }
     
-    return YES;
+    if(shouldStart){
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }else{
+        decisionHandler(WKNavigationActionPolicyCancel);
+    }
 }
 
 #pragma mark WKScriptMessageHandler delegate
@@ -1072,10 +1119,7 @@ BOOL isExiting = FALSE;
         self.currentURL = url;
     }
     
-    [self.navigationDelegate webView:theWebView decidePolicyForNavigationAction:navigationAction.request];
-    
-    decisionHandler(WKNavigationActionPolicyAllow);
-    
+    [self.navigationDelegate webView:theWebView decidePolicyForNavigationAction:navigationAction decisionHandler:decisionHandler];
 }
 
 - (void)webView:(WKWebView *)theWebView didFinishNavigation:(WKNavigation *)navigation
