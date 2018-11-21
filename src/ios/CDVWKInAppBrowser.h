@@ -27,6 +27,9 @@
 @class CDVWKInAppBrowserViewController;
 
 @interface CDVWKInAppBrowser : CDVPlugin {
+    @private
+    BOOL _useBeforeload;
+    BOOL _waitForBeforeload;
 }
 
 @property (nonatomic, retain) CDVWKInAppBrowser* instance;
@@ -40,6 +43,7 @@
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command;
 
 @end
 
