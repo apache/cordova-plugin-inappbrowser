@@ -81,6 +81,8 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import android.content.res.Configuration;
+
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
 
@@ -741,8 +743,10 @@ public class InAppBrowser extends CordovaPlugin {
                     _close = close;
                 }
 
+                Configuration config = activityRes.getConfiguration();
+                boolean isLeftToRight = config.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
                 RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                closeLayoutParams.addRule(isLeftToRight ? RelativeLayout.ALIGN_PARENT_RIGHT : RelativeLayout.ALIGN_PARENT_LEFT);
                 _close.setLayoutParams(closeLayoutParams);
 
                 if (Build.VERSION.SDK_INT >= 16)
@@ -769,6 +773,9 @@ public class InAppBrowser extends CordovaPlugin {
                     dialog.dismiss();
                 };
 
+                Configuration config = cordova.getActivity().getResources().getConfiguration();
+                boolean isLeftToRight = config.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
+
                 // Let's create the main dialog
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
@@ -786,25 +793,25 @@ public class InAppBrowser extends CordovaPlugin {
                 toolbar.setBackgroundColor(toolbarColor);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
-                toolbar.setHorizontalGravity(Gravity.LEFT);
+                toolbar.setHorizontalGravity(isLeftToRight ? Gravity.LEFT : Gravity.RIGHT);
                 toolbar.setVerticalGravity(Gravity.TOP);
 
                 // Action Button Container layout
                 RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
                 actionButtonContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-                actionButtonContainer.setHorizontalGravity(Gravity.LEFT);
+                actionButtonContainer.setHorizontalGravity(isLeftToRight ? Gravity.LEFT : Gravity.RIGHT);
                 actionButtonContainer.setVerticalGravity(Gravity.CENTER_VERTICAL);
                 actionButtonContainer.setId(Integer.valueOf(1));
 
                 // Back button
                 ImageButton back = new ImageButton(cordova.getActivity());
                 RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                backLayoutParams.addRule(RelativeLayout.ALIGN_LEFT);
+                backLayoutParams.addRule(isLeftToRight ? RelativeLayout.ALIGN_LEFT : RelativeLayout.ALIGN_RIGHT);
                 back.setLayoutParams(backLayoutParams);
                 back.setContentDescription("Back Button");
                 back.setId(Integer.valueOf(2));
                 Resources activityRes = cordova.getActivity().getResources();
-                int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
+                int backResId = activityRes.getIdentifier(isLeftToRight ? "ic_action_previous_item" : "ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable backIcon = activityRes.getDrawable(backResId);
                 if (navigationButtonColor != "") back.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 if (Build.VERSION.SDK_INT >= 16)
@@ -826,11 +833,11 @@ public class InAppBrowser extends CordovaPlugin {
                 // Forward button
                 ImageButton forward = new ImageButton(cordova.getActivity());
                 RelativeLayout.LayoutParams forwardLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                forwardLayoutParams.addRule(RelativeLayout.RIGHT_OF, 2);
+                forwardLayoutParams.addRule(isLeftToRight ? RelativeLayout.RIGHT_OF : RelativeLayout.LEFT_OF, 2);
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
                 forward.setId(Integer.valueOf(3));
-                int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
+                int fwdResId = activityRes.getIdentifier(isLeftToRight ? "ic_action_next_item" : "ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
                 Drawable fwdIcon = activityRes.getDrawable(fwdResId);
                 if (navigationButtonColor != "") forward.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 if (Build.VERSION.SDK_INT >= 16)
@@ -852,8 +859,8 @@ public class InAppBrowser extends CordovaPlugin {
                 // Edit Text Box
                 edittext = new EditText(cordova.getActivity());
                 RelativeLayout.LayoutParams textLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
-                textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
+                textLayoutParams.addRule(isLeftToRight ? RelativeLayout.RIGHT_OF : RelativeLayout.LEFT_OF, 1);
+                textLayoutParams.addRule(isLeftToRight ? RelativeLayout.LEFT_OF : RelativeLayout.RIGHT_OF, 5);
                 edittext.setLayoutParams(textLayoutParams);
                 edittext.setId(Integer.valueOf(4));
                 edittext.setSingleLine(true);
@@ -890,7 +897,7 @@ public class InAppBrowser extends CordovaPlugin {
                 footerLayout.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
                 footer.setLayoutParams(footerLayout);
                 if (closeButtonCaption != "") footer.setPadding(this.dpToPixels(8), this.dpToPixels(8), this.dpToPixels(8), this.dpToPixels(8));
-                footer.setHorizontalGravity(Gravity.LEFT);
+                footer.setHorizontalGravity(isLeftToRight ? Gravity.LEFT : Gravity.RIGHT);
                 footer.setVerticalGravity(Gravity.BOTTOM);
 
                 View footerClose = createCloseButton(7);
