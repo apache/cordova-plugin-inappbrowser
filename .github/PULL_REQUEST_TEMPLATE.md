@@ -1,22 +1,40 @@
-<!--
-Please make sure the checklist boxes are all checked before submitting the PR. The checklist
-is intended as a quick reference, for complete details please see our Contributor Guidelines:
+## Description
+<!--- Describe your changes in detail -->
 
-http://cordova.apache.org/contribute/contribute_guidelines.html
+## Context
+<!--- Place the link to the issue here preceded by either 'Closes' OR 'Fixes' -->
 
-Thanks!
--->
+<!--- Why is this change required? What problem does it solve? -->
 
-### Platforms affected
+## Type of changes
+<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply -->
+- [ ] Feature (change which adds functionality)
+    - [ ] BREAKING CHANGE (existing functionality will not work as expected due to new feature)
+- [ ] Fix (change which fixes an issue)
+    - [ ] BREAKING CHANGE (existing functionality will not work as expected due to fix)
+- [ ] Performance (change which improves performance)
+    - [ ] BREAKING CHANGE (existing functionality will not work as expected due to performance improvement)
+- [ ] Refactor (non-breaking change that is neither feature, fix nor performance)
+- [ ] Style (non-breaking change that only affects formatting and/or white-space)
 
+## Components affected
+- [ ] Android platform
+- [ ] iOS platform
+- [ ] JavaScript
+- [ ] OutSystems
 
-### What does this PR do?
+## Tests
+<!--- Describe how you tested your changes in detail -->
+<!--- Include details of your test environment if relevant -->
 
+## Screenshots (if appropriate)
+<!--- E.g. before change & after change -->
 
-### What testing has been done on this change?
-
-
-### Checklist
-- [ ] [Reported an issue](http://cordova.apache.org/contribute/issues.html) in the JIRA database
-- [ ] Commit message follows the format: "CB-3232: (android) Fix bug with resolving file paths", where CB-xxxx is the JIRA ID & "android" is the platform affected.
-- [ ] Added automated test coverage as appropriate for this change.
+## Checklist
+<!--- Go over all the following items and put an `x` in all the boxes that apply -->
+- [ ] Pull request title follows the format `RNMT-XXXX <title>`
+- [ ] Tests have been created
+- [ ] Code follows code style of this project
+- [ ] CHANGELOG.md file is correctly updated
+- [ ] Changes require an update to the documentation
+	- [ ] Documentation has been updated accordingly
