@@ -312,7 +312,7 @@ function beforeloadCallback(params, callback) {
 
 function customschemeCallBack(event) {
 
-    $('#status-message').text("An approved custome scheme url loaded, url:" + event.url);
+    $('#status-message').text("An approved custom scheme url loaded, url:" + event.url);
 
 }
 
