@@ -213,8 +213,16 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
   - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload=yes`).
-
+  - __customscheme__: event fires when the `InAppBrowser` load an custom schemes (Only when approved in AllowedSchemes preference).
+  
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
+
+### Preferences
+
+-  __AllowedSchemes__ (string, defaults to null). Configure the allowable schemes in a comma separated list in a new preference. This implements whitelisting for the allowed schemes, but doesn't use the Cordova Whitelist plugin.
+to make your customscheme event to fire on this urls: `examplescheme://` and `othercheme://` add:
+
+        <preference name="AllowedSchemes" value="examplescheme,othercheme" />
 
 ## Example
 
@@ -237,6 +245,8 @@ function showHelp(url) {
     inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
     inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
+
+    inAppBrowserRef.addEventListener('customscheme', customschemeCallBack);
 
 }
 
@@ -300,11 +310,17 @@ function beforeloadCallback(params, callback) {
 
 }
 
+function customschemeCallBack(event) {
+
+    $('#status-message').text("An approved custom scheme url loaded, url:" + event.url);
+
+}
+
 ```
 
 ### InAppBrowserEvent Properties
 
-- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
+- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `customscheme`, or `exit`. _(String)_
 
 - __url__: the URL that was loaded. _(String)_
 
@@ -344,6 +360,7 @@ function beforeloadCallback(params, callback) {
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __customscheme__: event fires when the `InAppBrowser` load an custom schemes (Only when approved in AllowedSchemes preference).
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
