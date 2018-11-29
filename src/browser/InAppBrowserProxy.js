@@ -29,27 +29,43 @@ var browserWrap,
     forwardButton,
     closeButton;
 
-function attachNavigationEvents(element, callback) {
+function attachNavigationEvents (element, callback) {
     var onError = function () {
-        callback({ type: "loaderror", url: this.contentWindow.location.href}, {keepCallback: true});
+        try {
+            callback({ type: 'loaderror', url: this.contentWindow.location.href }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: 'loaderror', url: null }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        }
     };
 
-    element.addEventListener("pageshow", function () {
-        callback({ type: "loadstart", url: this.contentWindow.location.href}, {keepCallback: true});
+    element.addEventListener('pageshow', function () {
+        try {
+            callback({ type: 'loadstart', url: this.contentWindow.location.href }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: 'loadstart', url: null }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        }
     });
 
-    element.addEventListener("load", function () {
-        callback({ type: "loadstop", url: this.contentWindow.location.href}, {keepCallback: true});
+    element.addEventListener('load', function () {
+        try {
+            callback({ type: 'loadstop', url: this.contentWindow.location.href }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        } catch (err) {
+            // blocked by CORS :\
+            callback({ type: 'loadstop', url: null }, {keepCallback: true}); // eslint-disable-line standard/no-callback-literal
+        }
     });
 
-    element.addEventListener("error", onError);
-    element.addEventListener("abort", onError);
+    element.addEventListener('error', onError);
+    element.addEventListener('abort', onError);
 }
 
 var IAB = {
     close: function (win, lose) {
         if (browserWrap) {
-            if (win) win({ type: "exit" });
+            // use the "open" function callback so that the exit event is fired properly
+            if (IAB._win) IAB._win({ type: 'exit' });
 
             browserWrap.parentNode.removeChild(browserWrap);
             browserWrap = null;
@@ -59,109 +75,108 @@ var IAB = {
 
     show: function (win, lose) {
         if (browserWrap) {
-            browserWrap.style.display = "block";
+            browserWrap.style.display = 'block';
         }
     },
 
     open: function (win, lose, args) {
-        var strUrl = args[0],
-            target = args[1],
-            features = args[2];
+        var strUrl = args[0];
+        var target = args[1];
+        var features = args[2];
 
-        if (target === "_self" || !target) {
+        IAB._win = win;
+
+        if (target === '_self' || !target) {
             window.location = strUrl;
-        } else if (target === "_system") {
-            modulemapper.getOriginalSymbol(window, 'window.open').call(window, strUrl, "_blank");
+        } else if (target === '_system') {
+            modulemapper.getOriginalSymbol(window, 'window.open').call(window, strUrl, '_blank');
         } else {
             // "_blank" or anything else
             if (!browserWrap) {
-                browserWrap = document.createElement("div");
-                browserWrap.style.position = "absolute";
-                browserWrap.style.top = "0";
-                browserWrap.style.left = "0";
-                browserWrap.style.boxSizing = "border-box";
-                browserWrap.style.borderWidth = "40px";
-                browserWrap.style.width = "100vw";
-                browserWrap.style.height = "100vh";
-                browserWrap.style.borderStyle = "solid";
-                browserWrap.style.borderColor = "rgba(0,0,0,0.25)";
+                browserWrap = document.createElement('div');
+                browserWrap.style.position = 'absolute';
+                browserWrap.style.top = '0';
+                browserWrap.style.left = '0';
+                browserWrap.style.boxSizing = 'border-box';
+                browserWrap.style.borderWidth = '40px';
+                browserWrap.style.width = '100vw';
+                browserWrap.style.height = '100vh';
+                browserWrap.style.borderStyle = 'solid';
+                browserWrap.style.borderColor = 'rgba(0,0,0,0.25)';
 
                 browserWrap.onclick = function () {
                     setTimeout(function () {
-                        IAB.close(win);
+                        IAB.close();
                     }, 0);
                 };
 
                 document.body.appendChild(browserWrap);
             }
 
-            if (features.indexOf("hidden=yes") !== -1) {
-                browserWrap.style.display = "none";
+            if (features.indexOf('hidden=yes') !== -1) {
+                browserWrap.style.display = 'none';
             }
 
-            popup = document.createElement("iframe");
-            popup.style.borderWidth = "0px";
-            popup.style.width = "100%";
+            popup = document.createElement('iframe');
+            popup.style.borderWidth = '0px';
+            popup.style.width = '100%';
 
             browserWrap.appendChild(popup);
 
-            if (features.indexOf("location=yes") !== -1 || features.indexOf("location") === -1) {
-                popup.style.height = "calc(100% - 60px)";
-                popup.style.marginBottom = "-4px";
+            if (features.indexOf('location=yes') !== -1 || features.indexOf('location') === -1) {
+                popup.style.height = 'calc(100% - 60px)';
+                popup.style.marginBottom = '-4px';
 
-                navigationButtonsDiv = document.createElement("div");
-                navigationButtonsDiv.style.height = "60px";
-                navigationButtonsDiv.style.backgroundColor = "#404040";
-                navigationButtonsDiv.style.zIndex = "999";
+                navigationButtonsDiv = document.createElement('div');
+                navigationButtonsDiv.style.height = '60px';
+                navigationButtonsDiv.style.backgroundColor = '#404040';
+                navigationButtonsDiv.style.zIndex = '999';
                 navigationButtonsDiv.onclick = function (e) {
                     e.cancelBubble = true;
                 };
 
-                navigationButtonsDivInner = document.createElement("div");
-                navigationButtonsDivInner.style.paddingTop = "10px";
-                navigationButtonsDivInner.style.height = "50px";
-                navigationButtonsDivInner.style.width = "160px";
-                navigationButtonsDivInner.style.margin = "0 auto";
-                navigationButtonsDivInner.style.backgroundColor = "#404040";
-                navigationButtonsDivInner.style.zIndex = "999";
+                navigationButtonsDivInner = document.createElement('div');
+                navigationButtonsDivInner.style.paddingTop = '10px';
+                navigationButtonsDivInner.style.height = '50px';
+                navigationButtonsDivInner.style.width = '160px';
+                navigationButtonsDivInner.style.margin = '0 auto';
+                navigationButtonsDivInner.style.backgroundColor = '#404040';
+                navigationButtonsDivInner.style.zIndex = '999';
                 navigationButtonsDivInner.onclick = function (e) {
                     e.cancelBubble = true;
                 };
 
+                backButton = document.createElement('button');
+                backButton.style.width = '40px';
+                backButton.style.height = '40px';
+                backButton.style.borderRadius = '40px';
 
-                backButton = document.createElement("button");
-                backButton.style.width = "40px";
-                backButton.style.height = "40px";
-                backButton.style.borderRadius = "40px";
-
-                backButton.innerHTML = "←";
-                backButton.addEventListener("click", function (e) {
-                    if (popup.canGoBack)
-                        popup.goBack();
+                backButton.innerHTML = '←';
+                backButton.addEventListener('click', function (e) {
+                    if (popup.canGoBack) { popup.goBack(); }
                 });
 
-                forwardButton = document.createElement("button");
-                forwardButton.style.marginLeft = "20px";
-                forwardButton.style.width = "40px";
-                forwardButton.style.height = "40px";
-                forwardButton.style.borderRadius = "40px";
+                forwardButton = document.createElement('button');
+                forwardButton.style.marginLeft = '20px';
+                forwardButton.style.width = '40px';
+                forwardButton.style.height = '40px';
+                forwardButton.style.borderRadius = '40px';
 
-                forwardButton.innerHTML = "→";
-                forwardButton.addEventListener("click", function (e) {
-                    if (popup.canGoForward)
-                        popup.goForward();
+                forwardButton.innerHTML = '→';
+                forwardButton.addEventListener('click', function (e) {
+                    if (popup.canGoForward) { popup.goForward(); }
                 });
 
-                closeButton = document.createElement("button");
-                closeButton.style.marginLeft = "20px";
-                closeButton.style.width = "40px";
-                closeButton.style.height = "40px";
-                closeButton.style.borderRadius = "40px";
+                closeButton = document.createElement('button');
+                closeButton.style.marginLeft = '20px';
+                closeButton.style.width = '40px';
+                closeButton.style.height = '40px';
+                closeButton.style.borderRadius = '40px';
 
-                closeButton.innerHTML = "✖";
-                closeButton.addEventListener("click", function (e) {
+                closeButton.innerHTML = '✖';
+                closeButton.addEventListener('click', function (e) {
                     setTimeout(function () {
-                        IAB.close(win);
+                        IAB.close();
                     }, 0);
                 });
 
@@ -176,7 +191,7 @@ var IAB = {
 
                 browserWrap.appendChild(navigationButtonsDiv);
             } else {
-                popup.style.height = "100%";
+                popup.style.height = '100%';
             }
 
             // start listening for navigation events
@@ -187,8 +202,8 @@ var IAB = {
     },
 
     injectScriptCode: function (win, fail, args) {
-        var code = args[0],
-            hasCallback = args[1];
+        var code = args[0];
+        var hasCallback = args[1];
 
         if (browserWrap && popup) {
             try {
@@ -196,7 +211,7 @@ var IAB = {
                 if (hasCallback) {
                     win([]);
                 }
-            } catch(e) {
+            } catch (e) {
                 console.error('Error occured while trying to injectScriptCode: ' + JSON.stringify(e));
             }
         }
@@ -208,7 +223,7 @@ var IAB = {
         if (fail) {
             fail(msg);
         }
-    }, 
+    },
 
     injectStyleCode: function (win, fail, args) {
         var msg = 'Browser cordova-plugin-inappbrowser injectStyleCode is not yet implemented';
@@ -229,4 +244,4 @@ var IAB = {
 
 module.exports = IAB;
 
-require("cordova/exec/proxy").add("InAppBrowser", module.exports);
+require('cordova/exec/proxy').add('InAppBrowser', module.exports);
