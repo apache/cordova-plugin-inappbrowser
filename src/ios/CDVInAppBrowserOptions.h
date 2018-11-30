@@ -48,5 +48,6 @@
 @property (nonatomic, assign) BOOL beforeload;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
++ (NSMutableURLRequest*)createRequest:(NSURL*)url headers:(NSString*)headers;
 
 @end
