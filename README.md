@@ -213,6 +213,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
   - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload=yes`).
+  - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -238,6 +239,7 @@ function showHelp(url) {
 
     inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
 
+    inAppBrowserRef.addEventListener('message', messageCallBack);
 }
 
 function loadStartCallBack() {
@@ -251,6 +253,8 @@ function loadStopCallBack() {
     if (inAppBrowserRef != undefined) {
 
         inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;" });
+
+        inAppBrowserRef.executeScript({ code: "webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify({my_message: 'this is the message'}));" });
 
         $('#status-message').text("");
 
@@ -300,17 +304,23 @@ function beforeloadCallback(params, callback) {
 
 }
 
+function messageCallback(params){
+    $('#status-message').text("message received: "+params.data.my_message);
+}
+
 ```
 
 ### InAppBrowserEvent Properties
 
-- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
+- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `message` or `exit`. _(String)_
 
 - __url__: the URL that was loaded. _(String)_
 
 - __code__: the error code, only in the case of `loaderror`. _(Number)_
 
 - __message__: the error message, only in the case of `loaderror`. _(String)_
+
+- __data__: the message contents , only in the case of `message`. _(Object)_
 
 
 ### Supported Platforms
@@ -323,7 +333,7 @@ function beforeloadCallback(params, callback) {
 
 ### Browser Quirks
 
-`loadstart` and `loaderror` events are not being fired.
+`loadstart`, `loaderror`, `message` events are not being fired.
 
 ### Quick Example
 
@@ -344,6 +354,7 @@ function beforeloadCallback(params, callback) {
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
