@@ -887,7 +887,6 @@ static CDVUIInAppBrowser* instance = nil;
 - (void)viewDidUnload
 {
     [self.webView loadHTMLString:nil baseURL:nil];
-    self.webView.delegate = nil;
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     [super viewDidUnload];
 }
@@ -905,7 +904,6 @@ static CDVUIInAppBrowser* instance = nil;
 {
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     self.currentURL = nil;
-    self.webView.delegate = nil;
 
     if ((self.navigationDelegate != nil) && [self.navigationDelegate respondsToSelector:@selector(browserExit)]) {
         [self.navigationDelegate browserExit];
