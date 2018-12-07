@@ -254,7 +254,12 @@ function loadStopCallBack() {
 
         inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;" });
 
-        inAppBrowserRef.executeScript({ code: "webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify({my_message: 'this is the message'}));" });
+        inAppBrowserRef.executeScript({ code: "\
+            var message = 'this is the message';\
+            var messageObj = {my_message: message};\
+            var stringifiedMessageObj = JSON.stringify(messageObj);\
+            webkit.messageHandlers.cordova_iab.postMessage(stringifiedMessageObj);"
+        });
 
         $('#status-message').text("");
 
@@ -320,7 +325,7 @@ function messageCallback(params){
 
 - __message__: the error message, only in the case of `loaderror`. _(String)_
 
-- __data__: the message contents , only in the case of `message`. _(Object)_
+- __data__: the message contents , only in the case of `message`. A stringified JSON object. _(String)_
 
 
 ### Supported Platforms
@@ -333,7 +338,11 @@ function messageCallback(params){
 
 ### Browser Quirks
 
-`loadstart`, `loaderror`, `message` events are not being fired.
+`loadstart`, `loaderror`, `message` events are not fired.
+
+### Windows Quirks
+
+`message` event is not fired.
 
 ### Quick Example
 
