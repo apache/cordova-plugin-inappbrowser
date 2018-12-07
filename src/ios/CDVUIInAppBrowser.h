@@ -35,7 +35,7 @@
   UIWindow * tmpWindow;
 
   @private
-  BOOL _useBeforeload;
+  NSString* _beforeload;
   BOOL _waitForBeforeload;
 }
 

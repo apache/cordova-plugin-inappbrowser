@@ -28,7 +28,7 @@
 
 @interface CDVWKInAppBrowser : CDVPlugin {
     @private
-    BOOL _useBeforeload;
+    NSString* _beforeload;
     BOOL _waitForBeforeload;
 }
 
