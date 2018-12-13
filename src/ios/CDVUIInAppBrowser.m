@@ -337,6 +337,16 @@ static CDVUIInAppBrowser* instance = nil;
     [self.inAppBrowserViewController navigateTo:url];
 }
 
+-(void)createIframeBridge
+{
+    // Create an iframe bridge in the new document to communicate with the CDVThemeableBrowserViewController
+    NSString* jsIframeBridge = @"var e = _cdvIframeBridge=d.getElementById('_cdvIframeBridge'); if(!_cdvIframeBridge) {e = _cdvIframeBridge = d.createElement('iframe'); e.id='_cdvIframeBridge'; e.style.display='none'; d.body.appendChild(e);}";
+    // Add the postMessage API
+    NSString* jspostMessageApi = @"window.webkit={messageHandlers:{cordova_iab:{postMessage:function(message){_cdvIframeBridge.src='gap-iab://message/'+encodeURIComponent(message);}}}}";
+    // Inject the JS to the webview
+    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"(function(d){%@%@})(document)", jsIframeBridge, jspostMessageApi]];
+}
+
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
 // provides a consistent method for injecting JavaScript code into the document.
 //
@@ -348,9 +358,6 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
 {
-    // Ensure an iframe bridge is created to communicate with the CDVUIInAppBrowserViewController
-    [self.inAppBrowserViewController.webView stringByEvaluatingJavaScriptFromString:@"(function(d){_cdvIframeBridge=d.getElementById('_cdvIframeBridge');if(!_cdvIframeBridge) {var e = _cdvIframeBridge = d.createElement('iframe');e.id='_cdvIframeBridge'; e.style.display='none';d.body.appendChild(e);}})(document)"];
-
     if (jsWrapper != nil) {
         NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -472,6 +479,22 @@ static CDVUIInAppBrowser* instance = nil;
             }
             [self.commandDelegate sendPluginResult:pluginResult callbackId:scriptCallbackId];
             return NO;
+        }else if ([scriptCallbackId isEqualToString:@"message"] && (self.callbackId != nil)) {
+            // Send a message event
+            NSString* scriptResult = [url path];
+            if ((scriptResult != nil) && ([scriptResult length] > 1)) {
+                scriptResult = [scriptResult substringFromIndex:1];
+                NSError* __autoreleasing error = nil;
+                NSData* decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+                if (error == nil) {
+                    NSMutableDictionary* dResult = [NSMutableDictionary new];
+                    [dResult setValue:@"message" forKey:@"type"];
+                    [dResult setObject:decodedResult forKey:@"data"];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dResult];
+                    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+                }
+            }
         }
     }
 
@@ -513,6 +536,7 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
+    [self createIframeBridge];
     if (self.callbackId != nil) {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
