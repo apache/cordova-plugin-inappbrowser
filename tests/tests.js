@@ -24,6 +24,7 @@
 var cordova = require('cordova');
 var isWindows = cordova.platformId === 'windows';
 var isIos = cordova.platformId === 'ios';
+var isAndroid = cordova.platformId === 'android';
 var isBrowser = cordova.platformId === 'browser';
 
 window.alert = window.alert || navigator.notification.alert;
@@ -150,6 +151,32 @@ exports.defineAutoTests = function () {
                     verifyLoadErrorEvent(evt);
                     done();
                 });
+            });
+
+            it('inappbrowser.spec.7 should support message event', function (done) {
+                if (!isAndroid && !isIos) {
+                    return pending(cordova.platformId + ' platform doesn\'t support message event');
+                }
+                var messageKey = 'my_message';
+                var messageValue = 'is_this';
+                iabInstance = cordova.InAppBrowser.open(url, '_blank', platformOpts);
+                iabInstance.addEventListener('message', function (evt) {
+                    // Verify message event
+                    expect(evt).toBeDefined();
+                    expect(evt.type).toEqual('message');
+                    expect(evt.data).toBeDefined();
+                    expect(evt.data[messageKey]).toBeDefined();
+                    expect(evt.data[messageKey]).toEqual(messageValue);
+                    done();
+                });
+                iabInstance.addEventListener('loadstop', function (evt) {
+                    var code = '(function(){\n' +
+                        '    var message = {' + messageKey + ': "' + messageValue + '"};\n' +
+                        '    webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(message));\n' +
+                        '})()';
+                    iabInstance.executeScript({ code: code });
+                });
+
             });
         });
     };
