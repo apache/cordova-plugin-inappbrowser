@@ -73,6 +73,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -268,11 +269,15 @@ public class InAppBrowser extends CordovaPlugin {
             });
         }
         else if (action.equals("injectScriptCode")) {
-            String jsWrapper = null;
-            if (args.getBoolean(1)) {
-                jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && args.getBoolean(1)) {
+                runJavascriptWithResult(args.getString(0), callbackContext);
+            } else {
+                String jsWrapper = null;
+                if (args.getBoolean(1)) {
+                    jsWrapper = String.format("(function(){prompt(JSON.stringify([eval(%%s)]), 'gap-iab://%s')})()", callbackContext.getCallbackId());
+                }
+                injectDeferredObject(args.getString(0), jsWrapper);
             }
-            injectDeferredObject(args.getString(0), jsWrapper);
         }
         else if (action.equals("injectScriptFile")) {
             String jsWrapper;
@@ -404,6 +409,35 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         inAppWebView.evaluateJavascript(finalScriptToInject, null);
                     }
+                }
+            });
+        } else {
+            LOG.d(LOG_TAG, "Can't inject code into the system browser");
+        }
+    }
+
+    private void runJavascriptWithResult(String scriptToInject, CallbackContext callbackContext) {
+        if (inAppWebView!=null) {
+            final String finalScriptToInject = scriptToInject;
+            final CallbackContext finalCallbackContext = callbackContext;
+            final String callbackId = callbackContext.getCallbackId();
+
+            this.cordova.getActivity().runOnUiThread(new Runnable() {
+                @SuppressLint("NewApi")
+                @Override
+                public void run() {
+                    inAppWebView.evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String s) {
+                            PluginResult pluginResult;
+                            try {
+                                pluginResult = new PluginResult(PluginResult.Status.OK, new JSONArray("[" + s + "]"));
+                            } catch(JSONException e) {
+                                pluginResult = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+                            }
+                            finalCallbackContext.sendPluginResult(pluginResult);
+                        }
+                    });
                 }
             });
         } else {
