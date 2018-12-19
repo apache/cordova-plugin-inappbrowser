@@ -24,6 +24,9 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.os.Build;
+import android.annotation.TargetApi;
+import android.webkit.PermissionRequest;
 import android.webkit.JsPromptResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
@@ -122,7 +125,7 @@ public class InAppChromeClient extends WebChromeClient {
             else
             {
                 // Anything else with a gap: prefix should get this message
-                LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue); 
+                LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue);
                 result.cancel();
                 return true;
             }
@@ -130,4 +133,9 @@ public class InAppChromeClient extends WebChromeClient {
         return false;
     }
 
+    @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void onPermissionRequest(PermissionRequest request) {
+        request.grant(request.getResources());
+    }
 }
