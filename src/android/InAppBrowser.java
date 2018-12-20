@@ -19,6 +19,7 @@
 package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -51,6 +52,8 @@ import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -141,7 +144,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
-    private boolean useBeforeload = false;
+    private String beforeload = "";
     private String[] allowedSchemes;
 
     /**
@@ -251,8 +254,8 @@ public class InAppBrowser extends CordovaPlugin {
             closeDialog();
         }
         else if (action.equals("loadAfterBeforeload")) {
-            if (!useBeforeload) {
-              LOG.e(LOG_TAG, "unexpected loadAfterBeforeload called without feature beforeload=yes");
+            if (beforeload == null) {
+                LOG.e(LOG_TAG, "unexpected loadAfterBeforeload called without feature beforeload=yes");
             }
             final String url = args.getString(0);
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -692,9 +695,8 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
-            String beforeload = features.get(BEFORELOAD);
-            if (beforeload != null) {
-                useBeforeload = beforeload.equals("yes") ? true : false;
+            if (features.get(BEFORELOAD) != null) {
+                beforeload = features.get(BEFORELOAD);
             }
         }
 
@@ -946,7 +948,7 @@ public class InAppBrowser extends CordovaPlugin {
                     }
 
                 });
-                WebViewClient client = new InAppBrowserClient(thatWebView, edittext, useBeforeload);
+                WebViewClient client = new InAppBrowserClient(thatWebView, edittext, beforeload);
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -1123,7 +1125,7 @@ public class InAppBrowser extends CordovaPlugin {
     public class InAppBrowserClient extends WebViewClient {
         EditText edittext;
         CordovaWebView webView;
-        boolean useBeforeload;
+        String beforeload;
         boolean waitForBeforeload;
 
         /**
@@ -1132,11 +1134,41 @@ public class InAppBrowser extends CordovaPlugin {
          * @param webView
          * @param mEditText
          */
-        public InAppBrowserClient(CordovaWebView webView, EditText mEditText, boolean useBeforeload) {
+        public InAppBrowserClient(CordovaWebView webView, EditText mEditText, String beforeload) {
             this.webView = webView;
             this.edittext = mEditText;
-            this.useBeforeload = useBeforeload;
-            this.waitForBeforeload = useBeforeload;
+            this.beforeload = beforeload;
+            this.waitForBeforeload = beforeload != null;
+        }
+
+        /**
+         * Override the URL that should be loaded
+         *
+         * Legacy (deprecated in API 24)
+         * For Android 6 and below.
+         *
+         * @param webView
+         * @param url
+         */
+        @SuppressWarnings("deprecation")
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+            return shouldOverrideUrlLoading(url, null);
+        }
+
+        /**
+         * Override the URL that should be loaded
+         *
+         * New (added in API 24)
+         * For Android 7 and above.
+         *
+         * @param webView
+         * @param request
+         */
+        @TargetApi(Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+            return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
         }
 
         /**
@@ -1144,23 +1176,44 @@ public class InAppBrowser extends CordovaPlugin {
          *
          * This handles a small subset of all the URIs that would be encountered.
          *
-         * @param webView
          * @param url
+         * @param method
          */
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+        public boolean shouldOverrideUrlLoading(String url, String method) {
             boolean override = false;
+            boolean useBeforeload = false;
+            String errorMessage = null;
+
+            if(beforeload.equals("yes")
+                    //TODO handle POST requests then this condition can be removed:
+                    && !method.equals("POST"))
+            {
+                useBeforeload = true;
+            }else if(beforeload.equals("get") && (method == null || method.equals("GET"))){
+                useBeforeload = true;
+            }else if(beforeload.equals("post") && (method == null || method.equals("POST"))){
+                //TODO handle POST requests
+                errorMessage = "beforeload doesn't yet support POST requests";
+            }
 
             // On first URL change, initiate JS callback. Only after the beforeload event, continue.
-            if (this.waitForBeforeload) {
-                try {
-                    JSONObject obj = new JSONObject();
-                    obj.put("type", "beforeload");
-                    obj.put("url", url);
-                    sendUpdate(obj, true);
+            if (useBeforeload && this.waitForBeforeload) {
+                if(sendBeforeLoad(url, method)){
                     return true;
-                } catch (JSONException ex) {
-                    LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+                }
+            }
+
+            if(errorMessage != null){
+                try {
+                    LOG.e(LOG_TAG, errorMessage);
+                    JSONObject obj = new JSONObject();
+                    obj.put("type", LOAD_ERROR_EVENT);
+                    obj.put("url", url);
+                    obj.put("code", -1);
+                    obj.put("message", errorMessage);
+                    sendUpdate(obj, true, PluginResult.Status.ERROR);
+                }catch(Exception e){
+                    LOG.e(LOG_TAG, "Error sending loaderror for " + url + ": " + e.toString());
                 }
             }
 
@@ -1239,12 +1292,58 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
 
-            if (this.useBeforeload) {
+            if (useBeforeload) {
                 this.waitForBeforeload = true;
             }
             return override;
         }
 
+        private boolean sendBeforeLoad(String url, String method){
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("type", "beforeload");
+                obj.put("url", url);
+                if(method != null){
+                    obj.put("method", method);
+                }
+                sendUpdate(obj, true);
+                return true;
+            } catch (JSONException ex) {
+                LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
+            }
+            return false;
+        }
+
+
+        /**
+         * Legacy (deprecated in API 21)
+         * For Android 4.4 and below.
+         * @param view
+         * @param url
+         * @return
+         */
+        @SuppressWarnings("deprecation")
+        @Override
+        public WebResourceResponse shouldInterceptRequest (final WebView view, String url) {
+            return shouldInterceptRequest(url, super.shouldInterceptRequest(view, url), null);
+        }
+
+        /**
+         * New (added in API 21)
+         * For Android 5.0 and above.
+         *
+         * @param webView
+         * @param request
+         */
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            return shouldInterceptRequest(request.getUrl().toString(), super.shouldInterceptRequest(view, request), request.getMethod());
+        }
+
+        public WebResourceResponse shouldInterceptRequest(String url, WebResourceResponse response, String method){
+            return response;
+        }
 
         /*
          * onPageStarted fires the LOAD_START_EVENT

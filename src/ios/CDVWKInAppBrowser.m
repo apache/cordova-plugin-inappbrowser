@@ -60,7 +60,7 @@ static CDVWKInAppBrowser* instance = nil;
     instance = self;
     _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
-    _useBeforeload = NO;
+    _beforeload = @"";
     _waitForBeforeload = NO;
 }
 
@@ -266,8 +266,12 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     // use of beforeload event
-    _useBeforeload = browserOptions.beforeload;
-    _waitForBeforeload = browserOptions.beforeload;
+    if([browserOptions.beforeload isKindOfClass:[NSString class]]){
+        _beforeload = browserOptions.beforeload;
+    }else{
+        _beforeload = @"yes";
+    }
+    _waitForBeforeload = ![_beforeload isEqualToString:@""];
     
     [self.inAppBrowserViewController navigateTo:url];
     [self show:nil withNoAnimate:browserOptions.hidden];
@@ -379,8 +383,8 @@ static CDVWKInAppBrowser* instance = nil;
 {
     NSString* urlStr = [command argumentAtIndex:0];
 
-    if (!_useBeforeload) {
-        NSLog(@"unexpected loadAfterBeforeload called without feature beforeload=yes");
+    if ([_beforeload isEqualToString:@""]) {
+        NSLog(@"unexpected loadAfterBeforeload called without feature beforeload=get|post");
     }
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to invoke loadAfterBeforeload on IAB after it was closed.");
@@ -392,6 +396,7 @@ static CDVWKInAppBrowser* instance = nil;
     }
 
     NSURL* url = [NSURL URLWithString:urlStr];
+    //_beforeload = @"";
     _waitForBeforeload = NO;
     [self.inAppBrowserViewController navigateTo:url];
 }
@@ -512,16 +517,40 @@ static CDVWKInAppBrowser* instance = nil;
     NSURL* mainDocumentURL = navigationAction.request.mainDocumentURL;
     BOOL isTopLevelNavigation = [url isEqual:mainDocumentURL];
     BOOL shouldStart = YES;
+    BOOL useBeforeLoad = NO;
+    NSString* httpMethod = navigationAction.request.HTTPMethod;
+    NSString* errorMessage = nil;
+    
+    if([_beforeload isEqualToString:@"post"]){
+        //TODO handle POST requests by preserving POST data then remove this condition
+        errorMessage = @"beforeload doesn't yet support POST requests";
+    }
+    else if(isTopLevelNavigation && (
+           [_beforeload isEqualToString:@"yes"]
+       || ([_beforeload isEqualToString:@"get"] && [httpMethod isEqualToString:@"GET"])
+    // TODO comment in when POST requests are handled
+    // || ([_beforeload isEqualToString:@"post"] && [httpMethod isEqualToString:@"POST"])
+    )){
+        useBeforeLoad = YES;
+    }
 
-    // When beforeload=yes, on first URL change, initiate JS callback. Only after the beforeload event, continue.
-    if (_waitForBeforeload && isTopLevelNavigation) {
+    // When beforeload, on first URL change, initiate JS callback. Only after the beforeload event, continue.
+    if (_waitForBeforeload && useBeforeLoad) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-
+        
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
+    }
+    
+    if(errorMessage != nil){
+        NSLog(errorMessage);
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                                      messageAsDictionary:@{@"type":@"loaderror", @"url":[url absoluteString], @"code": @"-1", @"message": errorMessage}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
     
     //if is an app store link, let the system handle it, otherwise it fails to load it
@@ -539,7 +568,7 @@ static CDVWKInAppBrowser* instance = nil;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
 
-    if (_useBeforeload && isTopLevelNavigation) {
+    if (useBeforeLoad) {
         _waitForBeforeload = YES;
     }
     
