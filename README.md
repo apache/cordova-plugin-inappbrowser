@@ -295,7 +295,7 @@ function executeScriptCallBack(params) {
 
 }
 
-function beforeloadCallback(params, callback) {
+function beforeloadCallBack(params, callback) {
 
     if (params.url.startsWith("http://www.example.com/")) {
 
@@ -309,7 +309,7 @@ function beforeloadCallback(params, callback) {
 
 }
 
-function messageCallback(params){
+function messageCallBack(params){
     $('#status-message').text("message received: "+params.data.my_message);
 }
 
