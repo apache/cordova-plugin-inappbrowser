@@ -17,7 +17,7 @@ interface Window {
      *                 The options string must not contain any blank space, and each feature's
      *                 name/value pairs must be separated by a comma. Feature names are case insensitive.
      */
-    open(url: string, target?: string, options?: string, replace?: boolean): InAppBrowser;
+    open(url: string, target?: string, options?: string): InAppBrowser;
 }
 
 /**
