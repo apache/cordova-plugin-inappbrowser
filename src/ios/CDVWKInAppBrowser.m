@@ -573,7 +573,14 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     if(shouldStart){
-        decisionHandler(WKNavigationActionPolicyAllow);
+        // Fix GH-417: Handle non-default target attribute
+        // Based on https://stackoverflow.com/a/25853806/777265
+        if (!navigationAction.targetFrame.isMainFrame){
+            [theWebView loadRequest:navigationAction.request];
+            decisionHandler(WKNavigationActionPolicyCancel);
+        }else{
+            decisionHandler(WKNavigationActionPolicyAllow);
+        }
     }else{
         decisionHandler(WKNavigationActionPolicyCancel);
     }
