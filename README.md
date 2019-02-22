@@ -35,6 +35,8 @@ This plugin provides a web browser view that displays when calling `cordova.InAp
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
 
+### `window.open`
+
 The `cordova.InAppBrowser.open()` function is defined to be a drop-in replacement
 for the `window.open()` function.  Existing `window.open()` calls can use the
 InAppBrowser window, by replacing window.open:
