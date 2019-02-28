@@ -35,6 +35,8 @@ This plugin provides a web browser view that displays when calling `cordova.InAp
 
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
 
+### `window.open`
+
 The `cordova.InAppBrowser.open()` function is defined to be a drop-in replacement
 for the `window.open()` function.  Existing `window.open()` calls can use the
 InAppBrowser window, by replacing window.open:
@@ -66,10 +68,6 @@ Although `window.open` is in the global scope, InAppBrowser is not available unt
         console.log("window.open works well");
     }
 
-Report issues with this plugin on the [Apache Cordova issue tracker](https://issues.apache.org/jira/issues/?jql=project%20%3D%20CB%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22cordova-plugin-inappbrowser%22%20ORDER%20BY%20priority%20DESC%2C%20summary%20ASC%2C%20updatedDate%20DESC)
-
-
-## <a id="reference">Reference</a>
 ## Installation
 
     cordova plugin add cordova-plugin-inappbrowser
@@ -111,6 +109,7 @@ instance, or the system browser.
     Android supports these additional options:
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __beforeload__: set to enable the `beforeload` event to modify which pages are actually loaded in the browser. Accepted values are `get` to intercept only GET requests, `post` to intercept on POST requests or `yes` to intercept both GET & POST requests. Note that POST requests are not currently supported and will be ignored (if you set `beforeload=post` it will raise an error).
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
     - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
@@ -132,24 +131,29 @@ instance, or the system browser.
 
     iOS supports these additional options:
 
+    - __usewkwebview__: set to `yes` to use WKWebView engine for the InappBrowser. Omit or set to `no` (default) to use UIWebView. Note: Using `usewkwebview=yes` requires that a WKWebView engine plugin be installed in the Cordova project (e.g. [cordova-plugin-wkwebview-engine](https://github.com/apache/cordova-plugin-wkwebview-engine) or [cordova-plugin-ionic-webview](https://github.com/ionic-team/cordova-plugin-ionic-webview)).
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
+    - __beforeload__: set to enable the `beforeload` event to modify which pages are actually loaded in the browser. Accepted values are `get` to intercept only GET requests, `post` to intercept on POST requests or `yes` to intercept both GET & POST requests. Note that POST requests are not currently supported and will be ignored (if you set `beforeload=post` it will raise an error).
     - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened    
+    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened. For WKWebView, requires iOS 11+ on target device.
+    - __cleardata__: set to `yes` to have the browser's entire local storage cleared (cookies, HTML5 local storage, IndexedDB, etc.) before the new window is opened
     - __closebuttoncolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default __Done__ button's color. Only applicable if toolbar is not disabled.
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
     - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
     - __hidenavigationbuttons__:  set to `yes` or `no` to turn the toolbar navigation buttons on or off (defaults to `no`). Only applicable if toolbar is not disabled.
+    - __navigationbuttoncolor__:  set as a valid hex color string, for example: `#00ff00`, to change from the default color. Only applicable if navigation buttons are visible.
     - __toolbar__:  set to `yes` or `no` to turn the toolbar on or off for the InAppBrowser (defaults to `yes`)
     - __toolbarcolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default color of the toolbar. Only applicable if toolbar is not disabled.
     - __toolbartranslucent__:  set to `yes` or `no` to make the toolbar translucent(semi-transparent)  (defaults to `yes`). Only applicable if toolbar is not disabled.
-    - __enableViewportScale__:  Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`).
-    - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
-    - __allowInlineMediaPlayback__: Set to `yes` or `no` to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML's `video` element must also include the `webkit-playsinline` attribute (defaults to `no`)
-    - __keyboardDisplayRequiresUserAction__: Set to `yes` or `no` to open the keyboard when form elements receive focus via JavaScript's `focus()` call (defaults to `yes`).
-    - __suppressesIncrementalRendering__: Set to `yes` or `no` to wait until all new view content is received before being rendered (defaults to `no`).
+    - __enableViewportScale__:  Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`). Only applicable to UIWebView (`usewkwebview=no`) and WKWebView (`usewkwebview=yes`) on iOS 10+.
+    - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`). Applicable to UIWebView (`usewkwebview=no`) and WKWebView (`usewkwebview=yes`).
+    - __allowInlineMediaPlayback__: Set to `yes` or `no` to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML's `video` element must also include the `webkit-playsinline` attribute (defaults to `no`). Applicable to UIWebView (`usewkwebview=no`) and WKWebView (`usewkwebview=yes`).
+    - __keyboardDisplayRequiresUserAction__: Set to `yes` or `no` to open the keyboard when form elements receive focus via JavaScript's `focus()` call (defaults to `yes`). Only applicable to UIWebView (`usewkwebview=no`).
+    - __suppressesIncrementalRendering__: Set to `yes` or `no` to wait until all new view content is received before being rendered (defaults to `no`). Only applicable to UIWebView (`usewkwebview=no`).
     - __presentationstyle__:  Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style](http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle) (defaults to `fullscreen`).
     - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
+    - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
 
     Windows supports these additional options:
 
@@ -211,6 +215,8 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload` set).
+  - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -224,7 +230,7 @@ function showHelp(url) {
 
     var target = "_blank";
 
-    var options = "location=yes,hidden=yes";
+    var options = "location=yes,hidden=yes,beforeload=yes";
 
     inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
 
@@ -234,6 +240,9 @@ function showHelp(url) {
 
     inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
 
+    inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
+
+    inAppBrowserRef.addEventListener('message', messageCallBack);
 }
 
 function loadStartCallBack() {
@@ -247,6 +256,13 @@ function loadStopCallBack() {
     if (inAppBrowserRef != undefined) {
 
         inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;" });
+
+        inAppBrowserRef.executeScript({ code: "\
+            var message = 'this is the message';\
+            var messageObj = {my_message: message};\
+            var stringifiedMessageObj = JSON.stringify(messageObj);\
+            webkit.messageHandlers.cordova_iab.postMessage(stringifiedMessageObj);"
+        });
 
         $('#status-message').text("");
 
@@ -282,17 +298,37 @@ function executeScriptCallBack(params) {
 
 }
 
+function beforeloadCallback(params, callback) {
+
+    if (params.url.startsWith("http://www.example.com/")) {
+
+        // Load this URL in the inAppBrowser.
+        callback(params.url);
+    } else {
+
+        // The callback is not invoked, so the page will not be loaded.
+        $('#status-message').text("This browser only opens pages on http://www.example.com/");
+    }
+
+}
+
+function messageCallback(params){
+    $('#status-message').text("message received: "+params.data.my_message);
+}
+
 ```
 
 ### InAppBrowserEvent Properties
 
-- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, or `exit`. _(String)_
+- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `message` or `exit`. _(String)_
 
 - __url__: the URL that was loaded. _(String)_
 
 - __code__: the error code, only in the case of `loaderror`. _(Number)_
 
 - __message__: the error message, only in the case of `loaderror`. _(String)_
+
+- __data__: the message contents , only in the case of `message`. A stringified JSON object. _(String)_
 
 
 ### Supported Platforms
@@ -305,7 +341,11 @@ function executeScriptCallBack(params) {
 
 ### Browser Quirks
 
-`loadstart` and `loaderror` events are not being fired.
+`loadstart`, `loaderror`, `message` events are not fired.
+
+### Windows Quirks
+
+`message` event is not fired.
 
 ### Quick Example
 
@@ -326,6 +366,7 @@ function executeScriptCallBack(params) {
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
