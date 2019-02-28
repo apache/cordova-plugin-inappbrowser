@@ -104,7 +104,7 @@ instance, or the system browser.
     All platforms support:
 
     - __location__: Set to `yes` or `no` to turn the `InAppBrowser`'s location bar on or off.
-    - __lefttoright__: Set to `yes` to swap position of the navigation buttons and the close button.
+    - __lefttoright__: Set to `yes` to swap positions of the navigation buttons and the close button. Specifically from left to right on iOS, and from right to left for Android(since the default values for the platforms are opposites).
 
     Android supports these additional options:
 
