@@ -136,8 +136,10 @@ exports.defineAutoTests = function () {
                     verifyEvent(evt, 'exit');
                     done();
                 });
-                iabInstance.close();
-                iabInstance = null;
+                iabInstance.addEventListener('loadstop', function (evt) {
+                    iabInstance.close();
+                    iabInstance = null;
+                });
             });
 
             it('inappbrowser.spec.6 should support loaderror event', function (done) {
