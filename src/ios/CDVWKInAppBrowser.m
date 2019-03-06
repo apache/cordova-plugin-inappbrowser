@@ -228,7 +228,8 @@ static CDVWKInAppBrowser* instance = nil;
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar :browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption :browserOptions.closebuttoncolor];
+        int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
+        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption :browserOptions.closebuttoncolor :closeButtonIndex];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -884,9 +885,15 @@ BOOL isExiting = FALSE;
 
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
-      [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+        if (_browserOptions.lefttoright) {
+            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+        } else {
+            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+        }
+    } else if (_browserOptions.lefttoright) {
+        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
     } else {
-      [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
     
     self.view.backgroundColor = [UIColor grayColor];
@@ -900,7 +907,7 @@ BOOL isExiting = FALSE;
     [self.webView setFrame:frame];
 }
 
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString
+- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex
 {
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
@@ -912,7 +919,7 @@ BOOL isExiting = FALSE;
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
     
     NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:0 withObject:self.closeButton];
+    [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
     [self.toolbar setItems:items];
 }
 
