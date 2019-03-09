@@ -21,6 +21,7 @@ package org.apache.cordova.inappbrowser;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +32,16 @@ import org.json.JSONObject;
 public class InAppBrowserDialog extends Dialog {
     Context context;
     InAppBrowser inAppBrowser = null;
+    boolean hardwareBack;
 
-    public InAppBrowserDialog(Context context, int theme) {
+    public InAppBrowserDialog(Context context, int theme,
+          boolean hardwareBack) {
         super(context, theme);
         this.context = context;
+        this.hardwareBack = hardwareBack;
     }
 
-    public void setInAppBroswer(InAppBrowser browser) {
+    public void setInAppBrowser(InAppBrowser browser) {
         this.inAppBrowser = browser;
     }
 
@@ -45,9 +49,9 @@ public class InAppBrowserDialog extends Dialog {
         if (this.inAppBrowser == null) {
             this.dismiss();
         } else {
-            // better to go through the in inAppBrowser
-            // because it does a clean up
-            if (this.inAppBrowser.hardwareBack() && this.inAppBrowser.canGoBack()) {
+            // better to go through in inAppBrowser because it does a clean
+            // up
+            if (this.hardwareBack && this.inAppBrowser.canGoBack()) {
                 this.inAppBrowser.goBack();
             }  else {
                 this.inAppBrowser.closeDialog();
