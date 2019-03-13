@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
+    "url": "https://github.com/aparosa2001/cordova-plugin-inappbrowser"
   },
   "bugs": {
     "url": "https://issues.apache.org/jira/browse/CB"
