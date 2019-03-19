@@ -37,7 +37,6 @@
 
     InAppBrowser.prototype = {
         _eventHandler: function (event) {
-            alert(event.type);
             if (event && (event.type in this.channels)) {
                 this.channels[event.type].fire(event);
             }
@@ -100,7 +99,6 @@
     };
 
     exports.open = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
-        alert('open');
         // Don't catch calls that write to existing frames (e.g. named iframes).
         if (window.frames && window.frames[strWindowName]) {
             var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
