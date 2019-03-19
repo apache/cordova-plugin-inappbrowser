@@ -140,7 +140,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
-    private boolean hadwareBackButton = true;
+    private boolean hardwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
@@ -582,7 +582,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @return boolean
      */
     public boolean hardwareBack() {
-        return hadwareBackButton;
+        return hardwareBackButton;
     }
 
     /**
@@ -665,9 +665,9 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
-                hadwareBackButton = hardwareBack.equals("yes") ? true : false;
+                hardwareBackButton = hardwareBack.equals("yes") ? true : false;
             } else {
-                hadwareBackButton = DEFAULT_HARDWARE_BACK;
+                hardwareBackButton = DEFAULT_HARDWARE_BACK;
             }
             String mediaPlayback = features.get(MEDIA_PLAYBACK_REQUIRES_USER_ACTION);
             if (mediaPlayback != null) {
