@@ -462,7 +462,7 @@ static CDVUIInAppBrowser* instance = nil;
     BOOL useBeforeLoad = NO;
     NSString* httpMethod = request.HTTPMethod;
     NSString* errorMessage = nil;
-    
+
     if([_beforeload isEqualToString:@"post"]){
         //TODO handle POST requests by preserving POST data then remove this condition
         errorMessage = @"beforeload doesn't yet support POST requests";
@@ -524,11 +524,11 @@ static CDVUIInAppBrowser* instance = nil;
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        
+
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         return NO;
     }
-    
+
     if(errorMessage != nil){
         NSLog(errorMessage);
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
@@ -692,7 +692,7 @@ static CDVUIInAppBrowser* instance = nil;
     UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpaceButton.width = 20;
 
-    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
+    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT - [self getStatusBarOffset] : [self getStatusBarOffset];
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
 
     self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
@@ -775,7 +775,7 @@ static CDVUIInAppBrowser* instance = nil;
         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
 
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -991,6 +991,7 @@ static CDVUIInAppBrowser* instance = nil;
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
     }
+
     [self rePositionViews];
 
     [super viewWillAppear:animated];
@@ -1009,7 +1010,7 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void) rePositionViews {
     if ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
-        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
+        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, [self getStatusBarOffset] + TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
 }
