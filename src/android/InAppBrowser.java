@@ -822,17 +822,6 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 toolbar.setVerticalGravity(Gravity.TOP);
 
-                // String toolbarBorderColor = features.get(BORDER_BOTTOM_COLOR);
-                // GradientDrawable toolbarBorder = null;
-                // if (toolbarBorderColor != null) {
-                //     toolbarBorder = new GradientDrawable();
-                //     toolbarBorder.setShape(GradientDrawable.LINE);
-                //     toolbarBorder.setColor(toolbarColor);
-                //     toolbarBorder.setStroke(2, Color.parseColor(toolbarBorderColor));
-
-                //     toolbar.setBackground(toolbarBorder);
-                // }
-
                 // Action Button Container layout
                 RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
                 RelativeLayout.LayoutParams actionButtonLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
