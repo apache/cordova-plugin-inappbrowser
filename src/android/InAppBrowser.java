@@ -645,7 +645,7 @@ public class InAppBrowser extends CordovaPlugin {
                 showLocationBar = show.equals("yes") ? true : false;
             }
             String hidePreviousNextButtons = features.get(HIDE_PREVIOUS_NEXT_BUTTONS);
-            if (hidePreviousNextButtons.equals("yes")) {
+            if (hidePreviousNextButtons != null && hidePreviousNextButtons.equals("yes")) {
                 showNextBackButtons = false;
             }
 
