@@ -33,6 +33,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -108,6 +109,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
     private static final String TOOLBAR_COLOR = "toolbarcolor";
+    private static final String BORDER_BOTTOM_COLOR = "borderbottomcolor";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
     private static final String CLOSE_BUTTON_COLOR = "closebuttoncolor";
     private static final String LEFT_TO_RIGHT = "lefttoright";
@@ -119,7 +121,14 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(
+        CLOSE_BUTTON_CAPTION,
+        TOOLBAR_COLOR,
+        NAVIGATION_COLOR,
+        CLOSE_BUTTON_COLOR,
+        FOOTER_COLOR,
+        BORDER_BOTTOM_COLOR
+    );
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -695,7 +704,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String toolbarColorSet = features.get(TOOLBAR_COLOR);
             if (toolbarColorSet != null) {
-                toolbarColor = android.graphics.Color.parseColor(toolbarColorSet);
+                toolbarColor = Color.parseColor(toolbarColorSet);
             }
             String navigationButtonColorSet = features.get(NAVIGATION_COLOR);
             if (navigationButtonColorSet != null) {
@@ -798,7 +807,6 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
-                main.setPadding(0, 0, 0, 0);
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
@@ -813,6 +821,17 @@ public class InAppBrowser extends CordovaPlugin {
                     toolbar.setHorizontalGravity(Gravity.RIGHT);
                 }
                 toolbar.setVerticalGravity(Gravity.TOP);
+
+                // String toolbarBorderColor = features.get(BORDER_BOTTOM_COLOR);
+                // GradientDrawable toolbarBorder = null;
+                // if (toolbarBorderColor != null) {
+                //     toolbarBorder = new GradientDrawable();
+                //     toolbarBorder.setShape(GradientDrawable.LINE);
+                //     toolbarBorder.setColor(toolbarColor);
+                //     toolbarBorder.setStroke(2, Color.parseColor(toolbarBorderColor));
+
+                //     toolbar.setBackground(toolbarBorder);
+                // }
 
                 // Action Button Container layout
                 RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
@@ -838,7 +857,7 @@ public class InAppBrowser extends CordovaPlugin {
                     Resources activityRes = cordova.getActivity().getResources();
                     int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
                     Drawable backIcon = activityRes.getDrawable(backResId);
-                    if (navigationButtonColor != "") back.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
+                    if (navigationButtonColor != "") back.setColorFilter(Color.parseColor(navigationButtonColor));
                     if (Build.VERSION.SDK_INT >= 16)
                         back.setBackground(null);
                     else
@@ -1058,6 +1077,14 @@ public class InAppBrowser extends CordovaPlugin {
                 if (getShowLocationBar()) {
                     // Add our toolbar to our main view/layout
                     main.addView(toolbar);
+                }
+
+                String toolbarBorderColor = features.get(BORDER_BOTTOM_COLOR);
+                if (getShowLocationBar() && toolbarBorderColor != null) {
+                    RelativeLayout toolbarBorder = new RelativeLayout(cordova.getActivity());
+                    toolbarBorder.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(1)));
+                    toolbarBorder.setBackgroundColor(Color.parseColor(toolbarBorderColor));
+                    main.addView(toolbarBorder);
                 }
 
                 // Add our webview to our main view/layout
