@@ -330,9 +330,7 @@
                 tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
-            double baseWindowLevel = [UIApplication sharedApplication].keyWindow.windowLevel;
             [tmpWindow setRootViewController:tmpController];
-            [tmpWindow setWindowLevel:baseWindowLevel+1];
 
             [tmpWindow makeKeyAndVisible];
             [tmpController presentViewController:nav animated:YES completion:nil];
@@ -629,7 +627,7 @@
     self.inAppBrowserViewController = nil;
     self.callbackId = nil;
     self.callbackIdPattern = nil;
-    
+
 
 
 
@@ -1232,6 +1230,8 @@
 
 - (void)close
 {
+    [self emitEventForButton:_browserOptions.closeButton];
+
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     self.currentURL = nil;
 
