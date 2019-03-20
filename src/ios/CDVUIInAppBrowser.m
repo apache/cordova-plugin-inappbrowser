@@ -29,7 +29,6 @@
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
 #define    TOOLBAR_HEIGHT 44.0
-#define    STATUSBAR_HEIGHT 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
@@ -684,7 +683,12 @@ static CDVUIInAppBrowser* instance = nil;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    if (_browserOptions.closebuttonimage != nil) {
+        UIImage *closeButtonImage = [[UIImage imageNamed:_browserOptions.closebuttonimage] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        self.closeButton = [[UIBarButtonItem alloc] initWithImage:closeButtonImage style:UIBarButtonItemStylePlain target:self action:@selector(close)];
+    } else {
+        self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    }
     self.closeButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -788,6 +792,9 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex
 {
+    // skip if we're using an image instead
+    if (_browserOptions.closebuttonimage) return;
+
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
     self.closeButton = nil;
