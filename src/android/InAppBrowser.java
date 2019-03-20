@@ -177,7 +177,7 @@ public class InAppBrowser extends CordovaPlugin {
                 t = SELF;
             }
             final String target = t;
-            final HashMap<String, String> features = parseFeature(args.optString(2));
+            final HashMap<String, String> features = parseFeatures(args.optString(2));
 
             LOG.d(LOG_TAG, "target = " + target);
 
@@ -430,7 +430,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param optString
      * @return
      */
-    private HashMap<String, String> parseFeature(String optString) {
+    private HashMap<String, String> parseFeatures(String optString) {
         if (optString.equals(NULL)) {
             return null;
         } else {
