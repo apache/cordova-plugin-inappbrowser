@@ -717,6 +717,12 @@ static CDVUIInAppBrowser* instance = nil;
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
       self.toolbar.translucent = NO;
     }
+    if (_browserOptions.borderbottomcolor != nil) { // add a border to the bottom of the toolbar
+      CALayer* toolbarBottomBorder = [[CALayer alloc] init];
+      toolbarBottomBorder.frame = CGRectMake(0, toolbarFrame.size.height - 1.0, toolbarFrame.size.width, 1.0);
+      toolbarBottomBorder.backgroundColor = [self colorFromHexString:_browserOptions.borderbottomcolor].CGColor;
+      [self.toolbar.layer addSublayer:toolbarBottomBorder];
+    }
 
     CGFloat labelInset = 5.0;
     float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;

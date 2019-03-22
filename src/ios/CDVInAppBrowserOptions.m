@@ -28,6 +28,7 @@
         self.usewkwebview = NO;
         self.location = YES;
         self.toolbar = YES;
+        self.borderbottomcolor = nil;
         self.closebuttoncaption = nil;
         self.closebuttonimage = @"cdvCloseButton";
         self.toolbarposition = @"top";
