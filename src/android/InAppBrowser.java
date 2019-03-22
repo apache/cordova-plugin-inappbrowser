@@ -768,8 +768,8 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-                if (leftToRight) closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                else closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (leftToRight) closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                else closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 _close.setLayoutParams(closeLayoutParams);
 
                 if (Build.VERSION.SDK_INT >= 16)
@@ -815,9 +815,9 @@ public class InAppBrowser extends CordovaPlugin {
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(60)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 if (leftToRight) {
-                    toolbar.setHorizontalGravity(Gravity.LEFT);
-                } else {
                     toolbar.setHorizontalGravity(Gravity.RIGHT);
+                } else {
+                    toolbar.setHorizontalGravity(Gravity.LEFT);
                 }
                 toolbar.setVerticalGravity(Gravity.TOP);
 
@@ -914,7 +914,7 @@ public class InAppBrowser extends CordovaPlugin {
 
 
                 // Header Close/Done button
-                int closeButtonId = leftToRight ? 1 : 5;
+                int closeButtonId = leftToRight ? 5 : 1;
                 View close = createCloseButton(closeButtonId);
                 toolbar.addView(close);
 
