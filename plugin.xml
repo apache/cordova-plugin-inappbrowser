@@ -101,6 +101,8 @@
 	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
 	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
 
+        <!--  new asset catalog specific to this plugin -->
+        <resource-file src="src/ios/InAppBrowser.xcassets" />
 
 	    <framework src="CoreGraphics.framework" />
     </platform>
