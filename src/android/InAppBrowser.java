@@ -112,6 +112,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String BORDER_BOTTOM_COLOR = "borderbottomcolor";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
     private static final String CLOSE_BUTTON_COLOR = "closebuttoncolor";
+    private static final String CLOSE_BUTTON_IMAGE = "closebuttonimage";
     private static final String LEFT_TO_RIGHT = "lefttoright";
     private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
     private static final String NAVIGATION_COLOR = "navigationbuttoncolor";
@@ -126,6 +127,7 @@ public class InAppBrowser extends CordovaPlugin {
         TOOLBAR_COLOR,
         NAVIGATION_COLOR,
         CLOSE_BUTTON_COLOR,
+        CLOSE_BUTTON_IMAGE,
         FOOTER_COLOR,
         BORDER_BOTTOM_COLOR
     );
@@ -150,6 +152,7 @@ public class InAppBrowser extends CordovaPlugin {
     private final static int FILECHOOSER_REQUESTCODE_LOLLIPOP = 2;
     private String closeButtonCaption = "";
     private String closeButtonColor = "";
+    private String closeButtonImage = "ic_action_remove";
     private boolean leftToRight = false;
     private int toolbarColor = android.graphics.Color.LTGRAY;
     private boolean hideNavigationButtons = false;
@@ -698,6 +701,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (closeButtonColorSet != null) {
                 closeButtonColor = closeButtonColorSet;
             }
+            String closeButtonImageSet = features.get(CLOSE_BUTTON_IMAGE);
+            if (closeButtonImageSet != null && !closeButtonImageSet.isEmpty()) {
+                closeButtonImage = closeButtonImageSet;
+            }
             String leftToRightSet = features.get(LEFT_TO_RIGHT);
             if (leftToRightSet != null) {
                 leftToRight = leftToRightSet.equals("yes") ? true : false;
@@ -757,7 +764,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 else {
                     ImageButton close = new ImageButton(cordova.getActivity());
-                    int closeResId = activityRes.getIdentifier("remove", "drawable", cordova.getActivity().getPackageName());
+                    int closeResId = activityRes.getIdentifier(closeButtonImage, "drawable", cordova.getActivity().getPackageName());
                     Drawable closeIcon = activityRes.getDrawable(closeResId);
                     close.setImageDrawable(closeIcon);
                     close.setScaleType(ImageView.ScaleType.FIT_CENTER);
