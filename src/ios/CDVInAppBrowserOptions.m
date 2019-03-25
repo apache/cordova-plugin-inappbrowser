@@ -28,7 +28,9 @@
         self.usewkwebview = NO;
         self.location = YES;
         self.toolbar = YES;
+        self.borderbottomcolor = nil;
         self.closebuttoncaption = nil;
+        self.closebuttonimage = nil;
         self.toolbarposition = @"bottom";
         self.cleardata = NO;
         self.clearcache = NO;

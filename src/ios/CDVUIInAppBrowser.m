@@ -29,7 +29,6 @@
 #define    kInAppBrowserToolbarBarPositionTop @"top"
 
 #define    TOOLBAR_HEIGHT 44.0
-#define    STATUSBAR_HEIGHT 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
@@ -462,7 +461,7 @@ static CDVUIInAppBrowser* instance = nil;
     BOOL useBeforeLoad = NO;
     NSString* httpMethod = request.HTTPMethod;
     NSString* errorMessage = nil;
-    
+
     if([_beforeload isEqualToString:@"post"]){
         //TODO handle POST requests by preserving POST data then remove this condition
         errorMessage = @"beforeload doesn't yet support POST requests";
@@ -524,11 +523,11 @@ static CDVUIInAppBrowser* instance = nil;
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        
+
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         return NO;
     }
-    
+
     if(errorMessage != nil){
         NSLog(errorMessage);
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
@@ -684,7 +683,12 @@ static CDVUIInAppBrowser* instance = nil;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    if (_browserOptions.closebuttonimage != nil) {
+        UIImage *closeButtonImage = [[UIImage imageNamed:_browserOptions.closebuttonimage] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        self.closeButton = [[UIBarButtonItem alloc] initWithImage:closeButtonImage style:UIBarButtonItemStylePlain target:self action:@selector(close)];
+    } else {
+        self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    }
     self.closeButton.enabled = YES;
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -692,7 +696,7 @@ static CDVUIInAppBrowser* instance = nil;
     UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpaceButton.width = 20;
 
-    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
+    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT - [self getStatusBarOffset] : [self getStatusBarOffset];
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
 
     self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
@@ -712,6 +716,12 @@ static CDVUIInAppBrowser* instance = nil;
     }
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
       self.toolbar.translucent = NO;
+    }
+    if (_browserOptions.borderbottomcolor != nil) { // add a border to the bottom of the toolbar
+      CALayer* toolbarBottomBorder = [[CALayer alloc] init];
+      toolbarBottomBorder.frame = CGRectMake(0, toolbarFrame.size.height - 1.0, toolbarFrame.size.width, 1.0);
+      toolbarBottomBorder.backgroundColor = [self colorFromHexString:_browserOptions.borderbottomcolor].CGColor;
+      [self.toolbar.layer addSublayer:toolbarBottomBorder];
     }
 
     CGFloat labelInset = 5.0;
@@ -775,7 +785,7 @@ static CDVUIInAppBrowser* instance = nil;
         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
 
-    self.view.backgroundColor = [UIColor grayColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
@@ -788,6 +798,9 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex
 {
+    // skip if we're using an image instead
+    if (_browserOptions.closebuttonimage) return;
+
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
     self.closeButton = nil;
@@ -991,6 +1004,7 @@ static CDVUIInAppBrowser* instance = nil;
     if (IsAtLeastiOSVersion(@"7.0")) {
         [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
     }
+
     [self rePositionViews];
 
     [super viewWillAppear:animated];
@@ -1009,7 +1023,7 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void) rePositionViews {
     if ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
-        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
+        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, [self getStatusBarOffset] + TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
 }
