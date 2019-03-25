@@ -30,8 +30,8 @@
         self.toolbar = YES;
         self.borderbottomcolor = nil;
         self.closebuttoncaption = nil;
-        self.closebuttonimage = @"cdvCloseButton";
-        self.toolbarposition = @"top";
+        self.closebuttonimage = nil;
+        self.toolbarposition = @"bottom";
         self.cleardata = NO;
         self.clearcache = NO;
         self.clearsessioncache = NO;
