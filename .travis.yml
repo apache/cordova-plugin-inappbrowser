@@ -7,26 +7,26 @@ addons:
 env:
   global:
   - SAUCE_USERNAME=snay
-  - TRAVIS_NODE_VERSION="4.2"
+  - TRAVIS_NODE_VERSION="6"
 
 matrix:
   include:
   - env: PLATFORM=browser-chrome
     os: linux
     language: node_js
-    node_js: '4.2'
+    node_js: '6'
   - env: PLATFORM=browser-firefox
     os: linux
     language: node_js
-    node_js: '4.2'
+    node_js: '6'
   - env: PLATFORM=browser-safari
     os: linux
     language: node_js
-    node_js: '4.2'
+    node_js: '6'
   - env: PLATFORM=browser-edge
     os: linux
     language: node_js
-    node_js: '4.2'
+    node_js: '6'
 # iOS 9 not supported by iOS WKWebView implementation
 #  - env: PLATFORM=ios-9.3
 #    os: osx
@@ -37,7 +37,7 @@ matrix:
     os: osx
     osx_image: xcode8.3
     language: node_js
-    node_js: '4.2'
+    node_js: '6'
   - env: PLATFORM=android-4.4
     os: linux
     language: android
