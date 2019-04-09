@@ -31,10 +31,10 @@ _android: &_android
 
 matrix:
   include:
-    # one local test, without saucelabs
-    - env: PLATFORM=local
-      os: osx
-      osx_image: xcode9
+    # # one local test, without saucelabs
+    # - env: PLATFORM=local
+    #   os: osx
+    #   osx_image: xcode9
 
     # many tests with saucelabs
 
