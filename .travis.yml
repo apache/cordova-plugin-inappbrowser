@@ -35,7 +35,6 @@ matrix:
 #    node_js: '4.2'
   - env: PLATFORM=ios-10.0
     os: osx
-    osx_image: xcode8.3
     language: node_js
     node_js: '6'
   - env: PLATFORM=android-4.4
