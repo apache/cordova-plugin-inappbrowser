@@ -13,13 +13,8 @@
       "windows"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
-  },
-  "bugs": {
-    "url": "https://issues.apache.org/jira/browse/CB"
-  },
+  "repository": "github:apache/cordova-plugin-inappbrowser",
+  "bugs": "https://github.com/apache/cordova-plugin-inappbrowser/issues",
   "keywords": [
     "cordova",
     "in",
@@ -45,7 +40,8 @@
       "4.0.0": {
         "cordova": ">100"
       }
-    }
+    },
+    "node": ">=6.0.0"
   },
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
@@ -57,5 +53,6 @@
     "eslint-plugin-node": "^5.0.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1"
-  }
+  },
+  "homepage": "https://cordova.apache.org/"
 }
