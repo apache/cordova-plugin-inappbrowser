@@ -12,9 +12,14 @@ env:
     - ANDROID_BUILD_TOOLS_VERSION=28.0.3
 
 language: node_js
-node_js: 6  
+node_js: 6
 
-# anchor/alias: https://medium.com/@tommyvn/travis-yml-dry-with-anchors-8b6a3ac1b027
+# yaml anchor/alias: https://medium.com/@tommyvn/travis-yml-dry-with-anchors-8b6a3ac1b027
+
+_ios: &_ios
+  os: osx
+  osx_image: xcode10.2
+
 _android: &_android
   language: android
   os: linux
@@ -31,22 +36,25 @@ _android: &_android
 
 matrix:
   include:
-    # # one local test, without saucelabs
-    # - env: PLATFORM=local
-    #   os: osx
-    #   osx_image: xcode9
+    # one local test, without saucelabs
+    - env: PLATFORM=local/ios-10.0
+      <<: *_ios
 
     # many tests with saucelabs
-
     - env: PLATFORM=browser-chrome
     - env: PLATFORM=browser-firefox
     - env: PLATFORM=browser-safari
     - env: PLATFORM=browser-edge
 
     - env: PLATFORM=ios-10.0
-      os: osx
-      osx_image: xcode9
-      
+      <<: *_ios
+    - env: PLATFORM=ios-11.3
+      <<: *_ios
+    - env: PLATFORM=ios-12.0
+      <<: *_ios
+    - env: PLATFORM=ios-12.2
+      <<: *_ios
+
     - env: PLATFORM=android-4.4
       <<: *_android
     - env: PLATFORM=android-5.1
@@ -63,22 +71,22 @@ matrix:
       <<: *_android
 
 before_install:
-- rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm
-  && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm
-  install $TRAVIS_NODE_VERSION
-- node --version
-- if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
-- if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
-- if [[ "$PLATFORM" =~ android ]]; then echo y | android update sdk -u --filter android-22,android-23,android-24,android-25,android-26,android-27;
-  fi
-- git clone https://github.com/apache/cordova-paramedic /tmp/paramedic && pushd /tmp/paramedic
-  && npm install && popd
-- npm install -g cordova
+  # `language: android` has no Node.js installed, therefore we need to install it manually
+  - if [[ "$PLATFORM" =~ android ]]; then nvm install $TRAVIS_NODE_VERSION; fi
+  - node --version
+  - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
+  - if [[ "$PLATFORM" =~ local ]]; then npm install -g ios-deploy; fi
+  - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
+  
+  - npm install -g github:apache/cordova-paramedic
+  - PARAMEDIC_BUILDNAME=travis-plugin-inappbrowser-$TRAVIS_JOB_NUMBER
+
+  - npm install -g cordova
 
 install:
-- npm install
+  - npm install
 
 script:
 - npm test
-- node /tmp/paramedic/main.js --config pr/$PLATFORM --plugin $(pwd) --shouldUseSauce
-  --buildName travis-plugin-inappbrowser-$TRAVIS_JOB_NUMBER
+- if [[ "$PLATFORM" != local ]]; then cordova-paramedic --config pr/$PLATFORM --plugin $(pwd) --buildName $PARAMEDIC_BUILDNAME --shouldUseSauce; fi
+- if [[ "$PLATFORM" =~ local ]]; then cordova-paramedic --config pr/$PLATFORM --plugin $(pwd) --buildName $PARAMEDIC_BUILDNAME; fi
