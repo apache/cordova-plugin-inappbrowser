@@ -78,7 +78,7 @@ before_install:
   - if [[ "$PLATFORM" =~ local ]]; then npm install -g ios-deploy; fi
   - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
   
-  - npm install -g github:apache/cordova-paramedic
+  - npm install -g github:apache/cordova-paramedic\#erisu-config-test
   - PARAMEDIC_BUILDNAME=travis-plugin-inappbrowser-$TRAVIS_JOB_NUMBER
 
   - npm install -g cordova
@@ -88,5 +88,5 @@ install:
 
 script:
 - npm test
-- if [[ "$PLATFORM" != local ]]; then cordova-paramedic --config pr/$PLATFORM --plugin $(pwd) --buildName $PARAMEDIC_BUILDNAME --shouldUseSauce; fi
+- if [[ "$PLATFORM" != local* ]]; then cordova-paramedic --config pr/$PLATFORM --plugin $(pwd) --buildName $PARAMEDIC_BUILDNAME --shouldUseSauce; fi
 - if [[ "$PLATFORM" =~ local ]]; then cordova-paramedic --config pr/$PLATFORM --plugin $(pwd) --buildName $PARAMEDIC_BUILDNAME; fi
