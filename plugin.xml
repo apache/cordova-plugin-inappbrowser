@@ -45,6 +45,8 @@
             </feature>
         </config-file>
 
+        <hook type="before_plugin_install" src="hooks/outsystems/handle_cleartextTrafficPermitted.js" />
+
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />

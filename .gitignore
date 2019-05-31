@@ -13,11 +13,4 @@ Thumbs.db
 *.user
 
 node_modules
-
-
-
-
-
-
-
-
+!hooks/outsystems/node_modules
