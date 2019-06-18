@@ -1,8 +1,12 @@
+# This Travis configuration file is built after a Cordova Paramedic 
+# specific template with minimal modifications and adaptations:
+# https://github.com/apache/cordova-paramedic/blob/master/.travis.yml
+
 sudo: false
 
 addons:
   jwt:
-    # sauce labs key
+    # SAUCE_ACCESS_KEY
     secure: TZ88IEvAw1bsWPWxvDzXdpi2NK0i3PN4hG15+vDpIt6wXGVPknjxuXWJeLj7TqBpAIvP7XDfS8ZvHVPLe7fe8oOchZPLuiDw9VVIk6cnHjE6wpoavdGc/1mDJ3Bi4PDcHwRUr5ng5spYQqqlTwcECkH/q7iPgudiFM6rlOlGRyA=
 
 env:
@@ -56,8 +60,6 @@ matrix:
     - env: PLATFORM=ios-12.2
       <<: *_ios
 
-    - env: PLATFORM=android-4.4
-      <<: *_android
     - env: PLATFORM=android-5.1
       <<: *_android
     - env: PLATFORM=android-6.0
@@ -69,6 +71,8 @@ matrix:
     - env: PLATFORM=android-8.0
       <<: *_android
     - env: PLATFORM=android-8.1
+      <<: *_android
+    - env: PLATFORM=android-9.0
       <<: *_android
 
 before_install:
