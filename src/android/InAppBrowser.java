@@ -808,7 +808,7 @@ public class InAppBrowser extends CordovaPlugin {
                 WindowManager.LayoutParams wlp = window.getAttributes();
                 wlp.gravity = Gravity.TOP | Gravity.LEFT;
                 wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                wlp.height = windowheight;
+                wlp.height = this.dpToPixels(windowheight);
                 wlp.dimAmount=0.5f; 
                 window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -1084,9 +1084,9 @@ public class InAppBrowser extends CordovaPlugin {
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
                 lp.x = 0;
-                lp.y = appheaderheight;
+                lp.y = this.dpToPixels(appheaderheight);
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = windowheight;
+                lp.height = this.dpToPixels(windowheight);
 
                 dialog.setContentView(main);
                 dialog.show();
