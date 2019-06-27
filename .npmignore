@@ -1,0 +1,16 @@
+# CI service configurations
+.travis.yml
+.appveyor.yml
+appveyor.yml
+
+# Testing, code coverage, and linting
+.eslintignore
+.eslintrc.yml
+
+# Git
+.git
+.gitattributes
+.gitignore
+
+# Github
+.github
