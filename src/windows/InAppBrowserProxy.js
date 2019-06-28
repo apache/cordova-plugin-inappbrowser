@@ -277,7 +277,7 @@ var IAB = {
                 if (isWebViewAvailable) {
                     strUrl = strUrl.replace('ms-appx://', 'ms-appx-web://');
                 }
-                popup.src = strUrl;
+                popup.setAttribute('src', strUrl);
             }
         });
     },
