@@ -37,7 +37,7 @@
     <platform name="android">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
+            <clobbers target="open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -71,7 +71,7 @@
     <platform name="ios">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
+            <clobbers target="open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -109,7 +109,7 @@
     <platform name="osx">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
+            <clobbers target="open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -125,7 +125,7 @@
     <platform name="windows">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
+            <clobbers target="open" />
         </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />
@@ -137,7 +137,7 @@
     <platform name="browser">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
+            <clobbers target="open" />
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />
