@@ -19,7 +19,7 @@
  *
 */
 
-(function() {
+(function () {
     // special patch to correctly work on Ripple emulator (CB-9760)
     if (window.parent && !!window.parent.ripple) { // https://gist.github.com/triceam/4658021
         module.exports = window.open.bind(window); // fallback to default window.open behaviour
@@ -31,63 +31,74 @@
     var modulemapper = require('cordova/modulemapper');
     var urlutil = require('cordova/urlutil');
 
-    function InAppBrowser() {
-       this.channels = {
+    function InAppBrowser () {
+        this.channels = {
+            'beforeload': channel.create('beforeload'),
             'loadstart': channel.create('loadstart'),
-            'loadstop' : channel.create('loadstop'),
-            'loaderror' : channel.create('loaderror'),
-            'exit' : channel.create('exit')
-       };
+            'loadstop': channel.create('loadstop'),
+            'loaderror': channel.create('loaderror'),
+            'exit': channel.create('exit'),
+            'customscheme': channel.create('customscheme'),
+            'message': channel.create('message')
+        };
     }
 
     InAppBrowser.prototype = {
         _eventHandler: function (event) {
             if (event && (event.type in this.channels)) {
-                this.channels[event.type].fire(event);
+                if (event.type === 'beforeload') {
+                    this.channels[event.type].fire(event, this._loadAfterBeforeload);
+                } else {
+                    this.channels[event.type].fire(event);
+                }
             }
         },
+        _loadAfterBeforeload: function (strUrl) {
+            strUrl = urlutil.makeAbsolute(strUrl);
+            exec(null, null, 'InAppBrowser', 'loadAfterBeforeload', [strUrl]);
+        },
         close: function (eventname) {
-            exec(null, null, "InAppBrowser", "close", []);
+            exec(null, null, 'InAppBrowser', 'close', []);
         },
         show: function (eventname) {
-            exec(null, null, "InAppBrowser", "show", []);
+            exec(null, null, 'InAppBrowser', 'show', []);
         },
         hide: function (eventname) {
-            exec(null, null, "InAppBrowser", "hide", []);
+            exec(null, null, 'InAppBrowser', 'hide', []);
         },
-        addEventListener: function (eventname,f) {
+        addEventListener: function (eventname, f) {
             if (eventname in this.channels) {
                 this.channels[eventname].subscribe(f);
             }
         },
-        removeEventListener: function(eventname, f) {
+        removeEventListener: function (eventname, f) {
             if (eventname in this.channels) {
                 this.channels[eventname].unsubscribe(f);
             }
         },
 
-        executeScript: function(injectDetails, cb) {
+        executeScript: function (injectDetails, cb) {
             if (injectDetails.code) {
-                exec(cb, null, "InAppBrowser", "injectScriptCode", [injectDetails.code, !!cb]);
+                exec(cb, null, 'InAppBrowser', 'injectScriptCode', [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
-                exec(cb, null, "InAppBrowser", "injectScriptFile", [injectDetails.file, !!cb]);
+                exec(cb, null, 'InAppBrowser', 'injectScriptFile', [injectDetails.file, !!cb]);
             } else {
                 throw new Error('executeScript requires exactly one of code or file to be specified');
             }
         },
 
-        insertCSS: function(injectDetails, cb) {
+        insertCSS: function (injectDetails, cb) {
             if (injectDetails.code) {
-                exec(cb, null, "InAppBrowser", "injectStyleCode", [injectDetails.code, !!cb]);
+                exec(cb, null, 'InAppBrowser', 'injectStyleCode', [injectDetails.code, !!cb]);
             } else if (injectDetails.file) {
-                exec(cb, null, "InAppBrowser", "injectStyleFile", [injectDetails.file, !!cb]);
+                exec(cb, null, 'InAppBrowser', 'injectStyleFile', [injectDetails.file, !!cb]);
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
         }
     };
 
-    module.exports = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
+    module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
         if (window.frames && window.frames[strWindowName]) {
             var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
@@ -102,13 +113,13 @@
             iab.addEventListener(callbackName, callbacks[callbackName]);
         }
 
-        var cb = function(eventname) {
-           iab._eventHandler(eventname);
+        var cb = function (eventname) {
+            iab._eventHandler(eventname);
         };
 
-        strWindowFeatures = strWindowFeatures || "";
+        strWindowFeatures = strWindowFeatures || '';
 
-        exec(cb, cb, "InAppBrowser", "open", [strUrl, strWindowName, strWindowFeatures]);
+        exec(cb, cb, 'InAppBrowser', 'open', [strUrl, strWindowName, strWindowFeatures]);
         return iab;
     };
 })();

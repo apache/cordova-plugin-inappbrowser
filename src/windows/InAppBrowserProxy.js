@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,9 +21,10 @@
 
 /* jslint sloppy:true */
 /* global Windows:true, setImmediate */
+/* eslint standard/no-callback-literal : 0 */
 
-var cordova = require('cordova'),
-    urlutil = require('cordova/urlutil');
+var cordova = require('cordova');
+var urlutil = require('cordova/urlutil');
 
 var browserWrap,
     popup,
@@ -40,56 +41,56 @@ var browserWrap,
 // http://msdn.microsoft.com/en-us/library/windows/apps/dn301831.aspx
 var isWebViewAvailable = cordova.platformId === 'windows';
 
-function attachNavigationEvents(element, callback) {
+function attachNavigationEvents (element, callback) {
     if (isWebViewAvailable) {
-        element.addEventListener("MSWebViewNavigationStarting", function (e) {
-            callback({ type: "loadstart", url: e.uri}, {keepCallback: true} );
+        element.addEventListener('MSWebViewNavigationStarting', function (e) {
+            callback({ type: 'loadstart', url: e.uri }, {keepCallback: true});
         });
 
-        element.addEventListener("MSWebViewNavigationCompleted", function (e) {
+        element.addEventListener('MSWebViewNavigationCompleted', function (e) {
             if (e.isSuccess) {
-                callback({ type: "loadstop", url: e.uri }, { keepCallback: true });
+                callback({ type: 'loadstop', url: e.uri }, { keepCallback: true });
             } else {
-                callback({ type: "loaderror", url: e.uri, code: e.webErrorStatus, message: "Navigation failed with error code " + e.webErrorStatus}, { keepCallback: true });
+                callback({ type: 'loaderror', url: e.uri, code: e.webErrorStatus, message: 'Navigation failed with error code ' + e.webErrorStatus }, { keepCallback: true });
             }
         });
 
-        element.addEventListener("MSWebViewUnviewableContentIdentified", function (e) {
+        element.addEventListener('MSWebViewUnviewableContentIdentified', function (e) {
             // WebView found the content to be not HTML.
             // http://msdn.microsoft.com/en-us/library/windows/apps/dn609716.aspx
-            callback({ type: "loaderror", url: e.uri, code: e.webErrorStatus, message: "Navigation failed with error code " + e.webErrorStatus}, { keepCallback: true });
+            callback({ type: 'loaderror', url: e.uri, code: e.webErrorStatus, message: 'Navigation failed with error code ' + e.webErrorStatus }, { keepCallback: true });
         });
 
-        element.addEventListener("MSWebViewContentLoading", function (e) {
+        element.addEventListener('MSWebViewContentLoading', function (e) {
             if (navigationButtonsDiv && popup) {
                 if (popup.canGoBack) {
-                    backButton.removeAttribute("disabled");
+                    backButton.removeAttribute('disabled');
                 } else {
-                    backButton.setAttribute("disabled", "true");
+                    backButton.setAttribute('disabled', 'true');
                 }
 
                 if (popup.canGoForward) {
-                    forwardButton.removeAttribute("disabled");
+                    forwardButton.removeAttribute('disabled');
                 } else {
-                    forwardButton.setAttribute("disabled", "true");
+                    forwardButton.setAttribute('disabled', 'true');
                 }
             }
         });
     } else {
         var onError = function () {
-            callback({ type: "loaderror", url: this.contentWindow.location}, {keepCallback: true});
+            callback({ type: 'loaderror', url: this.contentWindow.location }, {keepCallback: true});
         };
 
-        element.addEventListener("unload", function () {
-            callback({ type: "loadstart", url: this.contentWindow.location}, {keepCallback: true});
+        element.addEventListener('unload', function () {
+            callback({ type: 'loadstart', url: this.contentWindow.location }, {keepCallback: true});
         });
 
-        element.addEventListener("load", function () {
-            callback({ type: "loadstop", url: this.contentWindow.location}, {keepCallback: true});
+        element.addEventListener('load', function () {
+            callback({ type: 'loadstop', url: this.contentWindow.location }, {keepCallback: true});
         });
 
-        element.addEventListener("error", onError);
-        element.addEventListener("abort", onError);
+        element.addEventListener('error', onError);
+        element.addEventListener('abort', onError);
     }
 }
 
@@ -98,7 +99,7 @@ var IAB = {
         setImmediate(function () {
             if (browserWrap) {
                 if (navigationEventsCallback) {
-                    navigationEventsCallback({ type: "exit" });
+                    navigationEventsCallback({ type: 'exit' });
                 }
 
                 browserWrap.parentNode.removeChild(browserWrap);
@@ -107,52 +108,52 @@ var IAB = {
                 browserWrap = null;
                 popup = null;
 
-                document.removeEventListener("backbutton", hardwareBackCallback, false);
+                document.removeEventListener('backbutton', hardwareBackCallback, false);
             }
         });
     },
     show: function (win, lose) {
         setImmediate(function () {
             if (browserWrap) {
-                browserWrap.style.display = "block";
+                browserWrap.style.display = 'block';
             }
         });
     },
     hide: function (win, lose) {
         if (browserWrap) {
-            browserWrap.style.display = "none";
+            browserWrap.style.display = 'none';
         }
     },
     open: function (win, lose, args) {
         // make function async so that we can add navigation events handlers before view is loaded and navigation occured
         setImmediate(function () {
-            var strUrl = args[0],
-                target = args[1],
-                features = args[2],
-                url;
+            var strUrl = args[0];
+            var target = args[1];
+            var features = args[2];
+            var url;
 
             navigationEventsCallback = win;
 
-            if (target === "_system") {
+            if (target === '_system') {
                 url = new Windows.Foundation.Uri(strUrl);
                 Windows.System.Launcher.launchUriAsync(url);
-            } else if (target === "_self" || !target) {
+            } else if (target === '_self' || !target) {
                 window.location = strUrl;
             } else {
                 // "_blank" or anything else
                 if (!browserWrap) {
                     var browserWrapStyle = document.createElement('link');
-                    browserWrapStyle.rel = "stylesheet";
-                    browserWrapStyle.type = "text/css";
-                    browserWrapStyle.href = urlutil.makeAbsolute("/www/css/inappbrowser.css");
+                    browserWrapStyle.rel = 'stylesheet';
+                    browserWrapStyle.type = 'text/css';
+                    browserWrapStyle.href = urlutil.makeAbsolute('/www/css/inappbrowser.css');
 
                     document.head.appendChild(browserWrapStyle);
 
-                    browserWrap = document.createElement("div");
-                    browserWrap.className = "inAppBrowserWrap";
+                    browserWrap = document.createElement('div');
+                    browserWrap.className = 'inAppBrowserWrap';
 
-                    if (features.indexOf("fullscreen=yes") > -1) {
-                        browserWrap.classList.add("inAppBrowserWrapFullscreen");
+                    if (features.indexOf('fullscreen=yes') > -1) {
+                        browserWrap.classList.add('inAppBrowserWrapFullscreen');
                     }
 
                     // Save body overflow style to be able to reset it back later
@@ -166,22 +167,22 @@ var IAB = {
 
                     document.body.appendChild(browserWrap);
                     // Hide scrollbars for the whole body while inappbrowser's window is open
-                    document.body.style.msOverflowStyle = "none";
+                    document.body.style.msOverflowStyle = 'none';
                 }
 
-                if (features.indexOf("hidden=yes") !== -1) {
-                    browserWrap.style.display = "none";
+                if (features.indexOf('hidden=yes') !== -1) {
+                    browserWrap.style.display = 'none';
                 }
 
-                popup = document.createElement(isWebViewAvailable ? "x-ms-webview" : "iframe");
-                if (popup instanceof HTMLIFrameElement) {
+                popup = document.createElement(isWebViewAvailable ? 'x-ms-webview' : 'iframe');
+                if (popup instanceof HTMLIFrameElement) { // eslint-disable-line no-undef
                     // For iframe we need to override bacground color of parent element here
                     // otherwise pages without background color set will have transparent background
-                    popup.style.backgroundColor = "white";
+                    popup.style.backgroundColor = 'white';
                 }
-                popup.style.borderWidth = "0px";
-                popup.style.width = "100%";
-                popup.style.marginBottom = "-5px";
+                popup.style.borderWidth = '0px';
+                popup.style.width = '100%';
+                popup.style.marginBottom = '-5px';
 
                 browserWrap.appendChild(popup);
 
@@ -191,14 +192,14 @@ var IAB = {
                     }, 0);
                 };
 
-                if (features.indexOf("hardwareback=yes") > -1 || features.indexOf("hardwareback") === -1) {
+                if (features.indexOf('hardwareback=yes') > -1 || features.indexOf('hardwareback') === -1) {
                     hardwareBackCallback = function () {
                         if (browserWrap.style.display === 'none') {
                             // NOTE: backbutton handlers have to throw an exception in order to prevent
                             // returning 'true' inside cordova-js, which would mean that the event is handled by user.
                             // Throwing an exception means that the default/system navigation behavior will take place,
                             // which is to exit the app if the navigation stack is empty.
-                            throw 'Exit the app';
+                            throw 'Exit the app'; // eslint-disable-line no-throw-literal
                         }
 
                         if (popup.canGoBack) {
@@ -207,59 +208,57 @@ var IAB = {
                             closeHandler();
                         }
                     };
-                } else if (features.indexOf("hardwareback=no") > -1) {
+                } else if (features.indexOf('hardwareback=no') > -1) {
                     hardwareBackCallback = function () {
                         if (browserWrap.style.display === 'none') {
                             // See comment above
-                            throw 'Exit the app';
+                            throw 'Exit the app'; // eslint-disable-line no-throw-literal
                         }
 
                         closeHandler();
                     };
                 }
 
-                document.addEventListener("backbutton", hardwareBackCallback, false);
+                document.addEventListener('backbutton', hardwareBackCallback, false);
 
-                if (features.indexOf("location=yes") !== -1 || features.indexOf("location") === -1) {
-                    popup.style.height = "calc(100% - 70px)";
+                if (features.indexOf('location=yes') !== -1 || features.indexOf('location') === -1) {
+                    popup.style.height = 'calc(100% - 70px)';
 
-                    navigationButtonsDiv = document.createElement("div");
-                    navigationButtonsDiv.className = "inappbrowser-app-bar";
+                    navigationButtonsDiv = document.createElement('div');
+                    navigationButtonsDiv.className = 'inappbrowser-app-bar';
                     navigationButtonsDiv.onclick = function (e) {
                         e.cancelBubble = true;
                     };
 
-                    navigationButtonsDivInner = document.createElement("div");
-                    navigationButtonsDivInner.className = "inappbrowser-app-bar-inner";
+                    navigationButtonsDivInner = document.createElement('div');
+                    navigationButtonsDivInner.className = 'inappbrowser-app-bar-inner';
                     navigationButtonsDivInner.onclick = function (e) {
                         e.cancelBubble = true;
                     };
 
-                    backButton = document.createElement("div");
-                    backButton.innerText = "back";
-                    backButton.className = "app-bar-action action-back";
-                    backButton.addEventListener("click", function (e) {
-                        if (popup.canGoBack)
-                            popup.goBack();
+                    backButton = document.createElement('div');
+                    backButton.innerText = 'back';
+                    backButton.className = 'app-bar-action action-back';
+                    backButton.addEventListener('click', function (e) {
+                        if (popup.canGoBack) { popup.goBack(); }
                     });
 
-                    forwardButton = document.createElement("div");
-                    forwardButton.innerText = "forward";
-                    forwardButton.className = "app-bar-action action-forward";
-                    forwardButton.addEventListener("click", function (e) {
-                        if (popup.canGoForward)
-                            popup.goForward();
+                    forwardButton = document.createElement('div');
+                    forwardButton.innerText = 'forward';
+                    forwardButton.className = 'app-bar-action action-forward';
+                    forwardButton.addEventListener('click', function (e) {
+                        if (popup.canGoForward) { popup.goForward(); }
                     });
 
-                    closeButton = document.createElement("div");
-                    closeButton.innerText = "close";
-                    closeButton.className = "app-bar-action action-close";
-                    closeButton.addEventListener("click", closeHandler);
+                    closeButton = document.createElement('div');
+                    closeButton.innerText = 'close';
+                    closeButton.className = 'app-bar-action action-close';
+                    closeButton.addEventListener('click', closeHandler);
 
                     if (!isWebViewAvailable) {
                         // iframe navigation is not yet supported
-                        backButton.setAttribute("disabled", "true");
-                        forwardButton.setAttribute("disabled", "true");
+                        backButton.setAttribute('disabled', 'true');
+                        forwardButton.setAttribute('disabled', 'true');
                     }
 
                     navigationButtonsDivInner.appendChild(backButton);
@@ -269,14 +268,14 @@ var IAB = {
 
                     browserWrap.appendChild(navigationButtonsDiv);
                 } else {
-                    popup.style.height = "100%";
+                    popup.style.height = '100%';
                 }
 
                 // start listening for navigation events
                 attachNavigationEvents(popup, navigationEventsCallback);
 
                 if (isWebViewAvailable) {
-                    strUrl = strUrl.replace("ms-appx://", "ms-appx-web://");
+                    strUrl = strUrl.replace('ms-appx://', 'ms-appx-web://');
                 }
                 popup.src = strUrl;
             }
@@ -285,11 +284,11 @@ var IAB = {
 
     injectScriptCode: function (win, fail, args) {
         setImmediate(function () {
-            var code = args[0],
-                hasCallback = args[1];
+            var code = args[0];
+            var hasCallback = args[1];
 
             if (isWebViewAvailable && browserWrap && popup) {
-                var op = popup.invokeScriptAsync("eval", code);
+                var op = popup.invokeScriptAsync('eval', code);
                 op.oncomplete = function (e) {
                     if (hasCallback) {
                         // return null if event target is unavailable by some reason
@@ -305,19 +304,20 @@ var IAB = {
 
     injectScriptFile: function (win, fail, args) {
         setImmediate(function () {
-            var filePath = args[0],
-                hasCallback = args[1];
+            var filePath = args[0];
+            var hasCallback = args[1];
 
-            if (!!filePath) {
+            if (filePath) {
                 filePath = urlutil.makeAbsolute(filePath);
             }
 
             if (isWebViewAvailable && browserWrap && popup) {
-                var uri = new Windows.Foundation.Uri(filePath);
+                // CB-12364 getFileFromApplicationUriAsync does not support ms-appx-web
+                var uri = new Windows.Foundation.Uri(filePath.replace('ms-appx-web:', 'ms-appx:'));
                 Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).done(function (file) {
                     Windows.Storage.FileIO.readTextAsync(file).done(function (code) {
-                        var op = popup.invokeScriptAsync("eval", code);
-                        op.oncomplete = function(e) {
+                        var op = popup.invokeScriptAsync('eval', code);
+                        op.oncomplete = function (e) {
                             if (hasCallback) {
                                 var result = [e.target.result];
                                 win(result);
@@ -333,8 +333,8 @@ var IAB = {
 
     injectStyleCode: function (win, fail, args) {
         setImmediate(function () {
-            var code = args[0],
-                hasCallback = args[1];
+            var code = args[0];
+            var hasCallback = args[1];
 
             if (isWebViewAvailable && browserWrap && popup) {
                 injectCSS(popup, code, hasCallback && win);
@@ -344,13 +344,14 @@ var IAB = {
 
     injectStyleFile: function (win, fail, args) {
         setImmediate(function () {
-            var filePath = args[0],
-                hasCallback = args[1];
+            var filePath = args[0];
+            var hasCallback = args[1];
 
             filePath = filePath && urlutil.makeAbsolute(filePath);
 
             if (isWebViewAvailable && browserWrap && popup) {
-                var uri = new Windows.Foundation.Uri(filePath);
+                // CB-12364 getFileFromApplicationUriAsync does not support ms-appx-web
+                var uri = new Windows.Foundation.Uri(filePath.replace('ms-appx-web:', 'ms-appx:'));
                 Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
                     return Windows.Storage.FileIO.readTextAsync(file);
                 }).done(function (code) {
@@ -366,11 +367,11 @@ var IAB = {
 function injectCSS (webView, cssCode, callback) {
     // This will automatically escape all thing that we need (quotes, slashes, etc.)
     var escapedCode = JSON.stringify(cssCode);
-    var evalWrapper = "(function(d){var c=d.createElement('style');c.innerHTML=%s;d.head.appendChild(c);})(document)"
+    var evalWrapper = '(function(d){var c=d.createElement(\'style\');c.innerHTML=%s;d.head.appendChild(c);})(document)'
         .replace('%s', escapedCode);
 
-    var op = webView.invokeScriptAsync("eval", evalWrapper);
-    op.oncomplete = function() {
+    var op = webView.invokeScriptAsync('eval', evalWrapper);
+    op.oncomplete = function () {
         if (callback) {
             callback([]);
         }
@@ -381,4 +382,4 @@ function injectCSS (webView, cssCode, callback) {
 
 module.exports = IAB;
 
-require("cordova/exec/proxy").add("InAppBrowser", module.exports);
+require('cordova/exec/proxy').add('InAppBrowser', module.exports);

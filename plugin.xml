@@ -20,14 +20,14 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-inappbrowser"
-      version="1.6.0-dev">
+      version="3.1.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
-    <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git</repo>
-    <issue>https://issues.apache.org/jira/browse/CB/component/12320641</issue>
+    <repo>https://github.com/apache/cordova-plugin-inappbrowser</repo>
+    <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
       <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
@@ -40,7 +40,7 @@
             <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="InAppBrowser"> 
+            <feature name="InAppBrowser">
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
             </feature>
         </config-file>
@@ -49,7 +49,7 @@
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
 
-        <!--  drawable src/android/resources -->
+        <!-- drawable src/android/resources -->
         <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
         <resource-file src="src/android/res/drawable-mdpi/ic_action_next_item.png" target="res/drawable-mdpi/ic_action_next_item.png" />
         <resource-file src="src/android/res/drawable-xhdpi/ic_action_next_item.png" target="res/drawable-xhdpi/ic_action_next_item.png" />
@@ -65,52 +65,6 @@
         <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
         <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
 
-    </platform>
-
-    <!-- amazon-fireos -->
-    <platform name="amazon-fireos">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="InAppBrowser"> 
-                <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
-            </feature>
-        </config-file>
-
-        <source-file src="src/amazon/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
-        <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
-        <source-file src="src/amazon/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
-        
-        <!--  drawable src/android/resources -->
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_next_item.png" target="res/drawable-mdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_next_item.png" target="res/drawable-xhdpi/ic_action_next_item.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_next_item.png" target="res/drawable-xxhdpi/ic_action_next_item.png" />
-        
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_previous_item.png" target="res/drawable-hdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_previous_item.png" target="res/drawable-mdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_previous_item.png" target="res/drawable-xhdpi/ic_action_previous_item.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_previous_item.png" target="res/drawable-xxhdpi/ic_action_previous_item.png" />
-        
-        <resource-file src="src/android/res/drawable-hdpi/ic_action_remove.png" target="res/drawable-hdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-mdpi/ic_action_remove.png" target="res/drawable-mdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
-        <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
-    </platform>
-    
-    <!-- ubuntu -->
-    <platform name="ubuntu">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <header-file src="src/ubuntu/inappbrowser.h" />
-        <source-file src="src/ubuntu/inappbrowser.cpp" />
-        <resource-file src="src/ubuntu/InAppBrowser.qml" />
-        <resource-file src="src/ubuntu/InAppBrowser_escapeScript.js" />
-        <resource-file src="src/ubuntu/close.png" />
     </platform>
 
     <!-- ios -->
@@ -118,16 +72,35 @@
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
-        </js-module>  
+        </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
-                <param name="ios-package" value="CDVInAppBrowser" /> 
+                <param name="ios-package" value="CDVInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+            <feature name="UIInAppBrowser">
+                <param name="ios-package" value="CDVUIInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+            <feature name="WKInAppBrowser">
+                <param name="ios-package" value="CDVWKInAppBrowser" />
+                <param name="onload" value="true" />
             </feature>
         </config-file>
 
         <header-file src="src/ios/CDVInAppBrowser.h" />
 	    <source-file src="src/ios/CDVInAppBrowser.m" />
-	    
+        <header-file src="src/ios/CDVInAppBrowserOptions.h" />
+        <source-file src="src/ios/CDVInAppBrowserOptions.m" />
+        <header-file src="src/ios/CDVInAppBrowserNavigationController.h" />
+        <source-file src="src/ios/CDVInAppBrowserNavigationController.m" />
+	    <header-file src="src/ios/CDVUIInAppBrowser.h" />
+	    <source-file src="src/ios/CDVUIInAppBrowser.m" />
+	    <header-file src="src/ios/CDVWKInAppBrowser.h" />
+	    <source-file src="src/ios/CDVWKInAppBrowser.m" />
+	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
+	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
+
 	    <framework src="CoreGraphics.framework" />
     </platform>
 
@@ -147,87 +120,16 @@
         <source-file src="src/osx/CDVInAppBrowser.m" />
     </platform>
 
-    <!-- wp7 -->
-    <platform name="wp7">
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_NETWORKING"/>
-        </config-file>
-
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <config-file target="config.xml" parent="/*">
-            <feature name="InAppBrowser">
-                <param name="wp-package" value="InAppBrowser"/>
-            </feature>
-        </config-file>
-
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_NETWORKING" />
-        </config-file>
-
-        <source-file src="src/wp/InAppBrowser.cs" />
-    </platform>
-
-    <!-- wp8 -->
-    <platform name="wp8">
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_NETWORKING"/>
-        </config-file>
-                
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <config-file target="config.xml" parent="/*">
-            <feature name="InAppBrowser">
-                <param name="wp-package" value="InAppBrowser"/>
-            </feature>
-        </config-file>
-
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_NETWORKING" />
-        </config-file>
-
-        <source-file src="src/wp/InAppBrowser.cs" />
-    </platform>
-
-    <!-- windows8 -->
-    <platform name="windows8">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <js-module src="www/windows8/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
-        </js-module>
-    </platform>
-
-    <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
+    <!-- windows -->
     <platform name="windows">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
             <clobbers target="window.open" />
         </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
+            <runs />
         </js-module>
         <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
-    </platform>
-  
-    <!-- firefoxos -->
-    <platform name="firefoxos">
-        <config-file target="config.xml" parent="/*">
-            <permission name="browser" description="Enables the app to implement a browser in an iframe." privileged="true"/>
-        </config-file>
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
-        </js-module>
-        <js-module src="src/firefoxos/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
-        </js-module>
     </platform>
 
     <!-- browser -->
@@ -237,7 +139,7 @@
             <clobbers target="window.open" />
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <merges target="" />
+            <runs />
         </js-module>
     </platform>
 </plugin>
