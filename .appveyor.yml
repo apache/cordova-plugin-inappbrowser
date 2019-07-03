@@ -16,14 +16,15 @@ environment:
   matrix:
     - PLATFORM: windows-10-store
       JUST_BUILD: --justBuild
-    - PLATFORM: local\browser
 install:
   - npm cache clean -f
   - node --version
   - npm install -g cordova-paramedic@https://github.com/apache/cordova-paramedic.git
   - npm install -g cordova
+  - npm install
 
 build: off
 
 test_script:
+  - npm run eslint
   - cordova-paramedic --config pr\%PLATFORM% --plugin . %JUST_BUILD%
