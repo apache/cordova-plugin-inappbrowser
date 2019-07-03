@@ -10,6 +10,7 @@ import org.json.JSONException;
 //Download Files imports
 import android.app.DownloadManager;
 import android.os.Environment;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.widget.Toast;
@@ -71,17 +72,28 @@ public class InAppBrowserDownloads implements DownloadListener{
     }
 
     protected void processDownload() {
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(InAppBrowserDownloads.this.url));
+        final String url = InAppBrowserDownloads.this.url;
+        final String cookie = CookieManager.getInstance().getCookie(url);
+        final String filename = URLUtil.guessFileName(url, InAppBrowserDownloads.this.contentDisposition, InAppBrowserDownloads.this.mimetype);
+
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
         try {
             request.allowScanningByMediaScanner();
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-            final String filename = URLUtil.guessFileName(InAppBrowserDownloads.this.url, InAppBrowserDownloads.this.contentDisposition, InAppBrowserDownloads.this.mimetype);
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+            
+            request.addRequestHeader("Cookie", cookie);
+            request.addRequestHeader("User-Agent", InAppBrowserDownloads.this.userAgent);
+            request.addRequestHeader("Referer", url);
+
             DownloadManager dm = (DownloadManager) plugin.cordova.getActivity().getSystemService(DOWNLOAD_SERVICE);
             dm.enqueue(request);
+
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT); //This is important!
             intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
             intent.setType("*/*");//any application,any extension
+
             Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), "Downloading File '" + filename + "'", Toast.LENGTH_LONG).show();
         } catch (Exception exception) {
             Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), "Error downloading file, missing storage permissions", Toast.LENGTH_LONG).show();
