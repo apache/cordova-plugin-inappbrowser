@@ -28,7 +28,7 @@
 
 @interface CDVWKInAppBrowser : CDVPlugin {
     @private
-    BOOL _useBeforeload;
+    NSString* _beforeload;
     BOOL _waitForBeforeload;
 }
 
@@ -73,7 +73,7 @@
 - (void)navigateTo:(NSURL*)url headers:(NSString *)headers;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString;
+- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
 
