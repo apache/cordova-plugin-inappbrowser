@@ -168,6 +168,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, String> features = parseFeature(args.optString(2));
+            final HashMap<String, String> headers = parseHeaders(args.optString(3));
 
             LOG.d(LOG_TAG, "target = " + target);
 
@@ -233,7 +234,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in InAppBrowser
                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
-                            result = showWebPage(url, features);
+                            result = showWebPage(url, features, headers);
                         }
                     }
                     // SYSTEM
@@ -244,7 +245,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // BLANK - or anything else
                     else {
                         LOG.d(LOG_TAG, "in blank");
-                        result = showWebPage(url, features);
+                        result = showWebPage(url, features, headers);
                     }
 
                     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
@@ -271,7 +272,7 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
-                    inAppWebView.loadUrl(url);
+                    inAppWebView.loadUrl(url, null);
                 }
             });
         }
@@ -408,7 +409,7 @@ public class InAppBrowser extends CordovaPlugin {
                 public void run() {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                         // This action will have the side-effect of blurring the currently focused element
-                        inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+                        inAppWebView.loadUrl("javascript:" + finalScriptToInject, null);
                     } else {
                         inAppWebView.evaluateJavascript(finalScriptToInject, null);
                     }
@@ -440,6 +441,31 @@ public class InAppBrowser extends CordovaPlugin {
                     if (!customizableOptions.contains(key)){
                         value = value.equals("yes") || value.equals("no") ? value : "yes";
                     }
+                    map.put(key, value);
+                }
+            }
+            return map;
+        }
+    }
+
+    /**
+     * Put the headers string into a hash map
+     *
+     * @param headersString string of headers comma separated (key=value)
+     * @return map of headers
+     */
+    private HashMap<String, String> parseHeaders(String headersString) {
+        if (headersString.equals(NULL)) {
+            return null;
+        } else {
+            HashMap<String, String> map = new HashMap<String, String>();
+            StringTokenizer headers = new StringTokenizer(headersString, ",");
+            StringTokenizer header;
+            while(headers.hasMoreElements()) {
+                header = new StringTokenizer(headers.nextToken(), "=");
+                if (header.hasMoreElements()) {
+                    String key = header.nextToken().replace("@e","=").replace("@c", ",").replace("@a","@");
+                    String value = header.nextToken().replace("@e","=").replace("@c", ",").replace("@a","@");
                     map.put(key, value);
                 }
             }
@@ -542,7 +568,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // NB: From SDK 19: "If you call methods on WebView from any thread
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
-                childView.loadUrl("about:blank");
+                childView.loadUrl("about:blank", null);
 
                 try {
                     JSONObject obj = new JSONObject();
@@ -599,9 +625,9 @@ public class InAppBrowser extends CordovaPlugin {
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
 
         if (!url.startsWith("http") && !url.startsWith("file:")) {
-            this.inAppWebView.loadUrl("http://" + url);
+            this.inAppWebView.loadUrl("http://" + url, null);
         } else {
-            this.inAppWebView.loadUrl(url);
+            this.inAppWebView.loadUrl(url, null);
         }
         this.inAppWebView.requestFocus();
     }
@@ -625,8 +651,9 @@ public class InAppBrowser extends CordovaPlugin {
      *
      * @param url the url to load.
      * @param features jsonObject
+     * @param headers headers for navigation
      */
-    public String showWebPage(final String url, HashMap<String, String> features) {
+    public String showWebPage(final String url, HashMap<String, String> features, final HashMap<String, String> headers) {
         // Determine if we should hide the location bar.
         showLocationBar = true;
         showZoomControls = true;
@@ -1029,7 +1056,7 @@ public class InAppBrowser extends CordovaPlugin {
                     CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
                 }
 
-                inAppWebView.loadUrl(url);
+                inAppWebView.loadUrl(url, headers);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
