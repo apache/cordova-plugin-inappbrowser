@@ -61,6 +61,11 @@ behaviour:
 
     delete window.open // Reverts the call back to its prototype's default
 
+You can also get the original (native-code) function back with:
+
+    window.open = cordova.require('cordova/modulemapper').getOriginalSymbol(window, 'window.open');
+    
+
 Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
 
     document.addEventListener("deviceready", onDeviceReady, false);
