@@ -275,7 +275,9 @@ static CDVWKInAppBrowser* instance = nil;
     _waitForBeforeload = ![_beforeload isEqualToString:@""];
     
     [self.inAppBrowserViewController navigateTo:url];
-    [self show:nil withNoAnimate:browserOptions.hidden];
+    if (!browserOptions.hidden) {
+        [self show:nil withNoAnimate:browserOptions.hidden];
+    }
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command{
@@ -312,25 +314,7 @@ static CDVWKInAppBrowser* instance = nil;
     
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (weakSelf.inAppBrowserViewController != nil) {
-            float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-            if (!self->tmpWindow) {
-                CGRect frame = [[UIScreen mainScreen] bounds];
-                if(initHidden && osVersion < 11){
-                   frame.origin.x = -10000;
-                }
-                self->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
-            }
-            UIViewController *tmpController = [[UIViewController alloc] init];
-
-            [self->tmpWindow setRootViewController:tmpController];
-            [self->tmpWindow setWindowLevel:UIWindowLevelNormal];
-
-            if(!initHidden || osVersion < 11){
-                [self->tmpWindow makeKeyAndVisible];
-            }
-            [tmpController presentViewController:nav animated:!noAnimate completion:nil];
-        }
+        [weakSelf.viewController presentViewController:nav animated:!noAnimate completion:nil];
     });
 }
 
