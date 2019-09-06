@@ -904,6 +904,11 @@ BOOL isExiting = FALSE;
     [self.view addSubview:self.toolbar];
     [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
+    
+    self.topBarView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, webViewBounds.size.width, webViewBounds.origin.y)];
+    self.topBarView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.topBarView];
+    [self.view sendSubviewToBack:self.topBarView];
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
@@ -1107,14 +1112,39 @@ BOOL isExiting = FALSE;
     [self.webView goForward];
 }
 
+- (BOOL)hasTopNotch {
+    if (@available(iOS 11.0, *)) {
+        return [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
+    }
+    
+    return  NO;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     if (IsAtLeastiOSVersion(@"7.0") && !viewRenderedAtLeastOnce) {
         viewRenderedAtLeastOnce = TRUE;
         CGRect viewBounds = [self.webView bounds];
-        viewBounds.origin.y = STATUSBAR_HEIGHT;
-        viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT;
+        
+        if ([self hasTopNotch]) {
+            BOOL toolbarVisible = !self.toolbar.hidden;
+            BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+            
+            float topSafeArea = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top;
+            float bottomSafeArea = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.bottom;
+            
+            if (toolbarVisible && toolbarIsAtBottom) {
+                bottomSafeArea = 0.0;
+            }
+            
+            viewBounds.origin.y = topSafeArea;
+            viewBounds.size.height = viewBounds.size.height - (topSafeArea + bottomSafeArea);
+        } else {
+            viewBounds.origin.y = STATUSBAR_HEIGHT;
+            viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT;
+        }
         self.webView.frame = viewBounds;
+        self.topBarView.frame = CGRectMake(0, 0, viewBounds.size.width, viewBounds.origin.y);
         [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
     }
     [self rePositionViews];
@@ -1136,6 +1166,7 @@ BOOL isExiting = FALSE;
 - (void) rePositionViews {
     if ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop]) {
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
+        [self.topBarView setFrame:CGRectMake(self.topBarView.frame.origin.x, self.topBarView.frame.origin.y, self.topBarView.frame.size.width, self.webView.frame.origin.y)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
     }
 }
