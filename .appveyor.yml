@@ -21,8 +21,10 @@ install:
   - node --version
   - npm install -g cordova-paramedic@https://github.com/apache/cordova-paramedic.git
   - npm install -g cordova
+  - npm install
 
 build: off
 
 test_script:
+  - npm run eslint
   - cordova-paramedic --config pr\%PLATFORM% --plugin . %JUST_BUILD%

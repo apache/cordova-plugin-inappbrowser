@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser-tests",
-  "version": "1.7.1-dev",
+  "version": "3.1.0",
   "description": "",
   "cordova": {
     "id": "cordova-plugin-inappbrowser-tests",
@@ -10,5 +10,5 @@
     "ecosystem:cordova"
   ],
   "author": "",
-  "license": "Apache 2.0"
+  "license": "Apache-2.0"
 }
