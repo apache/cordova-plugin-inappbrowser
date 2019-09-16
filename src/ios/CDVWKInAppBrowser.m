@@ -1097,6 +1097,12 @@ BOOL isExiting = FALSE;
         [CDVUserAgentUtil acquireLock:^(NSInteger lockToken) {
             _userAgentLockToken = lockToken;
             [CDVUserAgentUtil setUserAgent:_userAgent lockToken:lockToken];
+            /*
+             * RNMT-3299
+             * For some reason the above line does not override our User-Agent in the first open of a WKWebView.
+             * To fix this we added the following line.
+             */
+            weakSelf.webView.customUserAgent = _userAgent;
             [weakSelf.webView loadRequest:request];
         }];
     }
@@ -1236,6 +1242,10 @@ BOOL isExiting = FALSE;
     //    from it must pass through its white-list. This *does* break PDFs that
     //    contain links to other remote PDF/websites.
     // More info at https://issues.apache.org/jira/browse/CB-2225
+    /*
+     * RNMT-3299
+     * Add this here to cause a conflict if anything related to this is changed.
+     */
     BOOL isPDF = NO;
     //TODO webview class
     //BOOL isPDF = [@"true" isEqualToString :[theWebView evaluateJavaScript:@"document.body==null"]];
