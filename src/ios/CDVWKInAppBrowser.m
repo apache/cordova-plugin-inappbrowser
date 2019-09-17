@@ -909,6 +909,13 @@ BOOL isExiting = FALSE;
     self.topBarView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.topBarView];
     [self.view sendSubviewToBack:self.topBarView];
+    
+    if (@available(iOS 12.0, *)) {
+        [[NSNotificationCenter defaultCenter]
+            addObserver:self
+               selector:@selector(keyboardWillHide)
+                   name:UIKeyboardWillHideNotification object:nil];
+    }
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
@@ -1168,6 +1175,17 @@ BOOL isExiting = FALSE;
         [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT, self.webView.frame.size.width, self.webView.frame.size.height)];
         [self.topBarView setFrame:CGRectMake(self.topBarView.frame.origin.x, self.topBarView.frame.origin.y, self.topBarView.frame.size.width, self.webView.frame.origin.y)];
         [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
+    }
+}
+
+- (void)keyboardWillHide {
+    if (self.webView) {
+        for (UIView* view in self.webView.subviews) {
+            if ([view isKindOfClass:[UIScrollView class]]) {
+                UIScrollView *scrollView = (UIScrollView*)view;
+                [scrollView setContentOffset:CGPointMake(0, 0)];
+            }
+        }
     }
 }
 
