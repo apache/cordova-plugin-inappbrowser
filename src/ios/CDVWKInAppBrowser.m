@@ -81,10 +81,6 @@ static CDVWKInAppBrowser* instance = nil;
         return;
     }
     
-    // Set tmpWindow to hidden to make main webview responsive to touch again
-    // https://stackoverflow.com/questions/4544489/how-to-remove-a-uiwindow
-    self->tmpWindow.hidden = YES;
-    
     // Things are cleaned up in browserExit.
     [self.inAppBrowserViewController close];
 }
@@ -699,6 +695,10 @@ static CDVWKInAppBrowser* instance = nil;
     // Set navigationDelegate to nil to ensure no callbacks are received from it.
     self.inAppBrowserViewController.navigationDelegate = nil;
     self.inAppBrowserViewController = nil;
+
+    // Set tmpWindow to hidden to make main webview responsive to touch again
+    // Based on https://stackoverflow.com/questions/4544489/how-to-remove-a-uiwindow
+    self->tmpWindow.hidden = YES;
     
     if (IsAtLeastiOSVersion(@"7.0")) {
         if (_previousStatusBarStyle != -1) {
