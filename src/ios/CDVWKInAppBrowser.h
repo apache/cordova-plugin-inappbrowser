@@ -27,6 +27,8 @@
 @class CDVWKInAppBrowserViewController;
 
 @interface CDVWKInAppBrowser : CDVPlugin {
+    UIWindow * tmpWindow;
+
     @private
     NSString* _beforeload;
     BOOL _waitForBeforeload;
