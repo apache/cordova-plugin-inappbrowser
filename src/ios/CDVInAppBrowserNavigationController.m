@@ -20,7 +20,6 @@
 #import "CDVInAppBrowserNavigationController.h"
 
 #define    STATUSBAR_HEIGHT 20.0
-#define    STATUSBAR_HEIGHT_NOTCH 44.0
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
@@ -41,7 +40,7 @@
         hasTopNotch = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
     }
     if(hasTopNotch){
-        statusBarFrame.size.height = STATUSBAR_HEIGHT_NOTCH;
+        statusBarFrame.size.height = [UIApplication sharedApplication].statusBarFrame.size.height;
     } else {
         statusBarFrame.size.height = STATUSBAR_HEIGHT;
     }
