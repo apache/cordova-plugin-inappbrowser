@@ -37,6 +37,7 @@
 
 #define    TOOLBAR_HEIGHT 44.0
 #define    STATUSBAR_HEIGHT 20.0
+#define    STATUSBAR_HEIGHT_NOTCH 20.0
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
@@ -1128,7 +1129,10 @@ BOOL isExiting = FALSE;
         if (@available(iOS 11.0, *)) {
             hasTopNotch = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
         }
-        if(!hasTopNotch){
+        if(hasTopNotch){
+            viewBounds.origin.y = STATUSBAR_HEIGHT_NOTCH;
+            viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT_NOTCH;
+        } else {
             viewBounds.origin.y = STATUSBAR_HEIGHT;
             viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT;
         }
