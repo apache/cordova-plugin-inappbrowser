@@ -105,8 +105,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HIDE_URL = "hideurlbar";
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
+    private static final String OVERRIDE_USERAGENT = "OverrideUserAgent";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, OVERRIDE_USERAGENT);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -890,7 +891,7 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
                 }
 
-                String overrideUserAgent = preferences.getString("OverrideUserAgent", null);
+                String overrideUserAgent = preferences.getString("OverrideUserAgent", features.get(OVERRIDE_USERAGENT));
                 String appendUserAgent = preferences.getString("AppendUserAgent", null);
 
                 if (overrideUserAgent != null) {
