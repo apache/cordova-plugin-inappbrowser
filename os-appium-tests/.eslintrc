@@ -1,0 +1,38 @@
+{
+  "extends": [
+    "standard",
+    "plugin:wdio/recommended"
+  ],
+  "parser": "typescript-eslint-parser",
+  "parserOptions": {
+    "ecmaVersion": 2016,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": [
+      2,
+      4
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "comma-dangle": [
+      "error",
+      "only-multiline"
+    ]
+  },
+  "globals": {
+    "$": true,
+    "$$": true,
+    "browser": true,
+    "driver": true
+  },
+  "plugins": [
+    "wdio",
+    "import"
+  ],
+  "env": {
+    "jasmine": true
+  }
+}
