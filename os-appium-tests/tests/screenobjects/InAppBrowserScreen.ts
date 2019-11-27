@@ -2,6 +2,12 @@ import * as AndroidUtils from '../helpers/AndroidUtils';
 import * as IOSUtils from '../helpers/IOSUtils';
 import * as Context from '../helpers/Context';
 
+// export function getContextList() : WebdriverIO.Element{
+//     let contexts = driver.getContexts();
+//
+// }
+
+
 export function getElementByTagName(locator: string) {
     return Context.getElemBySelector(locator);
 }
