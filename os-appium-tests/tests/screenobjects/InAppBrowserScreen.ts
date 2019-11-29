@@ -2,31 +2,33 @@ import * as AndroidUtils from '../helpers/AndroidUtils';
 import * as IOSUtils from '../helpers/IOSUtils';
 import * as Context from '../helpers/Context';
 
-// export function getContextList() : WebdriverIO.Element{
-//     let contexts = driver.getContexts();
-//
-// }
+export function getTextOnWebPage() {
+    Context.waitForWebsiteLoaded();
+    return  Context.getElemBySelector('#Joker-(2019)')
+}
 
+
+export function goBackButton(): WebdriverIO.Element {
+    Context.waitForDocumentFullyLoaded();
+    return Context.getElemBySelector('#Oh-yeah-close!');
+
+}
 
 export function getElementByTagName(locator: string) {
     return Context.getElemBySelector(locator);
 }
 
-
 export function getHomeScreenMenuEntry() {
     return Context.getElemBySelector('#b1-b1-HomeScreen');
 }
-
 
 export function getAppMenu(): WebdriverIO.Element {
     return Context.getElemBySelector('#b2-Menu');
 }
 
-
 export function GetURLConnectionWithLocators(string: any) {
     return Context.getElemBySelector("#" + string)
 }
-
 
 export function getSelectInAppBrowserButton() {
     return Context.getElemBySelector('#OpenBrowserBtn')
@@ -40,7 +42,6 @@ export function getTitle(): WebdriverIO.Element {
 export function GetURLConnection() {
     return Context.getElemBySelector('#button_https_valid_url');
 }
-
 
 export const SCREENTITLES = {
     HOME_SCREEN: 'In App Browser plugin'
