@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+<ns2:test-suite xmlns:ns2='urn:model.allure.qatools.yandex.ru' start='1575020257998' stop='1575020261791'>
+    <name>[TestSuite, Description("Add an URL and open it with right behaviour")]</name>
+    <title>[TestSuite, Description("Add an URL and open it with right behaviour")]</title>
+    <test-cases>
+        <test-case start='1575020261589' status='passed' stop='1575020261790'>
+            <name>[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]</name>
+            <title>[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]</title>
+            <labels>
+                <label name='language' value='javascript'/>
+                <label name='framework' value='wdio'/>
+                <label name='thread' value='0-0'/>
+            </labels>
+            <parameters>
+                <parameter kind='argument' name='device' value='Nexus'/>
+            </parameters>
+            <steps>
+                <step start='1575020261590' status='passed' stop='1575020261617'>
+                    <name>POST /session/:sessionId/elements</name>
+                    <title>POST /session/:sessionId/elements</title>
+                    <attachments>
+                        <attachment title='Request' source='f3e9633e-10f5-4531-9ac9-3c66db0f54ea-attachment.json' type='application/json' size='66'/>
+                        <attachment title='Response' source='e6c0aa24-c888-42d9-b3e4-9f57cf529444-attachment.json' type='application/json' size='116'/>
+                    </attachments>
+                    <steps/>
+                </step>
+                <step start='1575020261620' status='passed' stop='1575020261662'>
+                    <name>GET /session/:sessionId/element/0.6879804788397257-2/displayed</name>
+                    <title>GET /session/:sessionId/element/0.6879804788397257-2/displayed</title>
+                    <attachments>
+                        <attachment title='Response' source='c4781984-6822-4724-aa43-3d84d3cd5dfe-attachment.json' type='application/json' size='4'/>
+                    </attachments>
+                    <steps/>
+                </step>
+                <step start='1575020261662' status='passed' stop='1575020261788'>
+                    <name>POST /session/:sessionId/element/0.6879804788397257-2/click</name>
+                    <title>POST /session/:sessionId/element/0.6879804788397257-2/click</title>
+                    <attachments/>
+                    <steps/>
+                </step>
+            </steps>
+            <attachments/>
+        </test-case>
+    </test-cases>
+</ns2:test-suite>

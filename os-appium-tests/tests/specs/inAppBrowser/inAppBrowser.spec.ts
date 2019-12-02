@@ -82,20 +82,17 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour")
         let nativeAppContext = browser.getContexts()[1];
         Context.switchToContext(nativeAppContext);
         Context.waitForWebsiteLoaded();
-
         expect(result.getText()).toEqual(expectedResult);
     });
 
     it('[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]', () => {
 
-        console.log("\n Começou teste dois \n ");
         const expectedResult: string = 'Cinemas';
         const result = $(WEBPAGE_LOCATORS.LOCATORCINEMA);
+        console.log("pasou 3333???");
         const locatorCinema = $("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View/android.view.View[2]/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View/android.view.View[2]");
-
         const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
 
-        console.log("\n Passou depois dourl connection? \n " + urlConnection);
         urlConnection.waitForDisplayed();
         urlConnection.click();
         const openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
@@ -104,10 +101,11 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour")
         let nativeAppContext = browser.getContexts()[1];
 
         Context.switchToContext(nativeAppContext);
-
-     //
-        //  expect( locatorCinema.getText()).toEqual(expectedResult);
-       expect( result.getText()).toEqual(expectedResult);
+        Context.waitForWebsiteLoaded();
+// console.log("?????????????????????????????????????????????????????????????????????????'" +
+//     "????????????????????????????????????" +
+//     "?????????????????????????Pssou aqui agora?");
+        expect( result.getText()).toEqual(expectedResult);
 
     });
     afterEach(() => {
