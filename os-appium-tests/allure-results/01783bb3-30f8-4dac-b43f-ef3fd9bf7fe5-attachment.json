@@ -1,4 +1,0 @@
-{
-  "script": "return (() => document.readyState).apply(null, arguments)",
-  "args": []
-}

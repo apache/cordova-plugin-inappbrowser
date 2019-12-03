@@ -1,5 +1,0 @@
-{
-  "error": "no such element",
-  "message": "no such element: Unable to locate element: {\"method\":\"css selector\",\"selector\":\"Cinemas\"}\n  (Session info: chrome=74.0.3729.185)\n  (Driver info: chromedriver=2.46.628411 (3324f4c8be9ff2f70a05a30ebc72ffb013e1a71e),platform=Mac OS X 10.15.0 x86_64)",
-  "stacktrace": "NoSuchElementError: no such element: Unable to locate element: {\"method\":\"css selector\",\"selector\":\"Cinemas\"}\n  (Session info: chrome=74.0.3729.185)\n  (Driver info: chromedriver=2.46.628411 (3324f4c8be9ff2f70a05a30ebc72ffb013e1a71e),platform=Mac OS X 10.15.0 x86_64)\n    at errorFromMJSONWPStatusCode (/Applications/Appium.app/Contents/Resources/app/node_modules/appium/node_modules/appium-base-driver/lib/protocol/errors.js:764:12)\n    at ProxyRequestError.errorFromMJSONWPStatusCode [as getActualError] (/Applications/Appium.app/Contents/Resources/app/node_modules/appium/node_modules/appium-base-driver/lib/protocol/errors.js:661:14)\n    at getActualError (/Applications/Appium.app/Contents/Resources/app/node_modules/appium/node_modules/appium-base-driver/lib/protocol/protocol.js:384:25)"
-}

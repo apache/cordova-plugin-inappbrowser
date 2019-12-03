@@ -3,15 +3,12 @@ import * as IOSUtils from '../helpers/IOSUtils';
 import * as Context from '../helpers/Context';
 
 export function getTextOnWebPage() {
-    Context.waitForWebsiteLoaded();
     return  Context.getElemBySelector('#Joker-(2019)')
 }
 
 
 export function goBackButton(): WebdriverIO.Element {
-    Context.waitForDocumentFullyLoaded();
     return Context.getElemBySelector('#Oh-yeah-close!');
-
 }
 
 export function getElementByTagName(locator: string) {

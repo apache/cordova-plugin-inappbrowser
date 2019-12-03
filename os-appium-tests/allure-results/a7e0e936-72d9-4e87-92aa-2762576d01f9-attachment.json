@@ -1,4 +1,0 @@
-{
-  "using": "xpath",
-  "value": "//android.widget.TextView[@content-desc='Close Button']"
-}

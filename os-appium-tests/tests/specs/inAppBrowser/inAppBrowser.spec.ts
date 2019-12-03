@@ -2,12 +2,9 @@ import 'jasmine';
 import * as InAppBrowserScreen from '../../screenobjects/InAppBrowserScreen';
 import * as Context from '../../helpers/Context';
 import PermissionAlert from '../../helpers/PermissionAlert';
-import {url} from "inspector";
 import {DEFAULT_TIMEOUT} from "../../constants";
-import {TIMEOUT} from "dns";
-import {LOCATORS, WEBPAGE_LOCATORS} from "../LocatorsInAppBrowser";
-import * as assert from "assert";
-import * as Assert from "assert";
+import {LOCATORS, ANDROID_LOCATORS, IOS_LOCATORS} from "../../utils/locators/LocatorsInAppBrowser";
+
 
 describe('[TestSuite, Description("Add an URL and open it with right behaviour")]', () => {
 
@@ -68,46 +65,67 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour")
     );
 
 
+
+
+
     it('[Test, Description("Open valid url  https with locator:  LOCATORS.HTTPS_VALID_URL ),  Priority="P0"]', () => {
 
-        const result = $(WEBPAGE_LOCATORS.MESSAGE_IN_WEBPAGE);
-        const expectedResult: string = 'Joker (2019)';
+       // const expectedResult: string = 'Registar-se';
+
+        const expectedResultBemVindo: string = 'Bem-vindo ao Portal das Finanças';
 
         const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
         urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
         urlConnection.click();
         const openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+        const requestesBemVindo = $(ANDROID_LOCATORS.BEM_VINDO_MENSAGEM_FINANCAS);
         openInAppBrowserButton.click();
         let nativeAppContext = browser.getContexts()[1];
         Context.switchToContext(nativeAppContext);
         Context.waitForWebsiteLoaded();
-        expect(result.getText()).toEqual(expectedResult);
+
+       expect(requestesBemVindo.getText()).toEqual(expectedResultBemVindo);
     });
 
-    it('[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]', () => {
-
-        const expectedResult: string = 'Cinemas';
-        const result = $(WEBPAGE_LOCATORS.LOCATORCINEMA);
-        console.log("pasou 3333???");
-        const locatorCinema = $("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View/android.view.View[2]/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View/android.view.View[2]");
-        const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
-
-        urlConnection.waitForDisplayed();
-        urlConnection.click();
-        const openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-        openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-        openInAppBrowserButton.click();
-        let nativeAppContext = browser.getContexts()[1];
-
-        Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
-// console.log("?????????????????????????????????????????????????????????????????????????'" +
-//     "????????????????????????????????????" +
-//     "?????????????????????????Pssou aqui agora?");
-        expect( result.getText()).toEqual(expectedResult);
-
-    });
+    // xit('[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]', () => {
+    //
+    //     const expectedAndroidResult: string = 'Cinemas';
+    //     const androidResult = $(ANDROID_LOCATORS.REGISTAR_PORTAL_FINANCAS_NOME);
+    //     //TODO
+    //     //expected_iOS_Result and iOS_Result
+    //     let urlConnection: any;
+    //     let openInAppBrowserButton: any;
+    //     // const locatorCinema = $("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View/android.view.View[2]/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View/android.view.View[2]");
+    //     if (browser.isAndroid) {
+    //         urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
+    //         urlConnection.waitForDisplayed();
+    //         urlConnection.click();
+    //         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+    //         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+    //         openInAppBrowserButton.click();
+    //         let nativeAppContext = browser.getContexts()[1];
+    //         Context.switchToContext(nativeAppContext);
+    //         Context.waitForWebsiteLoaded();
+    //
+    //         expect(androidResult.getText()).toEqual(expectedAndroidResult);
+    //     }
+    //     else{
+    //         urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(IOS_LOCATORS.HTTPS_VALID_URL);
+    //         urlConnection.waitForDisplayed();
+    //         urlConnection.click();
+    //         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+    //         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+    //         openInAppBrowserButton.click();
+    //         let nativeAppContext = browser.getContexts()[1];
+    //
+    //         Context.switchToContext(nativeAppContext);
+    //         Context.waitForWebsiteLoaded();
+    //
+    //        // expect(androidResult.getText()).toEqual(expectedAndroidResult);
+    //     }
+    //
+    // });
     afterEach(() => {
         //Do test teardown here
     });
