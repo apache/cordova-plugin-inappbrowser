@@ -4,6 +4,7 @@ import * as Context from '../../helpers/Context';
 import PermissionAlert from '../../helpers/PermissionAlert';
 import {DEFAULT_TIMEOUT} from "../../constants";
 import {LOCATORS, ANDROID_LOCATORS, IOS_LOCATORS} from "../../utils/locators/LocatorsInAppBrowser";
+import * as assert from "assert";
 
 
 describe('[TestSuite, Description("Add an URL and open it with right behaviour")]', () => {
@@ -65,68 +66,179 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour")
     );
 
 
+    it('[Test, Description("Open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
 
+        const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
 
-    it('[Test, Description("Open valid url  https with locator:  LOCATORS.HTTPS_VALID_URL ),  Priority="P0"]', () => {
+        if (browser.isAndroid) {
 
-       // const expectedResult: string = 'Registar-se';
+            //Select Https url to be opened
+            const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
+            //wait to be displayed to grant the presence of it in the view before the click
+            urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
+            urlConnection.click();
 
-        const expectedResultBemVindo: string = 'Bem-vindo ao Portal das Finanças';
+            //open InApp browser button
+            const openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+            openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+            const requestWelcomeMessage = $(ANDROID_LOCATORS.BEM_VINDO_MENSAGEM_FINANCAS);
 
-        const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
-        urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
-        urlConnection.click();
-        const openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-        openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-        const requestesBemVindo = $(ANDROID_LOCATORS.BEM_VINDO_MENSAGEM_FINANCAS);
-        openInAppBrowserButton.click();
-        let nativeAppContext = browser.getContexts()[1];
-        Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
+            openInAppBrowserButton.click();
+            let nativeAppContext = browser.getContexts()[1];
+            Context.switchToContext(nativeAppContext);
+            Context.waitForWebsiteLoaded();
+            console.log("contextos:          " + Context.getCurrentContexts());
+            expect(requestWelcomeMessage.getText()).toEqual(expectedResultWelcomeMessage);
 
-       expect(requestesBemVindo.getText()).toEqual(expectedResultBemVindo);
+        }
+        else{
+
+        }
+
     });
+    it('[Test, Description("Open valid url http with "In App Browser",  Priority="P0"]', () => {
 
-    // xit('[Test, Description("Open valid url http  with locator: HTTP_VALID_URL,  Priority="P0"]', () => {
-    //
-    //     const expectedAndroidResult: string = 'Cinemas';
-    //     const androidResult = $(ANDROID_LOCATORS.REGISTAR_PORTAL_FINANCAS_NOME);
-    //     //TODO
-    //     //expected_iOS_Result and iOS_Result
-    //     let urlConnection: any;
-    //     let openInAppBrowserButton: any;
-    //     // const locatorCinema = $("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View/android.view.View[2]/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View/android.view.View[2]");
-    //     if (browser.isAndroid) {
-    //         urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
-    //         urlConnection.waitForDisplayed();
-    //         urlConnection.click();
-    //         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-    //         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //         openInAppBrowserButton.click();
-    //         let nativeAppContext = browser.getContexts()[1];
-    //         Context.switchToContext(nativeAppContext);
-    //         Context.waitForWebsiteLoaded();
-    //
-    //         expect(androidResult.getText()).toEqual(expectedAndroidResult);
-    //     }
-    //     else{
-    //         urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(IOS_LOCATORS.HTTPS_VALID_URL);
-    //         urlConnection.waitForDisplayed();
-    //         urlConnection.click();
-    //         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-    //         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //         openInAppBrowserButton.click();
-    //         let nativeAppContext = browser.getContexts()[1];
-    //
-    //         Context.switchToContext(nativeAppContext);
-    //         Context.waitForWebsiteLoaded();
-    //
-    //        // expect(androidResult.getText()).toEqual(expectedAndroidResult);
-    //     }
-    //
-    // });
-    afterEach(() => {
+        const expectedAndroidResult: string = 'eunops';
+        let urlConnection: any;
+        let openInAppBrowserButton: any;
+
+        //Android app test
+        if (browser.isAndroid) {
+            urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
+            urlConnection.waitForDisplayed();
+            urlConnection.click();
+            openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+            openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+            openInAppBrowserButton.click();
+            let nativeAppContext = browser.getContexts()[1];
+            Context.switchToContext(nativeAppContext);
+            Context.waitForWebsiteLoaded();
+            browser.waitUntil(() => {
+                return ($(ANDROID_LOCATORS.EUNOPS_XPATH).getText()) === 'eunops'
+            });
+            const link = $(ANDROID_LOCATORS.EUNOPS_XPATH);
+            console.log("contextos:          " + Context.getCurrentContexts());
+            expect(link.getText()).toEqual(expectedAndroidResult);
+
+         //iOS app test
+        } else {
+            urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(IOS_LOCATORS.HTTPS_VALID_URL);
+            urlConnection.waitForDisplayed();
+            urlConnection.click();
+            openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+            openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+            openInAppBrowserButton.click();
+            let nativeAppContext = browser.getContexts()[1];
+            Context.switchToContext(nativeAppContext);
+            Context.waitForWebsiteLoaded();
+
+            // expect(androidResult.getText()).toEqual(expectedAndroidResult);
+        }
+
+    });
+   //
+   // it('[Test, Description(Open valid url https with "System" ),  Priority="P0"]', () => {
+   //
+   //    //  let openWithSystyemButton: any;
+   //      const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
+   //      let urlConnection: any;
+   //      let openWithSystyemButton: any;
+   //      let openInAppBrowserButton: any;
+   //
+   //     browser.waitUntil(() => {
+   //         return ( $(ANDROID_LOCATORS.IN_APP_BROWSER_PLUGIN).isDisplayed());
+   //     });
+   //      if (browser.isAndroid) {
+   //
+   //          //Select Https url to be opened in web browser
+   //         urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
+   //         //wait to be displayed to grant the presence of it in the view before the click
+   //          urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          urlConnection.click();
+   //
+   //          openWithSystyemButton = InAppBrowserScreen.getSelectWithSystemButton();
+   //          openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          openWithSystyemButton.click();
+   //
+   //          //open InApp browser button
+   //          openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+   //          openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          openInAppBrowserButton.click();
+   //
+   //          let nativeAppContext = browser.getContexts()[0];
+   //          Context.switchToContext(nativeAppContext);
+   //          Context.waitForWebsiteLoaded();
+   //          const requestWelcomeMessage = $(ANDROID_LOCATORS.FINANCAS_BROWSER);
+   //
+   //          expect(requestWelcomeMessage.getText()).toEqual(expectedResultWelcomeMessage);
+   //          browser.closeApp();
+   //
+   //      }
+   //      else{
+   //
+   //      }
+   //
+   //  });
+   //
+   //  it('[Test, Description("Open valid url http with "System",  Priority="P0"]', () => {
+   //
+   //      const expectedAndroidResult: string = 'eunops';
+   //      let urlConnection: any;
+   //      let openWithSystyemButton: any;
+   //      let openInAppBrowserButton: any;
+   //
+   //      //Android app test
+   //      if (browser.isAndroid) {
+   //
+   //          urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
+   //          urlConnection.waitForDisplayed();
+   //          urlConnection.click();
+   //
+   //          openWithSystyemButton = InAppBrowserScreen.getSelectWithSystemButton();
+   //          openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          openWithSystyemButton.click();
+   //
+   //
+   //          openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+   //          openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          openInAppBrowserButton.click();
+   //
+   //
+   //          let nativeAppContext = browser.getContexts()[1];
+   //          Context.switchToContext(nativeAppContext);
+   //          Context.waitForWebsiteLoaded();
+   //
+   //          browser.waitUntil(() => {
+   //              return ($(ANDROID_LOCATORS.EUNOPS_BROWSER).getText()) === 'eunops'
+   //          });
+   //
+   //          const result = $(ANDROID_LOCATORS.EUNOPS_BROWSER);
+   //          console.log("contextos:          " + Context.getCurrentContexts());
+   //          expect(result.getText()).toEqual(expectedAndroidResult);
+   //
+   //
+   //
+   //          //iOS app test
+   //      } else {
+   //          urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(IOS_LOCATORS.HTTPS_VALID_URL);
+   //          urlConnection.waitForDisplayed();
+   //          urlConnection.click();
+   //          // openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+   //          // openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+   //          // openInAppBrowserButton.click();
+   //          let nativeAppContext = browser.getContexts()[0];
+   //          Context.switchToContext(nativeAppContext);
+   //          Context.waitForWebsiteLoaded();
+   //
+   //          // expect(androidResult.getText()).toEqual(expectedAndroidResult);
+   //      }
+   //
+   //  });
+
+
+   afterEach(() => {
         //Do test teardown here
+browser
     });
 });

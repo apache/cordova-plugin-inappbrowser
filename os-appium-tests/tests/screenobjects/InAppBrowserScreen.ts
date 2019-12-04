@@ -2,6 +2,11 @@ import * as AndroidUtils from '../helpers/AndroidUtils';
 import * as IOSUtils from '../helpers/IOSUtils';
 import * as Context from '../helpers/Context';
 
+export function getSelectWithSystemButton() {
+    return Context.getElemBySelector('#ButtonGroupItem12')
+}
+
+
 export function getTextOnWebPage() {
     return  Context.getElemBySelector('#Joker-(2019)')
 }
