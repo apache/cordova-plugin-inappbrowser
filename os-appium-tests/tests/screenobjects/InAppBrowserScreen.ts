@@ -46,7 +46,7 @@ export function getTitle(): WebdriverIO.Element {
     return Context.getElemBySelector('#b1-Title');
 }
 
-export function GetURLConnection() {
+export function GetHttpsURLConnection() {
     return Context.getElemBySelector('#button_https_valid_url');
 }
 
