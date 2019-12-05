@@ -52,7 +52,7 @@ exports.config = {
     // Some hooks
     // ====================
     afterTest: function (test) {
-        debugger;
+        //debugger;
         console.log(test);
         if (!test.passed) {
             browser.takeScreenshot();

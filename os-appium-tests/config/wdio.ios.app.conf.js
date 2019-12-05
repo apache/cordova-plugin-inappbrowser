@@ -9,11 +9,11 @@ config.capabilities = [
     {
         // The defaults you need to have in your config
         automationName: 'XCUITest',
-        deviceName: 'iPhone 11',
+        deviceName: 'iPhone XR',
         platformName: 'iOS',
-       platformVersion: '13.2',
+        platformVersion: '12.1',
         orientation: 'PORTRAIT',
-        app: join(process.cwd(), 'apps/InAppBrowser_Sample_App.zip'),
+        app: join(process.cwd(), './apps/InAppBrowser_Sample_App.zip'),
         noReset: true,
     },
 ];

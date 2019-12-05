@@ -7,12 +7,12 @@ const { config } = require('./wdio.shared.conf');
 config.capabilities = [
     {
         // The reference to the app
-        testobject_app_id: '...', //find it at SauceLabs App Dashboard
+        testobject_app_id: '1', //find it at SauceLabs App Dashboard
         // The api key that has a reference to the app-project in the TO cloud
-        testobject_api_key: '...',
+        testobject_api_key: '0C4D814674B04135BD5BBBBD12709AF9',
         // You can find more info in the Appium Basic Setup section
         platformName: 'Android',
-        platformVersion: '...', //e.g. 8.1
+        platformVersion: '10', //e.g. 8.1
         idleTimeout: 180,
         maxInstances: 2,
         orientation: 'PORTRAIT',
