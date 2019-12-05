@@ -70,18 +70,18 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
     );
 
 
+    //Select Https url to be opened
+
     it('[Test, Description("Open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
-
         const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das';
-        let requestWelcomeMessage: string = '';
 
-        //Select Https url to be opened
+        let requestWelcomeMessage: string = '';
         //const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
         const urlConnection = InAppBrowserScreen.GetURLConnection();
-        //wait to be displayed to grant the presence of it in the view before
         // the click
         urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
+        //wait to be displayed to grant the presence of it in the view before
         urlConnection.click();
 
         //Open InApp browser button
@@ -92,55 +92,36 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
         Context.waitForWebsiteLoaded();
-       // browser.getPageSource();
 
         requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
 
-
     });
 
-    xit('[Test, Description("Open valid url http with "In App Browser",  Priority="P0"]', () => {
+    it('[Test, Description("Open valid url http with "In App Browser",  Priority="P0"]', () => {
 
-        const expectedAndroidResult: string = 'eunops';
+        const expectedResult: string = 'eunops';
         let urlConnection: any;
         let openInAppBrowserButton: any;
 
-        //Android app test
-        if (browser.isAndroid) {
-            urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
-            urlConnection.waitForDisplayed();
-            urlConnection.click();
-            openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-            openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-            openInAppBrowserButton.click();
-            let nativeAppContext = browser.getContexts()[1];
-            Context.switchToContext(nativeAppContext);
-            Context.waitForWebsiteLoaded();
-            browser.waitUntil(() => {
-                return ($(ANDROID_LOCATORS.EUNOPS_XPATH).getText()) === 'eunops'
-            });
-            const link = $(ANDROID_LOCATORS.EUNOPS_XPATH);
-            console.log("contextos:          " + Context.getCurrentContexts());
+        //urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTP_VALID_URL);
+        urlConnection = InAppBrowserScreen.GetHttpURLConnectionWithLocators();
+        urlConnection.waitForDisplayed();
+        urlConnection.click();
 
-            console.log(" ???????????????????????????Terminou test 2");
+        openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+        openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+        openInAppBrowserButton.click();
+        let nativeAppContext = browser.getContexts()[0];
+        Context.switchToContext(nativeAppContext);
+        Context.waitForWebsiteLoaded();
 
-            expect(link.getText()).toEqual(expectedAndroidResult);
+        // browser.waitUntil(() => {
+        //     return ($(ANDROID_LOCATORS.EUNOPS_XPATH).getText()) === 'eunops'
+        // });
+        const messageFromHttpUrl = LocatorsInAppBrowser.getMessageFromUrl(browser);
 
-            //iOS app test
-        } else {
-            urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(IOS_LOCATORS.HTTPS_VALID_URL);
-            urlConnection.waitForDisplayed();
-            urlConnection.click();
-            openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-            openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-            openInAppBrowserButton.click();
-            let nativeAppContext = browser.getContexts()[1];
-            Context.switchToContext(nativeAppContext);
-            Context.waitForWebsiteLoaded();
-
-            // expect(androidResult.getText()).toEqual(expectedAndroidResult);
-        }
+        expect(messageFromHttpUrl).toContain(expectedResult);
 
     });
 

@@ -1,4 +1,5 @@
 import {DEFAULT_TIMEOUT} from "../../constants";
+import Browser = WebdriverIO.Browser;
 
 export const LOCATORS = {
 
@@ -40,15 +41,16 @@ export const IOS_LOCATORS = {
 
 const SELECTORS = {
     ANDROID: {
-        //BEM_VINDO_MENSAGEM_FINANCAS: '(td:contains("A AT no Youtube"))',
-        BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]'
-        //BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]'
+
+        BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]',
+        MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "eunops")]'
     },
     IOS: {
-        // BEM_VINDO_MENSAGEM_FINANCAS: '/XCUIElementTypeOther[@name="Portal das Finanças"]/XCUIElementTypeOther[101]',
-        BEM_VINDO_MENSAGEM_FINANCAS: '(td:contains("Bem-vindo ao Portal"))',
 
-    },
+        //BEM_VINDO_MENSAGEM_FINANCAS: '(td:contains("Bem-vindo ao Portal"))',
+        BEM_VINDO_MENSAGEM_FINANCAS: '(//XCUIElementTypeStaticText[@name="Bem-vindo ao Portal das Finanças"]',
+        MENSAGEM_EUNOPS: ''
+    }
 };
 
 
@@ -68,8 +70,10 @@ class LocatorsInAppBrowser {
     }
 
 
+    static getMessageFromUrl(driver): string {
+        return $(driver.isAndroid ? SELECTORS.ANDROID.MENSAGEM_EUNOPS_PAGE : SELECTORS.IOS.MENSAGEM_EUNOPS).getText();
+    }
 }
-
 
 
 export default LocatorsInAppBrowser;

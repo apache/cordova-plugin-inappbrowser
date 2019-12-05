@@ -2,6 +2,11 @@ import * as AndroidUtils from '../helpers/AndroidUtils';
 import * as IOSUtils from '../helpers/IOSUtils';
 import * as Context from '../helpers/Context';
 
+export function GetHttpURLConnectionWithLocators() {
+    return Context.getElemBySelector('#button_http_valid_url')
+}
+
+
 export function getSelectWithSystemButton() {
     return Context.getElemBySelector('#ButtonGroupItem12')
 }
