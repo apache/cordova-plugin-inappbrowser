@@ -39,11 +39,10 @@ export const IOS_LOCATORS = {
 
 const SELECTORS = {
     ANDROID: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]',
-
+        BEM_VINDO_MENSAGEM_FINANCAS: '(‘td:contains(“Bem-vindo ao Portal das Finanças”)’)'
     },
     IOS: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]',
+        BEM_VINDO_MENSAGEM_FINANCAS: '/XCUIElementTypeOther[@name="Portal das Finanças"]/XCUIElementTypeOther[101]',
 
     },
 };
