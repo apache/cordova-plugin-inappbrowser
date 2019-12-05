@@ -73,8 +73,9 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
     it('[Test, Description("Open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
 
-        const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
+        const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das';
         let requestWelcomeMessage: string = '';
+
         //Select Https url to be opened
         //const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
         const urlConnection = InAppBrowserScreen.GetURLConnection();
@@ -88,12 +89,13 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
 
         openInAppBrowserButton.click();
-        let nativeAppContext = browser.getContexts()[1];
+        let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
         Context.waitForWebsiteLoaded();
+       // browser.getPageSource();
 
         requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
-        expect(requestWelcomeMessage).toEqual(expectedResultWelcomeMessage);
+        expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
 
 
     });

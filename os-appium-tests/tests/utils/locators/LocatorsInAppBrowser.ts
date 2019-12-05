@@ -15,6 +15,7 @@ export const ANDROID_LOCATORS = {
     REGISTAR_PORTAL_FINANCAS_XPATH: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[1]/android.widget.FrameLayout[2]/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[2]/android.view.View/android.view.View[2]/android.view.View[1]',
     REGISTAR_PORTAL_FINANCAS_NOME: 'Registar-se',
     BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]',
+    //BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]',
 
     FINANCAS_BROWSER: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[1]/android.widget.FrameLayout[2]/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]',
     YEAH_CLOSE_BUTTON: "//android.widget.TextView[@content-desc='Close Button']",
@@ -39,10 +40,13 @@ export const IOS_LOCATORS = {
 
 const SELECTORS = {
     ANDROID: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '(‘td:contains(“Bem-vindo ao Portal das Finanças”)’)'
+        //BEM_VINDO_MENSAGEM_FINANCAS: '(td:contains("A AT no Youtube"))',
+        BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]'
+        //BEM_VINDO_MENSAGEM_FINANCAS: '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.webkit.WebView/android.webkit.WebView/android.view.View[2]/android.view.View[1]/android.view.View[3]/android.view.View[3]/android.view.View[2]/android.view.View[1]/android.view.View/android.view.View[1]'
     },
     IOS: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '/XCUIElementTypeOther[@name="Portal das Finanças"]/XCUIElementTypeOther[101]',
+        // BEM_VINDO_MENSAGEM_FINANCAS: '/XCUIElementTypeOther[@name="Portal das Finanças"]/XCUIElementTypeOther[101]',
+        BEM_VINDO_MENSAGEM_FINANCAS: '(td:contains("Bem-vindo ao Portal"))',
 
     },
 };
@@ -50,13 +54,22 @@ const SELECTORS = {
 
 class LocatorsInAppBrowser {
 
-    /**
-     * Wait for the alert to exist
-     */
+
     public static getUrlTitle(driver): string {
         const selector = driver.isAndroid ? SELECTORS.ANDROID.BEM_VINDO_MENSAGEM_FINANCAS : SELECTORS.IOS.BEM_VINDO_MENSAGEM_FINANCAS;
         return $(selector).getText();
 
     }
+
+    public static getText(driver): string {
+        const selector = driver.isAndroid ? SELECTORS.ANDROID.BEM_VINDO_MENSAGEM_FINANCAS : SELECTORS.IOS.BEM_VINDO_MENSAGEM_FINANCAS;
+        return $(selector).getText();
+
+    }
+
+
 }
+
+
+
 export default LocatorsInAppBrowser;
