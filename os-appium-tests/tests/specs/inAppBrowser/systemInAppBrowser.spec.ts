@@ -54,6 +54,8 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
     });
 
     beforeEach(() => {
+
+            browser.reset();
             // Wait for webview to load
             Context.waitForWebViewContextLoaded();
 
@@ -62,6 +64,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
             // Wait for Home Screen
             waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
+
         }
     );
 
@@ -102,6 +105,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
     it('[Test, Description("Open valid url http with "System",  Priority="P0"]', () => {
 
+       // browser.reloadSession();
         const expectedResult: string = 'eunops';
         let urlConnection: any;
         let openWithSystyemButton: any;
