@@ -6,16 +6,9 @@ export function GetHttpURLConnectionWithLocators() {
     return Context.getElemBySelector('#button_http_valid_url')
 }
 
-
 export function getSelectWithSystemButton() {
     return Context.getElemBySelector('#ButtonGroupItem12')
 }
-
-
-export function getTextOnWebPage() {
-    return  Context.getElemBySelector('#Joker-(2019)')
-}
-
 
 export function goBackButton(): WebdriverIO.Element {
     return Context.getElemBySelector('#Oh-yeah-close!');

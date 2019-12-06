@@ -1,11 +1,11 @@
 import 'jasmine';
-import * as InAppBrowserScreen from '../../screenobjects/InAppBrowserScreen';
-import * as Context from '../../helpers/Context';
-import PermissionAlert from '../../helpers/PermissionAlert';
-import {DEFAULT_TIMEOUT} from "../../constants";
+import * as InAppBrowserScreen from '../screenobjects/InAppBrowserScreen';
+import * as Context from '../helpers/Context';
+import PermissionAlert from '../helpers/PermissionAlert';
+import {DEFAULT_TIMEOUT} from "../constants";
 import LocatorsInAppBrowser, {
     LOCATORS
-} from "../../utils/locators/LocatorsInAppBrowser";
+} from "../utils/locators/LocatorsInAppBrowser";
 
 describe('[TestSuite, Description("Add an URL and open it with right behaviour using InAppBrowser")]', () => {
 
@@ -53,7 +53,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
     });
 
-    beforeEach(() => {
+   beforeEach(() => {
             // Wait for webview to load
             Context.waitForWebViewContextLoaded();
 
@@ -115,71 +115,6 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         expect(messageFromHttpUrl).toContain(expectedResult);
 
     });
-
-    // it('[Test, Description(Open valid url https with "System" ),  Priority="P0"]', () => {
-    //
-    //     //  let openWithSystyemButton: any;
-    //     const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
-    //     let urlConnection: any;
-    //     let openWithSystyemButton: any;
-    //     let openInAppBrowserButton: any;
-    //
-    //
-    //     //Select Https url to be opened in web browser
-    //     urlConnection = InAppBrowserScreen.GetHttpsURLConnection();
-    //     //wait to be displayed to grant the presence of it in the view before the click
-    //     urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
-    //     urlConnection.click();
-    //
-    //     openWithSystyemButton = InAppBrowserScreen.getSelectWithSystemButton();
-    //     openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //     openWithSystyemButton.click();
-    //
-    //     //open InApp browser button
-    //     openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-    //     openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //     openInAppBrowserButton.click();
-    //
-    //     let nativeAppContext = browser.getContexts()[1];
-    //     Context.switchToContext(nativeAppContext);
-    //     Context.waitForWebsiteLoaded();
-    //
-    //     const requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
-    //
-    //     expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
-    //
-    //
-    // });
-    //
-    // it('[Test, Description("Open valid url http with "System",  Priority="P0"]', () => {
-    //
-    //     const expectedResult: string = 'eunops';
-    //     let urlConnection: any;
-    //     let openWithSystyemButton: any;
-    //     let openInAppBrowserButton: any;
-    //
-    //
-    //     urlConnection = InAppBrowserScreen.GetHttpURLConnectionWithLocators();
-    //     urlConnection.waitForDisplayed();
-    //     urlConnection.click();
-    //
-    //     openWithSystyemButton = InAppBrowserScreen.getSelectWithSystemButton();
-    //     openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //     openWithSystyemButton.click();
-    //
-    //     openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-    //     openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-    //     openInAppBrowserButton.click();
-    //
-    //     let nativeAppContext = browser.getContexts()[1];
-    //     Context.switchToContext(nativeAppContext);
-    //     Context.waitForWebsiteLoaded();
-    //
-    //     const result = LocatorsInAppBrowser.getMessageFromUrl(browser);
-    //     expect(result).toContain(expectedResult);
-    //
-    // });
-
 
     afterEach(() => {
         //Do test teardown here

@@ -42,7 +42,7 @@ exports.config = {
     reporters: [
         ['allure',
             {
-                disableWebdriverScreenshotsReporting: false,
+                disableWebdriverScreenshotsReporting: true,
                 outputDir: './allure-results'
             }],
         'spec'
@@ -53,7 +53,7 @@ exports.config = {
     // ====================
     afterTest: function (test) {
         //debugger;
-        console.log(test);
+       // console.log(test);
         if (!test.passed) {
             browser.takeScreenshot();
         }
