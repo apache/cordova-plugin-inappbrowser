@@ -65,8 +65,33 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         }
     );
 
+    it('[Test, Description("Should open valid url http with "In App Browser",  Priority="P0"]', () => {
 
-    it('[Test, Description("Open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
+        const expectedResult: string = 'CTT';
+        let urlConnection: any;
+        let openInAppBrowserButton: any;
+
+        urlConnection = InAppBrowserScreen.GetHttpURLConnectionWithLocators();
+        urlConnection.waitForDisplayed();
+        urlConnection.click();
+
+        openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+        openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
+        openInAppBrowserButton.click();
+
+        let nativeAppContext = browser.getContexts()[0];
+        Context.switchToContext(nativeAppContext);
+        Context.waitForWebsiteLoaded();
+
+        const messageFromHttpUrl = LocatorsInAppBrowser.getMessageFromUrl(browser);
+console.log("messageFromHttpUrl" + messageFromHttpUrl);
+console.log("expected result" + expectedResult);
+
+        expect(messageFromHttpUrl).toContain(expectedResult);
+
+    });
+
+    it('[Test, Description("Should open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
         const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das';
 
@@ -89,30 +114,6 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
         requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
-
-    });
-
-    it('[Test, Description("Open valid url http with "In App Browser",  Priority="P0"]', () => {
-
-        const expectedResult: string = 'eunops';
-        let urlConnection: any;
-        let openInAppBrowserButton: any;
-
-        urlConnection = InAppBrowserScreen.GetHttpURLConnectionWithLocators();
-        urlConnection.waitForDisplayed();
-        urlConnection.click();
-
-        openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
-        openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
-        openInAppBrowserButton.click();
-
-        let nativeAppContext = browser.getContexts()[0];
-        Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
-
-        const messageFromHttpUrl = LocatorsInAppBrowser.getMessageFromUrl(browser);
-
-        expect(messageFromHttpUrl).toContain(expectedResult);
 
     });
 

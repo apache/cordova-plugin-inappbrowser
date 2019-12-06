@@ -7,11 +7,11 @@ export const LOCATORS = {
 const SELECTORS = {
     ANDROID: {
         BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]',
-        MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "eunops")]',
+        MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "CTT")]',
     },
     IOS: {
         BEM_VINDO_MENSAGEM_FINANCAS: '//XCUIElementTypeStaticText[@label="Bem-vindo ao Portal das Finanças"]',
-        MENSAGEM_EUNOPS: '//XCUIElementTypeStaticText[@label="eunops"]'
+        MENSAGEM_EUNOPS: '//XCUIElementTypeStaticText[@label="CTT"]'
     }
 };
 

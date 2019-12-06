@@ -60,13 +60,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         }
     );
 
-    afterEach(() => {
-        browser.closeApp();
-        browser.reset();
-    }
-);
-
-    it('[Test, Description(Open valid url https with "System" ),  Priority="P0"]', () => {
+    it('[Test, Description(Should open valid url https with "System" ),  Priority="P0"]', () => {
 
         //  let openWithSystyemButton: any;
         const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
@@ -91,7 +85,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         openInAppBrowserButton.click();
 
         let nativeAppContext = browser.getContexts()[Context.CONTEXT_REF.NATIVE];
-        Context.switchToContext(nativeAppContext);    
+        Context.switchToContext(nativeAppContext);
 
         const requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
@@ -99,9 +93,10 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
     });
 
-    it('[Test, Description("Open valid url http with "System",  Priority="P0"]', () => {
+    it('[Test, Description("Should open valid url http with "System",  Priority="P0"]', () => {
 
-        const expectedResult: string = 'eunops';
+
+        const expectedResult: string = 'CTT';
         let urlConnection: any;
         let openWithSystyemButton: any;
         let openInAppBrowserButton: any;
@@ -126,4 +121,7 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
     });
 
+    afterEach(() => {
+        //Do test teardown here
+    });
 });
