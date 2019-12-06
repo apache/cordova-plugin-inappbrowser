@@ -53,10 +53,10 @@ exports.config = {
     // ====================
     afterTest: function (test) {
         //debugger;
-       // console.log(test);
-        if (!test.passed) {
+       console.log(test);
+       /* if (!test.passed) {
             browser.takeScreenshot();
-        }
+        } */
     },
 
     beforeSession: (config, capabilities, specs) => {

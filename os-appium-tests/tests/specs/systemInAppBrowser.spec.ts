@@ -40,22 +40,11 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
     };
 
-    beforeAll(() => {
-
-        // Wait for webview to load
-        Context.waitForWebViewContextLoaded();
-
-        // Switch the context to WEBVIEW
-        Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
-
-        // Wait for Home Screen
-        waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
-
-    });
-
     beforeEach(() => {
 
-            browser.reset();
+            // Switch the context to WEBVIEW
+            Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
+
             // Wait for webview to load
             Context.waitForWebViewContextLoaded();
 
@@ -65,8 +54,17 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
             // Wait for Home Screen
             waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
 
+            // Enter Screen
+            InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
+
         }
     );
+
+    afterEach(() => {
+        browser.closeApp();
+        browser.reset();
+    }
+);
 
     it('[Test, Description(Open valid url https with "System" ),  Priority="P0"]', () => {
 
@@ -92,12 +90,10 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
         openInAppBrowserButton.click();
 
-        let nativeAppContext = browser.getContexts()[1];
-        Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
+        let nativeAppContext = browser.getContexts()[Context.CONTEXT_REF.NATIVE];
+        Context.switchToContext(nativeAppContext);    
 
         const requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
-
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
 
 
@@ -122,20 +118,12 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
         openInAppBrowserButton.click();
 
-        let nativeAppContext = browser.getContexts()[1];
+        let nativeAppContext = browser.getContexts()[Context.CONTEXT_REF.NATIVE];
         Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
 
         const result = LocatorsInAppBrowser.getMessageFromUrl(browser);
-
         expect(result).toContain(expectedResult);
-        browser.closeApp();
 
     });
 
-
-    afterEach(() => {
-        //Do test teardown here
-
-    });
 });
