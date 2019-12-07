@@ -32,7 +32,7 @@ exports.config = {
 
     },
     sync: true,
-    logLevel: 'debug',
+    logLevel: 'error',
     deprecationWarnings: true,
     bail: 0,
     baseUrl: '',

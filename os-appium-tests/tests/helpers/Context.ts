@@ -2,7 +2,7 @@ import {DEFAULT_TIMEOUT, DEFAULT_TIMEOUT_INTERVAL} from "../constants"
 
 export const CONTEXT_REF = {
     NATIVE: 'native',
-    WEBVIEW: 'webview',
+    WEBVIEW: 'webview_com',
 };
 const DOCUMENT_READY_STATE = {
     COMPLETE: 'complete',

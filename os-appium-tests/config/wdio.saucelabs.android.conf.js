@@ -12,19 +12,19 @@ config.capabilities = [
         testobject_api_key: '0C4D814674B04135BD5BBBBD12709AF9',
         // You can find more info in the Appium Basic Setup section
         platformName: 'Android',
-        platformVersion: '10', //e.g. 8.1
+        platformVersion: '9', //e.g. 8.1
         idleTimeout: 180,
         maxInstances: 2,
         orientation: 'PORTRAIT',
         newCommandTimeout: 180,
         privateDevicesOnly: false, //use Public or Private Cloud
         enableAnimations: false,
-        autoAcceptAlerts: true         
+        //autoAcceptAlerts: true         
         // testobject_test_name: '..', // The name of the test for in the cloud
         // deviceName: '...', // e.g. Samsung
         // testobject_cache_device: true,
         // noReset: true,
-        // phoneOnly: false,
+         phoneOnly: true,
         // tabletOnly: false
     },
 ];

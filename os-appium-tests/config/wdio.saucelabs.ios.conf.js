@@ -12,18 +12,18 @@ config.capabilities = [
         testobject_api_key: '90368C394D6444679C897DC5BFA93C3A',
         // You can find more info in the Appium Basic Setup section
         platformName: 'iOS',
-        platformVersion: '10.3',  // e.g. 12
+        platformVersion: '11.4',  // e.g. 12
         idleTimeout: 180,
         orientation: 'PORTRAIT',
         newCommandTimeout: 180,
         privateDevicesOnly: false, //use Public or Private Cloud
         enableAnimations: false,
-        autoAcceptAlerts: true
+        //autoAcceptAlerts: true
         // The name of the test for in the cloud
         // testobject_test_name: '...',
         // deviceName: 'iPhone.*',
         // maxInstances: 2,
-        // phoneOnly: false,
+         phoneOnly: true,
         // tabletOnly: false,
         // testobject_cache_device: true,
         // noReset: true,

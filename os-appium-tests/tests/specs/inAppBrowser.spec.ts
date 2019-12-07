@@ -7,51 +7,13 @@ import LocatorsInAppBrowser, {
     LOCATORS
 } from "../utils/locators/LocatorsInAppBrowser";
 
-describe('[TestSuite, Description("Add an URL and open it with right behaviour using InAppBrowser")]', () => {
-
-    const allowPermissionIfNeeded = (allow: boolean) => {
-        Context.switchToContext(Context.CONTEXT_REF.NATIVE);
-
-        if (PermissionAlert.isShown(true, browser)) {
-            PermissionAlert.allowPermission(allow, browser);
-            PermissionAlert.isShown(false, browser);
-        }
-        Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
-    };
+describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour, using InAppBrowser")]', () => {
 
     const waitForScreen = (title: string) => {
         InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
         const screenTitle: string = InAppBrowserScreen.getTitle().getText();
         expect(screenTitle).toContain(title);
     };
-
-    const backToHomeScreen = () => {
-        const menuButton = InAppBrowserScreen.getAppMenu();
-        menuButton.waitForDisplayed(DEFAULT_TIMEOUT);
-        if (!menuButton.isDisplayedInViewport()) {
-            menuButton.scrollIntoView();
-        }
-        menuButton.click();
-
-        const menuList = InAppBrowserScreen.getHomeScreenMenuEntry();
-        menuList.waitForDisplayed(DEFAULT_TIMEOUT);
-        menuList.click();
-
-        waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
-    };
-
-    beforeAll(() => {
-
-        // Wait for webview to load
-        Context.waitForWebViewContextLoaded();
-
-        // Switch the context to WEBVIEW
-        Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
-
-        // Wait for Home Screen
-        waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
-
-    });
 
    beforeEach(() => {
             // Wait for webview to load
@@ -64,6 +26,10 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
             waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
         }
     );
+
+    afterAll(() => {
+        browser.closeApp();
+    });
 
     it('[Test, Description("Should open valid url http with "In App Browser",  Priority="P0"]', () => {
 
@@ -81,12 +47,8 @@ describe('[TestSuite, Description("Add an URL and open it with right behaviour u
 
         let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
 
         const messageFromHttpUrl = LocatorsInAppBrowser.getMessageFromUrl(browser);
-console.log("messageFromHttpUrl" + messageFromHttpUrl);
-console.log("expected result" + expectedResult);
-
         expect(messageFromHttpUrl).toContain(expectedResult);
 
     });
@@ -110,15 +72,9 @@ console.log("expected result" + expectedResult);
         openInAppBrowserButton.click();
         let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
-        Context.waitForWebsiteLoaded();
 
         requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
 
     });
-
-    afterEach(() => {
-        //Do test teardown here
-    });
-
 });
