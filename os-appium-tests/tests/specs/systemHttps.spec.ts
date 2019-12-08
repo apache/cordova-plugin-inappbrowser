@@ -1,7 +1,6 @@
 import 'jasmine';
 import * as InAppBrowserScreen from '../screenobjects/InAppBrowserScreen';
 import * as Context from '../helpers/Context';
-import PermissionAlert from '../helpers/PermissionAlert';
 import {DEFAULT_TIMEOUT} from "../constants";
 import LocatorsInAppBrowser, {
     LOCATORS
@@ -25,25 +24,8 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
 
         // Enter Screen
         InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
-
-        
     }
 );
-
-    /*beforeEach(() => {
-
-            // Switch the context to WEBVIEW
-            Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
-
-            // Wait for Home Screen
-            waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
-
-            // Enter Screen
-            InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
-
-            
-        }
-    );*/
 
     afterAll(() => {
         browser.closeApp();
@@ -57,7 +39,6 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
         let urlConnection: any;
         let openWithSystyemButton: any;
         let openInAppBrowserButton: any;
-
 
         //Select Https url to be opened in web browser
         urlConnection = InAppBrowserScreen.GetHttpsURLConnection();
@@ -79,7 +60,5 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
 
         const requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
-
-
     });
 });

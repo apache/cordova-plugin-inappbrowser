@@ -7,11 +7,11 @@ export const LOCATORS = {
 const SELECTORS = {
     ANDROID: {
         BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]',
-        MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "CTT")]',
+        MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "eunops")]',
     },
     IOS: {
         BEM_VINDO_MENSAGEM_FINANCAS: '//XCUIElementTypeStaticText[@label="Bem-vindo ao Portal das Finanças"]',
-        MENSAGEM_EUNOPS: '//XCUIElementTypeStaticText[@label="CTT"]'
+        MENSAGEM_EUNOPS: '//XCUIElementTypeButton[@name="Search"]'
     }
 };
 
@@ -22,13 +22,9 @@ class LocatorsInAppBrowser {
         return $(selector).getText();
     }
 
-    public static getText(driver): string {
-        const selector = driver.isAndroid ? SELECTORS.ANDROID.BEM_VINDO_MENSAGEM_FINANCAS : SELECTORS.IOS.BEM_VINDO_MENSAGEM_FINANCAS;
-        return $(selector).getText();
-    }
-
-    static getMessageFromUrl(driver): string {
-        return $(driver.isAndroid ? SELECTORS.ANDROID.MENSAGEM_EUNOPS_PAGE : SELECTORS.IOS.MENSAGEM_EUNOPS).getText();
+    public static getMessageFromUrl(driver): string {
+        const selector =(driver.isAndroid ? SELECTORS.ANDROID.MENSAGEM_EUNOPS_PAGE : SELECTORS.IOS.MENSAGEM_EUNOPS);
+        return  $(selector).getText();
     }
 }
 

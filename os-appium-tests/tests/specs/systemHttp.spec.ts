@@ -1,7 +1,6 @@
 import 'jasmine';
 import * as InAppBrowserScreen from '../screenobjects/InAppBrowserScreen';
 import * as Context from '../helpers/Context';
-import PermissionAlert from '../helpers/PermissionAlert';
 import {DEFAULT_TIMEOUT} from "../constants";
 import LocatorsInAppBrowser, {
     LOCATORS
@@ -17,6 +16,9 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
 
     beforeAll(() => {
 
+        // Wait for webview to load
+        Context.waitForWebViewContextLoaded();
+
         // Switch the context to WEBVIEW
         Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
 
@@ -24,13 +26,11 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
         waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
 
         // Enter Screen
-        InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
-
-        
+        InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);  
     }
 );
 
-    /*beforeEach(() => {
+    beforeEach(() => {
        
             // Switch the context to WEBVIEW
             Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
@@ -40,19 +40,16 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
 
             // Enter Screen
             InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
-
-            
         }
-    );*/
+    );
 
     afterAll(() => {
         browser.closeApp();
     });
 
     it('[Test, Description("Should open valid url http with "System",  Priority="P0"]', () => {
-
-
-        const expectedResult: string = 'CTT';
+        const expectedResult: string = 'eunops';
+        const expectedResultiOS: string = 'Search';
         let urlConnection: any;
         let openWithSystyemButton: any;
         let openInAppBrowserButton: any;
@@ -71,9 +68,16 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
 
         let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
-
+        console.log("***" + nativeAppContext);
+        console.log("****" + browser);
         const result = LocatorsInAppBrowser.getMessageFromUrl(browser);
-        expect(result).toContain(expectedResult);
+        
+        if(browser.isAndroid) {
+            expect(result).toContain(expectedResult);
+        }
+        else {
+            expect(result).toContain(expectedResultiOS);
+        }
 
     });
 

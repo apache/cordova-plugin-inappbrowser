@@ -28,7 +28,7 @@ exports.config = {
         compiler: ['ts:ts-node/register'],
         // Updated the timeout to 30 seconds due to possible longer appium calls
         // When using XPATH
-        defaultTimeoutInterval: 90000
+        defaultTimeoutInterval: 120000
 
     },
     sync: true,

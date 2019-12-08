@@ -1,7 +1,6 @@
 import 'jasmine';
 import * as InAppBrowserScreen from '../screenobjects/InAppBrowserScreen';
 import * as Context from '../helpers/Context';
-import PermissionAlert from '../helpers/PermissionAlert';
 import {DEFAULT_TIMEOUT} from "../constants";
 import LocatorsInAppBrowser, {
     LOCATORS
@@ -15,7 +14,7 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
         expect(screenTitle).toContain(title);
     };
 
-   beforeEach(() => {
+   beforeAll(() => {
             // Wait for webview to load
             Context.waitForWebViewContextLoaded();
 
@@ -27,13 +26,26 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
         }
     );
 
+    beforeEach(() => {
+        // Wait for webview to load
+        Context.waitForWebViewContextLoaded();
+
+        // Switch the context to WEBVIEW
+        Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
+
+        // Wait for Home Screen
+        waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
+    }
+);
+
     afterAll(() => {
         browser.closeApp();
     });
 
     it('[Test, Description("Should open valid url http with "In App Browser",  Priority="P0"]', () => {
 
-        const expectedResult: string = 'CTT';
+        const expectedResult: string = 'eunops';
+        const expectedResultiOS: string = 'Search';
         let urlConnection: any;
         let openInAppBrowserButton: any;
 
@@ -49,7 +61,12 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
         Context.switchToContext(nativeAppContext);
 
         const messageFromHttpUrl = LocatorsInAppBrowser.getMessageFromUrl(browser);
-        expect(messageFromHttpUrl).toContain(expectedResult);
+        if(browser.isAndroid) {
+            expect(messageFromHttpUrl).toContain(expectedResult);
+        }
+        else {
+            expect(messageFromHttpUrl).toContain(expectedResultiOS);
+        }
 
     });
 
@@ -58,7 +75,6 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
         const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das';
 
         let requestWelcomeMessage: string = '';
-        //const urlConnection = InAppBrowserScreen.GetURLConnectionWithLocators(LOCATORS.HTTPS_VALID_URL);
         const urlConnection = InAppBrowserScreen.GetHttpsURLConnection();
         // the click
         urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
