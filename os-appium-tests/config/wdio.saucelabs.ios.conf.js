@@ -8,8 +8,6 @@ config.capabilities = [
     {
         // The reference to the app
         testobject_app_id: '1', // app version id - find it in saucelabs dashboard app versions
-        // The api key that has a reference to the app-project in the TO cloud
-        testobject_api_key: '90368C394D6444679C897DC5BFA93C3A',
         // You can find more info in the Appium Basic Setup section
         platformName: 'iOS',
         platformVersion: '11',  // e.g. 12
