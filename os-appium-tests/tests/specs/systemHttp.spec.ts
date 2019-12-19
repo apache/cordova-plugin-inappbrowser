@@ -26,12 +26,12 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
         waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
 
         // Enter Screen
-        InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);  
+        InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
     }
 );
 
     beforeEach(() => {
-       
+
             // Switch the context to WEBVIEW
             Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
 
@@ -47,7 +47,7 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
         browser.closeApp();
     });
 
-    it('[Test, Description("Should open valid url http with "System",  Priority="P0"]', () => {
+    it('[Test, Description("Should open valid url http with "System",  Priority="P0", ID = "IB0002"]', () => {
         const expectedResult: string = 'eunops';
         const expectedResultiOS: string = 'Search';
         let urlConnection: any;
@@ -68,10 +68,8 @@ describe('[TestSuite, Description("Open a HTTP URL with right behaviour, using S
 
         let nativeAppContext = browser.getContexts()[0];
         Context.switchToContext(nativeAppContext);
-        console.log("***" + nativeAppContext);
-        console.log("****" + browser);
         const result = LocatorsInAppBrowser.getMessageFromUrl(browser);
-        
+
         if(browser.isAndroid) {
             expect(result).toContain(expectedResult);
         }
