@@ -72,6 +72,7 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
 
     it('[Test, Description("Should open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
+
         const expectedResultWelcomeMessage: string = 'Welcome';
 
         let requestWelcomeMessage: string = '';
