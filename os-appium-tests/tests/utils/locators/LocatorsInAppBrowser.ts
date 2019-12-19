@@ -6,19 +6,22 @@ export const LOCATORS = {
 
 const SELECTORS = {
     ANDROID: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '//*[contains(@text, "Bem-vindo ao Portal das")]',
+       OUT_SYSTEMS_WEB_PAGE: '//*[contains(@text, "Welcome")]',
+       // OUT_SYSTEMS_WEB_PAGE: '//*[@id, "wrapper")]',
+        //*[@id="timeZone"]
         MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "eunops")]',
     },
     IOS: {
-        BEM_VINDO_MENSAGEM_FINANCAS: '//XCUIElementTypeStaticText[@label="Bem-vindo ao Portal das Finanças"]',
-        MENSAGEM_EUNOPS: '//XCUIElementTypeButton[@name="Search"]'
+        OUT_SYSTEMS_WEB_PAGE: '//XCUIElementTypeStaticText[@label="Welcome"]',
+       // OUT_SYSTEMS_WEB_PAGE: '//*[@id="wrapper"]',
+        MENSAGEM_EUNOPS: '//XCUIElementTypeButton[@name="Search"]',
     }
 };
 
 class LocatorsInAppBrowser {
 
     public static getUrlTitle(driver): string {
-        const selector = driver.isAndroid ? SELECTORS.ANDROID.BEM_VINDO_MENSAGEM_FINANCAS : SELECTORS.IOS.BEM_VINDO_MENSAGEM_FINANCAS;
+        const selector = driver.isAndroid ? SELECTORS.ANDROID.OUT_SYSTEMS_WEB_PAGE : SELECTORS.IOS.OUT_SYSTEMS_WEB_PAGE;
         return $(selector).getText();
     }
 

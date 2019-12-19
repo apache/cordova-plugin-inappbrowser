@@ -6,7 +6,7 @@ import LocatorsInAppBrowser, {
     LOCATORS
 } from "../utils/locators/LocatorsInAppBrowser";
 
-describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour, using InAppBrowser")]', () => {
+describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour, using InAppBrowser"), ID = "IB0002"]', () => {
 
     const waitForScreen = (title: string) => {
         InAppBrowserScreen.getTitle().waitForDisplayed(DEFAULT_TIMEOUT);
@@ -14,7 +14,7 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
         expect(screenTitle).toContain(title);
     };
 
-   beforeAll(() => {
+    beforeAll(() => {
             // Wait for webview to load
             Context.waitForWebViewContextLoaded();
 
@@ -27,16 +27,16 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
     );
 
     beforeEach(() => {
-        // Wait for webview to load
-        Context.waitForWebViewContextLoaded();
+            // Wait for webview to load
+            Context.waitForWebViewContextLoaded();
 
-        // Switch the context to WEBVIEW
-        Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
+            // Switch the context to WEBVIEW
+            Context.switchToContext(Context.CONTEXT_REF.WEBVIEW);
 
-        // Wait for Home Screen
-        waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
-    }
-);
+            // Wait for Home Screen
+            waitForScreen(InAppBrowserScreen.SCREENTITLES.HOME_SCREEN);
+        }
+    );
 
     afterAll(() => {
         browser.closeApp();
@@ -72,7 +72,7 @@ describe('[TestSuite, Description("Open a HTTP & HTTPS URL with right behaviour,
 
     it('[Test, Description("Should open valid url https with "In App Browser"  ),  Priority="P0"]', () => {
 
-        const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das';
+        const expectedResultWelcomeMessage: string = 'wrapper';
 
         let requestWelcomeMessage: string = '';
         const urlConnection = InAppBrowserScreen.GetHttpsURLConnection();

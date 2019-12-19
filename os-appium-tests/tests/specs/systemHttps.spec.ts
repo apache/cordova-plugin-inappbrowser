@@ -32,10 +32,10 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
     });
 
 
-    it('[Test, Description(Should open valid url https with "System" ),  Priority="P0"]', () => {
+    it('[Test, Description(Should open valid url https with "System" ),  Priority="P0", ID="IB0002"]', () => {
 
         //  let openWithSystyemButton: any;
-        const expectedResultWelcomeMessage: string = 'Bem-vindo ao Portal das Finanças';
+        const expectedResultWelcomeMessage: string = 'elcome';
         let urlConnection: any;
         let openWithSystyemButton: any;
         let openInAppBrowserButton: any;
@@ -45,20 +45,21 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
         //wait to be displayed to grant the presence of it in the view before the click
         urlConnection.waitForDisplayed(DEFAULT_TIMEOUT);
         urlConnection.click();
-
         openWithSystyemButton = InAppBrowserScreen.getSelectWithSystemButton();
+
         openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
         openWithSystyemButton.click();
-
         //open InApp browser button
         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
+
         openInAppBrowserButton.waitForDisplayed(DEFAULT_TIMEOUT);
         openInAppBrowserButton.click();
-
         let nativeAppContext = browser.getContexts()[0];
+
         Context.switchToContext(nativeAppContext);
 
         const requestWelcomeMessage = LocatorsInAppBrowser.getUrlTitle(browser);
+
         expect(requestWelcomeMessage).toContain(expectedResultWelcomeMessage);
     });
 });
