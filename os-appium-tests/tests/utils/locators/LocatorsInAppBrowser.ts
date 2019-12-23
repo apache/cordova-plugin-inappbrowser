@@ -7,13 +7,12 @@ export const LOCATORS = {
 const SELECTORS = {
     ANDROID: {
        OUT_SYSTEMS_WEB_PAGE: '//*[contains(@text, "Welcome")]',
-       // OUT_SYSTEMS_WEB_PAGE: '//*[@id, "wrapper")]',
-        //*[@id="timeZone"]
+
         MENSAGEM_EUNOPS_PAGE: '//*[contains(@text, "eunops")]',
     },
     IOS: {
         OUT_SYSTEMS_WEB_PAGE: '//XCUIElementTypeStaticText[@label="Welcome"]',
-       // OUT_SYSTEMS_WEB_PAGE: '//*[@id="wrapper"]',
+
         MENSAGEM_EUNOPS: '//XCUIElementTypeButton[@name="Search"]',
     }
 };

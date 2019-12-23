@@ -49,6 +49,7 @@ describe('[TestSuite, Description("Open a HTTPS URL with right behaviour, using 
 
         openWithSystyemButton.waitForDisplayed(DEFAULT_TIMEOUT);
         openWithSystyemButton.click();
+
         //open InApp browser button
         openInAppBrowserButton = InAppBrowserScreen.getSelectInAppBrowserButton();
 

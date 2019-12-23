@@ -1,10 +1,10 @@
 import * as Context from '../helpers/Context';
 
-export function GetHttpURLConnectionWithLocators() {
+export function GetHttpURLConnectionWithLocators(): WebdriverIO.Element {
     return Context.getElemBySelector('#button_http_valid_url')
 }
 
-export function getSelectWithSystemButton() {
+export function getSelectWithSystemButton(): WebdriverIO.Element {
     return Context.getElemBySelector('#ButtonGroupItem12')
 }
 
@@ -37,7 +37,7 @@ export function getTitle(): WebdriverIO.Element {
     return Context.getElemBySelector('#b1-Title');
 }
 
-export function GetHttpsURLConnection() {
+export function GetHttpsURLConnection(): WebdriverIO.Element {
     return Context.getElemBySelector('#button_https_valid_url');
 }
 

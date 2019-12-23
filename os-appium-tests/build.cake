@@ -16,7 +16,7 @@ var install=Task("Install")
     .Does(() =>
 {
     Information("Starting Install");
-    NpmCi();      
+    NpmCi();
     Information("Ending Install");
 });
 
@@ -26,12 +26,12 @@ var build=Task("Build")
     Information("Starting Build");
     var conf = ParseJsonFromFile("package.json");
     if(conf["scripts"]["build"]!=null)
-        NpmRunScript("build");      
+        NpmRunScript("build");
     Information("Ending Build");
 });
 var tests = Task("Tests")
 	.Does(()=>
-	{	
+	{
         Information("Starting Tests");
         var conf = ParseJsonFromFile("package.json");
         if(conf["scripts"]["test"]!=null)
@@ -45,11 +45,10 @@ var package = Task("Package")
         Information("Starting Pack");
         CreateDirectory("./artifacts");
         Environment.CurrentDirectory =@".\artifacts";
-        DeleteDirectory("./tools");
-        NpmPack(settings => settings.FromSource("./..")); 
+        NpmPack(settings => settings.FromSource("./.."));
         Information("Ending Pack");
     });
-    
+
 Task("Default")
     .IsDependentOn("Package");
 
