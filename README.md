@@ -43,6 +43,10 @@ InAppBrowser window, by replacing window.open:
 
     window.open = cordova.InAppBrowser.open;
 
+If you change the browsers `window.open` function this way, it can have unintended side
+effects (especially if this plugin is included only as a dependency of another
+plugin).
+
 The InAppBrowser window behaves like a standard web browser,
 and can't access Cordova APIs. For this reason, the InAppBrowser is recommended
 if you need to load third-party (untrusted) content, instead of loading that
@@ -51,22 +55,6 @@ whitelist, nor is opening links in the system browser.
 
 The InAppBrowser provides by default its own GUI controls for the user (back,
 forward, done).
-
-For backwards compatibility, this plugin also hooks `window.open`.
-However, the plugin-installed hook of `window.open` can have unintended side
-effects (especially if this plugin is included only as a dependency of another
-plugin).  The hook of `window.open` will be removed in a future major release.
-Until the hook is removed from the plugin, apps can manually restore the default
-behaviour:
-
-    delete window.open // Reverts the call back to its prototype's default
-
-Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
-
-    document.addEventListener("deviceready", onDeviceReady, false);
-    function onDeviceReady() {
-        console.log("window.open works well");
-    }
 
 ## Installation
 
