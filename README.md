@@ -180,7 +180,7 @@ instance, or the system browser.
 
 The default API level in the Cordova Android platform has been upgraded. On an Android 9 device, clear text communication is now disabled by default.
 
-To allow clear text communication again, set the android:usesCleartextTraffic on your application tag to true in `config.xml` file:
+To allow clear text communication again, set the `android:usesCleartextTraffic` on your application tag to true in `config.xml` file:
 `<platform name="android">
   <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
       <application android:usesCleartextTraffic="true" />
