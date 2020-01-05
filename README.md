@@ -176,6 +176,21 @@ instance, or the system browser.
     var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
     var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
 
+### Android Quirks
+
+The default API level in the Cordova Android platform has been upgraded. On an Android 9 device, clear text communication is now disabled by default.
+
+To allow clear text communication again, set the android:usesCleartextTraffic on your application tag to true:
+`<platform name="android">
+  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+      <application android:usesCleartextTraffic="true" />
+  </edit-config>
+</platform>`
+
+And also you need to add Android XML namespace `xmlns:android="http://schemas.android.com/apk/res/android"` to your widget tag in the same config.xml, like so:
+`<widget id="io.cordova.hellocordova" version="0.0.1" android-versionCode="13" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+</widget>`
+
 ### OSX Quirks
 
 At the moment the only supported target in OSX is `_system`.
