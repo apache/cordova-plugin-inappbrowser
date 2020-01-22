@@ -313,7 +313,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (dialog != null) {
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
                         dialog.show();
                     }
                 }
@@ -326,7 +326,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (dialog != null) {
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
                         dialog.hide();
                     }
                 }
@@ -537,7 +537,7 @@ public class InAppBrowser extends CordovaPlugin {
                 childView.setWebViewClient(new WebViewClient() {
                     // NB: wait for about:blank before dismissing
                     public void onPageFinished(WebView view, String url) {
-                        if (dialog != null) {
+                        if (dialog != null && !cordova.getActivity().isFinishing()) {
                             dialog.dismiss();
                             dialog = null;
                         }
