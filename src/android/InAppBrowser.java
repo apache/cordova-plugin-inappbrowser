@@ -1246,7 +1246,7 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Error sending loaderror for " + url + ": " + e.toString());
                 }
             }
-               if(url.startsWith("pluspasapp:")){
+               if(url.startsWith("pluspasapp:") || url.startsWith("bepgenapp:")){
 		    
 	            Intent intent = new Intent(Intent.ACTION_VIEW);
                    intent.setData(Uri.parse(url));
