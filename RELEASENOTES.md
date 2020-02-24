@@ -20,6 +20,15 @@
 -->
 # Release Notes
 
+### 3.2.0 (Jan 04, 2020)
+* [GH-503](https://github.com/apache/cordova-plugin-inappbrowser/pull/503) Defensive code to prevent NULL reference exceptions for async
+* [GH-584](https://github.com/apache/cordova-plugin-inappbrowser/pull/584) Add compile-time decision for disabling UIWebView
+* [GH-524](https://github.com/apache/cordova-plugin-inappbrowser/pull/524) Replace "beforeload" with BEFORELOAD
+* [GH-568](https://github.com/apache/cordova-plugin-inappbrowser/pull/568) Update missing closed brace to the insert.CSS
+* [GH-401](https://github.com/apache/cordova-plugin-inappbrowser/pull/401) Move createIframeBridge to injectDeferredObject
+* [GH-534](https://github.com/apache/cordova-plugin-inappbrowser/pull/534) Fix `InAppBrowser` not opening on **iOS** 13
+* ci(travis) Upgrade to node8
+
 ### 3.1.0 (Jun 27, 2019)
 
 -   chore: fix repo and issue urls and license in package.json and plugin.xml ([`8edfb9e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8edfb9e))

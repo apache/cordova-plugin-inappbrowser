@@ -17,6 +17,8 @@
  under the License.
  */
 
+#if !WK_WEB_VIEW_ONLY
+
 #import "CDVUIInAppBrowser.h"
 #import <Cordova/CDVPluginResult.h>
 #import <Cordova/CDVUserAgentUtil.h>
@@ -363,6 +365,7 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)injectDeferredObject:(NSString*)source withWrapper:(NSString*)jsWrapper
 {
+    [self createIframeBridge];
     if (jsWrapper != nil) {
         NSData* jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
         NSString* sourceArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -565,7 +568,6 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
 {
-    [self createIframeBridge];
     if (self.callbackId != nil) {
         // TODO: It would be more useful to return the URL the page is actually on (e.g. if it's been redirected).
         NSString* url = [self.inAppBrowserViewController.currentURL absoluteString];
@@ -1126,4 +1128,4 @@ static CDVUIInAppBrowser* instance = nil;
 
 @end
 
-
+#endif
