@@ -40,9 +40,44 @@
 #endif
 }
 
+- (NSHTTPCookie*) getCookieFromDictionary:(NSString*) cookieName cookieVal: (NSString*) cookieVal {
+    NSDictionary *properties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                @".corpintra.net", NSHTTPCookieDomain,
+                                @"/", NSHTTPCookiePath,
+                                cookieName, NSHTTPCookieName,
+                                cookieVal, NSHTTPCookieValue,
+                                nil];
+    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
+    return cookie;
+}
+
 - (void)open:(CDVInvokedUrlCommand*)command
 {
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    NSString* headers = [command argumentAtIndex:3 withDefault:@"{}"];
+    NSString* cookies = [command argumentAtIndex:4 withDefault:@"{}"];
+    NSLog(@"injecting headers: %@",headers);
+    if (![headers isEqualToString:@"{}"]) {
+        NSLog(@"Header injection not yet supported.");
+    }
+    NSLog(@"injecting cookies: %@",cookies);
+    if (@available(iOS 11.0, *)) {
+        WKWebsiteDataStore* dataStore = [WKWebsiteDataStore defaultDataStore];
+        WKHTTPCookieStore*  cookieStore = [dataStore httpCookieStore];
+        NSDictionary* cookieDict = [NSJSONSerialization JSONObjectWithData:
+                                    [cookies dataUsingEncoding:NSUTF8StringEncoding]
+                                    options: NSJSONReadingMutableContainers error: nil];
+   
+        
+        for (NSString* cookieName in cookieDict) {
+            id cookieVal = cookieDict[cookieName];
+            NSLog(@"cookie name: %@, val: %@", cookieName, cookieVal);
+            [cookieStore setCookie:[self getCookieFromDictionary:(NSString *)cookieName cookieVal:cookieVal] completionHandler: nil];
+        }
+    } else {
+        NSLog(@"iOS < 11 detected - no cookie handling");
+    }
+    
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
     if(browserOptions.usewkwebview && !self.wkwebviewavailable){
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@{@"type":@"loaderror", @"message": @"usewkwebview option specified but but no plugin that supplies a WKWebView engine is present"}] callbackId:command.callbackId];
