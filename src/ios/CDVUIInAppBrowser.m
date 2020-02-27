@@ -621,7 +621,7 @@ static CDVUIInAppBrowser* instance = nil;
 
 @synthesize currentURL;
 
-BOOL viewRenderedAtLeastOnce = FALSE;
+BOOL viewUIRenderedAtLeastOnce = FALSE;
 
 - (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions
 {
@@ -919,7 +919,7 @@ BOOL viewRenderedAtLeastOnce = FALSE;
 
 - (void)viewDidLoad
 {
-    viewRenderedAtLeastOnce = FALSE;
+    viewUIRenderedAtLeastOnce = FALSE;
     [super viewDidLoad];
 }
 
@@ -992,8 +992,8 @@ BOOL viewRenderedAtLeastOnce = FALSE;
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    if (IsAtLeastiOSVersion(@"7.0") && !viewRenderedAtLeastOnce) {
-        viewRenderedAtLeastOnce = TRUE;
+    if (IsAtLeastiOSVersion(@"7.0") && !viewUIRenderedAtLeastOnce) {
+        viewUIRenderedAtLeastOnce = TRUE;
         CGRect viewBounds = [self.webView bounds];
         CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
         CGFloat statusBarHeight = statusBarFrame.size.height;
