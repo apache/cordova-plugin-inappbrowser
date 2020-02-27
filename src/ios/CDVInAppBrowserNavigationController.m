@@ -19,7 +19,7 @@
 
 #import "CDVInAppBrowserNavigationController.h"
 
-#define    STATUSBAR_HEIGHT 20.0
+#define    STATUSBAR_HEIGHT 0.0
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
