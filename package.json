@@ -1,10 +1,10 @@
 {
-  "name": "cordova-plugin-inappbrowser",
+  "name": "@switch/cordova-plugin-daimler-inappbrowser",
   "version": "3.1.1",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser",
+    "id": "@switch/cordova-plugin-daimler-inappbrowser",
     "platforms": [
       "android",
       "browser",
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
+    "url": "https://git.daimler.com/switch-cordova/cordova-plugin-daimler-inappbrowser"
   },
   "bugs": {
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser/issues"
+    "url": "https://git.daimler.com/switch-cordova/cordova-plugin-daimler-inappbrowser/issues"
   },
   "keywords": [
     "cordova",

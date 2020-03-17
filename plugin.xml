@@ -19,15 +19,15 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="cordova-plugin-inappbrowser"
+           id="cordova-plugin-daimler-inappbrowser"
       version="3.1.1">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
-    <repo>https://github.com/apache/cordova-plugin-inappbrowser</repo>
-    <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
+    <repo>https://git.daimler.com/switch-cordova/cordova-plugin-daimler-inappbrowser</repo>
+    <issue>https://git.daimler.com/switch-cordova/cordova-plugin-daimler-inappbrowser/issues</issue>
 
     <engines>
       <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
