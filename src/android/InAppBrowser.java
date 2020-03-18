@@ -117,8 +117,10 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
+    private static final String APP_HEADER_HEIGHT = "appheaderheight";
+    private static final String WINDOW_HEIGHT = "windowheight";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, APP_HEADER_HEIGHT, WINDOW_HEIGHT);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -149,6 +151,8 @@ public class InAppBrowser extends CordovaPlugin {
     private String beforeload = "";
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+    private int appheaderheight;
+    private int windowheight;
 
     /**
      * Executes the request and returns PluginResult.
@@ -714,6 +718,12 @@ public class InAppBrowser extends CordovaPlugin {
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
             }
+            if (features.get(APP_HEADER_HEIGHT) != null) {
+                appheaderheight = Integer.valueOf(features.get(APP_HEADER_HEIGHT));
+            }
+            if (features.get(WINDOW_HEIGHT) != null) {
+                windowheight = Integer.valueOf(features.get(WINDOW_HEIGHT));
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -797,6 +807,17 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
+
+                Window window = dialog.getWindow();
+                WindowManager.LayoutParams wlp = window.getAttributes();
+                wlp.gravity = Gravity.TOP | Gravity.LEFT;
+                wlp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                wlp.height = this.dpToPixels(windowheight);
+                wlp.dimAmount=0.5f; 
+                window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                window.setAttributes(wlp);
 
                 // Main container layout
                 LinearLayout main = new LinearLayout(cordova.getActivity());
@@ -1066,8 +1087,10 @@ public class InAppBrowser extends CordovaPlugin {
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
+                lp.x = 0;
+                lp.y = this.dpToPixels(appheaderheight);
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = this.dpToPixels(windowheight);
 
                 if (dialog != null) {
                     dialog.setContentView(main);
