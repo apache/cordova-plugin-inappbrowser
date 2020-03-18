@@ -1,5 +1,6 @@
 package org.apache.cordova.inappbrowser;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -64,7 +65,7 @@ public class InAppBrowserDownloads implements DownloadListener{
         {
             if(r == PackageManager.PERMISSION_DENIED)
             {
-                Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), "Error downloading file, missing storage permissions", Toast.LENGTH_LONG).show();
+                Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), getStringResourceByName("inappbrowser_download_permission_error"), Toast.LENGTH_LONG).show();
             } else {
                 InAppBrowserDownloads.this.processDownload();
             }
@@ -94,10 +95,24 @@ public class InAppBrowserDownloads implements DownloadListener{
             intent.addCategory(Intent.CATEGORY_OPENABLE); //CATEGORY.OPENABLE
             intent.setType("*/*");//any application,any extension
 
-            Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), "Downloading File '" + filename + "'", Toast.LENGTH_LONG).show();
+            String toastText = String.format(getStringResourceByName("inappbrowser_downloading_file"), filename);
+            Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), toastText, Toast.LENGTH_LONG).show();
         } catch (Exception exception) {
-            Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), "Error downloading file, missing storage permissions", Toast.LENGTH_LONG).show();
+            Toast.makeText(plugin.cordova.getActivity().getApplicationContext(), getStringResourceByName("inappbrowser_download_permission_error"), Toast.LENGTH_LONG).show();
             exception.printStackTrace();
         }
+    }
+
+    /**
+     * Grabs a string from the activity's resources.
+     *
+     * @param aString The name of the resource to retrieve
+     * @return        The string contents of the resource
+     */
+    private String getStringResourceByName(String aString) {
+        Activity activity = plugin.cordova.getActivity();
+        String packageName = activity.getPackageName();
+        int resId = activity.getResources().getIdentifier(aString, "string", packageName);
+        return activity.getString(resId);
     }
 }
