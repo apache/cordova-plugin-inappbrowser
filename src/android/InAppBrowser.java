@@ -105,6 +105,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
+    private static final String ACCEPT_THIRD_PARTY_COOKIES = "acceptThirdPartyCookies";
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
     private static final String TOOLBAR_COLOR = "toolbarcolor";
@@ -132,6 +133,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hadwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
+    private boolean acceptThirdPartyCookies = false;
     private boolean useWideViewPort = true;
     private ValueCallback<Uri> mUploadCallback;
     private ValueCallback<Uri[]> mUploadCallbackLollipop;
@@ -714,6 +716,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
             }
+            Boolean thirdPartyCookies = features.get(ACCEPT_THIRD_PARTY_COOKIES);
+            if (thirdPartyCookies != null) {
+                acceptThirdPartyCookies = thirdPartyCookies.booleanValue();
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -1027,12 +1033,14 @@ public class InAppBrowser extends CordovaPlugin {
                 } else if (clearSessionCache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
-
+                
                 // Enable Thirdparty Cookies on >=Android 5.0 device
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
+                if (acceptThirdPartyCookies) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
+                    }
                 }
-
+                
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
