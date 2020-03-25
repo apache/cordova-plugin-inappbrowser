@@ -33,11 +33,13 @@ import android.graphics.drawable.Drawable;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -118,8 +120,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String BOTTOMREDUCEHEIGHTBY = "bottomreduceheightby";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, BOTTOMREDUCEHEIGHTBY);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -149,6 +152,7 @@ public class InAppBrowser extends CordovaPlugin {
     private String footerColor = "";
     private String beforeload = "";
     private boolean fullscreen = true;
+    private int bottomReduceHeightBy = 0;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
@@ -720,6 +724,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
             }
+            String bottomReduceHeightBySet = features.get(BOTTOMREDUCEHEIGHTBY);
+            if (bottomReduceHeightBySet != null) {
+                bottomReduceHeightBy = Integer.parseInt(bottomReduceHeightBySet);
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -1075,12 +1083,37 @@ public class InAppBrowser extends CordovaPlugin {
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+                
+                if (bottomReduceHeightBy != 0) {
+                    // Resize the window if it has to be reduced to less than the available screen height
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+                    // Make sure to convert height to density independent pixels (dip)
+                    int reducedHeightDip = (int) ((float) bottomReduceHeightBy * displayMetrics.density);
+
+                    // Calculate status bar height
+                    Rect rectangle = new Rect();
+                    cordova.getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                    int statusBarHeightDip = rectangle.top;
+
+                    // Also account for height of the status bar as heightPixels is the total height of the screen
+                    lp.height = displayMetrics.heightPixels - reducedHeightDip - statusBarHeightDip;
+
+                    // Make sure the dialog is aligned to the bottom of the status bar as it is centered by default
+                    lp.gravity = Gravity.TOP;
+                }
 
                 if (dialog != null) {
                     dialog.setContentView(main);
                     dialog.show();
                     dialog.getWindow().setAttributes(lp);
+
+                    if (bottomReduceHeightBy != 0) {
+                        // Ensure the parent window respond to clicks when the web view is displayed on top of it
+                        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+                        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    }
                 }
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
