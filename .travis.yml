@@ -1,4 +1,4 @@
-# This Travis configuration file is built after a Cordova Paramedic 
+# This Travis configuration file is built after a Cordova Paramedic
 # specific template with minimal modifications and adaptations:
 # https://github.com/apache/cordova-paramedic/blob/master/.travis.yml
 
@@ -12,18 +12,18 @@ addons:
 env:
   global:
     - SAUCE_USERNAME=snay
-    - TRAVIS_NODE_VERSION=8
+    - TRAVIS_NODE_VERSION=12
     - ANDROID_API_LEVEL=28
     - ANDROID_BUILD_TOOLS_VERSION=28.0.3
 
 language: node_js
-node_js: 8
+node_js: 12
 
 # yaml anchor/alias: https://medium.com/@tommyvn/travis-yml-dry-with-anchors-8b6a3ac1b027
 
 _ios: &_ios
   os: osx
-  osx_image: xcode10.2
+  osx_image: xcode10.3
 
 _android: &_android
   language: android
@@ -35,9 +35,9 @@ _android: &_android
       - build-tools-$ANDROID_BUILD_TOOLS_VERSION
       - android-$ANDROID_API_LEVEL
     licenses:
-      - 'android-sdk-preview-license-.+'
-      - 'android-sdk-license-.+'
-      - 'google-gdk-license-.+'
+      - "android-sdk-preview-license-.+"
+      - "android-sdk-license-.+"
+      - "google-gdk-license-.+"
 
 matrix:
   include:
@@ -75,13 +75,13 @@ matrix:
 
 before_install:
   # manually install Node for `language: android`
-  - if [[ "$PLATFORM" =~ android ]]; then nvm install $TRAVIS_NODE_VERSION; fi 
+  - if [[ "$PLATFORM" =~ android ]]; then nvm install $TRAVIS_NODE_VERSION; fi
   - node --version
   - if [[ "$PLATFORM" =~ android ]]; then gradle --version; fi
   - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
   - npm install -g cordova
   # install paramedic if not running on paramedic repo
-  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic; fi 
+  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic; fi
 
 install:
   - npm install
@@ -110,8 +110,9 @@ before_script:
     echo "PARAMEDIC_BUILDNAME=$PARAMEDIC_BUILDNAME"
 script:
   - $TEST_COMMAND
-  - if [[ "$ADDITIONAL_TESTS_DIR" != "" ]]; then
+  - |
+    if [[ "$ADDITIONAL_TESTS_DIR" != "" ]]; then
       cd $ADDITIONAL_TESTS_DIR && npm install && npm test;
-    else 
-      $PARAMEDIC_COMMAND --config ./pr/$PLATFORM --plugin $PARAMEDIC_PLUGIN_TO_TEST --buildName $PARAMEDIC_BUILDNAME; 
+    else
+      $PARAMEDIC_COMMAND --config ./pr/$PLATFORM --plugin $PARAMEDIC_PLUGIN_TO_TEST --buildName $PARAMEDIC_BUILDNAME;
     fi
