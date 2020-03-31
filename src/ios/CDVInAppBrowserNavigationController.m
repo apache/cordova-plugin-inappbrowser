@@ -28,11 +28,6 @@
 }
 
 - (void) viewDidLoad {
-    UIToolbar* bgToolbar = [[UIToolbar alloc] init];
-    bgToolbar.barStyle = UIBarStyleDefault;
-    [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    [self.view addSubview:bgToolbar];
-
     [super viewDidLoad];
 }
 
