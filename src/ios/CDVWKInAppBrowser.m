@@ -693,7 +693,7 @@ static CDVWKInAppBrowser* instance = nil;
 
 @synthesize currentURL;
 
-BOOL viewRenderedAtLeastOnce = FALSE;
+CGFloat lastReducedStatusBarHeight = 0.0;
 BOOL isExiting = FALSE;
 
 - (id)initWithBrowserOptions: (CDVInAppBrowserOptions*) browserOptions andSettings:(NSDictionary *)settings
@@ -1037,7 +1037,6 @@ BOOL isExiting = FALSE;
 
 - (void)viewDidLoad
 {
-    viewRenderedAtLeastOnce = FALSE;
     [super viewDidLoad];
 }
 
@@ -1094,16 +1093,6 @@ BOOL isExiting = FALSE;
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    if (IsAtLeastiOSVersion(@"7.0") && !viewRenderedAtLeastOnce) {
-        viewRenderedAtLeastOnce = TRUE;
-        CGRect viewBounds = [self.webView bounds];
-        CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
-        CGFloat statusBarHeight = statusBarFrame.size.height;
-        viewBounds.origin.y = statusBarHeight;
-        viewBounds.size.height = viewBounds.size.height - statusBarHeight;
-        self.webView.frame = viewBounds;
-        [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
-    }
     [self rePositionViews];
     
     [super viewWillAppear:animated];
@@ -1115,18 +1104,28 @@ BOOL isExiting = FALSE;
 // change that value.
 //
 - (float) getStatusBarOffset {
-    CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
-    float statusBarOffset = IsAtLeastiOSVersion(@"7.0") ? MIN(statusBarFrame.size.width, statusBarFrame.size.height) : 0.0;
-    return statusBarOffset;
+    return (float) IsAtLeastiOSVersion(@"7.0") ? [[UIApplication sharedApplication] statusBarFrame].size.height : 0.0;
 }
 
 - (void) rePositionViews {
+    CGRect viewBounds = [self.webView bounds];
+    CGFloat statusBarHeight = [self getStatusBarOffset];
+    
+    // orientation portrait or portraitUpsideDown: status bar is on the top and web view is to be aligned to the bottom of the status bar
+    // orientation landscapeLeft or landscapeRight: status bar height is 0 in but lets account for it in case things ever change in the future
+    viewBounds.origin.y = statusBarHeight;
+    
+    // account for web view height portion that may have been reduced by a previous call to this method
+    viewBounds.size.height = viewBounds.size.height - statusBarHeight + lastReducedStatusBarHeight;
+    lastReducedStatusBarHeight = statusBarHeight;
+    
     if ((_browserOptions.toolbar) && ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop])) {
-        CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
-        CGFloat statusBarHeight = statusBarFrame.size.height;
-        [self.webView setFrame:CGRectMake(self.webView.frame.origin.x, TOOLBAR_HEIGHT + [self getStatusBarOffset], self.webView.frame.size.width, self.webView.frame.size.height - [self getStatusBarOffset] + statusBarHeight)];
-        [self.toolbar setFrame:CGRectMake(self.toolbar.frame.origin.x, [self getStatusBarOffset], self.toolbar.frame.size.width, self.toolbar.frame.size.height)];
+        // if we have to display the toolbar on top of the web view, we need to account for its height
+        viewBounds.origin.y += TOOLBAR_HEIGHT;
+        self.toolbar.frame = CGRectMake(self.toolbar.frame.origin.x, statusBarHeight, self.toolbar.frame.size.width, self.toolbar.frame.size.height);
     }
+    
+    self.webView.frame = viewBounds;
 }
 
 // Helper function to convert hex color string to UIColor
@@ -1228,7 +1227,7 @@ BOOL isExiting = FALSE;
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
     if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)]) {
         return [self.orientationDelegate supportedInterfaceOrientations];
@@ -1244,6 +1243,19 @@ BOOL isExiting = FALSE;
     }
     
     return YES;
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+        [self rePositionViews];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
+    {
+
+    }];
+
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 
