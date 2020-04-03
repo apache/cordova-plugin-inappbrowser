@@ -31,21 +31,21 @@ interface InAppBrowser extends Window {
     onexit(type: InAppBrowserEvent): void;
     // addEventListener overloads
     /**
-    * Adds a listener for an event from the InAppBrowser.
-    * @param type      loadstart: event fires when the InAppBrowser starts to load a URL.
-    *                  loadstop: event fires when the InAppBrowser finishes loading a URL.
-    *                  loaderror: event fires when the InAppBrowser encounters an error when loading a URL.
-    *                  exit: event fires when the InAppBrowser window is closed.
-    * @param callback  the function that executes when the event fires. The function is
-    *                  passed an InAppBrowserEvent object as a parameter.
-    */
+     * Adds a listener for an event from the InAppBrowser.
+     * @param type      loadstart: event fires when the InAppBrowser starts to load a URL.
+     *                  loadstop: event fires when the InAppBrowser finishes loading a URL.
+     *                  loaderror: event fires when the InAppBrowser encounters an error when loading a URL.
+     *                  exit: event fires when the InAppBrowser window is closed.
+     * @param callback  the function that executes when the event fires. The function is
+     *                  passed an InAppBrowserEvent object as a parameter.
+     */
     addEventListener(type: channel, callback: InAppBrowserEventListenerOrEventListenerObject): void;
     /**
-    * Adds a listener for an event from the InAppBrowser.
-    * @param type      any custom event that might occur.
-    * @param callback  the function that executes when the event fires. The function is
-    *                  passed an InAppBrowserEvent object as a parameter.
-    */
+     * Adds a listener for an event from the InAppBrowser.
+     * @param type      any custom event that might occur.
+     * @param callback  the function that executes when the event fires. The function is
+     *                  passed an InAppBrowserEvent object as a parameter.
+     */
     addEventListener(type: string, callback: InAppBrowserEventListenerOrEventListenerObject): void;
     // removeEventListener overloads
     /**
