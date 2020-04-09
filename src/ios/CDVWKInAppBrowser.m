@@ -1100,10 +1100,9 @@ BOOL isExiting = FALSE;
     if (IsAtLeastiOSVersion(@"7.0") && !viewRenderedAtLeastOnce) {
         viewRenderedAtLeastOnce = TRUE;
         CGRect viewBounds = [self.webView bounds];
-        // viewBounds.origin.y = STATUSBAR_HEIGHT;
-        // viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT;
+       
 
-
+// Adding top notch fix.
         bool hasTopNotch = NO;
         if (@available(iOS 11.0, *)) {
             hasTopNotch = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;

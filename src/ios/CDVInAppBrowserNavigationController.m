@@ -32,7 +32,8 @@
 - (void) viewDidLoad {
 
     CGRect statusBarFrame = [self invertFrameIfNeeded:[UIApplication sharedApplication].statusBarFrame];
-    //statusBarFrame.size.height = STATUSBAR_HEIGHT;
+    
+    // Adding top notch fix.
      bool hasTopNotch = NO;
       if (@available(iOS 11.0, *)) {
           hasTopNotch = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
