@@ -117,6 +117,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
+    private static final String FULLSCREEN = "fullscreen";
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
@@ -147,6 +148,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showFooter = false;
     private String footerColor = "";
     private String beforeload = "";
+    private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
@@ -313,7 +315,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (dialog != null) {
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
                         dialog.show();
                     }
                 }
@@ -326,7 +328,7 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (dialog != null) {
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
                         dialog.hide();
                     }
                 }
@@ -537,7 +539,7 @@ public class InAppBrowser extends CordovaPlugin {
                 childView.setWebViewClient(new WebViewClient() {
                     // NB: wait for about:blank before dismissing
                     public void onPageFinished(WebView view, String url) {
-                        if (dialog != null) {
+                        if (dialog != null && !cordova.getActivity().isFinishing()) {
                             dialog.dismiss();
                             dialog = null;
                         }
@@ -692,9 +694,8 @@ public class InAppBrowser extends CordovaPlugin {
                 closeButtonColor = closeButtonColorSet;
             }
             String leftToRightSet = features.get(LEFT_TO_RIGHT);
-            if (leftToRightSet != null) {
-                leftToRight = leftToRightSet.equals("yes") ? true : false;
-            }
+            leftToRight = leftToRightSet != null && leftToRightSet.equals("yes");
+
             String toolbarColorSet = features.get(TOOLBAR_COLOR);
             if (toolbarColorSet != null) {
                 toolbarColor = android.graphics.Color.parseColor(toolbarColorSet);
@@ -713,6 +714,10 @@ public class InAppBrowser extends CordovaPlugin {
             }
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
+            }
+            String fullscreenSet = features.get(FULLSCREEN);
+            if (fullscreenSet != null) {
+                fullscreen = fullscreenSet.equals("yes") ? true : false;
             }
         }
 
@@ -794,7 +799,9 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                if (fullscreen) {
+                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 

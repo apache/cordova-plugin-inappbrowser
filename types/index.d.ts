@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Open Technologies Inc
 // Licensed under the MIT license.
 // TypeScript Version: 2.3
-type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message";
+type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme";
 
 interface Window {
     /**
@@ -40,6 +40,13 @@ interface InAppBrowser extends Window {
      *                  passed an InAppBrowserEvent object as a parameter.
      */
     addEventListener(type: channel, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    /**
+     * Adds a listener for an event from the InAppBrowser.
+     * @param type      any custom event that might occur.
+     * @param callback  the function that executes when the event fires. The function is
+     *                  passed an InAppBrowserEvent object as a parameter.
+     */
+    addEventListener(type: string, callback: InAppBrowserEventListenerOrEventListenerObject): void;
     // removeEventListener overloads
     /**
      * Removes a listener for an event from the InAppBrowser.
