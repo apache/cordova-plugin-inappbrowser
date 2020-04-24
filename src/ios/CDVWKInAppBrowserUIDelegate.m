@@ -79,7 +79,7 @@
 
     [[self getViewController] presentViewController:alert animated:YES completion:nil];
 }
-//added this code to open popup window within frame. 
+//open popup window within same frame. 
 - (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
 {
   if (!navigationAction.targetFrame.isMainFrame) {
