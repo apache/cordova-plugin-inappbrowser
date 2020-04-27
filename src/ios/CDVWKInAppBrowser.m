@@ -324,6 +324,7 @@ static CDVWKInAppBrowser* instance = nil;
     // Set tmpWindow to hidden to make main webview responsive to touch again
     // https://stackoverflow.com/questions/4544489/how-to-remove-a-uiwindow
     self->tmpWindow.hidden = YES;
+    self->tmpWindow = nil;
 
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to hide IAB after it was closed.");
@@ -677,7 +678,8 @@ static CDVWKInAppBrowser* instance = nil;
     // Set tmpWindow to hidden to make main webview responsive to touch again
     // Based on https://stackoverflow.com/questions/4544489/how-to-remove-a-uiwindow
     self->tmpWindow.hidden = YES;
-    
+    self->tmpWindow = nil;
+
     if (IsAtLeastiOSVersion(@"7.0")) {
         if (_previousStatusBarStyle != -1) {
             [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
