@@ -758,6 +758,9 @@ BOOL isExiting = FALSE;
         configuration.mediaPlaybackRequiresUserAction = _browserOptions.mediaplaybackrequiresuseraction;
     }
     
+    if (@available(iOS 13.0, *)) {
+        configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
+    }
     
 
     self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
