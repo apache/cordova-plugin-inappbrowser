@@ -1472,9 +1472,6 @@ public class InAppBrowser extends CordovaPlugin {
                 case SslError.SSL_INVALID:
                     message = "A generic error occurred";
                     break;
-                case SslError.SSL_MAX_ERROR:
-                    message = "<SSL_MAX_ERROR>";
-                    break;
                 case SslError.SSL_NOTYETVALID:
                     message = "The certificate is not yet valid";
                     break;
