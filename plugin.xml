@@ -31,7 +31,7 @@
 
     <engines>
       <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
-      <engine name="cordova-ios" version=">=6.0.0-dev" />
+      <engine name="cordova-ios" version=">=4.0.0" />
     </engines>
 
     <!-- android -->
