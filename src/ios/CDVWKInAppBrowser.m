@@ -759,7 +759,13 @@ BOOL isExiting = FALSE;
     }
     
     if (@available(iOS 13.0, *)) {
-        configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
+        NSString *contentMode = [self settingForKey:@"PreferredContentMode"];
+        if ([contentMode  isEqual: @"mobile"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
+        } else if ([contentMode  isEqual: @"desktop"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeDesktop;
+        }
+        
     }
     
 
