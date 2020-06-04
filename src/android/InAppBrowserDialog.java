@@ -18,12 +18,9 @@
 */
 package org.apache.cordova.inappbrowser;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by Oliver on 22/11/2013.

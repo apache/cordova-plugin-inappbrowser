@@ -6,9 +6,7 @@
        to you under the Apache License, Version 2.0 (the
        "License"); you may not use this file except in compliance
        with the License.  You may obtain a copy of the License at
-
          http://www.apache.org/licenses/LICENSE-2.0
-
        Unless required by applicable law or agreed to in writing,
        software distributed under the License is distributed on an
        "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,24 +18,27 @@ package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
 import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.InputType;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -78,6 +79,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -98,6 +100,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
+    private static final String TITLE = "title";
+    private static final String TITLE_COLOR = "titlecolor";
+    private static final String STATUS_BAR_STYLE = "statusbarstyle";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -112,6 +117,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String TOOLBAR_COLOR = "toolbarcolor";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
     private static final String CLOSE_BUTTON_COLOR = "closebuttoncolor";
+    private static final String CLOSE_BUTTON_ICON = "closebuttonicon";
     private static final String LEFT_TO_RIGHT = "lefttoright";
     private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
     private static final String NAVIGATION_COLOR = "navigationbuttoncolor";
@@ -120,8 +126,12 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String SHADOW_SIZE = "shadowsize";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(TITLE, TITLE_COLOR, STATUS_BAR_STYLE, SHADOW_SIZE, CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, CLOSE_BUTTON_ICON, FOOTER_COLOR);
+
+    private static final String STATUS_BAR_LIGHT_MODE = "light";
+    private static final String STATUS_BAR_DARK_MODE = "dark";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -140,8 +150,12 @@ public class InAppBrowser extends CordovaPlugin {
     private ValueCallback<Uri[]> mUploadCallbackLollipop;
     private final static int FILECHOOSER_REQUESTCODE = 1;
     private final static int FILECHOOSER_REQUESTCODE_LOLLIPOP = 2;
+    private String title = "";
+    private String titleColor = "";
+    private String statusBarStyle = "";
     private String closeButtonCaption = "";
     private String closeButtonColor = "";
+    private String closeButtonIcon = "";
     private boolean leftToRight = false;
     private int toolbarColor = android.graphics.Color.LTGRAY;
     private boolean hideNavigationButtons = false;
@@ -150,9 +164,11 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showFooter = false;
     private String footerColor = "";
     private String beforeload = "";
+    private String shadowSize = "";
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+
 
     /**
      * Executes the request and returns PluginResult.
@@ -614,7 +630,6 @@ public class InAppBrowser extends CordovaPlugin {
         this.inAppWebView.requestFocus();
     }
 
-
     /**
      * Should we show the location bar?
      *
@@ -687,6 +702,18 @@ public class InAppBrowser extends CordovaPlugin {
             if (wideViewPort != null ) {
                 useWideViewPort = wideViewPort.equals("yes") ? true : false;
             }
+            String titleSet = features.get(TITLE);
+            if (titleSet != null) {
+                title = titleSet;
+            }
+            String titleColorSet = features.get(TITLE_COLOR);
+            if (titleColorSet != null) {
+                titleColor = titleColorSet;
+            }
+            String statusBarStyleSet = features.get(STATUS_BAR_STYLE);
+            if (statusBarStyleSet != null) {
+                statusBarStyle = statusBarStyleSet;
+            }
             String closeButtonCaptionSet = features.get(CLOSE_BUTTON_CAPTION);
             if (closeButtonCaptionSet != null) {
                 closeButtonCaption = closeButtonCaptionSet;
@@ -694,6 +721,10 @@ public class InAppBrowser extends CordovaPlugin {
             String closeButtonColorSet = features.get(CLOSE_BUTTON_COLOR);
             if (closeButtonColorSet != null) {
                 closeButtonColor = closeButtonColorSet;
+            }
+            String closeButtonIconSet = features.get(CLOSE_BUTTON_ICON);
+            if (closeButtonIconSet != null) {
+                closeButtonIcon = closeButtonIconSet;
             }
             String leftToRightSet = features.get(LEFT_TO_RIGHT);
             leftToRight = leftToRightSet != null && leftToRightSet.equals("yes");
@@ -721,6 +752,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
             }
+            String shadowSizeSet = features.get(SHADOW_SIZE);
+            if (shadowSizeSet != null) {
+                shadowSize = shadowSizeSet;
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -741,15 +776,20 @@ public class InAppBrowser extends CordovaPlugin {
                 return value;
             }
 
+            private Drawable getDefaultCloseDrawable() {
+                Resources activityRes = cordova.getActivity().getResources();
+                int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
+                return activityRes.getDrawable(closeResId);
+            }
+
             private View createCloseButton(int id) {
                 View _close;
-                Resources activityRes = cordova.getActivity().getResources();
 
                 if (closeButtonCaption != "") {
                     // Use TextView for text
                     TextView close = new TextView(cordova.getActivity());
                     close.setText(closeButtonCaption);
-                    close.setTextSize(20);
+                    close.setTextSize(18);
                     if (closeButtonColor != "") close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
                     close.setGravity(android.view.Gravity.CENTER_VERTICAL);
                     close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
@@ -757,10 +797,18 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 else {
                     ImageButton close = new ImageButton(cordova.getActivity());
-                    int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
-                    Drawable closeIcon = activityRes.getDrawable(closeResId);
                     if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
-                    close.setImageDrawable(closeIcon);
+                    if (!closeButtonIcon.isEmpty()) {
+                        try {
+                            final Bitmap bitmap = BitmapFactory.decodeStream(cordova.getActivity().getAssets().open(closeButtonIcon));
+                            close.setImageBitmap(bitmap);
+                        } catch (IOException e) {
+                            Log.e(LOG_TAG, "Creating close button icon error" + e.getMessage());
+                        }
+                    } else {
+                        Drawable closeIcon = getDefaultCloseDrawable();
+                        close.setImageDrawable(closeIcon);
+                    }
                     close.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     if (Build.VERSION.SDK_INT >= 16)
                         close.getAdjustViewBounds();
@@ -768,7 +816,7 @@ public class InAppBrowser extends CordovaPlugin {
                     _close = close;
                 }
 
-                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                RelativeLayout.LayoutParams closeLayoutParams = new RelativeLayout.LayoutParams(dpToPixels(44), LayoutParams.MATCH_PARENT);
                 if (leftToRight) closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 else closeLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 _close.setLayoutParams(closeLayoutParams);
@@ -815,6 +863,11 @@ public class InAppBrowser extends CordovaPlugin {
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
                 //Please, no more black!
                 toolbar.setBackgroundColor(toolbarColor);
+                try {
+                    toolbar.setElevation(Float.parseFloat(shadowSize));
+                } catch (Exception e) {
+                    Log.d(LOG_TAG, "Shadow value parsing error " + e.getMessage());
+                }
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(44)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 if (leftToRight) {
@@ -910,7 +963,6 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 });
 
-
                 // Header Close/Done button
                 int closeButtonId = leftToRight ? 1 : 5;
                 View close = createCloseButton(closeButtonId);
@@ -935,6 +987,26 @@ public class InAppBrowser extends CordovaPlugin {
                 View footerClose = createCloseButton(7);
                 footer.addView(footerClose);
 
+                // Title
+                if (title != null) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        final int leftRightPadding = close.getWidth() + 12;
+                        final TextView titleTextView = new TextView(cordova.getActivity());
+                        titleTextView.setBackgroundColor(Color.TRANSPARENT);
+                        titleTextView.setText(title);
+                        titleTextView.setTextSize(20);
+                        titleTextView.setMaxLines(1);
+                        titleTextView.setEllipsize(TextUtils.TruncateAt.END);
+                        titleTextView.setPadding(leftRightPadding , 0, leftRightPadding, 0);
+                        if (!titleColor.isEmpty()) {
+                            titleTextView.setTextColor(Color.parseColor(titleColor));
+                        }
+                        final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                        params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                        titleTextView.setLayoutParams(params);
+                        toolbar.addView(titleTextView);
+                    });
+                }
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
@@ -1073,15 +1145,20 @@ public class InAppBrowser extends CordovaPlugin {
                     webViewLayout.addView(footer);
                 }
 
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-
                 if (dialog != null) {
                     dialog.setContentView(main);
                     dialog.show();
-                    dialog.getWindow().setAttributes(lp);
+                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    if (statusBarStyle != null && !statusBarStyle.isEmpty()) {
+                        if (statusBarStyle.equals(STATUS_BAR_LIGHT_MODE)) {
+                            setLightStatusBar(dialog.getWindow());
+                        } else if (statusBarStyle.equals(STATUS_BAR_DARK_MODE)) {
+                            setDarkStatusBar(dialog.getWindow());
+                        }
+                    } else {
+                        setLightStatusBar(dialog.getWindow());
+                    }
+                    dialog.getWindow().setStatusBarColor(toolbarColor);
                 }
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
@@ -1092,6 +1169,22 @@ public class InAppBrowser extends CordovaPlugin {
         };
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
+    }
+
+    private void setLightStatusBar(@NonNull final Window window) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = window.getDecorView().getSystemUiVisibility();
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
+    }
+
+    private void setDarkStatusBar(@NonNull final Window window) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int flags = window.getDecorView().getSystemUiVisibility();
+            flags = flags & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     /**
@@ -1478,25 +1571,25 @@ public class InAppBrowser extends CordovaPlugin {
                 obj.put("sslerror", error.getPrimaryError());
                 String message;
                 switch (error.getPrimaryError()) {
-                case SslError.SSL_DATE_INVALID:
-                    message = "The date of the certificate is invalid";
-                    break;
-                case SslError.SSL_EXPIRED:
-                    message = "The certificate has expired";
-                    break;
-                case SslError.SSL_IDMISMATCH:
-                    message = "Hostname mismatch";
-                    break;
-                default:
-                case SslError.SSL_INVALID:
-                    message = "A generic error occurred";
-                    break;
-                case SslError.SSL_NOTYETVALID:
-                    message = "The certificate is not yet valid";
-                    break;
-                case SslError.SSL_UNTRUSTED:
-                    message = "The certificate authority is not trusted";
-                    break;
+                    case SslError.SSL_DATE_INVALID:
+                        message = "The date of the certificate is invalid";
+                        break;
+                    case SslError.SSL_EXPIRED:
+                        message = "The certificate has expired";
+                        break;
+                    case SslError.SSL_IDMISMATCH:
+                        message = "Hostname mismatch";
+                        break;
+                    default:
+                    case SslError.SSL_INVALID:
+                        message = "A generic error occurred";
+                        break;
+                    case SslError.SSL_NOTYETVALID:
+                        message = "The certificate is not yet valid";
+                        break;
+                    case SslError.SSL_UNTRUSTED:
+                        message = "The certificate authority is not trusted";
+                        break;
                 }
                 obj.put("message", message);
 
