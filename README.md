@@ -25,6 +25,15 @@ description: Open an in-app browser window.
 |:-:|:-:|
 |[![Build status](https://ci.appveyor.com/api/projects/status/github/apache/cordova-plugin-inappbrowser?branch=master)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-plugin-inappbrowser)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
 
+### mway fork parameters
+
+* ~~toolbarposition~~: removed, only top position is supported now
+* title: (string) title shown in the toolbar
+* titlecolor: (#RRGGBB) color of the title font
+* closebuttonicon: (relative path string) path to icon to use as close button
+* statusbarstyle: (light or dark) defines status bar font color
+* shadowsize: (number) Android only, defines shadow below toolbar. On iOS, shadow looks always the same.
+
 # cordova-plugin-inappbrowser
 
 You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
