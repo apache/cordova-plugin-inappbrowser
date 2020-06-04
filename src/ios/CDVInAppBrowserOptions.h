@@ -25,7 +25,6 @@
 @property (nonatomic, copy) NSString* closebuttoncaption;
 @property (nonatomic, copy) NSString* closebuttoncolor;
 @property (nonatomic, assign) BOOL lefttoright;
-@property (nonatomic, copy) NSString* toolbarposition;
 @property (nonatomic, copy) NSString* toolbarcolor;
 @property (nonatomic, assign) BOOL toolbartranslucent;
 @property (nonatomic, assign) BOOL hidenavigationbuttons;
@@ -44,6 +43,13 @@
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, copy) NSString* beforeload;
+
+@property (nonatomic, copy) NSString* title;
+@property (nonatomic, copy) NSString* titlecolor;
+
+@property (nonatomic, copy) NSString* closebuttonicon;
+@property (nonatomic, copy) NSString* statusbarstyle;
+@property (nonatomic, assign) BOOL hideurlbar;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
