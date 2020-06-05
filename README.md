@@ -170,7 +170,7 @@ At the moment the only supported target in OSX is `_system`.
 
 ### iOS Quirks
 
-Since iOS 13 iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to `Macintosh`. You can change this with the `PreferredContentMode` preference in "config.xml".
+Since the introduction of iPadOS 13, iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to Macintosh making it hard to detect them as mobile devices using user agent string sniffing. You can change this with the PreferredContentMode preference in "config.xml".
 
 ```xml
 <preference name="PreferredContentMode" value="mobile" />
