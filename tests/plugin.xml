@@ -29,10 +29,5 @@
     <js-module src="tests.js" name="tests">
     </js-module>
 
-    <platform name="ios">
-      <dependency id="cordova-plugin-wkwebview-engine-allowfileaccess" url="https://github.com/knight9999/cordova-plugin-wkwebview-engine-allowfileaccess.git" />
-    </platform>
-
-
     <asset src="resources" target="cdvtests/iab-resources" />
 </plugin>
