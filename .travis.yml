@@ -44,7 +44,7 @@ matrix:
     # local tests, without saucelabs
     - env: PLATFORM=local/browser
       <<: *_ios
-    - env: PLATFORM=local/ios-10.0
+    - env: PLATFORM=local/ios-13.0
       <<: *_ios
 
     # many tests with saucelabs
@@ -81,7 +81,7 @@ before_install:
   - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
   - npm install -g cordova
   # install paramedic if not running on paramedic repo
-  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic; fi
+  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic#ios13; fi
 
 install:
   - npm install
