@@ -30,8 +30,6 @@
     </js-module>
 
     <platform name="ios">
-      <!-- The WKWebView implementation for inappbrowser requires the presence of this plugin  -->
-      <dependency id="cordova-plugin-wkwebview-engine" />
       <dependency id="cordova-plugin-wkwebview-engine-allowfileaccess" url="https://github.com/knight9999/cordova-plugin-wkwebview-engine-allowfileaccess.git" />
     </platform>
 
