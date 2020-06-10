@@ -1,10 +1,10 @@
 {
-  "name": "cordova-plugin-inappbrowser",
+  "name": "cordova-plugin-inappbrowser-mway",
   "version": "4.0.0",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser",
+    "id": "cordova-plugin-inappbrowser-mway",
     "platforms": [
       "android",
       "browser",
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
+    "url": "https://github.com/mwaylabs/cordova-plugin-inappbrowser-mway"
   },
   "bugs": {
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser/issues"
+    "url": "https://github.com/mwaylabs/cordova-plugin-inappbrowser-mway/issues"
   },
   "keywords": [
     "cordova",
