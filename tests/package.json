@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-inappbrowser-tests",
+  "name": "cordova-plugin-inappbrowser-mway-tests",
   "version": "4.0.0-dev",
   "description": "",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser-tests",
+    "id": "cordova-plugin-inappbrowser-mway-tests",
     "platforms": []
   },
   "keywords": [
