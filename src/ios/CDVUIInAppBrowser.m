@@ -259,14 +259,16 @@ static CDVUIInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            if (!tmpWindow) {
+            __strong __typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf->tmpWindow) {
             CGRect frame = [[UIScreen mainScreen] bounds];
-                tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+                strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
-            [tmpWindow setRootViewController:tmpController];
+            [strongSelf->tmpWindow setRootViewController:tmpController];
+            [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            [tmpWindow makeKeyAndVisible];
+            [self->tmpWindow makeKeyAndVisible];
             [tmpController presentViewController:nav animated:YES completion:nil];
         }
     });
@@ -274,6 +276,9 @@ static CDVUIInAppBrowser* instance = nil;
 
 - (void)hide:(CDVInvokedUrlCommand*)command
 {
+    self->tmpWindow.hidden = YES;
+    self->tmpWindow = nil;
+
     if (self.inAppBrowserViewController == nil) {
         NSLog(@"Tried to hide IAB after it was closed.");
         return;
@@ -604,6 +609,9 @@ static CDVUIInAppBrowser* instance = nil;
     // Don't recycle the ViewController since it may be consuming a lot of memory.
     // Also - this is required for the PDF/User-Agent bug work-around.
     self.inAppBrowserViewController = nil;
+
+    self.tmpWindow.hidden = YES;
+    self.tmpWindow = nil;
 
     if (IsAtLeastiOSVersion(@"7.0")) {
         if (_previousStatusBarStyle != -1) {
