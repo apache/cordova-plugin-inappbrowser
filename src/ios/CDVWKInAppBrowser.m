@@ -290,6 +290,7 @@ static CDVWKInAppBrowser* instance = nil;
     nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
+    nav.presentationController.delegate = self.inAppBrowserViewController;
     
     __weak CDVWKInAppBrowser* weakSelf = self;
     
@@ -306,7 +307,6 @@ static CDVWKInAppBrowser* instance = nil;
                 strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
-
             [strongSelf->tmpWindow setRootViewController:tmpController];
             [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
@@ -1257,5 +1257,10 @@ BOOL isExiting = FALSE;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
+#pragma mark UIAdaptivePresentationControllerDelegate
+
+- (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
+    isExiting = TRUE;
+}
 
 @end //CDVWKInAppBrowserViewController
