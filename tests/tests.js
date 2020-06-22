@@ -27,6 +27,9 @@ var isIos = cordova.platformId === 'ios';
 var isAndroid = cordova.platformId === 'android';
 var isBrowser = cordova.platformId === 'browser';
 
+var longStringLength = 10240 + 11;
+var longString = (new Array(longStringLength)).join('x');
+
 window.alert = window.alert || navigator.notification.alert;
 if (isWindows && navigator && navigator.notification && navigator.notification.alert) {
     // window.alert is defined but not functional on UWP
@@ -328,10 +331,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                 var code = '(function(){\n' +
                   '    var header = document.getElementById("header");\n' +
                   '    header.innerHTML = "Script literal successfully injected";\n' +
-                  '    return "abc";\n' +
+                  '    return "' + longString + '";\n' +
                   '})()';
                 iab.executeScript({ code: code }, useCallback && function (results) {
-                    if (results && results.length === 1 && results[0] === 'abc') {
+                    if (results && results.length === 1 && results[0] === longString) {
                         alert('Results verified'); // eslint-disable-line no-undef
                     } else {
                         console.log(results);
