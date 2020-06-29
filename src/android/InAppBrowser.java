@@ -58,6 +58,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.DownloadListener;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -101,6 +102,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
+    private static final String DOWNLOAD_EVENT = "download";
     private static final String MESSAGE_EVENT = "message";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
@@ -276,6 +278,7 @@ public class InAppBrowser extends CordovaPlugin {
                         ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
                     inAppWebView.loadUrl(url);
+
                 }
             });
         }
@@ -339,6 +342,7 @@ public class InAppBrowser extends CordovaPlugin {
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
+
         else {
             return false;
         }
@@ -938,6 +942,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
+
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
@@ -990,6 +995,30 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
+                
+                // download event
+                
+                inAppWebView.setDownloadListener(
+                    new DownloadListener(){
+                        public void onDownloadStart(
+                                String url, String userAgent, String contentDisposition, String mimetype, long contentLength
+                        ){
+                            try{
+                                JSONObject succObj = new JSONObject();
+                                succObj.put("type", DOWNLOAD_EVENT);
+                                succObj.put("url",url);
+                                succObj.put("userAgent",userAgent);
+                                succObj.put("contentDisposition",contentDisposition);
+                                succObj.put("mimetype",mimetype);
+                                succObj.put("contentLength",contentLength);
+                                sendUpdate(succObj, true);
+                            }
+                            catch(Exception e){
+                                LOG.e(LOG_TAG,e.getMessage());
+                            }
+                        }
+                    }
+                );        
 
                 // Add postMessage interface
                 class JsObject {
@@ -1113,6 +1142,7 @@ public class InAppBrowser extends CordovaPlugin {
         if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(keepCallback);
+                                
             callbackContext.sendPluginResult(result);
             if (!keepCallback) {
                 callbackContext = null;
