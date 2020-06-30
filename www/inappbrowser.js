@@ -115,7 +115,7 @@
         var cb = function (eventname) {
             iab._eventHandler(eventname);
         };
-        
+
         strWindowFeatures = strWindowFeatures || '';
 
         exec(cb, cb, 'InAppBrowser', 'open', [strUrl, strWindowName, strWindowFeatures]);
