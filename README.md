@@ -204,7 +204,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __exit__: event fires when the `InAppBrowser` window is closed.
   - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload` set).
   - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
-  - __download__: event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
+  - __download__: _(Android Only)_ event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -319,15 +319,15 @@ Whenever the InAppBrowser receives or locates to a url which leads in downloadin
 ```
 
 function downloadListener(params){
-var url = params.url;
-var mimetype = params.mimetype;
+    var url = params.url;
+    var mimetype = params.mimetype;
 
-var xhr = new XMLHttpRequest();
-xhr.open("GET", params.url);
-xhr.onload = function() {
-    var content = xhr.responseText;
-};
-xhr.send();
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", params.url);
+    xhr.onload = function() {
+        var content = xhr.responseText;
+    };
+    xhr.send();
 
 }
 
