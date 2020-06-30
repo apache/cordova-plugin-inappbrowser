@@ -1090,15 +1090,17 @@ public class InAppBrowser extends CordovaPlugin {
                     cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
                     // Make sure to convert height to density independent pixels (dip)
-                    int reducedHeightDip = (int) ((float) bottomReduceHeightBy * displayMetrics.density);
+                    // The height is reduced by 1 pixel to correct 1 pixel dip error on high resolution/density devices
+                    int reducedHeightDip = (int) ((float) bottomReduceHeightBy * displayMetrics.density) - 1;
 
-                    // Calculate status bar height
+                    // Calculate visible display size
+                    // Note that the visible display height differs from the device height by the status bar height if the device does not have a notch
+                    // In devices with a notch, they are the same
                     Rect rectangle = new Rect();
                     cordova.getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
-                    int statusBarHeightDip = rectangle.top;
 
-                    // Also account for height of the status bar as heightPixels is the total height of the screen
-                    lp.height = displayMetrics.heightPixels - reducedHeightDip - statusBarHeightDip;
+                    // Note that device height - visible display height is zero in devices with a notch, non zero on other devices
+                    lp.height = rectangle.height() - reducedHeightDip;
 
                     // Make sure the dialog is aligned to the bottom of the status bar as it is centered by default
                     lp.gravity = Gravity.TOP;
