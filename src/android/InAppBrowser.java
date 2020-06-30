@@ -338,7 +338,6 @@ public class InAppBrowser extends CordovaPlugin {
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         }
-
         else {
             return false;
         }
@@ -917,10 +916,8 @@ public class InAppBrowser extends CordovaPlugin {
                 View footerClose = createCloseButton(7);
                 footer.addView(footerClose);
 
-
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
-
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
@@ -1096,8 +1093,7 @@ public class InAppBrowser extends CordovaPlugin {
     private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
         if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
-            result.setKeepCallback(keepCallback);
-                                
+            result.setKeepCallback(keepCallback);                                
             callbackContext.sendPluginResult(result);
             if (!keepCallback) {
                 callbackContext = null;
