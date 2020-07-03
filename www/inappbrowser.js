@@ -90,10 +90,6 @@
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
-        },
-
-        addDownloadListener: function(success,error){
-            exec(success,error,"InAppBrowser","downloadListener");
         }
     };
 
