@@ -13,13 +13,8 @@
       "windows"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser"
-  },
-  "bugs": {
-    "url": "https://github.com/apache/cordova-plugin-inappbrowser/issues"
-  },
+  "repository": "github:apache/cordova-plugin-inappbrowser",
+  "bugs": "https://github.com/apache/cordova-plugin-inappbrowser/issues",
   "keywords": [
     "cordova",
     "in",
