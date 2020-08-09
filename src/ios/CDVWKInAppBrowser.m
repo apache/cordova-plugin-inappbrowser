@@ -110,6 +110,7 @@ static CDVWKInAppBrowser* instance = nil;
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
         } else { // _blank or anything else
+            self.CDVBrowserOptions  = [CDVInAppBrowserOptions parseOptions:options];
             [self openInInAppBrowser:absoluteUrl withOptions:options];
         }
         
@@ -290,7 +291,6 @@ static CDVWKInAppBrowser* instance = nil;
     nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
-    nav.presentationController.delegate = self.inAppBrowserViewController;
     
     __weak CDVWKInAppBrowser* weakSelf = self;
     
@@ -304,6 +304,15 @@ static CDVWKInAppBrowser* instance = nil;
                 if(initHidden && osVersion < 11){
                    frame.origin.x = -10000;
                 }
+                    // Set Dimensions
+                double x        = self->_CDVBrowserOptions.x      != nil ? [self->_CDVBrowserOptions.x       doubleValue] : frame.origin.x;
+                double y        = self->_CDVBrowserOptions.y      != nil ? [self->_CDVBrowserOptions.y       doubleValue] : frame.origin.y;
+                double width    = self->_CDVBrowserOptions.width  != nil ? [self->_CDVBrowserOptions.width   doubleValue] : (frame.size.width - x); // For taking in consideration if (x) is set , custom width not set
+                double height   = self->_CDVBrowserOptions.height != nil ? [self->_CDVBrowserOptions.height  doubleValue] : (frame.size.height - y); // For taking in consideration if (y) is set , custom height not set
+                
+                // Set Updated Frame
+                frame   = CGRectMake(x , y , width , height );
+
                 strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
@@ -1071,7 +1080,6 @@ BOOL isExiting = FALSE;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         isExiting = TRUE;
-        lastReducedStatusBarHeight = 0.0;
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
             [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         } else {
@@ -1258,10 +1266,5 @@ BOOL isExiting = FALSE;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
-#pragma mark UIAdaptivePresentationControllerDelegate
-
-- (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
-    isExiting = TRUE;
-}
 
 @end //CDVWKInAppBrowserViewController
