@@ -92,10 +92,10 @@ instance, or the system browser.
     All platforms support:
 
     - __location__: Set to `yes` or `no` to turn the `InAppBrowser`'s location bar on or off.
-    -__x__: Sets the X position for the InappBrowser. The default value is 0.
-    -__y__: Sets the Y position for the InappBrowser. The default value is 0.
-    -__width__: Sets the width of the InappBrowser Webview. The default value is fill-width of the screen.
-    -__height__: Sets the height of the InappBrowser Webview. The default value is fill-height of the screen.
+    - __x__: Sets the X position for the InappBrowser. The default value is 0.
+    - __y__: Sets the Y position for the InappBrowser. The default value is 0.
+    - __width__: Sets the width of the InappBrowser Webview. The default value is fill-width of the screen.
+    - __height__: Sets the height of the InappBrowser Webview. The default value is fill-height of the screen.
     
     Android supports these additional options:
 
