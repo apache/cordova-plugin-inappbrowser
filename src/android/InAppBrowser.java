@@ -461,10 +461,13 @@ public class InAppBrowser extends CordovaPlugin {
                 if (option.hasMoreElements()) {
                     String key = option.nextToken();
                     String value = option.nextToken();
-                    if (!customizableOptions.contains(key)) {
-                        value = value.equals("yes") || value.equals("no") ? value : "yes";
+                    if (option.hasMoreTokens()) {
+                        String value = option.nextToken();
+                        if (!customizableOptions.contains(key)) {
+                            value = value.equals("yes") || value.equals("no") ? value : "yes";
+                        }
+                        map.put(key, value);
                     }
-                    map.put(key, value);
                 }
             }
             return map;
