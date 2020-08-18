@@ -68,6 +68,14 @@ simply hook `window.open` during initialization.  For example:
         window.open = cordova.InAppBrowser.open;
     }
 
+### Preferences
+
+#### <b>config.xml</b>
+- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent' or 'default'. Defaults to 'default') set text color style for iOS.
+```
+<preference name="InAppBrowserStatusBarStyle" value="lightcontent" />
+```
+
 ## cordova.InAppBrowser.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
