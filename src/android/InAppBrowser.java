@@ -1080,36 +1080,29 @@ public class InAppBrowser extends CordovaPlugin {
                     webViewLayout.addView(footer);
                 }
 
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                
+                int windowHeight = WindowManager.LayoutParams.MATCH_PARENT;
+
                 if (bottomReduceHeightBy != 0) {
                     // Resize the window if it has to be reduced to less than the available screen height
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
                     // Make sure to convert height to density independent pixels (dip)
-                    // The height is reduced by 1 pixel to correct 1 pixel dip error on high resolution/density devices
-                    int reducedHeightDip = (int) ((float) bottomReduceHeightBy * displayMetrics.density) - 1;
+                    int reducedHeightDip = (int) ((float) bottomReduceHeightBy * displayMetrics.density);
 
-                    // Calculate visible display size
-                    // Note that the visible display height differs from the device height by the status bar height if the device does not have a notch
-                    // In devices with a notch, they are the same
+                    // Calculate status bar height
                     Rect rectangle = new Rect();
                     cordova.getActivity().getWindow().getDecorView().getWindowVisibleDisplayFrame(rectangle);
+                    int statusBarHeightDip = rectangle.top;
 
-                    // Note that device height - visible display height is zero in devices with a notch, non zero on other devices
-                    lp.height = rectangle.height() - reducedHeightDip;
-
-                    // Make sure the dialog is aligned to the bottom of the status bar as it is centered by default
-                    lp.gravity = Gravity.TOP;
+                    windowHeight = rectangle.height() + statusBarHeightDip - reducedHeightDip;
                 }
 
                 if (dialog != null) {
                     dialog.setContentView(main);
                     dialog.show();
-                    dialog.getWindow().setAttributes(lp);
+                    dialog.getWindow().setGravity(Gravity.TOP);
+                    dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, windowHeight);
 
                     if (bottomReduceHeightBy != 0) {
                         // Ensure the parent window respond to clicks when the web view is displayed on top of it
