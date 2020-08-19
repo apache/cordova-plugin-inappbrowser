@@ -20,6 +20,30 @@
 -->
 # Release Notes
 
+### 4.0.0 (Jun 09, 2020)
+* [GH-715](https://github.com/apache/cordova-plugin-inappbrowser/pull/715) (ios): fix regression in 2706f34
+* [GH-685](https://github.com/apache/cordova-plugin-inappbrowser/pull/685) chore: update install engines
+* [GH-656](https://github.com/apache/cordova-plugin-inappbrowser/pull/656) (ios) Remove fake status bar with hardcoded height to fix issues in **iOS** devices with a notch
+* [GH-693](https://github.com/apache/cordova-plugin-inappbrowser/pull/693) fix(ios): Allow loading local html files
+* [GH-293](https://github.com/apache/cordova-plugin-inappbrowser/pull/293)  **Android**: SSL errors handling in **Android**
+* [GH-672](https://github.com/apache/cordova-plugin-inappbrowser/pull/672) fix(ios): prevent statusbar rotation after closing `InAppBrowser`
+* chore(asf): update git notification settings
+* [GH-669](https://github.com/apache/cordova-plugin-inappbrowser/pull/669) Allow App using `InAppBrowser` to be hosted in a cross-origin iframe
+* [GH-600](https://github.com/apache/cordova-plugin-inappbrowser/pull/600) (all platforms): remove "window.open" overwrite
+* [GH-670](https://github.com/apache/cordova-plugin-inappbrowser/pull/670) chore: bump version to 4.0.0-dev
+* Update CONTRIBUTING.md
+* [GH-662](https://github.com/apache/cordova-plugin-inappbrowser/pull/662) docs: replaces outdated transition and presentation style links
+* [GH-666](https://github.com/apache/cordova-plugin-inappbrowser/pull/666) chore: remove deprecated orientation methods
+* [GH-515](https://github.com/apache/cordova-plugin-inappbrowser/pull/515) Fix incorrect TypeScript typings
+* [GH-654](https://github.com/apache/cordova-plugin-inappbrowser/pull/654) add check for openInSystem postNotification
+* [GH-659](https://github.com/apache/cordova-plugin-inappbrowser/pull/659) ci: updates Node.js versions
+* [GH-658](https://github.com/apache/cordova-plugin-inappbrowser/pull/658) chore(npm): improve ignore list
+* [GH-442](https://github.com/apache/cordova-plugin-inappbrowser/pull/442) fix(android): Reset lefttoright if not set
+* [GH-648](https://github.com/apache/cordova-plugin-inappbrowser/pull/648) (android) Correcting the documentation regarding lefttoright opt…
+* [GH-634](https://github.com/apache/cordova-plugin-inappbrowser/pull/634) (android) Added option to turn on/off fullscreen mode in **Android**
+* [GH-616](https://github.com/apache/cordova-plugin-inappbrowser/pull/616) (android) `InAppBrowser`: java.lang.IllegalArgumentException
+* [GH-635](https://github.com/apache/cordova-plugin-inappbrowser/pull/635) breaking(ios): remove UIWebView
+
 ### 3.2.0 (Jan 04, 2020)
 * [GH-503](https://github.com/apache/cordova-plugin-inappbrowser/pull/503) Defensive code to prevent NULL reference exceptions for async
 * [GH-584](https://github.com/apache/cordova-plugin-inappbrowser/pull/584) Add compile-time decision for disabling UIWebView

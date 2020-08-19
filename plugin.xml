@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-inappbrowser"
-      version="3.2.1-dev">
+      version="4.0.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -31,13 +31,13 @@
 
     <engines>
       <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
+      <engine name="cordova-ios" version=">=4.0.0" />
     </engines>
 
     <!-- android -->
     <platform name="android">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -71,7 +71,6 @@
     <platform name="ios">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -95,7 +94,6 @@
     <platform name="osx">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -111,7 +109,6 @@
     <platform name="windows">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />
@@ -123,7 +120,6 @@
     <platform name="browser">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />

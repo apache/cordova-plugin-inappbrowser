@@ -43,6 +43,10 @@ InAppBrowser window, by replacing window.open:
 
     window.open = cordova.InAppBrowser.open;
 
+If you change the browsers `window.open` function this way, it can have unintended side
+effects (especially if this plugin is included only as a dependency of another
+plugin).
+
 The InAppBrowser window behaves like a standard web browser,
 and can't access Cordova APIs. For this reason, the InAppBrowser is recommended
 if you need to load third-party (untrusted) content, instead of loading that
@@ -51,22 +55,6 @@ whitelist, nor is opening links in the system browser.
 
 The InAppBrowser provides by default its own GUI controls for the user (back,
 forward, done).
-
-For backwards compatibility, this plugin also hooks `window.open`.
-However, the plugin-installed hook of `window.open` can have unintended side
-effects (especially if this plugin is included only as a dependency of another
-plugin).  The hook of `window.open` will be removed in a future major release.
-Until the hook is removed from the plugin, apps can manually restore the default
-behaviour:
-
-    delete window.open // Reverts the call back to its prototype's default
-
-Although `window.open` is in the global scope, InAppBrowser is not available until after the `deviceready` event.
-
-    document.addEventListener("deviceready", onDeviceReady, false);
-    function onDeviceReady() {
-        console.log("window.open works well");
-    }
 
 ## Installation
 
@@ -123,7 +111,7 @@ instance, or the system browser.
     - __hideurlbar__: set to `yes` to hide the url bar on the location toolbar, only has effect if user has location set to `yes`. The default value is `no`.
     - __navigationbuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the color of both navigation buttons from default. Only has effect if user has location set to `yes` and not hidenavigationbuttons set to `yes`.
     - __toolbarcolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the color the toolbar from default. Only has effect if user has location set to `yes`.
-    - __lefttoright__: Set to `yes` to swap positions of the navigation buttons and the close button. Specifically, navigation buttons go to the left and close button to the right.
+    - __lefttoright__: Set to `yes` to swap positions of the navigation buttons and the close button. Specifically, navigation buttons go to the right and close button to the left. Default value is `no`.
     - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
     - __shouldPauseOnSuspend__: Set to `yes` to make InAppBrowser WebView to pause/resume with the app to stop background audio (this may be required to avoid Google Play issues like described in [CB-11013](https://issues.apache.org/jira/browse/CB-11013)).
@@ -150,8 +138,8 @@ instance, or the system browser.
     - __enableViewportScale__:  Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`).
     - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
     - __allowInlineMediaPlayback__: Set to `yes` or `no` to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML's `video` element must also include the `webkit-playsinline` attribute (defaults to `no`).
-    - __presentationstyle__:  Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style](http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle) (defaults to `fullscreen`).
-    - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
+    - __presentationstyle__:  Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) (defaults to `fullscreen`).
+    - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](https://developer.apple.com/documentation/uikit/uimodaltransitionstyle) (defaults to `coververtical`).
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
     - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
     - __bottomreduceheightby__: Reduces the IAB WebView height by the amount of pixels specified and moves the the IAB WebView to the top of the screen. That results in the content of the underlying Cordova window to be (partially) shown. Default value is `0`.
