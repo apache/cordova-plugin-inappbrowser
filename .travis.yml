@@ -23,7 +23,7 @@ node_js: 12
 
 _ios: &_ios
   os: osx
-  osx_image: xcode10.3
+  osx_image: xcode11.6
 
 _android: &_android
   language: android
