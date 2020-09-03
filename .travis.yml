@@ -81,7 +81,7 @@ before_install:
   - if [[ "$PLATFORM" =~ ios ]]; then npm install -g ios-deploy; fi
   - npm install -g cordova
   # install paramedic if not running on paramedic repo
-  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic#ios13-test; fi
+  - if ! [[ "$TRAVIS_REPO_SLUG" =~ cordova-paramedic ]]; then npm install -g github:apache/cordova-paramedic; fi
 
 install:
   - npm install
