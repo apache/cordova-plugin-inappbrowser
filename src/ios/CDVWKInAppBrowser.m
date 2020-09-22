@@ -62,6 +62,39 @@ static CDVWKInAppBrowser* instance = nil;
     _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
+ 
+ // If less than ios 13.4
+       if (@available(iOS 13.4, *)) {} else {
+           // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+           // Apple has released a fix in 13.4, but not in 12.x (as of 12.4.6)
+           [[NSNotificationCenter defaultCenter]
+           addObserver:self
+           selector:@selector(keyboardWillHide)
+           name:UIKeyboardWillHideNotification object:nil];
+       }
+}
+
+-(void)keyboardWillHide
+   {
+       [self performSelector:@selector(resetScrollViewToBottomPosition) withObject:nil afterDelay:0.3];
+   }
+   
+- (void)resetScrollViewToBottomPosition {
+     // For keyboard dismissal leaving viewport shifted (can potentially be removed when apple releases the fix for the issue discussed here: https://github.com/apache/cordova-ios/issues/417#issuecomment-423340885)
+           UIScrollView * scrollView = self.inAppBrowserViewController.webView.scrollView;
+           // Calculate some vars for convenience
+           CGFloat contentLengthWithInsets = scrollView.contentSize.height + scrollView.adjustedContentInset.top + scrollView.adjustedContentInset.bottom;
+           CGFloat contentOffsetY = scrollView.contentOffset.y;
+           CGFloat screenHeight = scrollView.frame.size.height;
+           CGFloat maxAllowedOffsetY = fmax(contentLengthWithInsets - screenHeight, 0); // 0 is for the case where content is shorter than screen
+
+           // If the keyboard allowed the user to get to an offset beyond the max
+           if (contentOffsetY >= maxAllowedOffsetY) {
+               // Reset the scroll to the max allowed so that there is no additional empty white space at the bottom where the keyboard occupied!
+               CGPoint bottomOfPage = CGPointMake(scrollView.contentOffset.x, maxAllowedOffsetY);
+               [scrollView setContentOffset:bottomOfPage];
+               
+           }
 }
 
 - (id)settingForKey:(NSString*)key
