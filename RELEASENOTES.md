@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 3.1.3 (Oct 6, 2020)
+- Added AppBoundDomains to enable service workers
+
 ### 3.1.2 (May 20, 2020)
 - Fixed exception when injecting empty headers
 

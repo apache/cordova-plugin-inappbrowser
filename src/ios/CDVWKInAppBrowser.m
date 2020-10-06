@@ -774,7 +774,7 @@ BOOL isExiting = FALSE;
         configuration.mediaPlaybackRequiresUserAction = _browserOptions.mediaplaybackrequiresuseraction;
     }
     
-    
+    configuration.limitsNavigationsToAppBoundDomains = true;
 
     self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
     
