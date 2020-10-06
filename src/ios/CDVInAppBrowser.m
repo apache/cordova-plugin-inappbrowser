@@ -54,8 +54,8 @@
 - (void)open:(CDVInvokedUrlCommand*)command
 {
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
-    NSString* headers = [command argumentAtIndex:3 withDefault:@"{}"];
-    NSString* cookies = [command argumentAtIndex:4 withDefault:@"{}"];
+    NSString* headers = [command argumentAtIndex:3 withDefault:@"{}" andClass:[NSString class]];
+    NSString* cookies = [command argumentAtIndex:4 withDefault:@"{}" andClass:[NSString class]];
     NSLog(@"injecting headers: %@",headers);
     if (![headers isEqualToString:@"{}"]) {
         NSLog(@"Header injection not yet supported.");

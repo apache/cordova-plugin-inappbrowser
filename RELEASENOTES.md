@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 3.1.2 (May 20, 2020)
+- Fixed exception when injecting empty headers
+
 ### 3.1.0 (Jun 27, 2019)
 
 -   chore: fix repo and issue urls and license in package.json and plugin.xml ([`8edfb9e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8edfb9e))
