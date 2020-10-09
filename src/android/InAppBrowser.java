@@ -39,6 +39,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
+import android.util.DisplayMetrics; /* ADDED */
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -120,8 +121,11 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String BOTTOM_HEIGHT_REDUCE_BY = "bottomreduceheightby"; /* MODIFIED_FOR_EMBEDDING */
+    private static final String ANDROID_OFFSET_SPACE = "androidoffsetspace"; /* MODIFIED_FOR_EMBEDDING */
+    private static final String TOP_MARGIN = "topmargin"; /* MODIFIED_FOR_EMBEDDING */
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, BOTTOM_HEIGHT_REDUCE_BY, ANDROID_OFFSET_SPACE, TOP_MARGIN);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -149,6 +153,9 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
+    private int bottomreduceheightby = 0; /* MODIFIED_FOR_EMBEDDING */
+    private int androidoffsetspace = 0; /* MODIFIED_FOR_EMBEDDING */
+    private int topmargin = 0; /* MODIFIED_FOR_EMBEDDING */
     private String beforeload = "";
     private boolean fullscreen = true;
     private String[] allowedSchemes;
@@ -714,6 +721,18 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
+            String heightSet = features.get(BOTTOM_HEIGHT_REDUCE_BY); /* MODIFIED_FOR_EMBEDDING */
+            if (Integer.parseInt(heightSet) > 0) { /* MODIFIED_FOR_EMBEDDING */
+                bottomreduceheightby = Integer.parseInt(heightSet); /* MODIFIED_FOR_EMBEDDING */
+            } /* MODIFIED_FOR_EMBEDDING */
+            String offsetSpaceSet = features.get(ANDROID_OFFSET_SPACE); /* MODIFIED_FOR_EMBEDDING */
+            if (Integer.parseInt(offsetSpaceSet) > 0) { /* MODIFIED_FOR_EMBEDDING */
+                androidoffsetspace = Integer.parseInt(offsetSpaceSet); /* MODIFIED_FOR_EMBEDDING */
+            } /* MODIFIED_FOR_EMBEDDING */
+            String marginSet = features.get(TOP_MARGIN); /* MODIFIED_FOR_EMBEDDING */
+            if (Integer.parseInt(marginSet) > 0) { /* MODIFIED_FOR_EMBEDDING */
+                topmargin = Integer.parseInt(marginSet); /* MODIFIED_FOR_EMBEDDING */
+            } /* MODIFIED_FOR_EMBEDDING */
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
             }
@@ -800,11 +819,15 @@ public class InAppBrowser extends CordovaPlugin {
                 // Let's create the main dialog
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+                dialog.getWindow().getAttributes().gravity = Gravity.TOP;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL); /* MODIFIED_FOR_EMBEDDING */
+                dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); /* MODIFIED_FOR_EMBEDDING */
                 if (fullscreen) {
                     dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 }
                 dialog.setCancelable(true);
+                dialog.setCanceledOnTouchOutside(true); /* MODIFIED_FOR_EMBEDDING */
                 dialog.setInAppBroswer(getInAppBrowser());
 
                 // Main container layout
@@ -1076,7 +1099,17 @@ public class InAppBrowser extends CordovaPlugin {
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 lp.copyFrom(dialog.getWindow().getAttributes());
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+                // lp.height = WindowManager.LayoutParams.MATCH_PARENT; /* COMMENTED */
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                /* ADDED BY CANARY - START */
+                cordova.getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int displayWidth = displayMetrics.widthPixels;
+                int bottomreduceheightbyInPixels = dpToPixels(bottomreduceheightby);
+                int androidOffsetSpaceInPixels = dpToPixels(androidoffsetspace);
+                int displayHeight = displayMetrics.heightPixels - bottomreduceheightbyInPixels - androidOffsetSpaceInPixels;
+                lp.height = displayHeight;
+                lp.y = topmargin;
+                /* ADDED BY CANARY - END */
 
                 if (dialog != null) {
                     dialog.setContentView(main);
@@ -1478,25 +1511,25 @@ public class InAppBrowser extends CordovaPlugin {
                 obj.put("sslerror", error.getPrimaryError());
                 String message;
                 switch (error.getPrimaryError()) {
-                case SslError.SSL_DATE_INVALID:
-                    message = "The date of the certificate is invalid";
-                    break;
-                case SslError.SSL_EXPIRED:
-                    message = "The certificate has expired";
-                    break;
-                case SslError.SSL_IDMISMATCH:
-                    message = "Hostname mismatch";
-                    break;
-                default:
-                case SslError.SSL_INVALID:
-                    message = "A generic error occurred";
-                    break;
-                case SslError.SSL_NOTYETVALID:
-                    message = "The certificate is not yet valid";
-                    break;
-                case SslError.SSL_UNTRUSTED:
-                    message = "The certificate authority is not trusted";
-                    break;
+                    case SslError.SSL_DATE_INVALID:
+                        message = "The date of the certificate is invalid";
+                        break;
+                    case SslError.SSL_EXPIRED:
+                        message = "The certificate has expired";
+                        break;
+                    case SslError.SSL_IDMISMATCH:
+                        message = "Hostname mismatch";
+                        break;
+                    default:
+                    case SslError.SSL_INVALID:
+                        message = "A generic error occurred";
+                        break;
+                    case SslError.SSL_NOTYETVALID:
+                        message = "The certificate is not yet valid";
+                        break;
+                    case SslError.SSL_UNTRUSTED:
+                        message = "The certificate authority is not trusted";
+                        break;
                 }
                 obj.put("message", message);
 

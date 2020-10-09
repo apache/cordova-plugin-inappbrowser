@@ -42,6 +42,7 @@
 
 @interface CDVWKInAppBrowser () {
     NSInteger _previousStatusBarStyle;
+    CDVInAppBrowserOptions* _browserOptions;
 }
 @end
 
@@ -60,6 +61,7 @@ static CDVWKInAppBrowser* instance = nil;
     _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
+    _browserOptions = nil;
 }
 
 - (void)onReset
@@ -124,7 +126,8 @@ static CDVWKInAppBrowser* instance = nil;
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
 {
-    CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    _browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    CDVInAppBrowserOptions* browserOptions = _browserOptions;
     
     WKWebsiteDataStore* dataStore = [WKWebsiteDataStore defaultDataStore];
     if (browserOptions.cleardata) {
@@ -290,7 +293,6 @@ static CDVWKInAppBrowser* instance = nil;
     nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
-    nav.presentationController.delegate = self.inAppBrowserViewController;
     
     __weak CDVWKInAppBrowser* weakSelf = self;
     
@@ -304,9 +306,15 @@ static CDVWKInAppBrowser* instance = nil;
                 if(initHidden && osVersion < 11){
                    frame.origin.x = -10000;
                 }
+                if(nil != _browserOptions) {
+                    // Resize the window if it has to be reduced to less than the available screen height
+                    frame.size.height = frame.size.height - [_browserOptions.bottomreduceheightby floatValue];
+                    frame.origin.y = [_browserOptions.topmargin floatValue];
+                }
                 strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
+
             [strongSelf->tmpWindow setRootViewController:tmpController];
             [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
@@ -757,15 +765,6 @@ BOOL isExiting = FALSE;
         configuration.mediaPlaybackRequiresUserAction = _browserOptions.mediaplaybackrequiresuseraction;
     }
     
-    if (@available(iOS 13.0, *)) {
-        NSString *contentMode = [self settingForKey:@"PreferredContentMode"];
-        if ([contentMode isEqual: @"mobile"]) {
-            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
-        } else if ([contentMode  isEqual: @"desktop"]) {
-            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeDesktop;
-        }
-        
-    }
     
 
     self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
@@ -1064,12 +1063,7 @@ BOOL isExiting = FALSE;
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
-    NSString* statusBarStylePreference = [self settingForKey:@"InAppBrowserStatusBarStyle"];
-    if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"lightcontent"]) {
-        return UIStatusBarStyleLightContent;
-    } else {
-        return UIStatusBarStyleDefault;
-    }
+    return UIStatusBarStyleDefault;
 }
 
 - (BOOL)prefersStatusBarHidden {
@@ -1085,7 +1079,6 @@ BOOL isExiting = FALSE;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         isExiting = TRUE;
-        lastReducedStatusBarHeight = 0.0;
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
             [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         } else {
@@ -1272,10 +1265,5 @@ BOOL isExiting = FALSE;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
-#pragma mark UIAdaptivePresentationControllerDelegate
-
-- (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
-    isExiting = TRUE;
-}
 
 @end //CDVWKInAppBrowserViewController

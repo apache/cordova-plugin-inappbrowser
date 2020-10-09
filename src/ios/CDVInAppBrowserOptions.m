@@ -44,6 +44,8 @@
         self.lefttoright = false;
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
+        self.bottomreduceheightby = [NSNumber numberWithFloat:0.0]; /* MODIFIED_FOR_EMBEDDING */
+        self.topmargin = [NSNumber numberWithFloat:0.0]; /* MODIFIED_FOR_EMBEDDING */
         self.beforeload = @"";
     }
 

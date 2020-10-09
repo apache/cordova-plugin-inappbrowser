@@ -43,6 +43,8 @@
 @property (nonatomic, assign) BOOL allowinlinemediaplayback;
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
+@property (nonatomic, copy) NSNumber* bottomreduceheightby; /* MODIFIED_FOR_EMBEDDING */
+@property (nonatomic, copy) NSNumber* topmargin; /* MODIFIED_FOR_EMBEDDING */
 @property (nonatomic, copy) NSString* beforeload;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
