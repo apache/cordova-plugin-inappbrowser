@@ -19,6 +19,8 @@
 #
 -->
 # Release Notes
+### 3.1.4 (Oct 14, 2020)
+- Fixed AppBoundDomains plist entry
 
 ### 3.1.3 (Oct 6, 2020)
 - Added AppBoundDomains to enable service workers
