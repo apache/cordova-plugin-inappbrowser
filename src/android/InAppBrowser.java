@@ -269,12 +269,8 @@ public class InAppBrowser extends CordovaPlugin {
                 @SuppressLint("NewApi")
                 @Override
                 public void run() {
-                    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-                        currentClient.waitForBeforeload = false;
-                        inAppWebView.setWebViewClient(currentClient);
-                    } else {
-                        ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
-                    }
+                    currentClient.waitForBeforeload = false;
+                    inAppWebView.setWebViewClient(currentClient);
                     inAppWebView.loadUrl(url);
                 }
             });
@@ -414,7 +410,7 @@ public class InAppBrowser extends CordovaPlugin {
                 @SuppressLint("NewApi")
                 @Override
                 public void run() {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                    if (Build.VERSION.SDK_INT < 19) {
                         // This action will have the side-effect of blurring the currently focused element
                         inAppWebView.loadUrl("javascript:" + finalScriptToInject);
                     } else {
@@ -1006,7 +1002,7 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 }
 
-                if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                if(android.os.Build.VERSION.SDK_INT >= 17) {
                     settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
                     inAppWebView.addJavascriptInterface(new JsObject(), "cordova_iab");
                 }
@@ -1038,7 +1034,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Enable Thirdparty Cookies on >=Android 5.0 device
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                if (android.os.Build.VERSION.SDK_INT >= 21) {
                     CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
                 }
 
@@ -1129,7 +1125,7 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         // For Android >= 5.0
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if(Build.VERSION.SDK_INT >= 21) {
             LOG.d(LOG_TAG, "onActivityResult (For Android >= 5.0)");
             // If RequestCode or Callback is Invalid
             if(requestCode != FILECHOOSER_REQUESTCODE_LOLLIPOP || mUploadCallbackLollipop == null) {
@@ -1202,7 +1198,7 @@ public class InAppBrowser extends CordovaPlugin {
          * @param webView
          * @param request
          */
-        @TargetApi(Build.VERSION_CODES.N)
+        @TargetApi(24)
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
             return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
@@ -1374,7 +1370,7 @@ public class InAppBrowser extends CordovaPlugin {
          * @param webView
          * @param request
          */
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @TargetApi(21)
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             return shouldInterceptRequest(request.getUrl().toString(), super.shouldInterceptRequest(view, request), request.getMethod());
@@ -1425,12 +1421,12 @@ public class InAppBrowser extends CordovaPlugin {
             super.onPageFinished(view, url);
 
             // Set the namespace for postMessage()
-            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (Build.VERSION.SDK_INT >= 17) {
                 injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
             }
 
             // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            if (android.os.Build.VERSION.SDK_INT >= 21) {
                 CookieManager.getInstance().flush();
             } else {
                 CookieSyncManager.getInstance().sync();
