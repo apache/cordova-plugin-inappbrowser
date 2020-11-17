@@ -20,6 +20,22 @@
 -->
 # Release Notes
 
+### 4.1.0 (Nov 17, 2020)
+* [GH-792](https://github.com/apache/cordova-plugin-inappbrowser/pull/792) fix(android): Add mitigation strategy for CVE-2020-6506
+* [GH-817](https://github.com/apache/cordova-plugin-inappbrowser/pull/817) Updated typings
+* [GH-803](https://github.com/apache/cordova-plugin-inappbrowser/pull/803) fix(android): allow compilation in old `cordova-android` versions
+* [GH-688](https://github.com/apache/cordova-plugin-inappbrowser/pull/688) (ios): allow to set "preferredContentMode"
+* [GH-768](https://github.com/apache/cordova-plugin-inappbrowser/pull/768) ci(travis): update osx xcode image
+* add documentation for `InAppBrowser`StatusBarStyle preference
+* undo whitespace changes due to editor preferrences
+* [GH-728](https://github.com/apache/cordova-plugin-inappbrowser/pull/728) **iOS**: added `InAppBrowser`StatusBarStyle preference
+* [GH-767](https://github.com/apache/cordova-plugin-inappbrowser/pull/767) ci(travis): updates **Android** API level
+* (ios): Fix incorrect view height from the second open time
+* [GH-748](https://github.com/apache/cordova-plugin-inappbrowser/pull/748) chore: adds package-lock file
+* [GH-746](https://github.com/apache/cordova-plugin-inappbrowser/pull/746) chore(npm): use short notation in `package.json`
+* [GH-747](https://github.com/apache/cordova-plugin-inappbrowser/pull/747) refactor(eslint): use cordova-eslint /w fix
+* [GH-737](https://github.com/apache/cordova-plugin-inappbrowser/pull/737) fix(ios): exit event not fired on swipe down
+
 ### 4.0.0 (Jun 09, 2020)
 * [GH-715](https://github.com/apache/cordova-plugin-inappbrowser/pull/715) (ios): fix regression in 2706f34
 * [GH-685](https://github.com/apache/cordova-plugin-inappbrowser/pull/685) chore: update install engines
