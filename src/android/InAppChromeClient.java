@@ -24,8 +24,12 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+import android.os.Message;
 import android.webkit.JsPromptResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -135,4 +139,45 @@ public class InAppChromeClient extends WebChromeClient {
         return false;
     }
 
+    /**
+     * The InAppWebBrowser WebView is configured to MultipleWindow mode to mitigate a security
+     * bug found in Chromium prior to version 83.0.4103.106.
+     * See https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
+     *
+     * Valid Urls set to open in new window will be routed back to load in the original WebView.
+     *
+     * @param view
+     * @param isDialog
+     * @param isUserGesture
+     * @param resultMsg
+     * @return
+     */
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        WebView inAppWebView = view;
+        final WebViewClient webViewClient =
+                new WebViewClient() {
+                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                        inAppWebView.loadUrl(request.getUrl().toString());
+                        return true;
+                    }
+
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        inAppWebView.loadUrl(url);
+                        return true;
+                    }
+                };
+
+        final WebView newWebView = new WebView(view.getContext());
+        newWebView.setWebViewClient(webViewClient);
+
+        final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+        transport.setWebView(newWebView);
+        resultMsg.sendToTarget();
+
+        return true;
+    }
 }
