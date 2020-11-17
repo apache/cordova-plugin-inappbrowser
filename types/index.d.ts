@@ -9,7 +9,7 @@
 type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme";
 
 /**
- * The object returned from a call to window.open.
+ * The object returned from a call to cordova.InAppBrowser.open.
  * NOTE: The InAppBrowser window behaves like a standard web browser, and can't access Cordova APIs.
  */
 interface InAppBrowser {
