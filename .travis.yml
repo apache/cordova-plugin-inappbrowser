@@ -44,7 +44,7 @@ matrix:
     # local tests, without saucelabs
     - env: PLATFORM=local/browser
       <<: *_ios
-    - env: PLATFORM=local/ios-13.6
+    - env: PLATFORM=local/ios-12.2
       <<: *_ios
 
     # many tests with saucelabs
