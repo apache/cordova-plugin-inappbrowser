@@ -157,7 +157,6 @@ public class InAppChromeClient extends WebChromeClient {
         WebView inAppWebView = view;
         final WebViewClient webViewClient =
                 new WebViewClient() {
-                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                         inAppWebView.loadUrl(request.getUrl().toString());
