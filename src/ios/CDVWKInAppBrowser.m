@@ -19,8 +19,8 @@
 
 #import "CDVWKInAppBrowser.h"
 
-#if __has_include("CDVWKProcessPoolFactory.h")
-#import "CDVWKProcessPoolFactory.h"
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
+#import <Cordova/CDVWebViewProcessPoolFactory.h>
 #endif
 
 #import <Cordova/CDVPluginResult.h>
@@ -739,8 +739,8 @@ BOOL isExiting = FALSE;
     }
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
-#if __has_include("CDVWKProcessPoolFactory.h")
-    configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
+    configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
 #endif
     [configuration.userContentController addScriptMessageHandler:self name:IAB_BRIDGE_NAME];
     
