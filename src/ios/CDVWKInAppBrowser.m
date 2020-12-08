@@ -1069,7 +1069,7 @@ BOOL isExiting = FALSE;
         return UIStatusBarStyleLightContent;
     } else if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"darkcontent"]) {
         if (@available(iOS 13.0, *)) {
-            return  UIStatusBarStyleDarkContent;
+            return UIStatusBarStyleDarkContent;
         } else {
             return UIStatusBarStyleDefault;
         }
