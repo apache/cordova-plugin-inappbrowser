@@ -801,9 +801,10 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                if (fullscreen) {
-                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                }
+                // Make the dialog possible to be outside touch
+                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+                dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                   
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
@@ -1077,9 +1078,13 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                dialog.getWindow().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
                 lp.copyFrom(dialog.getWindow().getAttributes());
+                lp.gravity = Gravity.TOP;
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = displayMetrics.heightPixels - this.dpToPixels(150);
 
                 if (dialog != null) {
                     dialog.setContentView(main);
