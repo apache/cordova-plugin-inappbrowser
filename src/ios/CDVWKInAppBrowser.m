@@ -1139,7 +1139,7 @@ BOOL isExiting = FALSE;
     viewBounds.origin.y = statusBarHeight;
     
     // account for web view height portion that may have been reduced by a previous call to this method
-    viewBounds.size.height = (viewBounds.size.height - statusBarHeight + lastReducedStatusBarHeight);
+    viewBounds.size.height = (viewBounds.size.height - statusBarHeight + lastReducedStatusBarHeight) - 80;
     lastReducedStatusBarHeight = statusBarHeight;
     
     if ((_browserOptions.toolbar) && ([_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop])) {
