@@ -725,7 +725,7 @@ BOOL isExiting = FALSE;
     
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    webViewBounds.size.height -= (_browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT) - 150;
+    webViewBounds.size.height -= (_browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT) - 100;
     WKUserContentController* userContentController = [[WKUserContentController alloc] init];
     
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
