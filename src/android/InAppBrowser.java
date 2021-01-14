@@ -119,6 +119,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
+    private static final String FULLSCREEN = "fullscreen";
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
@@ -149,6 +150,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean showFooter = false;
     private String footerColor = "";
     private String beforeload = "";
+    private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
@@ -315,7 +317,9 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    dialog.show();
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
+                        dialog.show();
+                    }
                 }
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
@@ -326,7 +330,9 @@ public class InAppBrowser extends CordovaPlugin {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    dialog.hide();
+                    if (dialog != null && !cordova.getActivity().isFinishing()) {
+                        dialog.hide();
+                    }
                 }
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
@@ -439,7 +445,7 @@ public class InAppBrowser extends CordovaPlugin {
                 if (option.hasMoreElements()) {
                     String key = option.nextToken();
                     String value = option.nextToken();
-                    if (!customizableOptions.contains(key)){
+                    if (!customizableOptions.contains(key)) {
                         value = value.equals("yes") || value.equals("no") ? value : "yes";
                     }
                     map.put(key, value);
@@ -535,7 +541,7 @@ public class InAppBrowser extends CordovaPlugin {
                 childView.setWebViewClient(new WebViewClient() {
                     // NB: wait for about:blank before dismissing
                     public void onPageFinished(WebView view, String url) {
-                        if (dialog != null) {
+                        if (dialog != null && !cordova.getActivity().isFinishing()) {
                             dialog.dismiss();
                             dialog = null;
                         }
@@ -618,7 +624,7 @@ public class InAppBrowser extends CordovaPlugin {
         return this.showLocationBar;
     }
 
-    private InAppBrowser getInAppBrowser(){
+    private InAppBrowser getInAppBrowser() {
         return this;
     }
 
@@ -690,9 +696,8 @@ public class InAppBrowser extends CordovaPlugin {
                 closeButtonColor = closeButtonColorSet;
             }
             String leftToRightSet = features.get(LEFT_TO_RIGHT);
-            if (leftToRightSet != null) {
-                leftToRight = leftToRightSet.equals("yes") ? true : false;
-            }
+            leftToRight = leftToRightSet != null && leftToRightSet.equals("yes");
+
             String toolbarColorSet = features.get(TOOLBAR_COLOR);
             if (toolbarColorSet != null) {
                 toolbarColor = android.graphics.Color.parseColor(toolbarColorSet);
@@ -711,6 +716,10 @@ public class InAppBrowser extends CordovaPlugin {
             }
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
+            }
+            String fullscreenSet = features.get(FULLSCREEN);
+            if (fullscreenSet != null) {
+                fullscreen = fullscreenSet.equals("yes") ? true : false;
             }
         }
 
@@ -732,7 +741,7 @@ public class InAppBrowser extends CordovaPlugin {
                 return value;
             }
 
-            private View createCloseButton(int id){
+            private View createCloseButton(int id) {
                 View _close;
                 Resources activityRes = cordova.getActivity().getResources();
 
@@ -792,7 +801,9 @@ public class InAppBrowser extends CordovaPlugin {
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                if (fullscreen) {
+                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                }
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
@@ -908,9 +919,9 @@ public class InAppBrowser extends CordovaPlugin {
                 // Footer
                 RelativeLayout footer = new RelativeLayout(cordova.getActivity());
                 int _footerColor;
-                if(footerColor != ""){
+                if(footerColor != "") {
                     _footerColor = Color.parseColor(footerColor);
-                }else{
+                } else {
                     _footerColor = android.graphics.Color.LTGRAY;
                 }
                 footer.setBackgroundColor(_footerColor);
@@ -1067,12 +1078,14 @@ public class InAppBrowser extends CordovaPlugin {
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
                 lp.height = WindowManager.LayoutParams.MATCH_PARENT;
 
-                dialog.setContentView(main);
-                dialog.show();
-                dialog.getWindow().setAttributes(lp);
+                if (dialog != null) {
+                    dialog.setContentView(main);
+                    dialog.show();
+                    dialog.getWindow().setAttributes(lp);
+                }
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
-                if(openWindowHidden) {
+                if (openWindowHidden && dialog != null) {
                     dialog.hide();
                 }
             }
@@ -1210,26 +1223,26 @@ public class InAppBrowser extends CordovaPlugin {
 
             if (beforeload.equals("yes") && method == null) {
                 useBeforeload = true;
-            }else if(beforeload.equals("yes")
+            } else if(beforeload.equals("yes")
                     //TODO handle POST requests then this condition can be removed:
                     && !method.equals("POST"))
             {
                 useBeforeload = true;
-            }else if(beforeload.equals("get") && (method == null || method.equals("GET"))){
+            } else if(beforeload.equals("get") && (method == null || method.equals("GET"))) {
                 useBeforeload = true;
-            }else if(beforeload.equals("post") && (method == null || method.equals("POST"))){
+            } else if(beforeload.equals("post") && (method == null || method.equals("POST"))) {
                 //TODO handle POST requests
                 errorMessage = "beforeload doesn't yet support POST requests";
             }
 
             // On first URL change, initiate JS callback. Only after the beforeload event, continue.
             if (useBeforeload && this.waitForBeforeload) {
-                if(sendBeforeLoad(url, method)){
+                if(sendBeforeLoad(url, method)) {
                     return true;
                 }
             }
 
-            if(errorMessage != null){
+            if(errorMessage != null) {
                 try {
                     LOG.e(LOG_TAG, errorMessage);
                     JSONObject obj = new JSONObject();
@@ -1238,7 +1251,7 @@ public class InAppBrowser extends CordovaPlugin {
                     obj.put("code", -1);
                     obj.put("message", errorMessage);
                     sendUpdate(obj, true, PluginResult.Status.ERROR);
-                }catch(Exception e){
+                } catch(Exception e) {
                     LOG.e(LOG_TAG, "Error sending loaderror for " + url + ": " + e.toString());
                 }
             }
@@ -1324,12 +1337,12 @@ public class InAppBrowser extends CordovaPlugin {
             return override;
         }
 
-        private boolean sendBeforeLoad(String url, String method){
+        private boolean sendBeforeLoad(String url, String method) {
             try {
                 JSONObject obj = new JSONObject();
-                obj.put("type", "beforeload");
+                obj.put("type", BEFORELOAD);
                 obj.put("url", url);
-                if(method != null){
+                if(method != null) {
                     obj.put("method", method);
                 }
                 sendUpdate(obj, true);
@@ -1367,7 +1380,7 @@ public class InAppBrowser extends CordovaPlugin {
             return shouldInterceptRequest(request.getUrl().toString(), super.shouldInterceptRequest(view, request), request.getMethod());
         }
 
-        public WebResourceResponse shouldInterceptRequest(String url, WebResourceResponse response, String method){
+        public WebResourceResponse shouldInterceptRequest(String url, WebResourceResponse response, String method) {
             return response;
         }
 
@@ -1408,13 +1421,11 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
-
-
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
             // Set the namespace for postMessage()
-            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1){
+            if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
             }
 
@@ -1461,6 +1472,46 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+        }
+
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            super.onReceivedSslError(view, handler, error);
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("type", LOAD_ERROR_EVENT);
+                obj.put("url", error.getUrl());
+                obj.put("code", 0);
+                obj.put("sslerror", error.getPrimaryError());
+                String message;
+                switch (error.getPrimaryError()) {
+                case SslError.SSL_DATE_INVALID:
+                    message = "The date of the certificate is invalid";
+                    break;
+                case SslError.SSL_EXPIRED:
+                    message = "The certificate has expired";
+                    break;
+                case SslError.SSL_IDMISMATCH:
+                    message = "Hostname mismatch";
+                    break;
+                default:
+                case SslError.SSL_INVALID:
+                    message = "A generic error occurred";
+                    break;
+                case SslError.SSL_NOTYETVALID:
+                    message = "The certificate is not yet valid";
+                    break;
+                case SslError.SSL_UNTRUSTED:
+                    message = "The certificate authority is not trusted";
+                    break;
+                }
+                obj.put("message", message);
+
+                sendUpdate(obj, true, PluginResult.Status.ERROR);
+            } catch (JSONException ex) {
+                LOG.d(LOG_TAG, "Should never happen");
+            }
+            handler.cancel();
         }
 
         /**

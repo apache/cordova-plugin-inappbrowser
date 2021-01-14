@@ -25,40 +25,13 @@ Anyone can contribute to Cordova. And we need your contributions.
 
 There are multiple ways to contribute: report bugs, improve the docs, and
 contribute code.
-
+  
 For instructions on this, start with the
 [contribution overview](http://cordova.apache.org/contribute/).
 
 The details are explained there, but the important items are:
- - Sign and submit an Apache ICLA (Contributor License Agreement).
- - Have a Jira issue open that corresponds to your contribution.
+ - Check for Github issues that corresponds to your contribution and link or create them if necessary.
  - Run the tests so your patch doesn't break existing functionality.
 
 We look forward to your contributions!
 
-The notes on [Commit Workflow](https://github.com/apache/cordova-coho/blob/master/docs/committer-workflow.md#commit-workflow) can be helpful even if you are not a committer.
-
-## Running plugin tests
-
-* clone and install [cordova-plugin-test-framework](https://github.com/apache/cordova-plugin-test-framework)
-```
-git clone git@github.com:apache/cordova-plugin-test-framework.git
-```
-* edit ```cordova-plugin-test-framework/www/assets/index.html``` and add the following line
-```
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com http://cordova.apache.org http://google.co.uk https://google.co.uk 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
-```
-* create test project
-```
-cordova create plugintest
-cd plugintest
-cordova platform add android
-cordova plugin add ../cordova-plugin-inappbrowser
-cordova plugin add ../cordova-plugin-inappbrowser/tests
-cordova plugin add ../cordova-plugin-test-framework
-```
-* edit ```config.xml``` and replace ```<content src="index.html" />``` with ```<content src="cdvtests/index.html" />```
-* run application
-```
-cordova run
-```
