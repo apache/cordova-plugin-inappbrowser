@@ -31,6 +31,7 @@
 @property (nonatomic, assign) BOOL hidenavigationbuttons;
 @property (nonatomic, copy) NSString* navigationbuttoncolor;
 @property (nonatomic, assign) BOOL cleardata;
+@property (nonatomic, assign) BOOL clearswregistrations;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 @property (nonatomic, assign) BOOL hidespinner;

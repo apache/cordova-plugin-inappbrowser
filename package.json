@@ -1,6 +1,6 @@
 {
   "name": "@switch/cordova-plugin-daimler-inappbrowser",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {

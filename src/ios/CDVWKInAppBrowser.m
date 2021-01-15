@@ -197,6 +197,21 @@ static CDVWKInAppBrowser* instance = nil;
         }
     }
 
+    if (browserOptions.clearswregistrations) {
+         if (@available(iOS 14.0, *)) {
+             // Deletes serviceworker registrations
+             [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:[NSSet setWithObject:WKWebsiteDataTypeServiceWorkerRegistrations]
+              completionHandler:^(NSArray<WKWebsiteDataRecord *> * __nonnull records) {
+                 [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:[NSSet setWithObject:WKWebsiteDataTypeServiceWorkerRegistrations] forDataRecords: records completionHandler:^{
+                        NSLog(@"Deleted %lu SW-registrations",[records count]);
+                 }];
+              }];
+         } else {
+             NSLog(@"clearswregistrations not available below iOS 14.0");
+         }
+     }
+
+
     if (self.inAppBrowserViewController == nil) {
         self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithBrowserOptions: browserOptions andSettings:self.commandDelegate.settings];
         self.inAppBrowserViewController.navigationDelegate = self;
