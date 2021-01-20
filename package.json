@@ -43,7 +43,7 @@
       },
       "5.0.0": {
         "cordova-android": ">=9.0.0",
-        "cordova-ios": ">=5.1.0",
+        "cordova-ios": ">=6.0.0",
         "cordova": ">=9.0.0"
       },
       "6.0.0": {
