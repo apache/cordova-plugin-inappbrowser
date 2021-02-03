@@ -50,7 +50,8 @@ public class InAppBrowserDialog extends Dialog {
             if (this.inAppBrowser.hardwareBack() && this.inAppBrowser.canGoBack()) {
                 this.inAppBrowser.goBack();
             }  else {
-                this.inAppBrowser.closeDialog();
+                //behavior livepepper does not want to have
+                //this.inAppBrowser.closeDialog();
             }
         }
     }
