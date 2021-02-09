@@ -30,8 +30,9 @@
     <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
-      <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
-      <engine name="cordova-ios" version=">=4.0.0" />
+        <engine name="cordova" version=">=9.0.0"/>
+        <engine name="cordova-android" version=">=9.0.0" />
+        <engine name="cordova-ios" version=">=6.0.0" />
     </engines>
 
     <!-- android -->
