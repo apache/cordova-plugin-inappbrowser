@@ -71,7 +71,7 @@ simply hook `window.open` during initialization.  For example:
 ### Preferences
 
 #### <b>config.xml</b>
-- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent' or 'default'. Defaults to 'default') set text color style for iOS.
+- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent', 'darkcontent' or 'default'. Defaults to 'default') set text color style for iOS. 'lightcontent' is intended for use on dark backgrounds. 'darkcontent' is only available since iOS 13 and intended for use on light backgrounds.
 ```
 <preference name="InAppBrowserStatusBarStyle" value="lightcontent" />
 ```

@@ -1071,6 +1071,12 @@ BOOL isExiting = FALSE;
     NSString* statusBarStylePreference = [self settingForKey:@"InAppBrowserStatusBarStyle"];
     if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"lightcontent"]) {
         return UIStatusBarStyleLightContent;
+    } else if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"darkcontent"]) {
+        if (@available(iOS 13.0, *)) {
+            return UIStatusBarStyleDarkContent;
+        } else {
+            return UIStatusBarStyleDefault;
+        }
     } else {
         return UIStatusBarStyleDefault;
     }
