@@ -686,6 +686,8 @@ public class InAppBrowser extends CordovaPlugin {
             String closeButtonCaptionSet = features.get(CLOSE_BUTTON_CAPTION);
             if (closeButtonCaptionSet != null) {
                 closeButtonCaption = closeButtonCaptionSet;
+            } else {
+                closeButtonCaption = "";
             }
             String closeButtonColorSet = features.get(CLOSE_BUTTON_COLOR);
             if (closeButtonColorSet != null) {
