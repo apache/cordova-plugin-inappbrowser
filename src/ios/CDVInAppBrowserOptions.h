@@ -45,6 +45,8 @@
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, copy) NSString* beforeload;
 
+@property (nonatomic, assign) BOOL extendwebviewtobottom;
+
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
 @end
