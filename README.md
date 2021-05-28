@@ -68,6 +68,14 @@ simply hook `window.open` during initialization.  For example:
         window.open = cordova.InAppBrowser.open;
     }
 
+### Preferences
+
+#### <b>config.xml</b>
+- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent', 'darkcontent' or 'default'. Defaults to 'default') set text color style for iOS. 'lightcontent' is intended for use on dark backgrounds. 'darkcontent' is only available since iOS 13 and intended for use on light backgrounds.
+```
+<preference name="InAppBrowserStatusBarStyle" value="lightcontent" />
+```
+
 ## cordova.InAppBrowser.open
 
 Opens a URL in a new `InAppBrowser` instance, the current browser
@@ -167,6 +175,16 @@ instance, or the system browser.
 At the moment the only supported target in OSX is `_system`.
 
 `_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
+
+### iOS Quirks
+
+Since the introduction of iPadOS 13, iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to Macintosh, making it hard to detect them as mobile devices using user agent string sniffing. You can change this with the `PreferredContentMode` preference in `config.xml`.
+
+```xml
+<preference name="PreferredContentMode" value="mobile" />
+```
+
+The example above forces the user agent to contain `iPad`. The other option is to use the value `desktop` to turn the user agent to `Macintosh`.
 
 ### Browser Quirks
 
