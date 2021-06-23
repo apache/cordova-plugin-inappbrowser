@@ -970,7 +970,7 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setUserAgentString(overrideUserAgent);
                 }
                 if (appendUserAgent != null) {
-                    settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
+                    settings.setUserAgentString(settings.getUserAgentString() + " " + appendUserAgent);
                 }
 
                 //Toggle whether this is enabled or not!
