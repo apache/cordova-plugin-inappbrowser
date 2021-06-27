@@ -20,6 +20,7 @@ package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,8 @@ import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
 import android.net.http.SslError;
 import android.net.Uri;
@@ -45,6 +48,7 @@ import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -996,9 +1000,6 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
-                // Multiple Windows set to true to mitigate Chromium security bug.
-                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
-                inAppWebView.getSettings().setSupportMultipleWindows(true);
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
@@ -1140,7 +1141,46 @@ public class InAppBrowser extends CordovaPlugin {
         @TargetApi(Build.VERSION_CODES.N)
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
-            return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
+            String url = request.getUrl().toString();
+
+            if (url.startsWith("http") || url.startsWith("https") ) return false;//open web links as usual
+
+            // If activity exists for a browsable URL then open the URL.
+            Uri parsedUri = Uri.parse(url);
+            PackageManager packageManager = cordova.getActivity().getPackageManager();
+            Intent browseIntent = new Intent(Intent.ACTION_VIEW).setData(parsedUri);
+            if (browseIntent.resolveActivity(packageManager) != null) {
+                    cordova.getActivity().startActivity(browseIntent);
+                    return true;
+            }
+
+            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
+            if (url.startsWith("intent:")) {
+                    try {
+                        // Try to find an installed app
+                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                        if (intent.resolveActivity(packageManager) != null) {
+                                cordova.getActivity().startActivity(intent);
+                                return true;
+                        }
+                        // Try to open the fallback URL
+                        String fallbackUrl = intent.getStringExtra("browser_fallback_url");
+                        if (fallbackUrl != null) {
+                                webView.loadUrl(fallbackUrl);
+                                return true;
+                        }
+                        // Head to the Abdroid Store and look for an app.
+                        Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
+                        if (marketIntent.resolveActivity(packageManager) != null) {
+                                cordova.getActivity().startActivity(marketIntent);
+                                return true;
+                        }
+                    } catch (Exception e) {
+                        // Failed to do anything useful with it.
+                        LOG.e(LOG_TAG, "Failed to handle INTENT: " + e.toString() );
+                    }
+            }
+            return true;
         }
 
         /**
