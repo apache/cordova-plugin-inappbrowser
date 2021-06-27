@@ -20,7 +20,6 @@ package org.apache.cordova.inappbrowser;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,8 +29,6 @@ import android.provider.Browser;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Color;
 import android.net.http.SslError;
 import android.net.Uri;
@@ -48,7 +45,6 @@ import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -1154,7 +1150,7 @@ public class InAppBrowser extends CordovaPlugin {
                     return true;
             }
 
-            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go tothe store link app
+            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
             if (url.startsWith("intent:")) {
                     try {
                         // Try to find an installed app
@@ -1169,7 +1165,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 webView.loadUrl(fallbackUrl);
                                 return true;
                         }
-                        // Try to open the app link
+                        // Head to the Abdroid Store and look for an app.
                         Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
                         if (marketIntent.resolveActivity(packageManager) != null) {
                                 cordova.getActivity().startActivity(marketIntent);
