@@ -1154,7 +1154,7 @@ public class InAppBrowser extends CordovaPlugin {
                     return true;
             }
 
-            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
+            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go tothe store link app
             if (url.startsWith("intent:")) {
                     try {
                         // Try to find an installed app
