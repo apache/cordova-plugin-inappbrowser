@@ -1169,7 +1169,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 webView.loadUrl(fallbackUrl);
                                 return true;
                         }
-                        // Head to the Abdroid Store and look for an app.
+                        // Try to open the app link
                         Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
                         if (marketIntent.resolveActivity(packageManager) != null) {
                                 cordova.getActivity().startActivity(marketIntent);
