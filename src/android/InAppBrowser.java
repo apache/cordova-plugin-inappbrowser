@@ -996,6 +996,9 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
+                // Multiple Windows set to true to mitigate Chromium security bug.
+                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
+                inAppWebView.getSettings().setSupportMultipleWindows(true);   
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
@@ -1153,22 +1156,11 @@ public class InAppBrowser extends CordovaPlugin {
             // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
             if (url.startsWith("intent:")) {
                     try {
-                        // Try to find an installed app
-                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-                        if (intent.resolveActivity(packageManager) != null) {
-                                cordova.getActivity().startActivity(intent);
-                                return true;
-                        }
+                        
                         // Try to open the fallback URL
                         String fallbackUrl = intent.getStringExtra("browser_fallback_url");
                         if (fallbackUrl != null) {
                                 webView.loadUrl(fallbackUrl);
-                                return true;
-                        }
-                        // Head to the Abdroid Store and look for an app.
-                        Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
-                        if (marketIntent.resolveActivity(packageManager) != null) {
-                                cordova.getActivity().startActivity(marketIntent);
                                 return true;
                         }
                     } catch (Exception e) {
