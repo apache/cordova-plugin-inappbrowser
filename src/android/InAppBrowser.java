@@ -1156,7 +1156,7 @@ public class InAppBrowser extends CordovaPlugin {
             // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
             if (url.startsWith("intent:")) {
                     try {
-                        
+                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
                         // Try to open the fallback URL
                         String fallbackUrl = intent.getStringExtra("browser_fallback_url");
                         if (fallbackUrl != null) {
