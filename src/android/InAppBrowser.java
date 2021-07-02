@@ -996,11 +996,15 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
-                if (!url.startsWith("intent:")) {   
                 // Multiple Windows set to true to mitigate Chromium security bug.
                 //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
-                inAppWebView.getSettings().setSupportMultipleWindows(true);
+                String url = request.getUrl().toString();   
+                if (url.startsWith("intent:")) {   
+                inAppWebView.getSettings().setSupportMultipleWindows(false);
                 }
+                else {   
+                inAppWebView.getSettings().setSupportMultipleWindows(true);
+                }   
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
