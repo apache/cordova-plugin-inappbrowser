@@ -24,6 +24,8 @@
 #endif
 
 #import <Cordova/CDVPluginResult.h>
+#import "SVWebViewControllerActivityChrome.h"
+#import "SVWebViewControllerActivitySafari.h"
 
 #define    kInAppBrowserTargetSelf @"_self"
 #define    kInAppBrowserTargetSystem @"_system"
@@ -815,6 +817,12 @@ BOOL isExiting = FALSE;
     
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
+
+    self.shareButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(share)];
+    self.shareButton.enabled = NO;
+     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
+      self.shareButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
     
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
@@ -891,23 +899,56 @@ BOOL isExiting = FALSE;
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-    // Filter out Navigation Buttons if user requests so
-    if (_browserOptions.hidenavigationbuttons) {
-        if (_browserOptions.lefttoright) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
-        } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
-        }
-    } else if (_browserOptions.lefttoright) {
-        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
-    } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
-    }
+    UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    fixedSpaceButton.width = 30;
+
+    self.navigationController.navigationBar.titleTextAttributes = @{NSFontAttributeName: [UIFont systemFontOfSize:14], NSForegroundColorAttributeName: [UIColor colorWithWhite:1.0 alpha:0.45]};
+    self.navigationItem.leftBarButtonItems = @[self.closeButton];
+    self.navigationItem.rightBarButtonItems = @[self.shareButton, self.forwardButton, fixedSpaceButton, self.backButton];
     
-    self.view.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:self.toolbar];
-    [self.view addSubview:self.addressLabel];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectZero];
+    label.textColor = [UIColor colorWithWhite:1.0 alpha:0.45];
+    label.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTitle:)];
+    tapGestureRecognizer.numberOfTapsRequired = 1;
+    [label addGestureRecognizer:tapGestureRecognizer];
+
+    self.navigationItem.titleView = label;
+
+    // Filter out Navigation Buttons if user requests so
+    // if (_browserOptions.hidenavigationbuttons) {
+    //     if (_browserOptions.lefttoright) {
+    //         [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
+    //     } else {
+    //         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
+    //     }
+    // } else if (_browserOptions.lefttoright) {
+    //     [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+    // } else {
+    //     [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+    // }
+    
+    // self.view.backgroundColor = [UIColor clearColor];
+    // [self.view addSubview:self.toolbar];
+    // [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
+}
+
+- (id)createNavigationViewContoller {
+    CDVInAppBrowserNavigationController *nav = [[CDVInAppBrowserNavigationController alloc] initWithRootViewController:self];
+    nav.orientationDelegate = self;
+    nav.navigationBarHidden = NO;
+    nav.navigationBar.translucent = NO;
+    UIImage *image = [UIImage new];
+    nav.navigationBar.shadowImage = image;
+    [nav.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
+    
+    if (_browserOptions.toolbarcolor != nil) {
+        nav.navigationBar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+    }
+    nav.modalPresentationStyle = self.modalPresentationStyle;
+    
+    return nav;
 }
 
 - (id)settingForKey:(NSString*)key
@@ -1094,6 +1135,24 @@ BOOL isExiting = FALSE;
     });
 }
 
+- (void)share
+{
+    if (self.currentURL) {
+        NSArray *activities = @[[SVWebViewControllerActivityChrome new],
+                                [SVWebViewControllerActivitySafari new]];
+        UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.currentURL] applicationActivities:activities];
+        // For iPad
+        if (vc.popoverPresentationController) {
+            vc.popoverPresentationController.barButtonItem = self.shareButton;
+        }
+
+        __weak UIViewController* weakSelf = self;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf presentViewController:vc animated:YES completion:nil];
+        });
+    }
+}
 - (void)navigateTo:(NSURL*)url
 {
     if ([url.scheme isEqualToString:@"file"]) {
@@ -1114,9 +1173,15 @@ BOOL isExiting = FALSE;
     [self.webView goForward];
 }
 
+- (void)tapTitle:(id)sender
+{
+    [self.webView reload];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [self rePositionViews];
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
     
     [super viewWillAppear:animated];
 }
@@ -1171,6 +1236,7 @@ BOOL isExiting = FALSE;
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
+    self.shareButton.enabled = NO;
     
     NSLog(_browserOptions.hidespinner ? @"Yes" : @"No");
     if(!_browserOptions.hidespinner) {
@@ -1201,6 +1267,7 @@ BOOL isExiting = FALSE;
     self.addressLabel.text = [self.currentURL absoluteString];
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
+    self.shareButton.enabled = YES;
     theWebView.scrollView.contentInset = UIEdgeInsetsZero;
     
     [self.spinner stopAnimating];
