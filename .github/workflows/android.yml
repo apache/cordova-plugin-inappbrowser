@@ -1,0 +1,148 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Android Testsuite
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+
+jobs:
+  test:
+    name: Android ${{ matrix.versions.android }} Test
+    runs-on: macos-latest
+
+    # hoist configurations to top that are expected to be updated
+    env:
+      # Storing a copy of the repo
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+      node-version: 16
+
+      # These are the default Java configurations used by most tests.
+      # To customize these options, add "java-distro" or "java-version" to the strategy matrix with its overriding value.
+      default_java-distro: adopt
+      default_java-version: 8
+
+      # These are the default Android System Image configurations used by most tests.
+      # To customize these options, add "system-image-arch" or "system-image-target" to the strategy matrix with its overriding value.
+      default_system-image-arch: x86_64
+      default_system-image-target: google_apis # Most system images have a google_api option. Set this as default.
+
+    # configurations for each testing strategy (test matrix)
+    strategy:
+      matrix:
+        versions:
+          - android: 5.1
+            android-api: 22
+
+          - android: 6
+            android-api: 23
+
+          - android: 7
+            android-api: 24
+
+          - android: 7.1
+            android-api: 25
+
+          - android: 8
+            android-api: 26
+
+          - android: 8.1
+            android-api: 27
+            system-image-target: default
+
+          - android: 9
+            android-api: 28
+
+          - android: 10
+            android-api: 29
+
+          - android: 11
+            android-api: 30
+            java-version: 11
+
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - uses: actions/setup-java@v2
+        env:
+          java-version: ${{ matrix.versions.java-version == '' && env.default_java-version || matrix.versions.java-version }}
+          java-distro: ${{ matrix.versions.java-distro == '' && env.default_java-distro || matrix.versions.java-distro }}
+        with:
+          distribution: ${{ env.java-distro }}
+          java-version: ${{ env.java-version }}
+
+      - name: Run Environment Information
+        run: |
+          node --version
+          npm --version
+          java -version
+
+      - name: Run npm install
+        run: |
+          export PATH="/usr/local/lib/android/sdk/platform-tools":$PATH
+          export JAVA_HOME=$JAVA_HOME_11_X64
+          npm i -g cordova@latest
+          npm ci
+
+      - name: Run paramedic install
+        if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
+        run: npm i -g github:apache/cordova-paramedic
+
+      - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e
+        env:
+          system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
+          system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}
+        with:
+          api-level: ${{ matrix.versions.android-api }}
+          target: ${{ env.system-image-target }}
+          arch: ${{ env.system-image-arch }}
+          force-avd-creation: false
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: echo "Pregenerate the AVD before running Paramedic"
+
+      - name: Run paramedic tests
+        uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e
+        env:
+          system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
+          system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}
+          test_config: 'android-${{ matrix.versions.android }}.config.json'
+          # Generally, this should automatically work for cordova-paramedic & plugins. If the path is unique, this can be manually changed.
+          test_plugin_path: ${{ endswith(env.repo, '/cordova-paramedic') && './spec/testable-plugin/' || './' }}
+          paramedic: ${{ endswith(env.repo, '/cordova-paramedic') && 'node main.js' || 'cordova-paramedic' }}
+        with:
+          api-level: ${{ matrix.versions.android-api }}
+          target: ${{ env.system-image-target }}
+          arch: ${{ env.system-image-arch }}
+          force-avd-creation: false
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: ${{ env.paramedic }} --config ./pr/local/${{ env.test_config }} --plugin ${{ env.test_plugin_path }}
