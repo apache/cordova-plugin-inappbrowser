@@ -32,7 +32,7 @@ on:
 jobs:
   test:
     name: iOS ${{ matrix.versions.ios-version }} Test
-    runs-on: macos-latest
+    runs-on: ${{ matrix.versions.os-version }}
 
     # hoist configurations to top that are expected to be updated
     env:
@@ -49,9 +49,21 @@ jobs:
     strategy:
       matrix:
         versions:
-          - ios-version: 12.x
-          - ios-version: 13.x
-          - ios-version: 14.x
+          - os-version: macos-10.15
+            ios-version: 12.x
+            xcode-version: 11.x
+
+          - os-version: macos-10.15
+            ios-version: 13.x
+            xcode-version: 11.x
+
+          - os-version: macos-10.15
+            ios-version: 14.x
+            xcode-version: 12.x
+
+          - os-version: macos-11
+            ios-version: 15.x
+            xcode-version: 13.x
 
     steps:
       - uses: actions/checkout@v2
@@ -74,6 +86,12 @@ jobs:
         run: |
           npm i -g cordova@latest ios-deploy@latest
           npm ci
+
+      - name: Run setup iOS 12.x support
+        if: ${{ matrix.versions.ios-version == '12.x' }}
+        run: |
+          sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+          sudo ln -s /Applications/Xcode_10.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 12.4.simruntime
 
       - name: Run paramedic install
         if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
