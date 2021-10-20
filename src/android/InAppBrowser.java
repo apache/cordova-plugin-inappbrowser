@@ -228,6 +228,16 @@ public class InAppBrowser extends CordovaPlugin {
                                 LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                             }
                         }
+                        else if (url.startsWith(WebView.SCHEME_MAILTO)) {
+                            try {
+                                LOG.d(LOG_TAG, "opening mailto:");
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(url));
+                                cordova.getActivity().startActivity(intent);
+                            } catch (android.content.ActivityNotFoundException e) {
+                                LOG.e(LOG_TAG, "Error opening mailto: " + url + ": " + e.toString());
+                            }
+                        }
                         // load in InAppBrowser
                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
