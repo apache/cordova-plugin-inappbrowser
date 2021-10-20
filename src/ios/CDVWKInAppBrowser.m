@@ -44,6 +44,7 @@
 
 @interface CDVWKInAppBrowser () {
     NSInteger _previousStatusBarStyle;
+    CDVInAppBrowserOptions* _browserOptions;
 }
 @end
 
@@ -62,6 +63,7 @@ static CDVWKInAppBrowser* instance = nil;
     _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
+    _browserOptions = nil;
 }
 
 - (void)onReset
@@ -126,7 +128,8 @@ static CDVWKInAppBrowser* instance = nil;
 
 - (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
 {
-    CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    _browserOptions = [CDVInAppBrowserOptions parseOptions:options];
+    CDVInAppBrowserOptions* browserOptions = _browserOptions;
     
     WKWebsiteDataStore* dataStore = [WKWebsiteDataStore defaultDataStore];
     if (browserOptions.cleardata) {
@@ -305,6 +308,10 @@ static CDVWKInAppBrowser* instance = nil;
                 CGRect frame = [[UIScreen mainScreen] bounds];
                 if(initHidden && osVersion < 11){
                    frame.origin.x = -10000;
+                }
+                if(nil != _browserOptions) {
+                    // Resize the window if it has to be reduced to less than the available screen height
+                    frame.size.height = frame.size.height - [_browserOptions.bottomreduceheightby floatValue];
                 }
                 strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
             }
