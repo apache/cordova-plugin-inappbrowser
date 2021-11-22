@@ -116,8 +116,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String LOCATION_TEXT_COLOR = "locationtextcolor";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, LOCATION_TEXT_COLOR);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -145,6 +146,7 @@ public class InAppBrowser extends CordovaPlugin {
     private String footerColor = "";
     private String beforeload = "";
     private boolean fullscreen = true;
+    private String locationTextColor = "";
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
@@ -710,6 +712,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
             }
+            String locationTextColorSet = features.get(LOCATION_TEXT_COLOR);
+            if (locationTextColorSet != null) {
+                locationTextColor = locationTextColorSet;
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -870,6 +876,7 @@ public class InAppBrowser extends CordovaPlugin {
                 textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
                 edittext.setLayoutParams(textLayoutParams);
                 edittext.setId(Integer.valueOf(4));
+                if (locationTextColor != "") edittext.setTextColor(android.graphics.Color.parseColor(locationTextColor));
                 edittext.setSingleLine(true);
                 edittext.setText(url);
                 edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
