@@ -359,10 +359,25 @@ static CDVWKInAppBrowser* instance = nil;
 
 - (void)openInSystem:(NSURL*)url
 {
+    CDVPluginResult* loadStartResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                  messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
+    [loadStartResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:loadStartResult callbackId:self.callbackId];
+
     if ([[UIApplication sharedApplication] openURL:url] == NO) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+                                                      messageAsDictionary:@{@"type":@"loaderror", @"url":[url absoluteString], @"code": @"-1", @"message": @"Tried to open the url, but it failed"}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
         [[UIApplication sharedApplication] openURL:url];
     }
+
+    CDVPluginResult* loadStopResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                  messageAsDictionary:@{@"type":@"loadstop", @"url":[url absoluteString]}];
+    [loadStopResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:loadStopResult callbackId:self.callbackId];
 }
 
 - (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command
