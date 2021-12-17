@@ -21,11 +21,10 @@ description: Open an in-app browser window.
 #         under the License.
 -->
 
-|AppVeyor|Travis CI|
-|:-:|:-:|
-|[![Build status](https://ci.appveyor.com/api/projects/status/github/apache/cordova-plugin-inappbrowser?branch=master)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-plugin-inappbrowser)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
 
 # cordova-plugin-inappbrowser
+
+[![Android Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml) [![Chrome Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml) [![iOS Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml) [![Lint Test](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml)
 
 You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
 
@@ -67,6 +66,14 @@ simply hook `window.open` during initialization.  For example:
     function onDeviceReady() {
         window.open = cordova.InAppBrowser.open;
     }
+
+### Preferences
+
+#### <b>config.xml</b>
+- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent', 'darkcontent' or 'default'. Defaults to 'default') set text color style for iOS. 'lightcontent' is intended for use on dark backgrounds. 'darkcontent' is only available since iOS 13 and intended for use on light backgrounds.
+```
+<preference name="InAppBrowserStatusBarStyle" value="lightcontent" />
+```
 
 ## cordova.InAppBrowser.open
 
@@ -171,6 +178,16 @@ instance, or the system browser.
 At the moment the only supported target in OSX is `_system`.
 
 `_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
+
+### iOS Quirks
+
+Since the introduction of iPadOS 13, iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to Macintosh, making it hard to detect them as mobile devices using user agent string sniffing. You can change this with the `PreferredContentMode` preference in `config.xml`.
+
+```xml
+<preference name="PreferredContentMode" value="mobile" />
+```
+
+The example above forces the user agent to contain `iPad`. The other option is to use the value `desktop` to turn the user agent to `Macintosh`.
 
 ### Browser Quirks
 

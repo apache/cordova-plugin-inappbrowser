@@ -19,8 +19,10 @@
 
 #import "CDVWKInAppBrowser.h"
 
-#if __has_include("CDVWKProcessPoolFactory.h")
-#import "CDVWKProcessPoolFactory.h"
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>) // Cordova-iOS >=6
+  #import <Cordova/CDVWebViewProcessPoolFactory.h>
+#elif __has_include("CDVWKProcessPoolFactory.h") // Cordova-iOS <6 with WKWebView plugin
+  #import "CDVWKProcessPoolFactory.h"
 #endif
 
 #import <Cordova/CDVPluginResult.h>
@@ -546,8 +548,9 @@ static CDVWKInAppBrowser* instance = nil;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
     
-    //if is an app store link, let the system handle it, otherwise it fails to load it
-    if ([[ url scheme] isEqualToString:@"itms-appss"] || [[ url scheme] isEqualToString:@"itms-apps"]) {
+    //if is an app store, tel, sms, mailto or geo link, let the system handle it, otherwise it fails to load it
+    NSArray * allowedSchemes = @[@"itms-appss", @"itms-apps", @"tel", @"sms", @"mailto", @"geo"];
+    if ([allowedSchemes containsObject:[url scheme]]) {
         [theWebView stopLoading];
         [self openInSystem:url];
         shouldStart = NO;
@@ -748,7 +751,9 @@ BOOL isExiting = FALSE;
     }
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
-#if __has_include("CDVWKProcessPoolFactory.h")
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
+    configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
+#elif __has_include("CDVWKProcessPoolFactory.h")
     configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
 #endif
     [configuration.userContentController addScriptMessageHandler:self name:IAB_BRIDGE_NAME];
@@ -766,6 +771,15 @@ BOOL isExiting = FALSE;
         configuration.mediaPlaybackRequiresUserAction = _browserOptions.mediaplaybackrequiresuseraction;
     }
     
+    if (@available(iOS 13.0, *)) {
+        NSString *contentMode = [self settingForKey:@"PreferredContentMode"];
+        if ([contentMode isEqual: @"mobile"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
+        } else if ([contentMode  isEqual: @"desktop"]) {
+            configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeDesktop;
+        }
+        
+    }
     
 
     self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
@@ -1064,7 +1078,18 @@ BOOL isExiting = FALSE;
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
-    return UIStatusBarStyleDefault;
+    NSString* statusBarStylePreference = [self settingForKey:@"InAppBrowserStatusBarStyle"];
+    if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"lightcontent"]) {
+        return UIStatusBarStyleLightContent;
+    } else if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"darkcontent"]) {
+        if (@available(iOS 13.0, *)) {
+            return UIStatusBarStyleDarkContent;
+        } else {
+            return UIStatusBarStyleDefault;
+        }
+    } else {
+        return UIStatusBarStyleDefault;
+    }
 }
 
 - (BOOL)prefersStatusBarHidden {
