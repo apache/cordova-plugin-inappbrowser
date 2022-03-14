@@ -1,0 +1,106 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: iOS Testsuite
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+
+jobs:
+  test:
+    name: iOS ${{ matrix.versions.ios-version }} Test
+    runs-on: ${{ matrix.versions.os-version }}
+
+    # hoist configurations to top that are expected to be updated
+    env:
+      # Storing a copy of the repo
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+      node-version: 16
+
+      # > Starting April 26, 2021, all iOS and iPadOS apps submitted to the App Store must be built with Xcode 12 and the iOS 14 SDK.
+      # Because of Apple's requirement, listed above, We will only be using the latest Xcode release for testing.
+      # To customize these options, add "xcode-version" to the strategy matrix with its overriding value.
+      default_xcode-version: latest-stable
+
+    strategy:
+      matrix:
+        versions:
+          - os-version: macos-10.15
+            ios-version: 12.x
+            xcode-version: 11.x
+
+          - os-version: macos-10.15
+            ios-version: 13.x
+            xcode-version: 11.x
+
+          - os-version: macos-10.15
+            ios-version: 14.x
+            xcode-version: 12.x
+
+          - os-version: macos-11
+            ios-version: 15.x
+            xcode-version: 13.x
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+      - uses: maxim-lobanov/setup-xcode@881be567d30efed8fb3f12b5099d68c3fb72aa3d
+        env:
+          xcode-version: ${{ matrix.versions.xcode-version == '' && env.default_xcode-version || matrix.versions.xcode-version }}
+        with:
+          xcode-version: ${{ env.xcode-version }}
+
+      - name: Run Environment Information
+        run: |
+          node --version
+          npm --version
+          xcodebuild -version
+
+      - name: Run npm install
+        run: |
+          npm i -g cordova@latest ios-deploy@latest
+          npm ci
+
+      - name: Run setup iOS 12.x support
+        if: ${{ matrix.versions.ios-version == '12.x' }}
+        run: |
+          sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+          sudo ln -s /Applications/Xcode_10.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 12.4.simruntime
+
+      - name: Run paramedic install
+        if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
+        run: npm i -g github:apache/cordova-paramedic
+
+      - name: Run paramedic tests
+        env:
+          test_config: 'ios-${{ matrix.versions.ios-version }}.config.json'
+          # Generally, this should automatically work for cordova-paramedic & plugins. If the path is unique, this can be manually changed.
+          test_plugin_path: ${{ endswith(env.repo, '/cordova-paramedic') && './spec/testable-plugin/' || './' }}
+          paramedic: ${{ endswith(env.repo, '/cordova-paramedic') && 'node main.js' || 'cordova-paramedic' }}
+        run: ${{ env.paramedic }} --config ./pr/local/${{ env.test_config }} --plugin ${{ env.test_plugin_path }}

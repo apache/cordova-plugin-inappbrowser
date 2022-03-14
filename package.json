@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser",
-  "version": "5.0.0-dev",
+  "version": "5.0.1-dev",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
@@ -42,6 +42,11 @@
         "cordova-ios": ">=4.0.0"
       },
       "5.0.0": {
+        "cordova-android": ">=9.0.0",
+        "cordova-ios": ">=6.0.0",
+        "cordova": ">=9.0.0"
+      },
+      "6.0.0": {
         "cordova": ">100"
       }
     }

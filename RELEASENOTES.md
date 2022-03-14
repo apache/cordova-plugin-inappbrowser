@@ -20,6 +20,15 @@
 -->
 # Release Notes
 
+### 5.0.0 (Feb 10, 2021)
+* [GH-828](https://github.com/apache/cordova-plugin-inappbrowser/pull/828) feat(ios): add `InAppBrowser`StatusBarStyle 'darkcontent' configuration option
+* [GH-823](https://github.com/apache/cordova-plugin-inappbrowser/pull/823) chore: bump engines requirements
+* [GH-824](https://github.com/apache/cordova-plugin-inappbrowser/pull/824) breaking: cleanup code for old **Android** versions
+* [GH-825](https://github.com/apache/cordova-plugin-inappbrowser/pull/825) (ios): rename CDVWKProcessPoolFactory
+* [GH-826](https://github.com/apache/cordova-plugin-inappbrowser/pull/826) ci: add node-14.x to workflow
+* [GH-821](https://github.com/apache/cordova-plugin-inappbrowser/pull/821) breaking(android): replace magic numbers with **Android**.os.Build constants
+* [GH-717](https://github.com/apache/cordova-plugin-inappbrowser/pull/717) ci(ios): remove wkwebview plugin
+
 ### 4.1.0 (Nov 17, 2020)
 * [GH-792](https://github.com/apache/cordova-plugin-inappbrowser/pull/792) fix(android): Add mitigation strategy for CVE-2020-6506
 * [GH-817](https://github.com/apache/cordova-plugin-inappbrowser/pull/817) Updated typings
