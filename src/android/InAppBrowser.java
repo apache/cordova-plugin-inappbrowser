@@ -1080,13 +1080,25 @@ public class InAppBrowser extends CordovaPlugin {
 
                 WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
                 DisplayMetrics displayMetrics = new DisplayMetrics();
-                dialog.getWindow().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                dialog.getWindow().getWindowManager().getDefaultDisplay().getRealMetrics(displayMetrics);
+
+                int resourceId = cordova.getActivity().getResources().getIdentifier("status_bar_height", "dimen", "android");
+                int statusBarHeight = 0;
+                if (resourceId > 0) {
+                  statusBarHeight = Math.round(cordova.getActivity().getResources().getDimensionPixelSize(resourceId));
+                }
+
+                resourceId = cordova.getActivity().getResources().getIdentifier("action_bar_default_height", "dimen", "android");
+                int actionBarHeight = 0;
+                if (resourceId > 0) {
+                  actionBarHeight = Math.round(cordova.getActivity().getResources().getDimensionPixelSize(resourceId));
+                }
 
                 lp.copyFrom(dialog.getWindow().getAttributes());
                 lp.gravity = Gravity.TOP;
                 lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                int IntValue = (int) (100 * (displayMetrics.ydpi / displayMetrics.densityDpi));
-                lp.height = displayMetrics.heightPixels - this.dpToPixels(IntValue);
+                int IntValue = (int) (80 * (displayMetrics.ydpi / displayMetrics.densityDpi));
+                lp.height = displayMetrics.heightPixels - statusBarHeight - actionBarHeight - this.dpToPixels(IntValue);
 
                 if (dialog != null) {
                     dialog.setContentView(main);
