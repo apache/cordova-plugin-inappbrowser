@@ -540,7 +540,7 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     //if is an app store, tel, sms, mailto or geo link, let the system handle it, otherwise it fails to load it
-    NSArray * allowedSchemes = @[@"itms-appss", @"itms-apps", @"tel", @"sms", @"mailto", @"geo"];
+    NSArray * allowedSchemes = @[@"itms-appss", @"itms-apps", @"tel", @"sms", @"mailto", @"geo", @"intent", @"twint-issuer12", @"twint-issuer16", @"twint-issuer10", @"twint-issuer17", @"twint-issuer18", @"twint-issuer5", @"twint-issuer13", @"twint-issuer4", @"twint-issuer15", @"twint-issuer21", @"twint-issuer11", @"twint-issuer8", @"twint-issuer7", @"twint-issuer6", @"twint-issuer14", @"twint-issuer19", @"twint-issuer1", @"twint-issuer2", @"twint-issuer20", @"twint-issuer3", @"twint-issuer9"];
     if ([allowedSchemes containsObject:[url scheme]]) {
         [theWebView stopLoading];
         [self openInSystem:url];
@@ -1125,8 +1125,40 @@ BOOL isExiting = FALSE;
     [self.webView goForward];
 }
 
+- (BOOL)hasTopNotch {
+    if (@available(iOS 11.0, *)) {
+        return [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
+    }
+
+    return  NO;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
+    if (IsAtLeastiOSVersion(@"7.0") && !viewRenderedAtLeastOnce) {
+        viewRenderedAtLeastOnce = TRUE;
+        CGRect viewBounds = [self.webView bounds];
+        
+        if ([self hasTopNotch]) {
+            BOOL toolbarVisible = !self.toolbar.hidden;
+            BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+
+            float topSafeArea = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top;
+            float bottomSafeArea = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.bottom;
+
+            if (toolbarVisible && toolbarIsAtBottom) {
+                bottomSafeArea = 0.0;
+            }
+
+            viewBounds.origin.y = topSafeArea;
+            viewBounds.size.height = viewBounds.size.height - (topSafeArea + bottomSafeArea);
+        } else {
+            viewBounds.origin.y = STATUSBAR_HEIGHT;
+            viewBounds.size.height = viewBounds.size.height - STATUSBAR_HEIGHT;
+        }
+        self.webView.frame = viewBounds;
+        [[UIApplication sharedApplication] setStatusBarStyle:[self preferredStatusBarStyle]];
+    }
     [self rePositionViews];
     
     [super viewWillAppear:animated];
