@@ -43,8 +43,8 @@ jobs:
 
       # These are the default Java configurations used by most tests.
       # To customize these options, add "java-distro" or "java-version" to the strategy matrix with its overriding value.
-      default_java-distro: adopt
-      default_java-version: 8
+      default_java-distro: temurin
+      default_java-version: 11
 
       # These are the default Android System Image configurations used by most tests.
       # To customize these options, add "system-image-arch" or "system-image-target" to the strategy matrix with its overriding value.
@@ -82,7 +82,6 @@ jobs:
 
           - android: 11
             android-api: 30
-            java-version: 11
 
     timeout-minutes: 60
 
@@ -91,7 +90,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.node-version }}
-      - uses: actions/setup-java@v2
+      - uses: actions/setup-java@v3
         env:
           java-version: ${{ matrix.versions.java-version == '' && env.default_java-version || matrix.versions.java-version }}
           java-distro: ${{ matrix.versions.java-distro == '' && env.default_java-distro || matrix.versions.java-distro }}
