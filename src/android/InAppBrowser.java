@@ -124,9 +124,9 @@ public class InAppBrowser extends CordovaPlugin {
         CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
     // Resources
-	private static final String TOOLBAR_CLOSE_BUTTON = "ic_action_remove";
-	private static final String TOOLBAR_BACK_BUTTON = "ic_action_previous_item";
-	private static final String TOOLBAR_FORWARD_BUTTON = "ic_action_next_item";
+    private static final String TOOLBAR_CLOSE_BUTTON = "ic_action_remove";
+    private static final String TOOLBAR_BACK_BUTTON = "ic_action_previous_item";
+    private static final String TOOLBAR_FORWARD_BUTTON = "ic_action_next_item";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
