@@ -100,6 +100,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String MESSAGE_EVENT = "message";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+    private static final String ENABLE_THIRD_PARTY_COOKIES = "enablethirdpartycookies";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
@@ -136,6 +137,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
+    private boolean enableThirdPartyCookies = true;
     private boolean hardwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
@@ -679,6 +681,10 @@ public class InAppBrowser extends CordovaPlugin {
                     clearSessionCache = cache.equals("yes") ? true : false;
                 }
             }
+            String thirdPartyCookies = features.get(ENABLE_THIRD_PARTY_COOKIES);
+            if (thirdPartyCookies != null) {
+                enableThirdPartyCookies = thirdPartyCookies.equals("yes") ? true : false;
+            }
             String shouldPause = features.get(SHOULD_PAUSE);
             if (shouldPause != null) {
                 shouldPauseInAppBrowser = shouldPause.equals("yes") ? true : false;
@@ -807,7 +813,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
-                //Please, no more black!
+                //"Please, no more black!" <- who said this?!? Black is awesome, especially on OLED! ^^
                 toolbar.setBackgroundColor(toolbarColor);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
@@ -998,7 +1004,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Enable Thirdparty Cookies
-                CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
+                CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, enableThirdPartyCookies);
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
