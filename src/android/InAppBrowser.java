@@ -122,6 +122,11 @@ public class InAppBrowser extends CordovaPlugin {
     private static final List customizableOptions = Arrays.asList(
         CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
+    // Resources
+	private static final String TOOLBAR_CLOSE_BUTTON = "ic_action_remove";
+	private static final String TOOLBAR_BACK_BUTTON = "ic_action_previous_item";
+	private static final String TOOLBAR_FORWARD_BUTTON = "ic_action_next_item";
+
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
@@ -619,6 +624,15 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowser getInAppBrowser() {
         return this;
     }
+	
+    /**
+     * Get a drawable by name from the main package.
+     */
+    private Drawable getDrawableFromResources(String name){
+        Resources activityRes = cordova.getActivity().getResources();
+        int resId = activityRes.getIdentifier(name, "drawable", cordova.getActivity().getPackageName());
+        return activityRes.getDrawable(resId, cordova.getActivity().getTheme());
+    }
 
     /**
      * Display a new browser with the specified URL.
@@ -743,8 +757,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 else {
                     ImageButton close = new ImageButton(cordova.getActivity());
-                    int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
-                    Drawable closeIcon = activityRes.getDrawable(closeResId);
+                    Drawable closeIcon = getDrawableFromResources(TOOLBAR_CLOSE_BUTTON);
                     if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
                     close.setImageDrawable(closeIcon);
                     close.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -823,8 +836,7 @@ public class InAppBrowser extends CordovaPlugin {
                 back.setContentDescription("Back Button");
                 back.setId(Integer.valueOf(2));
                 Resources activityRes = cordova.getActivity().getResources();
-                int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
-                Drawable backIcon = activityRes.getDrawable(backResId);
+                Drawable backIcon = getDrawableFromResources(TOOLBAR_BACK_BUTTON);
                 if (navigationButtonColor != "") back.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 back.setBackground(null);
                 back.setImageDrawable(backIcon);
@@ -845,8 +857,7 @@ public class InAppBrowser extends CordovaPlugin {
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
                 forward.setId(Integer.valueOf(3));
-                int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
-                Drawable fwdIcon = activityRes.getDrawable(fwdResId);
+                Drawable fwdIcon = getDrawableFromResources(TOOLBAR_FORWARD_BUTTON);
                 if (navigationButtonColor != "") forward.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 forward.setBackground(null);
                 forward.setImageDrawable(fwdIcon);
