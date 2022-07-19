@@ -1033,7 +1033,14 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setDisplayZoomControls(false);
-                settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
+                settings.setPluginState(android.webkit.WebSettings.PluginState.ON);     //TODO: deprecated in API level 18
+                settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
+                settings.setLoadWithOverviewMode(true);
+                settings.setUseWideViewPort(useWideViewPort);
+                // Multiple Windows set to true to mitigate Chromium security bug.
+                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
+                settings.setSupportMultipleWindows(true);
+                //TODO: consider option for 'setMixedContentMode'
 
                 // Add postMessage interface
                 class JsObject {
@@ -1049,8 +1056,6 @@ public class InAppBrowser extends CordovaPlugin {
                         }
                     }
                 }
-				
-                settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
                 inAppWebView.addJavascriptInterface(new JsObject(), "cordova_iab");
 
                 String overrideUserAgent = preferences.getString("OverrideUserAgent", null);
@@ -1063,12 +1068,12 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setUserAgentString(settings.getUserAgentString() + " " + appendUserAgent);
                 }
 
-                //Toggle whether this is enabled or not!
+                //Storage
                 Bundle appSettings = cordova.getActivity().getIntent().getExtras();
                 boolean enableDatabase = appSettings == null || appSettings.getBoolean("InAppBrowserStorageEnabled", true);
                 if (enableDatabase) {
                     String databasePath = cordova.getActivity().getApplicationContext().getDir("inAppBrowserDB", Context.MODE_PRIVATE).getPath();
-                    settings.setDatabasePath(databasePath);
+                    settings.setDatabasePath(databasePath);     //TODO: deprecated in API level 19
                     settings.setDatabaseEnabled(true);
                 }
                 settings.setDomStorageEnabled(true);
@@ -1079,7 +1084,7 @@ public class InAppBrowser extends CordovaPlugin {
                     clearSessionCookieCache();
                 }
 
-                // Enable Thirdparty Cookies
+                // Enable third-party Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, enableThirdPartyCookies);
                 //check url
                 String loadUrl = url;
@@ -1099,11 +1104,6 @@ public class InAppBrowser extends CordovaPlugin {
                     }
                 }
                 inAppWebView.loadUrl(loadUrl);
-                inAppWebView.getSettings().setLoadWithOverviewMode(true);
-                inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
-                // Multiple Windows set to true to mitigate Chromium security bug.
-                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
-                inAppWebView.getSettings().setSupportMultipleWindows(true);
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
