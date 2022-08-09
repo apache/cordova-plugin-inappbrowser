@@ -1138,7 +1138,18 @@ BOOL isExiting = FALSE;
 // change that value.
 //
 - (float) getStatusBarOffset {
-    return (float) IsAtLeastiOSVersion(@"7.0") ? [[UIApplication sharedApplication] statusBarFrame].size.height : 0.0;
+    bool hasTopNotch = NO;
+    if (@available(iOS 11.0, *)) {
+         hasTopNotch = [[[UIApplication sharedApplication] delegate] window].safeAreaInsets.top > 20.0;
+    }
+
+    float statusBarHeight = (float) IsAtLeastiOSVersion(@"7.0") ? [[UIApplication sharedApplication] statusBarFrame].size.height : 0.0;
+
+    if (hasTopNotch){
+        statusBarHeight -= 14; // Remove 14px from the status bar height on iPhone with a notch
+     }
+
+    return statusBarHeight;
 }
 
 - (void) rePositionViews {
