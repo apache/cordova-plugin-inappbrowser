@@ -33,6 +33,7 @@ jobs:
   test:
     name: Android ${{ matrix.versions.android }} Test
     runs-on: macos-latest
+    continue-on-error: true
 
     # hoist configurations to top that are expected to be updated
     env:
@@ -55,39 +56,28 @@ jobs:
     strategy:
       matrix:
         versions:
+          # Test the lowest minimum supported APIs
           - android: 5.1
             android-api: 22
 
-          - android: 6
-            android-api: 23
-
-          - android: 7
-            android-api: 24
-
-          - android: 7.1
-            android-api: 25
-
-          - android: 8
-            android-api: 26
-
-          - android: 8.1
-            android-api: 27
-            system-image-target: default
-
-          - android: 9
-            android-api: 28
-
+          # Test the last 3-4 supported APIs
           - android: 10
             android-api: 29
 
           - android: 11
             android-api: 30
 
+          - android: 12
+            android-api: 31
+
+          - android: 12L
+            android-api: 32
+
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
       - uses: actions/setup-java@v3
@@ -112,7 +102,7 @@ jobs:
           npm ci
 
       - name: Run paramedic install
-        if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
+        if: ${{ endswith(env.repo, '/cordova-paramedic') != true }}
         run: npm i -g github:apache/cordova-paramedic
 
       - uses: reactivecircus/android-emulator-runner@5de26e4bd23bf523e8a4b7f077df8bfb8e52b50e
