@@ -27,6 +27,11 @@
 @class CDVWKInAppBrowserViewController;
 
 @interface CDVWKInAppBrowser : CDVPlugin {
+    UIWindow * tmpWindow;
+
+    @private
+    NSString* _beforeload;
+    BOOL _waitForBeforeload;
 }
 
 @property (nonatomic, retain) CDVWKInAppBrowser* instance;
@@ -40,15 +45,14 @@
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command;
 
 @end
 
-@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler>{
+@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler,UIAdaptivePresentationControllerDelegate>{
     @private
-    NSString* _userAgent;
-    NSString* _prevUserAgent;
-    NSInteger _userAgentLockToken;
     CDVInAppBrowserOptions *_browserOptions;
+    NSDictionary *_settings;
 }
 
 @property (nonatomic, strong) IBOutlet WKWebView* webView;
@@ -69,8 +73,8 @@
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString;
+- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex;
 
-- (id)initWithUserAgent:(NSString*)userAgent prevUserAgent:(NSString*)prevUserAgent browserOptions: (CDVInAppBrowserOptions*) browserOptions;
+- (id)initWithBrowserOptions: (CDVInAppBrowserOptions*) browserOptions andSettings:(NSDictionary*) settings;
 
 @end

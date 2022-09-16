@@ -20,8 +20,104 @@
 -->
 # Release Notes
 
-### 3.1.0-dev (Unreleased)
-* CB-7179 (iOS): Add support to optionally use WKWebView for iOS
+### 5.0.0 (Feb 10, 2021)
+* [GH-828](https://github.com/apache/cordova-plugin-inappbrowser/pull/828) feat(ios): add `InAppBrowser`StatusBarStyle 'darkcontent' configuration option
+* [GH-823](https://github.com/apache/cordova-plugin-inappbrowser/pull/823) chore: bump engines requirements
+* [GH-824](https://github.com/apache/cordova-plugin-inappbrowser/pull/824) breaking: cleanup code for old **Android** versions
+* [GH-825](https://github.com/apache/cordova-plugin-inappbrowser/pull/825) (ios): rename CDVWKProcessPoolFactory
+* [GH-826](https://github.com/apache/cordova-plugin-inappbrowser/pull/826) ci: add node-14.x to workflow
+* [GH-821](https://github.com/apache/cordova-plugin-inappbrowser/pull/821) breaking(android): replace magic numbers with **Android**.os.Build constants
+* [GH-717](https://github.com/apache/cordova-plugin-inappbrowser/pull/717) ci(ios): remove wkwebview plugin
+
+### 4.1.0 (Nov 17, 2020)
+* [GH-792](https://github.com/apache/cordova-plugin-inappbrowser/pull/792) fix(android): Add mitigation strategy for CVE-2020-6506
+* [GH-817](https://github.com/apache/cordova-plugin-inappbrowser/pull/817) Updated typings
+* [GH-803](https://github.com/apache/cordova-plugin-inappbrowser/pull/803) fix(android): allow compilation in old `cordova-android` versions
+* [GH-688](https://github.com/apache/cordova-plugin-inappbrowser/pull/688) (ios): allow to set "preferredContentMode"
+* [GH-768](https://github.com/apache/cordova-plugin-inappbrowser/pull/768) ci(travis): update osx xcode image
+* add documentation for `InAppBrowser`StatusBarStyle preference
+* undo whitespace changes due to editor preferrences
+* [GH-728](https://github.com/apache/cordova-plugin-inappbrowser/pull/728) **iOS**: added `InAppBrowser`StatusBarStyle preference
+* [GH-767](https://github.com/apache/cordova-plugin-inappbrowser/pull/767) ci(travis): updates **Android** API level
+* (ios): Fix incorrect view height from the second open time
+* [GH-748](https://github.com/apache/cordova-plugin-inappbrowser/pull/748) chore: adds package-lock file
+* [GH-746](https://github.com/apache/cordova-plugin-inappbrowser/pull/746) chore(npm): use short notation in `package.json`
+* [GH-747](https://github.com/apache/cordova-plugin-inappbrowser/pull/747) refactor(eslint): use cordova-eslint /w fix
+* [GH-737](https://github.com/apache/cordova-plugin-inappbrowser/pull/737) fix(ios): exit event not fired on swipe down
+
+### 4.0.0 (Jun 09, 2020)
+* [GH-715](https://github.com/apache/cordova-plugin-inappbrowser/pull/715) (ios): fix regression in 2706f34
+* [GH-685](https://github.com/apache/cordova-plugin-inappbrowser/pull/685) chore: update install engines
+* [GH-656](https://github.com/apache/cordova-plugin-inappbrowser/pull/656) (ios) Remove fake status bar with hardcoded height to fix issues in **iOS** devices with a notch
+* [GH-693](https://github.com/apache/cordova-plugin-inappbrowser/pull/693) fix(ios): Allow loading local html files
+* [GH-293](https://github.com/apache/cordova-plugin-inappbrowser/pull/293)  **Android**: SSL errors handling in **Android**
+* [GH-672](https://github.com/apache/cordova-plugin-inappbrowser/pull/672) fix(ios): prevent statusbar rotation after closing `InAppBrowser`
+* chore(asf): update git notification settings
+* [GH-669](https://github.com/apache/cordova-plugin-inappbrowser/pull/669) Allow App using `InAppBrowser` to be hosted in a cross-origin iframe
+* [GH-600](https://github.com/apache/cordova-plugin-inappbrowser/pull/600) (all platforms): remove "window.open" overwrite
+* [GH-670](https://github.com/apache/cordova-plugin-inappbrowser/pull/670) chore: bump version to 4.0.0-dev
+* Update CONTRIBUTING.md
+* [GH-662](https://github.com/apache/cordova-plugin-inappbrowser/pull/662) docs: replaces outdated transition and presentation style links
+* [GH-666](https://github.com/apache/cordova-plugin-inappbrowser/pull/666) chore: remove deprecated orientation methods
+* [GH-515](https://github.com/apache/cordova-plugin-inappbrowser/pull/515) Fix incorrect TypeScript typings
+* [GH-654](https://github.com/apache/cordova-plugin-inappbrowser/pull/654) add check for openInSystem postNotification
+* [GH-659](https://github.com/apache/cordova-plugin-inappbrowser/pull/659) ci: updates Node.js versions
+* [GH-658](https://github.com/apache/cordova-plugin-inappbrowser/pull/658) chore(npm): improve ignore list
+* [GH-442](https://github.com/apache/cordova-plugin-inappbrowser/pull/442) fix(android): Reset lefttoright if not set
+* [GH-648](https://github.com/apache/cordova-plugin-inappbrowser/pull/648) (android) Correcting the documentation regarding lefttoright opt…
+* [GH-634](https://github.com/apache/cordova-plugin-inappbrowser/pull/634) (android) Added option to turn on/off fullscreen mode in **Android**
+* [GH-616](https://github.com/apache/cordova-plugin-inappbrowser/pull/616) (android) `InAppBrowser`: java.lang.IllegalArgumentException
+* [GH-635](https://github.com/apache/cordova-plugin-inappbrowser/pull/635) breaking(ios): remove UIWebView
+
+### 3.2.0 (Jan 04, 2020)
+* [GH-503](https://github.com/apache/cordova-plugin-inappbrowser/pull/503) Defensive code to prevent NULL reference exceptions for async
+* [GH-584](https://github.com/apache/cordova-plugin-inappbrowser/pull/584) Add compile-time decision for disabling UIWebView
+* [GH-524](https://github.com/apache/cordova-plugin-inappbrowser/pull/524) Replace "beforeload" with BEFORELOAD
+* [GH-568](https://github.com/apache/cordova-plugin-inappbrowser/pull/568) Update missing closed brace to the insert.CSS
+* [GH-401](https://github.com/apache/cordova-plugin-inappbrowser/pull/401) Move createIframeBridge to injectDeferredObject
+* [GH-534](https://github.com/apache/cordova-plugin-inappbrowser/pull/534) Fix `InAppBrowser` not opening on **iOS** 13
+* ci(travis) Upgrade to node8
+
+### 3.1.0 (Jun 27, 2019)
+
+-   chore: fix repo and issue urls and license in package.json and plugin.xml ([`8edfb9e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8edfb9e))
+-   chore: unknown changes because of linebreak change in binary files ([`e44ad91`](https://github.com/apache/cordova-plugin-inappbrowser/commit/e44ad91))
+-   build: add `.npmignore` to remove unneeded files from npm package ([`0ec4a11`](https://github.com/apache/cordova-plugin-inappbrowser/commit/0ec4a11))
+-   build: add `.gitattributes` to force LF (instead of possible CRLF on Windows) ([`2751255`](https://github.com/apache/cordova-plugin-inappbrowser/commit/2751255))
+-   ci(travis): Update Travis CI configuration for new paramedic ([#478](https://github.com/apache/cordova-plugin-inappbrowser/issues/478)) ([`c2bb6c1`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c2bb6c1))
+-   docs: remove outdated translations ([`cc5ee00`](https://github.com/apache/cordova-plugin-inappbrowser/commit/cc5ee00))
+-   fix(android): Fix beforeload for Android &lt;= 7 ([#427](https://github.com/apache/cordova-plugin-inappbrowser/issues/427)) ([`94fec84`](https://github.com/apache/cordova-plugin-inappbrowser/commit/94fec84))
+-   ci(travis) Fix failing CI tests ([#460](https://github.com/apache/cordova-plugin-inappbrowser/issues/460)) ([`a162bd9`](https://github.com/apache/cordova-plugin-inappbrowser/commit/a162bd9))
+-   test: Fix test spec.5 to close inappbrowser after loadstop event ([#440](https://github.com/apache/cordova-plugin-inappbrowser/issues/440)) ([`5f1afbd`](https://github.com/apache/cordova-plugin-inappbrowser/commit/5f1afbd), [`af44235`](https://github.com/apache/cordova-plugin-inappbrowser/commit/af44235))
+-   fix(android): Prevent malformed callbackId from reaching app cordova view ([#436](https://github.com/apache/cordova-plugin-inappbrowser/issues/436)) ([`6861084`](https://github.com/apache/cordova-plugin-inappbrowser/commit/6861084), [`c95dbcb`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c95dbcb))
+-   feat: [CB-13969](https://issues.apache.org/jira/browse/CB-13969): Allow close button and navigation buttons positions to be swapped ([#262](https://github.com/apache/cordova-plugin-inappbrowser/issues/262)) ([`d01bd25`](https://github.com/apache/cordova-plugin-inappbrowser/commit/d01bd25), [`f861655`](https://github.com/apache/cordova-plugin-inappbrowser/commit/f861655), [`9c7c2f3`](https://github.com/apache/cordova-plugin-inappbrowser/commit/9c7c2f3), [`3c0a42e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/3c0a42e), [`5359f6c`](https://github.com/apache/cordova-plugin-inappbrowser/commit/5359f6c), [`df84dda`](https://github.com/apache/cordova-plugin-inappbrowser/commit/df84dda), [`2bcec40`](https://github.com/apache/cordova-plugin-inappbrowser/commit/2bcec40), [`fc0c560`](https://github.com/apache/cordova-plugin-inappbrowser/commit/fc0c560), [`5ead1e6`](https://github.com/apache/cordova-plugin-inappbrowser/commit/5ead1e6), [`c7931fa`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c7931fa), [`e2adf1b`](https://github.com/apache/cordova-plugin-inappbrowser/commit/e2adf1b), [`4adf4c7`](https://github.com/apache/cordova-plugin-inappbrowser/commit/4adf4c7), [`cbe3a42`](https://github.com/apache/cordova-plugin-inappbrowser/commit/cbe3a42), [`74ccef1`](https://github.com/apache/cordova-plugin-inappbrowser/commit/74ccef1), [`ec6af56`](https://github.com/apache/cordova-plugin-inappbrowser/commit/ec6af56), [`b06ad8e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/b06ad8e), [`313e0ae`](https://github.com/apache/cordova-plugin-inappbrowser/commit/313e0ae), [`05e37a1`](https://github.com/apache/cordova-plugin-inappbrowser/commit/05e37a1), [`0c6189e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/0c6189e), [`d940b59`](https://github.com/apache/cordova-plugin-inappbrowser/commit/d940b59), [`f3d7f72`](https://github.com/apache/cordova-plugin-inappbrowser/commit/f3d7f72))
+-   docs: Add headline to window.open documentation ([#406](https://github.com/apache/cordova-plugin-inappbrowser/issues/406)) ([`92243cd`](https://github.com/apache/cordova-plugin-inappbrowser/commit/92243cd))
+-   fix(ios): Fix iframes in iOS/WKWebView which were broken by [#418](https://github.com/apache/cordova-plugin-inappbrowser/issues/418) ([#425](https://github.com/apache/cordova-plugin-inappbrowser/issues/425)) ([`388e3f6`](https://github.com/apache/cordova-plugin-inappbrowser/commit/388e3f6))
+-   chore(github): Add or update GitHub pull request and issue template ([`ae329bc`](https://github.com/apache/cordova-plugin-inappbrowser/commit/ae329bc))
+-   fix(ios): Handle non-default target attribute values (e.g. target=on links in WKWebView implementation on iOS ([#418](https://github.com/apache/cordova-plugin-inappbrowser/issues/418)) ([`9f4b729`](https://github.com/apache/cordova-plugin-inappbrowser/commit/9f4b729))
+-   fix(types): remove unused replace parameter ([#410](https://github.com/apache/cordova-plugin-inappbrowser/issues/410)) ([`6db2f2d`](https://github.com/apache/cordova-plugin-inappbrowser/commit/6db2f2d))
+-   documentation: Example documentation - Fix callBack function name ([#383](https://github.com/apache/cordova-plugin-inappbrowser/issues/383)) ([`a890e60`](https://github.com/apache/cordova-plugin-inappbrowser/commit/a890e60), [`2500b08`](https://github.com/apache/cordova-plugin-inappbrowser/commit/2500b08))
+-   fix: Fix beforeload to work with POST requests ([#367](https://github.com/apache/cordova-plugin-inappbrowser/issues/367)) ([`632a395`](https://github.com/apache/cordova-plugin-inappbrowser/commit/632a395))
+-   feat: (iOS & Android) Add postMessage API support ([#362](https://github.com/apache/cordova-plugin-inappbrowser/issues/362)) ([`c54d100`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c54d100))
+-   fix(ios): Fixes loadAfterBeforeload on iOS. ([#350](https://github.com/apache/cordova-plugin-inappbrowser/issues/350)) ([`0fd43ae`](https://github.com/apache/cordova-plugin-inappbrowser/commit/0fd43ae))
+-   fix(ios): Fix crashes when using WKWebView implementation on iOS 9. ([#337](https://github.com/apache/cordova-plugin-inappbrowser/issues/337)) ([`3b82c16`](https://github.com/apache/cordova-plugin-inappbrowser/commit/3b82c16))
+-   fix(ios): Fix iOS CDVWKInAppBrowser evaluateJavascript method randomly gets blocked on ios 12 ([#341](https://github.com/apache/cordova-plugin-inappbrowser/issues/341)) ([`978b147`](https://github.com/apache/cordova-plugin-inappbrowser/commit/978b147))
+-   docs: remove unwanted information in README table ([#308](https://github.com/apache/cordova-plugin-inappbrowser/issues/308)) ([`3eadde6`](https://github.com/apache/cordova-plugin-inappbrowser/commit/3eadde6))
+-   fix(ios): This lets the default window layering do it's thing. ([#336](https://github.com/apache/cordova-plugin-inappbrowser/issues/336)) ([`c24bb46`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c24bb46), [`27fe8ec`](https://github.com/apache/cordova-plugin-inappbrowser/commit/27fe8ec))
+-   feat(ios): [CB-7179](https://issues.apache.org/jira/browse/CB-7179) (iOS): Add optional WKWebView support for iOS ([#271](https://github.com/apache/cordova-plugin-inappbrowser/issues/271)) ([`10a0669`](https://github.com/apache/cordova-plugin-inappbrowser/commit/10a0669), [`3927b8f`](https://github.com/apache/cordova-plugin-inappbrowser/commit/3927b8f), [`8248215`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8248215), [`61014dd`](https://github.com/apache/cordova-plugin-inappbrowser/commit/61014dd), [`c41f5b5`](https://github.com/apache/cordova-plugin-inappbrowser/commit/c41f5b5), [`19c6dfe`](https://github.com/apache/cordova-plugin-inappbrowser/commit/19c6dfe), [`7f5fa2a`](https://github.com/apache/cordova-plugin-inappbrowser/commit/7f5fa2a), [`5d2df21`](https://github.com/apache/cordova-plugin-inappbrowser/commit/5d2df21), [`86cc778`](https://github.com/apache/cordova-plugin-inappbrowser/commit/86cc778), [`cbfa195`](https://github.com/apache/cordova-plugin-inappbrowser/commit/cbfa195), [`52e3534`](https://github.com/apache/cordova-plugin-inappbrowser/commit/52e3534), [`8165232`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8165232), [`e2210bd`](https://github.com/apache/cordova-plugin-inappbrowser/commit/e2210bd), [`dc7fa34`](https://github.com/apache/cordova-plugin-inappbrowser/commit/dc7fa34), [`b48e02f`](https://github.com/apache/cordova-plugin-inappbrowser/commit/b48e02f), [`27e6c67`](https://github.com/apache/cordova-plugin-inappbrowser/commit/27e6c67))
+-   docs: remove JIRA link ([`d9cafcd`](https://github.com/apache/cordova-plugin-inappbrowser/commit/d9cafcd))
+-   chore(types): [CB-12941](https://issues.apache.org/jira/browse/CB-12941): update typings ([#267](https://github.com/apache/cordova-plugin-inappbrowser/issues/267)) ([`a0c267f`](https://github.com/apache/cordova-plugin-inappbrowser/commit/a0c267f))
+-   feat: [CB-14188](https://issues.apache.org/jira/browse/CB-14188): add beforeload event, catching navigation before it happens ([#276](https://github.com/apache/cordova-plugin-inappbrowser/issues/276)) ([`228703a`](https://github.com/apache/cordova-plugin-inappbrowser/commit/228703a), [`eafaeda`](https://github.com/apache/cordova-plugin-inappbrowser/commit/eafaeda))
+-   ci(travis): reenable testing on all platforms ([`0ed0bf5`](https://github.com/apache/cordova-plugin-inappbrowser/commit/0ed0bf5))
+-   ci(travis): also accept terms for android sdk `android-27` ([`f8ad528`](https://github.com/apache/cordova-plugin-inappbrowser/commit/f8ad528))
+-   fix(android): [CB-10795](https://issues.apache.org/jira/browse/CB-10795): Exclude current app from external intent list ([#154](https://github.com/apache/cordova-plugin-inappbrowser/issues/154)) ([`a078337`](https://github.com/apache/cordova-plugin-inappbrowser/commit/a078337))
+-   fix(ios): [CB-14234](https://issues.apache.org/jira/browse/CB-14234): Don't call handleOpenURL for system URLs ([#278](https://github.com/apache/cordova-plugin-inappbrowser/issues/278)) ([`cf58b04`](https://github.com/apache/cordova-plugin-inappbrowser/commit/cf58b04))
+-   fix(ios): [CB-12875](https://issues.apache.org/jira/browse/CB-12875): (iOS) Pushes the inappbrowser window to a higher ui level than the existing apps window. ([#284](https://github.com/apache/cordova-plugin-inappbrowser/issues/284)) ([`dc5329d`](https://github.com/apache/cordova-plugin-inappbrowser/commit/dc5329d))
+-   ci: Quick CI fixes ([#277](https://github.com/apache/cordova-plugin-inappbrowser/issues/277))  ([`de86501`](https://github.com/apache/cordova-plugin-inappbrowser/commit/de86501), [`07d9a99`](https://github.com/apache/cordova-plugin-inappbrowser/commit/07d9a99), [`81f1437`](https://github.com/apache/cordova-plugin-inappbrowser/commit/81f1437), [`a464ea6`](https://github.com/apache/cordova-plugin-inappbrowser/commit/a464ea6), [`e75fe14`](https://github.com/apache/cordova-plugin-inappbrowser/commit/e75fe14), [`eb245ec`](https://github.com/apache/cordova-plugin-inappbrowser/commit/eb245ec))
+-   fix(ios): [CB-12922](https://issues.apache.org/jira/browse/CB-12922) (ios): fix In-app browser does not cede control ([#272](https://github.com/apache/cordova-plugin-inappbrowser/issues/272)) ([`dac06aa`](https://github.com/apache/cordova-plugin-inappbrowser/commit/dac06aa), [`9cc7f69`](https://github.com/apache/cordova-plugin-inappbrowser/commit/9cc7f69))
+-   fix(android): [CB-14061](https://issues.apache.org/jira/browse/CB-14061): (android) comply with RFC 3986 for custom URL scheme handling ([#269](https://github.com/apache/cordova-plugin-inappbrowser/issues/269)) ([`f57ede9`](https://github.com/apache/cordova-plugin-inappbrowser/commit/f57ede9), [`26cf6e4`](https://github.com/apache/cordova-plugin-inappbrowser/commit/26cf6e4))
+-   fix(android): [CB-14048](https://issues.apache.org/jira/browse/CB-14048): (android) allowedSchemes check empty string fix ([#268](https://github.com/apache/cordova-plugin-inappbrowser/issues/268)) ([`57eda78`](https://github.com/apache/cordova-plugin-inappbrowser/commit/57eda78), [`33aff11`](https://github.com/apache/cordova-plugin-inappbrowser/commit/33aff11))
+
 
 ### 3.0.0 (Apr 12, 2018)
 * [CB-13659](https://issues.apache.org/jira/browse/CB-13659) **iOS** Add hidespinner option

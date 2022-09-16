@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin-inappbrowser-tests"
-    version="3.0.1-dev">
+    version="5.0.1-dev">
     <name>Cordova InAppBrowser Plugin Tests</name>
     <license>Apache 2.0</license>
 
@@ -28,13 +28,6 @@
 
     <js-module src="tests.js" name="tests">
     </js-module>
-
-    <platform name="ios">
-      <!-- The WKWebView implementation for inappbrowser requires the presence of this plugin  -->
-      <dependency id="cordova-plugin-wkwebview-engine" />
-      <dependency id="cordova-plugin-wkwebview-engine-allowfileaccess" url="https://github.com/knight9999/cordova-plugin-wkwebview-engine-allowfileaccess.git" />
-    </platform>
-
 
     <asset src="resources" target="cdvtests/iab-resources" />
 </plugin>

@@ -20,24 +20,25 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-inappbrowser"
-      version="3.1.0-dev">
+      version="5.0.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
-    <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git</repo>
-    <issue>https://issues.apache.org/jira/browse/CB/component/12320641</issue>
+    <repo>https://github.com/apache/cordova-plugin-inappbrowser</repo>
+    <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
-      <engine name="cordova" version=">=3.1.0" /><!-- Needs cordova/urlutil -->
+        <engine name="cordova" version=">=9.0.0"/>
+        <engine name="cordova-android" version=">=9.0.0" />
+        <engine name="cordova-ios" version=">=6.0.0" />
     </engines>
 
     <!-- android -->
     <platform name="android">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -49,7 +50,7 @@
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
 
-        <!--  drawable src/android/resources -->
+        <!-- drawable src/android/resources -->
         <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
         <resource-file src="src/android/res/drawable-mdpi/ic_action_next_item.png" target="res/drawable-mdpi/ic_action_next_item.png" />
         <resource-file src="src/android/res/drawable-xhdpi/ic_action_next_item.png" target="res/drawable-xhdpi/ic_action_next_item.png" />
@@ -71,36 +72,21 @@
     <platform name="ios">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
-                <param name="ios-package" value="CDVInAppBrowser" />
-                <param name="onload" value="true" />
-            </feature>
-            <feature name="UIInAppBrowser">
-                <param name="ios-package" value="CDVUIInAppBrowser" />
-                <param name="onload" value="true" />
-            </feature>
-            <feature name="WKInAppBrowser">
                 <param name="ios-package" value="CDVWKInAppBrowser" />
                 <param name="onload" value="true" />
             </feature>
         </config-file>
-
-        <header-file src="src/ios/CDVInAppBrowser.h" />
-	    <source-file src="src/ios/CDVInAppBrowser.m" />
         <header-file src="src/ios/CDVInAppBrowserOptions.h" />
         <source-file src="src/ios/CDVInAppBrowserOptions.m" />
         <header-file src="src/ios/CDVInAppBrowserNavigationController.h" />
         <source-file src="src/ios/CDVInAppBrowserNavigationController.m" />
-	    <header-file src="src/ios/CDVUIInAppBrowser.h" />
-	    <source-file src="src/ios/CDVUIInAppBrowser.m" />
 	    <header-file src="src/ios/CDVWKInAppBrowser.h" />
 	    <source-file src="src/ios/CDVWKInAppBrowser.m" />
 	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
 	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
-
 
 	    <framework src="CoreGraphics.framework" />
     </platform>
@@ -109,7 +95,6 @@
     <platform name="osx">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
@@ -121,11 +106,10 @@
         <source-file src="src/osx/CDVInAppBrowser.m" />
     </platform>
 
-    <!-- windows universal apps (Windows 8.1, Windows Phone 8.1, Windows 8.0) -->
+    <!-- windows -->
     <platform name="windows">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />
@@ -137,7 +121,6 @@
     <platform name="browser">
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
-            <clobbers target="window.open" />
         </js-module>
         <js-module src="src/browser/InAppBrowserProxy.js" name="InAppBrowserProxy">
             <runs />

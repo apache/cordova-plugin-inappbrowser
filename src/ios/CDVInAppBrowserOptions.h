@@ -20,11 +20,11 @@
 
 @interface CDVInAppBrowserOptions : NSObject {}
 
-@property (nonatomic, assign) BOOL usewkwebview;
 @property (nonatomic, assign) BOOL location;
 @property (nonatomic, assign) BOOL toolbar;
 @property (nonatomic, copy) NSString* closebuttoncaption;
 @property (nonatomic, copy) NSString* closebuttoncolor;
+@property (nonatomic, assign) BOOL lefttoright;
 @property (nonatomic, copy) NSString* toolbarposition;
 @property (nonatomic, copy) NSString* toolbarcolor;
 @property (nonatomic, assign) BOOL toolbartranslucent;
@@ -41,11 +41,9 @@
 @property (nonatomic, assign) BOOL enableviewportscale;
 @property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
 @property (nonatomic, assign) BOOL allowinlinemediaplayback;
-@property (nonatomic, assign) BOOL keyboarddisplayrequiresuseraction;
-@property (nonatomic, assign) BOOL suppressesincrementalrendering;
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
-@property (nonatomic, assign) BOOL beforeload;
+@property (nonatomic, copy) NSString* beforeload;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 

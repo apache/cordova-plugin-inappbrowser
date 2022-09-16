@@ -1,5 +1,3 @@
-<!--
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,22 +14,43 @@
 #  KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-#
--->
 
-# Contributing to Apache Cordova
+name: Lint Test
 
-Anyone can contribute to Cordova. And we need your contributions.
+on:
+  push:
+    paths:
+      - '**.js'
+      - '.eslint*'
+      - '.github/workflow/lint.yml'
+  pull_request:
+    paths:
+      - '**.js'
+      - '.eslint*'
+      - '.github/workflow/lint.yml'
 
-There are multiple ways to contribute: report bugs, improve the docs, and
-contribute code.
-  
-For instructions on this, start with the
-[contribution overview](http://cordova.apache.org/contribute/).
+jobs:
+  test:
+    name: Lint Test
+    runs-on: ubuntu-latest
+    env:
+      node-version: 16
 
-The details are explained there, but the important items are:
- - Check for Github issues that corresponds to your contribution and link or create them if necessary.
- - Run the tests so your patch doesn't break existing functionality.
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
 
-We look forward to your contributions!
+      - name: Run Environment Information
+        run: |
+          node --version
+          npm --version
 
+      - name: Run npm install
+        run: |
+          npm ci
+
+      - name: Run lint test
+        run: |
+          npm run lint

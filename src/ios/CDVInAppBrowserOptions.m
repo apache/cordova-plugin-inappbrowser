@@ -25,7 +25,6 @@
 {
     if (self = [super init]) {
         // default values
-        self.usewkwebview = NO;
         self.location = YES;
         self.toolbar = YES;
         self.closebuttoncaption = nil;
@@ -38,14 +37,14 @@
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
         self.allowinlinemediaplayback = NO;
-        self.keyboarddisplayrequiresuseraction = YES;
-        self.suppressesincrementalrendering = NO;
         self.hidden = NO;
         self.disallowoverscroll = NO;
         self.hidenavigationbuttons = NO;
         self.closebuttoncolor = nil;
+        self.lefttoright = false;
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
+        self.beforeload = @"";
     }
 
     return self;
