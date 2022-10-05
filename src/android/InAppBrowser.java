@@ -454,8 +454,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @return
      */
     private HashMap<String, String> parseFeature(String optString) {
-        LOG.e(LOG_TAG, "parseFeature - optSring:" + optString);
-
         if (optString.equals(NULL)) {
             return null;
         } else {
