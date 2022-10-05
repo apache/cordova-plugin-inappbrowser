@@ -86,6 +86,8 @@ import java.util.StringTokenizer;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -160,12 +162,16 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowserClient currentClient;
 
     private class BasicAuthLogin {
-        public String host;
         public String user;
         public String pass;
     };
 
-    private BasicAuthLogin[] basicAuthLogins;
+    /**
+     * Maps host -> { user, pass }
+     */
+    private HashMap<String, BasicAuthLogin> basicAuthLogins;
+    private Type basicAuthLoginMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
+    }.getType();
 
     /**
      * Executes the request and returns PluginResult.
@@ -758,8 +764,10 @@ public class InAppBrowser extends CordovaPlugin {
             String basicAuthSet = features.get(BASICAUTH);
             if (basicAuthSet != null) {
                 Gson gson = new Gson();
-                LOG.e(LOG_TAG, "BASICAUTH found - " + basicAuthSet);
-                basicAuthLogins = gson.fromJson(basicAuthSet, BasicAuthLogin[].class);
+                LOG.e(LOG_TAG, "BASICAUTH basicAuthSet:" + basicAuthSet);
+                LOG.e(LOG_TAG, "BASICAUTH basicAuthLoginMapType:" + basicAuthLoginMapType.toString());
+
+                basicAuthLogins = gson.fromJson(basicAuthSet, basicAuthLoginMapType);
             }
         }
 
@@ -1509,8 +1517,10 @@ public class InAppBrowser extends CordovaPlugin {
             LOG.e(LOG_TAG, "onReceivedHttpAuthRequest - host:" + host);
             LOG.e(LOG_TAG, "onReceivedHttpAuthRequest - basicAuthLogins:" + gson.toJson(basicAuthLogins));
             if (basicAuthLogins != null) {
-                for (BasicAuthLogin login : basicAuthLogins) {
-                    if (login.host.equals(host)) {
+                for (HashMap.Entry<String, BasicAuthLogin> entry : basicAuthLogins.entrySet()) {
+                    String loginhost = entry.getKey();
+                    BasicAuthLogin login = entry.getValue();
+                    if (loginhost.equals(host)) {
                         LOG.e(LOG_TAG, "onReceivedHttpAuthRequest -" + gson.toJson(login));
                         handler.proceed(login.user, login.pass);
                         return;
