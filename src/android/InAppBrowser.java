@@ -671,8 +671,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @param features jsonObject
      */
     public String showWebPage(final String url, HashMap<String, String> features) {
-        LOG.e(LOG_TAG, "showWebPage - features:" + new Gson().toJson(features));
-
         // Determine if we should hide the location bar.
         showLocationBar = true;
         showZoomControls = true;
@@ -763,11 +761,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String basicAuthSet = features.get(BASICAUTH);
             if (basicAuthSet != null) {
-                Gson gson = new Gson();
-                LOG.e(LOG_TAG, "BASICAUTH basicAuthSet:" + basicAuthSet);
-                LOG.e(LOG_TAG, "BASICAUTH basicAuthLoginMapType:" + basicAuthLoginMapType.toString());
-
-                basicAuthLogins = gson.fromJson(basicAuthSet, basicAuthLoginMapType);
+                basicAuthLogins = new Gson().fromJson(basicAuthSet, basicAuthLoginMapType);
             }
         }
 
@@ -1513,15 +1507,12 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
             // Check for basicAuthSettings that match the host
-            Gson gson = new Gson();
-            LOG.e(LOG_TAG, "onReceivedHttpAuthRequest - host:" + host);
-            LOG.e(LOG_TAG, "onReceivedHttpAuthRequest - basicAuthLogins:" + gson.toJson(basicAuthLogins));
             if (basicAuthLogins != null) {
                 for (HashMap.Entry<String, BasicAuthLogin> entry : basicAuthLogins.entrySet()) {
                     String loginhost = entry.getKey();
                     BasicAuthLogin login = entry.getValue();
                     if (loginhost.equals(host)) {
-                        LOG.e(LOG_TAG, "onReceivedHttpAuthRequest -" + gson.toJson(login));
+                        LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
                         handler.proceed(login.user, login.pass);
                         return;
                     }
