@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-inappbrowser-tests",
+  "name": "@bennord/cordova-plugin-inappbrowser-tests",
   "version": "5.0.1-dev",
   "description": "",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser-tests",
+    "id": "@bennord/cordova-plugin-inappbrowser-tests",
     "platforms": []
   },
   "keywords": [

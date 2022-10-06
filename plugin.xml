@@ -19,15 +19,15 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="cordova-plugin-inappbrowser"
+           id="@bennord/cordova-plugin-inappbrowser"
       version="5.0.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,in,app,browser,inappbrowser</keywords>
-    <repo>https://github.com/apache/cordova-plugin-inappbrowser</repo>
-    <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
+    <repo>https://github.com/bennord/cordova-plugin-inappbrowser</repo>
+    <issue>https://github.com/bennord/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
         <engine name="cordova" version=">=9.0.0"/>
