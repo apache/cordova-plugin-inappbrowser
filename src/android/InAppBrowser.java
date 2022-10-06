@@ -75,6 +75,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -82,6 +83,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.Gson;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -116,11 +123,14 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String BASICAUTH = "basicauth";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR,
-            CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH);
+
+    private static final List urlEncodedOptions = Arrays.asList(BASICAUTH);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -150,6 +160,18 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+
+    private class BasicAuthLogin {
+        public String user;
+        public String pass;
+    };
+
+    /**
+     * Maps host -> { user, pass }
+     */
+    private HashMap<String, BasicAuthLogin> basicAuthLogins;
+    private Type basicAuthLoginMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
+    }.getType();
 
     /**
      * Executes the request and returns PluginResult.
@@ -443,6 +465,14 @@ public class InAppBrowser extends CordovaPlugin {
                 if (option.hasMoreElements()) {
                     String key = option.nextToken();
                     String value = option.nextToken();
+                    if (urlEncodedOptions.contains(key)) {
+                        try {
+                            value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+                        } catch (UnsupportedEncodingException e) {
+                            // not going to happen - value came from JDK's own StandardCharsets
+                            LOG.e(LOG_TAG, e.getMessage());
+                        }
+                    }
                     if (!customizableOptions.contains(key)) {
                         value = value.equals("yes") || value.equals("no") ? value : "yes";
                     }
@@ -726,6 +756,10 @@ public class InAppBrowser extends CordovaPlugin {
             String fullscreenSet = features.get(FULLSCREEN);
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
+            }
+            String basicAuthSet = features.get(BASICAUTH);
+            if (basicAuthSet != null) {
+                basicAuthLogins = new Gson().fromJson(basicAuthSet, basicAuthLoginMapType);
             }
         }
 
@@ -1470,6 +1504,18 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+            // Check for basicAuthSettings that match the host
+            if (basicAuthLogins != null) {
+                for (HashMap.Entry<String, BasicAuthLogin> entry : basicAuthLogins.entrySet()) {
+                    String loginhost = entry.getKey();
+                    BasicAuthLogin login = entry.getValue();
+                    if (loginhost.equals(host)) {
+                        LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
+                        handler.proceed(login.user, login.pass);
+                        return;
+                    }
+                }
+            }
 
             // Check if there is some plugin which can resolve this auth challenge
             PluginManager pluginManager = null;

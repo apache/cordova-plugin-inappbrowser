@@ -1,10 +1,10 @@
 {
-  "name": "cordova-plugin-inappbrowser",
+  "name": "@bennord/cordova-plugin-inappbrowser",
   "version": "5.0.1-dev",
-  "description": "Cordova InAppBrowser Plugin",
+  "description": "Cordova InAppBrowser Plugin (bennord fork)",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "cordova-plugin-inappbrowser",
+    "id": "@bennord/cordova-plugin-inappbrowser",
     "platforms": [
       "android",
       "browser",
@@ -13,8 +13,8 @@
       "windows"
     ]
   },
-  "repository": "github:apache/cordova-plugin-inappbrowser",
-  "bugs": "https://github.com/apache/cordova-plugin-inappbrowser/issues",
+  "repository": "github:bennord/cordova-plugin-inappbrowser",
+  "bugs": "https://github.com/bennord/cordova-plugin-inappbrowser/issues",
   "keywords": [
     "cordova",
     "in",
