@@ -1175,6 +1175,18 @@ BOOL isExiting = FALSE;
 
 #pragma mark WKNavigationDelegate
 
+- (void)webView:(WKWebView *)theWebView didReceiveAuthenticationChallenge:(nonnull NSURLAuthenticationChallenge *)challenge completionHandler:(nonnull void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+    NSString *domain = theWebView.URL.absoluteURL.host;
+    NSDictionary *credentials = _browserOptions.basicauth[domain];
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodHTTPBasic] == YES && credentials) {
+        NSLog(@"didReceiveAuthenticationChallenge");
+        NSURLCredential *credential = [NSURLCredential credentialWithUser:credentials[@"user"] password:credentials[@"pass"] persistence:NSURLCredentialPersistenceForSession];
+        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+    } else {
+        completionHandler(NSURLSessionAuthChallengeRejectProtectionSpace, nil);
+    }
+}
+
 - (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation{
     
     // loading url, start spinner, update back/forward
