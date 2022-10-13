@@ -34,6 +34,7 @@
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 @property (nonatomic, assign) BOOL hidespinner;
+@property (nonatomic, copy) NSDictionary* basicauth;
 
 @property (nonatomic, copy) NSString* presentationstyle;
 @property (nonatomic, copy) NSString* transitionstyle;

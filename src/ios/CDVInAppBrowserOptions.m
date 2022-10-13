@@ -45,6 +45,7 @@
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
         self.beforeload = @"";
+        self.basicauth = @{};
     }
 
     return self;
@@ -73,7 +74,19 @@
 
             // set the property according to the key name
             if ([obj respondsToSelector:NSSelectorFromString(key)]) {
-                if (isNumber) {
+                if ([key isEqualToString:@"basicauth"]) {
+                    if ([value isEqualToString:@""]) {
+                        continue;
+                    }
+                    NSString *escapedString = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
+                    escapedString = [escapedString stringByRemovingPercentEncoding];
+                    NSData *jsonData = [escapedString dataUsingEncoding:NSUTF8StringEncoding];
+                    NSError *error;
+                    NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+                    if (error == nil) {
+                        [obj setValue:jsonDictionary forKey:key];
+                    }
+                } else if (isNumber) {
                     [obj setValue:[numberFormatter numberFromString:value_lc] forKey:key];
                 } else if (isBoolean) {
                     [obj setValue:[NSNumber numberWithBool:[value_lc isEqualToString:@"yes"]] forKey:key];
