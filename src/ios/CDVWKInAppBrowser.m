@@ -1180,7 +1180,7 @@ BOOL isExiting = FALSE;
     NSDictionary *login = _browserOptions.basicauth[host];
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodHTTPBasic] == YES && login) {
         NSLog(@"didReceiveAuthenticationChallenge");
-        NSURLCredential *credential = [NSURLCredential credentialWithUser:credentials[@"user"] password:credentials[@"pass"] persistence:NSURLCredentialPersistenceForSession];
+        NSURLCredential *credential = [NSURLCredential credentialWithUser:login[@"user"] password:login[@"pass"] persistence:NSURLCredentialPersistenceForSession];
         completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
     } else {
         completionHandler(NSURLSessionAuthChallengeRejectProtectionSpace, nil);
