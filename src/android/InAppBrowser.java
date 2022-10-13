@@ -83,6 +83,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -124,6 +125,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
     private static final String BASICAUTH = "basicauth";
+    private static final String HEADERS = "headers";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
@@ -172,6 +174,24 @@ public class InAppBrowser extends CordovaPlugin {
     private HashMap<String, BasicAuthLogin> basicAuthLogins;
     private Type basicAuthLoginMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
     }.getType();
+
+    /**
+     * Maps host -> ( Map header -> value )
+     */
+    private HashMap<String, Map<String, String>> additionalHeaders;
+    private Type additionalHeaderMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
+    }.getType();
+
+    /**
+     * Loads the url in the WebView with addional headers per host.
+     * 
+     * @param url
+     */
+    private void loadUrlWithAdditionalHeaders(WebView view, String url) {
+        final String host = new URL(url).getHost();
+        final Map<String, String> headers = additionalHeaders != null ? additionalHeaders[host] : null;
+        view.loadUrl(url, additionalHeaders);
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -242,7 +262,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in webview
                         if (Boolean.TRUE.equals(shouldAllowNavigation)) {
                             LOG.d(LOG_TAG, "loading in webview");
-                            webView.loadUrl(url);
+                            loadUrlWithAdditionalHeaders(webView, url);
                         }
                         // Load the dialer
                         else if (url.startsWith(WebView.SCHEME_TEL)) {
@@ -294,7 +314,7 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient) inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
-                    inAppWebView.loadUrl(url);
+                    loadUrlWithAdditionalHeaders(inAppWebView, url);
                 }
             });
         } else if (action.equals("injectScriptCode")) {
@@ -581,7 +601,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // NB: From SDK 19: "If you call methods on WebView from any thread
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
-                childView.loadUrl("about:blank");
+                loadUrlWithAdditionalHeaders(childView, "about:blank");
 
                 try {
                     JSONObject obj = new JSONObject();
@@ -642,9 +662,9 @@ public class InAppBrowser extends CordovaPlugin {
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
 
         if (!url.startsWith("http") && !url.startsWith("file:")) {
-            this.inAppWebView.loadUrl("http://" + url);
+            loadUrlWithAdditionalHeaders(inAppWebView, "http://" + url);
         } else {
-            this.inAppWebView.loadUrl(url);
+            loadUrlWithAdditionalHeaders(inAppWebView, url);
         }
         this.inAppWebView.requestFocus();
     }
@@ -760,6 +780,10 @@ public class InAppBrowser extends CordovaPlugin {
             String basicAuthSet = features.get(BASICAUTH);
             if (basicAuthSet != null) {
                 basicAuthLogins = new Gson().fromJson(basicAuthSet, basicAuthLoginMapType);
+            }
+            String headersSet = features.get(HEADERS);
+            if (headersSet != null) {
+                additionalHeaders = new Gson().fromJson(headersSet, additionalHeaderMapType);
             }
         }
 
@@ -1064,7 +1088,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, true);
 
-                inAppWebView.loadUrl(url);
+                loadUrlWithAdditionalHeaders(inAppWebView, url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
@@ -1505,15 +1529,12 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
             // Check for basicAuthSettings that match the host
-            if (basicAuthLogins != null) {
-                for (HashMap.Entry<String, BasicAuthLogin> entry : basicAuthLogins.entrySet()) {
-                    String loginhost = entry.getKey();
-                    BasicAuthLogin login = entry.getValue();
-                    if (loginhost.equals(host)) {
-                        LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
-                        handler.proceed(login.user, login.pass);
-                        return;
-                    }
+            if (basicAuthLogins != null && basicAuthLogins[host] != null) {
+                BasicAuthLogin login = basicAuthLogins[host];
+                if (loginhost.equals(host)) {
+                    LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
+                    handler.proceed(login.user, login.pass);
+                    return;
                 }
             }
 
