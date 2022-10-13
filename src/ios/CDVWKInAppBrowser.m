@@ -1176,8 +1176,8 @@ BOOL isExiting = FALSE;
 #pragma mark WKNavigationDelegate
 
 - (void)webView:(WKWebView *)theWebView didReceiveAuthenticationChallenge:(nonnull NSURLAuthenticationChallenge *)challenge completionHandler:(nonnull void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
-    NSString *domain = theWebView.URL.absoluteURL.host;
-    NSDictionary *login = _browserOptions.basicauth[domain];
+    NSString *host = theWebView.URL.absoluteURL.host;
+    NSDictionary *login = _browserOptions.basicauth[host];
     if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodHTTPBasic] == YES && login) {
         NSLog(@"didReceiveAuthenticationChallenge");
         NSURLCredential *credential = [NSURLCredential credentialWithUser:credentials[@"user"] password:credentials[@"pass"] persistence:NSURLCredentialPersistenceForSession];
