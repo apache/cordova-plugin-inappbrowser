@@ -194,7 +194,7 @@ public class InAppBrowser extends CordovaPlugin {
                 headers = additionalHeaders.get(new URL(url).getHost());
             }
         } catch (MalformedURLException e) {
-            LOG.i(LOG_TAG, "Can't find headers for malformed url: " + url);
+            LOG.d(LOG_TAG, "Can't find headers for malformed url: " + url);
         }
         view.loadUrl(url, headers);
     }
