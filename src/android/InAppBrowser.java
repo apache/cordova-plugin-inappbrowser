@@ -189,7 +189,7 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
         final String host = new URL(url).getHost();
-        final Map<String, String> headers = additionalHeaders != null ? additionalHeaders[host] : null;
+        final HashMap<String, String> headers = additionalHeaders != null ? additionalHeaders[host] : null;
         view.loadUrl(url, additionalHeaders);
     }
 
