@@ -189,7 +189,7 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
         final String host = new URL(url).getHost();
-        final HashMap<String, String> headers = additionalHeaders != null ? additionalHeaders[host] : null;
+        final HashMap<String, String> headers = additionalHeaders != null ? additionalHeaders.get(host) : null;
         view.loadUrl(url, additionalHeaders);
     }
 
@@ -1529,8 +1529,8 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
             // Check for basicAuthSettings that match the host
-            if (basicAuthLogins != null && basicAuthLogins[host] != null) {
-                BasicAuthLogin login = basicAuthLogins[host];
+            if (basicAuthLogins != null && basicAuthLogins.get(host) != null) {
+                BasicAuthLogin login = basicAuthLogins.get(host);
                 if (loginhost.equals(host)) {
                     LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
                     handler.proceed(login.user, login.pass);
