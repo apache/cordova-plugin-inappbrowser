@@ -130,9 +130,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final int TOOLBAR_HEIGHT = 48;
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR,
-            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH);
+            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH, HEADERS);
 
-    private static final List urlEncodedOptions = Arrays.asList(BASICAUTH);
+    private static final List urlEncodedOptions = Arrays.asList(BASICAUTH, HEADERS);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -196,7 +196,11 @@ public class InAppBrowser extends CordovaPlugin {
         } catch (java.net.MalformedURLException e) {
             LOG.d(LOG_TAG, "Can't find headers for malformed url: " + url);
         }
-        view.loadUrl(url, headers);
+        if (headers == null) {
+            view.loadUrl(url);
+        } else {
+            view.loadUrl(url, headers);
+        }
     }
 
     /**
