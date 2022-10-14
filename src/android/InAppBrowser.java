@@ -188,8 +188,14 @@ public class InAppBrowser extends CordovaPlugin {
      * @param url
      */
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
-        final String host = new URL(url).getHost();
-        final HashMap<String, String> headers = additionalHeaders != null ? additionalHeaders.get(host) : null;
+        final HashMap<String, String> headers = null;
+        try {
+            if (additionalHeaders != null) {
+                headers = additionalHeaders.get(new URL(url).getHost());
+            }
+        } catch (MalformedURLException e) {
+            LOG.i(LOG_TAG, "Can't find headers for malformed url: " + url);
+        }
         view.loadUrl(url, headers);
     }
 
