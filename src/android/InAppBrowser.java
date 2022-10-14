@@ -1531,11 +1531,9 @@ public class InAppBrowser extends CordovaPlugin {
             // Check for basicAuthSettings that match the host
             if (basicAuthLogins != null && basicAuthLogins.get(host) != null) {
                 BasicAuthLogin login = basicAuthLogins.get(host);
-                if (loginhost.equals(host)) {
-                    LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
-                    handler.proceed(login.user, login.pass);
-                    return;
-                }
+                LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
+                handler.proceed(login.user, login.pass);
+                return;
             }
 
             // Check if there is some plugin which can resolve this auth challenge
