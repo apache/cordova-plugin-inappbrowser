@@ -178,8 +178,8 @@ public class InAppBrowser extends CordovaPlugin {
     /**
      * Maps host -> ( Map header -> value )
      */
-    private HashMap<String, Map<String, String>> additionalHeaders;
-    private Type additionalHeaderMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
+    private HashMap<String, HashMap<String, String>> additionalHeaders;
+    private Type additionalHeaderMapType = new TypeToken<HashMap<String, HashMap<String, String>>>() {
     }.getType();
 
     /**
