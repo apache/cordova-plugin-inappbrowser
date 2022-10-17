@@ -197,11 +197,11 @@ public class InAppBrowser extends CordovaPlugin {
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
         // Search or a url pattern match
         if (additionalHeaders != null) {
-            for (HttpHeaderGroup headerSet : additionalHeaders) {
+            for (HttpHeaderGroup group : additionalHeaders) {
                 try {
-                    Pattern urlPattern = Pattern.compile(headerSet.urlRegex, Pattern.CASE_INSENSITIVE);
+                    Pattern urlPattern = Pattern.compile(group.urlRegex, Pattern.CASE_INSENSITIVE);
                     if (urlPattern.matcher(url).find()) {
-                        view.loadUrl(url, headerSet.headers);
+                        view.loadUrl(url, group.headers);
                         return;
                     }
                 } catch (PatternSyntaxException e) {
