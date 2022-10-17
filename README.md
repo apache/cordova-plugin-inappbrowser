@@ -5,6 +5,7 @@
 Forked to investigate the following features:
 
 - `basicauth` support
+- `headers` support
 
 #
 
