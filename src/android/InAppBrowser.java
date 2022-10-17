@@ -87,6 +87,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -176,31 +178,35 @@ public class InAppBrowser extends CordovaPlugin {
     }.getType();
 
     /**
-     * Maps host -> ( Map header -> value )
+     * Maps url-regex -> ( Map header -> value )
      */
     private HashMap<String, HashMap<String, String>> additionalHeaders;
     private Type additionalHeaderMapType = new TypeToken<HashMap<String, HashMap<String, String>>>() {
     }.getType();
 
     /**
-     * Loads the url in the WebView with addional headers per host.
+     * Loads the url in the WebView with addional headers per url-regex.
      * 
      * @param url
      */
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
-        HashMap<String, String> headers = null;
-        try {
-            if (additionalHeaders != null) {
-                headers = additionalHeaders.get(new URL(url).getHost());
+        // Search or a url pattern match
+        if (additionalHeaders != null) {
+            for (HashMap.Entry<String, HashMap<String, String>> entry : additionalHeaders.entrySet()) {
+                try {
+                    Pattern urlPattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
+                    if (urlPattern.matcher(url).find()) {
+                        view.loadUrl(url, entry.getValue());
+                        return;
+                    }
+                } catch (PatternSyntaxException e) {
+                    LOG.e(LOG_TAG, "Pattern syntax error in headers url-pattern: " + e.getLocalizedMessage());
+                } catch (IllegalArgumentException e) {
+                    LOG.e(LOG_TAG, "Illegal pattern flags used with headers url-pattern: " + e.getLocalizedMessage());
+                }
             }
-        } catch (java.net.MalformedURLException e) {
-            LOG.d(LOG_TAG, "Can't find headers for malformed url: " + url);
         }
-        if (headers == null) {
-            view.loadUrl(url);
-        } else {
-            view.loadUrl(url, headers);
-        }
+        view.loadUrl(url);
     }
 
     /**
