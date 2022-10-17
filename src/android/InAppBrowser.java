@@ -83,9 +83,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -124,13 +127,14 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
     private static final String BASICAUTH = "basicauth";
+    private static final String HEADERS = "headers";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
     private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR,
-            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH);
+            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH, HEADERS);
 
-    private static final List urlEncodedOptions = Arrays.asList(BASICAUTH);
+    private static final List urlEncodedOptions = Arrays.asList(BASICAUTH, HEADERS);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -166,12 +170,49 @@ public class InAppBrowser extends CordovaPlugin {
         public String pass;
     };
 
+    private class HttpHeaderGroup {
+        public String urlRegex;
+        public HashMap<String, String> headers;
+    };
+
     /**
      * Maps host -> { user, pass }
      */
-    private HashMap<String, BasicAuthLogin> basicAuthLogins;
+    private HashMap<String, BasicAuthLogin> basicAuthLogins = null;
     private Type basicAuthLoginMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
     }.getType();
+
+    /**
+     * Maps url-regex -> ( Map header -> value )
+     */
+    private HttpHeaderGroup[] additionalHeaders = null;
+    private Type additionalHeadersType = new TypeToken<HttpHeaderGroup[]>() {
+    }.getType();
+
+    /**
+     * Loads the url in the WebView with addional headers per url-regex.
+     * 
+     * @param url
+     */
+    private void loadUrlWithAdditionalHeaders(WebView view, String url) {
+        // Search or a url pattern match
+        if (additionalHeaders != null) {
+            for (HttpHeaderGroup group : additionalHeaders) {
+                try {
+                    Pattern urlPattern = Pattern.compile(group.urlRegex, Pattern.CASE_INSENSITIVE);
+                    if (urlPattern.matcher(url).find()) {
+                        view.loadUrl(url, group.headers);
+                        return;
+                    }
+                } catch (PatternSyntaxException e) {
+                    LOG.e(LOG_TAG, "Pattern syntax error in headers url-pattern: " + e.getLocalizedMessage());
+                } catch (IllegalArgumentException e) {
+                    LOG.e(LOG_TAG, "Illegal pattern flags used with headers url-pattern: " + e.getLocalizedMessage());
+                }
+            }
+        }
+        view.loadUrl(url);
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -294,7 +335,7 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient) inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
-                    inAppWebView.loadUrl(url);
+                    loadUrlWithAdditionalHeaders(inAppWebView, url);
                 }
             });
         } else if (action.equals("injectScriptCode")) {
@@ -581,7 +622,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // NB: From SDK 19: "If you call methods on WebView from any thread
                 // other than your app's UI thread, it can cause unexpected results."
                 // http://developer.android.com/guide/webapps/migrating.html#Threads
-                childView.loadUrl("about:blank");
+                loadUrlWithAdditionalHeaders(childView, "about:blank");
 
                 try {
                     JSONObject obj = new JSONObject();
@@ -642,9 +683,9 @@ public class InAppBrowser extends CordovaPlugin {
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
 
         if (!url.startsWith("http") && !url.startsWith("file:")) {
-            this.inAppWebView.loadUrl("http://" + url);
+            loadUrlWithAdditionalHeaders(inAppWebView, "http://" + url);
         } else {
-            this.inAppWebView.loadUrl(url);
+            loadUrlWithAdditionalHeaders(inAppWebView, url);
         }
         this.inAppWebView.requestFocus();
     }
@@ -760,6 +801,10 @@ public class InAppBrowser extends CordovaPlugin {
             String basicAuthSet = features.get(BASICAUTH);
             if (basicAuthSet != null) {
                 basicAuthLogins = new Gson().fromJson(basicAuthSet, basicAuthLoginMapType);
+            }
+            String headersSet = features.get(HEADERS);
+            if (headersSet != null) {
+                additionalHeaders = new Gson().fromJson(headersSet, additionalHeadersType);
             }
         }
 
@@ -1064,7 +1109,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, true);
 
-                inAppWebView.loadUrl(url);
+                loadUrlWithAdditionalHeaders(inAppWebView, url);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
@@ -1505,16 +1550,11 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
             // Check for basicAuthSettings that match the host
-            if (basicAuthLogins != null) {
-                for (HashMap.Entry<String, BasicAuthLogin> entry : basicAuthLogins.entrySet()) {
-                    String loginhost = entry.getKey();
-                    BasicAuthLogin login = entry.getValue();
-                    if (loginhost.equals(host)) {
-                        LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
-                        handler.proceed(login.user, login.pass);
-                        return;
-                    }
-                }
+            if (basicAuthLogins != null && basicAuthLogins.get(host) != null) {
+                BasicAuthLogin login = basicAuthLogins.get(host);
+                LOG.i(LOG_TAG, "onReceivedHttpAuthRequest - found user/pass for matching host:" + host);
+                handler.proceed(login.user, login.pass);
+                return;
             }
 
             // Check if there is some plugin which can resolve this auth challenge
