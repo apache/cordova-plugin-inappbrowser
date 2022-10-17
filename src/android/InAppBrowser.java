@@ -170,18 +170,23 @@ public class InAppBrowser extends CordovaPlugin {
         public String pass;
     };
 
+    private class HttpHeaderGroup {
+        public String urlRegex;
+        public HashMap<String, String> headers;
+    };
+
     /**
      * Maps host -> { user, pass }
      */
-    private HashMap<String, BasicAuthLogin> basicAuthLogins;
+    private HashMap<String, BasicAuthLogin> basicAuthLogins = null;
     private Type basicAuthLoginMapType = new TypeToken<HashMap<String, BasicAuthLogin>>() {
     }.getType();
 
     /**
      * Maps url-regex -> ( Map header -> value )
      */
-    private HashMap<String, HashMap<String, String>> additionalHeaders;
-    private Type additionalHeaderMapType = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+    private HttpHeaderGroup[] additionalHeaders = null;
+    private Type additionalHeadersType = new TypeToken<HttpHeaderGroup[]>() {
     }.getType();
 
     /**
@@ -192,11 +197,11 @@ public class InAppBrowser extends CordovaPlugin {
     private void loadUrlWithAdditionalHeaders(WebView view, String url) {
         // Search or a url pattern match
         if (additionalHeaders != null) {
-            for (HashMap.Entry<String, HashMap<String, String>> entry : additionalHeaders.entrySet()) {
+            for (HttpHeaderGroup headerSet : additionalHeaders) {
                 try {
-                    Pattern urlPattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
+                    Pattern urlPattern = Pattern.compile(headerSet.urlRegex, Pattern.CASE_INSENSITIVE);
                     if (urlPattern.matcher(url).find()) {
-                        view.loadUrl(url, entry.getValue());
+                        view.loadUrl(url, headerSet.headers);
                         return;
                     }
                 } catch (PatternSyntaxException e) {
@@ -799,7 +804,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String headersSet = features.get(HEADERS);
             if (headersSet != null) {
-                additionalHeaders = new Gson().fromJson(headersSet, additionalHeaderMapType);
+                additionalHeaders = new Gson().fromJson(headersSet, additionalHeadersType);
             }
         }
 
