@@ -208,6 +208,8 @@ public class InAppBrowser extends CordovaPlugin {
                     LOG.e(LOG_TAG, "Pattern syntax error in headers url-pattern: " + e.getLocalizedMessage());
                 } catch (IllegalArgumentException e) {
                     LOG.e(LOG_TAG, "Illegal pattern flags used with headers url-pattern: " + e.getLocalizedMessage());
+                } catch (NullPointerException e) {
+                    LOG.e(LOG_TAG, "Null pattern in headers url-pattern: " + e.getLocalizedMessage());
                 }
             }
         }
