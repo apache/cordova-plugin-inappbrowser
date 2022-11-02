@@ -34,6 +34,7 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.GeolocationPermissions.Callback;
+import android.webkit.PermissionRequest;
 
 public class InAppChromeClient extends WebChromeClient {
 
@@ -181,5 +182,19 @@ public class InAppChromeClient extends WebChromeClient {
         resultMsg.sendToTarget();
 
         return true;
+    }
+
+    /**
+     * When the webpage requests permissions, we attempt to grant them, assuming
+     * that the app contains the relavent manifest entries and has requested
+     * permissions from the user in advance.
+     * https://developer.android.com/reference/android/webkit/PermissionRequest#grant(java.lang.String[])
+     * 
+     * @param request
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void onPermissionRequest(PermissionRequest request) {
+        request.grant(request.getResources());
     }
 }
