@@ -34,6 +34,7 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.GeolocationPermissions.Callback;
+import android.webkit.PermissionRequest;
 
 public class InAppChromeClient extends WebChromeClient {
 
@@ -45,6 +46,7 @@ public class InAppChromeClient extends WebChromeClient {
         super();
         this.webView = webView;
     }
+
     /**
      * Handle database quota exceeded notification.
      *
@@ -57,14 +59,15 @@ public class InAppChromeClient extends WebChromeClient {
      */
     @Override
     public void onExceededDatabaseQuota(String url, String databaseIdentifier, long currentQuota, long estimatedSize,
-            long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater)
-    {
-        LOG.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize, currentQuota, totalUsedQuota);
+            long totalUsedQuota, WebStorage.QuotaUpdater quotaUpdater) {
+        LOG.d(LOG_TAG, "onExceededDatabaseQuota estimatedSize: %d  currentQuota: %d  totalUsedQuota: %d", estimatedSize,
+                currentQuota, totalUsedQuota);
         quotaUpdater.updateQuota(MAX_QUOTA);
     }
 
     /**
-     * Instructs the client to show a prompt to ask the user to set the Geolocation permission state for the specified origin.
+     * Instructs the client to show a prompt to ask the user to set the Geolocation
+     * permission state for the specified origin.
      *
      * @param origin
      * @param callback
@@ -103,35 +106,35 @@ public class InAppChromeClient extends WebChromeClient {
      */
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-        // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder should be the id of a callback to execute.
+        // See if the prompt string uses the 'gap-iab' protocol. If so, the remainder
+        // should be the id of a callback to execute.
         if (defaultValue != null && defaultValue.startsWith("gap")) {
-            if(defaultValue.startsWith("gap-iab://")) {
+            if (defaultValue.startsWith("gap-iab://")) {
                 PluginResult scriptResult;
                 String scriptCallbackId = defaultValue.substring(10);
                 if (scriptCallbackId.matches("^InAppBrowser[0-9]{1,10}$")) {
-                    if(message == null || message.length() == 0) {
+                    if (message == null || message.length() == 0) {
                         scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray());
                     } else {
                         try {
                             scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray(message));
-                        } catch(JSONException e) {
+                        } catch (JSONException e) {
                             scriptResult = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
                         }
                     }
                     this.webView.sendPluginResult(scriptResult, scriptCallbackId);
                     result.confirm("");
                     return true;
-                }
-                else {
-                    // Anything else that doesn't look like InAppBrowser0123456789 should end up here
-                    LOG.w(LOG_TAG, "InAppBrowser callback called with invalid callbackId : "+ scriptCallbackId);
+                } else {
+                    // Anything else that doesn't look like InAppBrowser0123456789 should end up
+                    // here
+                    LOG.w(LOG_TAG, "InAppBrowser callback called with invalid callbackId : " + scriptCallbackId);
                     result.cancel();
                     return true;
                 }
-            }
-            else {
+            } else {
                 // Anything else with a gap: prefix should get this message
-                LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue); 
+                LOG.w(LOG_TAG, "InAppBrowser does not support Cordova API calls: " + url + " " + defaultValue);
                 result.cancel();
                 return true;
             }
@@ -140,11 +143,13 @@ public class InAppChromeClient extends WebChromeClient {
     }
 
     /**
-     * The InAppWebBrowser WebView is configured to MultipleWindow mode to mitigate a security
+     * The InAppWebBrowser WebView is configured to MultipleWindow mode to mitigate
+     * a security
      * bug found in Chromium prior to version 83.0.4103.106.
      * See https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
      *
-     * Valid Urls set to open in new window will be routed back to load in the original WebView.
+     * Valid Urls set to open in new window will be routed back to load in the
+     * original WebView.
      *
      * @param view
      * @param isDialog
@@ -155,20 +160,19 @@ public class InAppChromeClient extends WebChromeClient {
     @Override
     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
         WebView inAppWebView = view;
-        final WebViewClient webViewClient =
-                new WebViewClient() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                        inAppWebView.loadUrl(request.getUrl().toString());
-                        return true;
-                    }
+        final WebViewClient webViewClient = new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                inAppWebView.loadUrl(request.getUrl().toString());
+                return true;
+            }
 
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        inAppWebView.loadUrl(url);
-                        return true;
-                    }
-                };
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                inAppWebView.loadUrl(url);
+                return true;
+            }
+        };
 
         final WebView newWebView = new WebView(view.getContext());
         newWebView.setWebViewClient(webViewClient);
@@ -178,5 +182,19 @@ public class InAppChromeClient extends WebChromeClient {
         resultMsg.sendToTarget();
 
         return true;
+    }
+
+    /**
+     * When the webpage requests permissions, we attempt to grant them, assuming
+     * that the app contains the relavent manifest entries and has requested
+     * permissions from the user in advance.
+     * https://developer.android.com/reference/android/webkit/PermissionRequest#grant(java.lang.String[])
+     * 
+     * @param request
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void onPermissionRequest(PermissionRequest request) {
+        request.grant(request.getResources());
     }
 }
