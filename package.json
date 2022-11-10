@@ -1,6 +1,6 @@
 {
   "name": "@bennord/cordova-plugin-inappbrowser",
-  "version": "5.0.6-dev",
+  "version": "5.0.7-dev",
   "description": "Cordova InAppBrowser Plugin (bennord fork)",
   "types": "./types/index.d.ts",
   "cordova": {
