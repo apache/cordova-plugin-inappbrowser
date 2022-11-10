@@ -45,10 +45,26 @@
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
         self.beforeload = @"";
+
         self.basicauth = @{};
+        self.headers = @[];
+
+        _encodedJsonKeys = @[ @"basicauth", @"headers" ];
     }
 
     return self;
+}
+
++ (CDVInAppBrowserOptions*)parseEncodedJson:(NSString*)value
+{
+    if ([value isEqualToString:@""]) {
+        return nil;
+    }
+    NSString* escapedString = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
+    escapedString = [escapedString stringByRemovingPercentEncoding];
+    NSData* jsonData = [escapedString dataUsingEncoding:NSUTF8StringEncoding];
+    NSError* error;
+    return [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
 }
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options
@@ -71,20 +87,14 @@
             NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setAllowsFloats:YES];
             BOOL isNumber = [numberFormatter numberFromString:value_lc] != nil;
+            BOOL isEncodedJson = [obj->_encodedJsonKeys containsObject:key];
 
             // set the property according to the key name
             if ([obj respondsToSelector:NSSelectorFromString(key)]) {
-                if ([key isEqualToString:@"basicauth"]) {
-                    if ([value isEqualToString:@""]) {
-                        continue;
-                    }
-                    NSString* escapedString = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
-                    escapedString = [escapedString stringByRemovingPercentEncoding];
-                    NSData* jsonData = [escapedString dataUsingEncoding:NSUTF8StringEncoding];
-                    NSError* error;
-                    NSDictionary* jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
-                    if (error == nil) {
-                        [obj setValue:jsonDictionary forKey:key];
+                if (isEncodedJson) {
+                    id parsedObject = [self parseEncodedJson:value];
+                    if (parsedObject != nil) {
+                        [obj setValue:parsedObject forKey:key];
                     }
                 } else if (isNumber) {
                     [obj setValue:[numberFormatter numberFromString:value_lc] forKey:key];

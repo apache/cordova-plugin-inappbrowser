@@ -18,6 +18,8 @@
  */
 
 @interface CDVInAppBrowserOptions : NSObject {
+@private
+    NSArray* _encodedJsonKeys;
 }
 
 @property (nonatomic, assign) BOOL location;
@@ -34,7 +36,6 @@
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
 @property (nonatomic, assign) BOOL hidespinner;
-@property (nonatomic, copy) NSDictionary* basicauth;
 
 @property (nonatomic, copy) NSString* presentationstyle;
 @property (nonatomic, copy) NSString* transitionstyle;
@@ -45,6 +46,9 @@
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, copy) NSString* beforeload;
+
+@property (nonatomic, copy) NSDictionary* basicauth;
+@property (nonatomic, copy) NSArray* headers;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 

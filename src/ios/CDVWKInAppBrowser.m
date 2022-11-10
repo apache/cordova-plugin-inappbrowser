@@ -209,13 +209,15 @@ static CDVWKInAppBrowser* instance = nil;
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
             self.inAppBrowserViewController.orientationDelegate = (UIViewController<CDVScreenOrientationDelegate>*)self.viewController;
         }
+    } else {
+        [self.inAppBrowserViewController updateBrowserOptions:browserOptions];
     }
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
-    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar:browserOptions.toolbarposition];
+    [self.inAppBrowserViewController showToolBar:browserOptions.toolbar atPosition:browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
         int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption:browserOptions.closebuttoncolor:closeButtonIndex];
+        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption andColor:browserOptions.closebuttoncolor andIndex:closeButtonIndex];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -714,8 +716,12 @@ BOOL isExiting = FALSE;
 
         [self createViews];
     }
-
     return self;
+}
+
+- (void)updateBrowserOptions:(CDVInAppBrowserOptions*)browserOptions
+{
+    _browserOptions = browserOptions;
 }
 
 - (void)dealloc
@@ -924,8 +930,7 @@ BOOL isExiting = FALSE;
     [self.webView setFrame:frame];
 }
 
-- (void)setCloseButtonTitle:(NSString*)title:(NSString*)colorString
-                           :(int)buttonIndex
+- (void)setCloseButtonTitle:(NSString*)title andColor:(NSString*)colorString andIndex:(int)buttonIndex
 {
     // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
@@ -992,7 +997,7 @@ BOOL isExiting = FALSE;
     }
 }
 
-- (void)showToolBar:(BOOL)show:(NSString*)toolbarPosition
+- (void)showToolBar:(BOOL)show atPosition:(NSString*)toolbarPosition
 {
     CGRect toolbarFrame = self.toolbar.frame;
     CGRect locationbarFrame = self.addressLabel.frame;
@@ -1111,7 +1116,28 @@ BOOL isExiting = FALSE;
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
-        NSURLRequest* request = [NSURLRequest requestWithURL:url];
+        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:url];
+
+        // Find headers for a matching url pattern
+        for (NSDictionary* headerGroup in _browserOptions.headers) {
+            NSError* error = NULL;
+            NSRegularExpression* urlRegex =
+                [NSRegularExpression regularExpressionWithPattern:headerGroup[@"urlRegex"]
+                                                          options:NSRegularExpressionCaseInsensitive
+                                                            error:&error];
+            if ([urlRegex numberOfMatchesInString:url.absoluteString
+                                          options:0
+                                            range:NSMakeRange(0, [url.absoluteString length])]
+                > 0) {
+
+                // Add found headers to url request
+                NSDictionary* matchingHeaders = headerGroup[@"headers"];
+                for (NSString* key in matchingHeaders) {
+                    [request setValue:matchingHeaders[key] forHTTPHeaderField:key];
+                }
+                break;
+            }
+        }
         [self.webView loadRequest:request];
     }
 }
