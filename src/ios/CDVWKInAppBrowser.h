@@ -17,19 +17,19 @@
  under the License.
  */
 
-#import <Cordova/CDVPlugin.h>
-#import <Cordova/CDVInvokedUrlCommand.h>
-#import <Cordova/CDVScreenOrientationDelegate.h>
-#import "CDVWKInAppBrowserUIDelegate.h"
-#import "CDVInAppBrowserOptions.h"
 #import "CDVInAppBrowserNavigationController.h"
+#import "CDVInAppBrowserOptions.h"
+#import "CDVWKInAppBrowserUIDelegate.h"
+#import <Cordova/CDVInvokedUrlCommand.h>
+#import <Cordova/CDVPlugin.h>
+#import <Cordova/CDVScreenOrientationDelegate.h>
 
 @class CDVWKInAppBrowserViewController;
 
 @interface CDVWKInAppBrowser : CDVPlugin {
-    UIWindow * tmpWindow;
+    UIWindow* tmpWindow;
 
-    @private
+@private
     NSString* _beforeload;
     BOOL _waitForBeforeload;
 }
@@ -37,9 +37,9 @@
 @property (nonatomic, retain) CDVWKInAppBrowser* instance;
 @property (nonatomic, retain) CDVWKInAppBrowserViewController* inAppBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
-@property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
+@property (nonatomic, copy) NSRegularExpression* callbackIdPattern;
 
-+ (id) getInstance;
++ (id)getInstance;
 - (void)open:(CDVInvokedUrlCommand*)command;
 - (void)close:(CDVInvokedUrlCommand*)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand*)command;
@@ -49,10 +49,10 @@
 
 @end
 
-@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler,UIAdaptivePresentationControllerDelegate>{
-    @private
-    CDVInAppBrowserOptions *_browserOptions;
-    NSDictionary *_settings;
+@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UIAdaptivePresentationControllerDelegate> {
+@private
+    CDVInAppBrowserOptions* _browserOptions;
+    NSDictionary* _settings;
 }
 
 @property (nonatomic, strong) IBOutlet WKWebView* webView;
@@ -65,16 +65,17 @@
 @property (nonatomic, strong) IBOutlet UIToolbar* toolbar;
 @property (nonatomic, strong) IBOutlet CDVWKInAppBrowserUIDelegate* webViewUIDelegate;
 
-@property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
+@property (nonatomic, weak) id<CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVWKInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
 
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex;
+- (void)showToolBar:(BOOL)show:(NSString*)toolbarPosition;
+- (void)setCloseButtonTitle:(NSString*)title:(NSString*)colorString
+                           :(int)buttonIndex;
 
-- (id)initWithBrowserOptions: (CDVInAppBrowserOptions*) browserOptions andSettings:(NSDictionary*) settings;
+- (id)initWithBrowserOptions:(CDVInAppBrowserOptions*)browserOptions andSettings:(NSDictionary*)settings;
 
 @end
