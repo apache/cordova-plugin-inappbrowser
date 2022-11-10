@@ -76,5 +76,6 @@
 - (void)setCloseButtonTitle:(NSString*)title andColor:(NSString*)colorString andIndex:(int)buttonIndex;
 
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions*)browserOptions andSettings:(NSDictionary*)settings;
+- (void)updateBrowserOptions:(CDVInAppBrowserOptions*)browserOptions;
 
 @end
