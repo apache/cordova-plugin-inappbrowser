@@ -87,7 +87,7 @@
             NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setAllowsFloats:YES];
             BOOL isNumber = [numberFormatter numberFromString:value_lc] != nil;
-            BOOL isEncodedJson = [_encodedJsonKeys contains:key];
+            BOOL isEncodedJson = [obj->_encodedJsonKeys containsObject:key];
 
             // set the property according to the key name
             if ([obj respondsToSelector:NSSelectorFromString(key)]) {

@@ -72,9 +72,8 @@
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show:(NSString*)toolbarPosition;
-- (void)setCloseButtonTitle:(NSString*)title:(NSString*)colorString
-                           :(int)buttonIndex;
+- (void)showToolBar:(BOOL)show atPosition:(NSString*)toolbarPosition;
+- (void)setCloseButtonTitle:(NSString*)title andColor:(NSString*)colorString andIndex:(int)buttonIndex;
 
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions*)browserOptions andSettings:(NSDictionary*)settings;
 
