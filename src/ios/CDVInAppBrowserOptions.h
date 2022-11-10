@@ -18,6 +18,8 @@
  */
 
 @interface CDVInAppBrowserOptions : NSObject {
+@private
+    NSArray* _encodedJsonKeys;
 }
 
 @property (nonatomic, assign) BOOL location;
@@ -47,8 +49,6 @@
 
 @property (nonatomic, copy) NSDictionary* basicauth;
 @property (nonatomic, copy) NSArray* headers;
-
-@property (nonatomic, copy) NSArray* encodedJsonKeys;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 

@@ -49,7 +49,7 @@
         self.basicauth = @{};
         self.headers = @[];
 
-        self.encodedJsonKeys = @[ @"basicauth", @"headers" ];
+        _encodedJsonKeys = @[ @"basicauth", @"headers" ];
     }
 
     return self;
@@ -87,7 +87,7 @@
             NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
             [numberFormatter setAllowsFloats:YES];
             BOOL isNumber = [numberFormatter numberFromString:value_lc] != nil;
-            BOOL isEncodedJson = [self.encodedJsonKeys contains:key];
+            BOOL isEncodedJson = [_encodedJsonKeys contains:key];
 
             // set the property according to the key name
             if ([obj respondsToSelector:NSSelectorFromString(key)]) {
