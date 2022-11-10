@@ -17,8 +17,8 @@
  under the License.
  */
 
-
-@interface CDVInAppBrowserOptions : NSObject {}
+@interface CDVInAppBrowserOptions : NSObject {
+}
 
 @property (nonatomic, assign) BOOL location;
 @property (nonatomic, assign) BOOL toolbar;

@@ -78,11 +78,11 @@
                     if ([value isEqualToString:@""]) {
                         continue;
                     }
-                    NSString *escapedString = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
+                    NSString* escapedString = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
                     escapedString = [escapedString stringByRemovingPercentEncoding];
-                    NSData *jsonData = [escapedString dataUsingEncoding:NSUTF8StringEncoding];
-                    NSError *error;
-                    NSDictionary *jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
+                    NSData* jsonData = [escapedString dataUsingEncoding:NSUTF8StringEncoding];
+                    NSError* error;
+                    NSDictionary* jsonDictionary = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
                     if (error == nil) {
                         [obj setValue:jsonDictionary forKey:key];
                     }
