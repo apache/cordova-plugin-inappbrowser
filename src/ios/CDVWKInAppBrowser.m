@@ -209,6 +209,8 @@ static CDVWKInAppBrowser* instance = nil;
         if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
             self.inAppBrowserViewController.orientationDelegate = (UIViewController<CDVScreenOrientationDelegate>*)self.viewController;
         }
+    } else {
+        [self.inAppBrowserViewController updateBrowserOptions:browserOptions];
     }
 
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
@@ -714,8 +716,12 @@ BOOL isExiting = FALSE;
 
         [self createViews];
     }
-
     return self;
+}
+
+- (void)updateBrowserOptions:(CDVInAppBrowserOptions*)browserOptions
+{
+    _browserOptions = browserOptions;
 }
 
 - (void)dealloc
