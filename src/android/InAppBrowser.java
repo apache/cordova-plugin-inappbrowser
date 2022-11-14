@@ -117,6 +117,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
     private static final String TOOLBAR_COLOR = "toolbarcolor";
     private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
+    private static final String CLOSE_BUTTON_SIZE = "closebuttonsize";
+    private static final String CLOSE_BUTTON_OFFSET_X = "closebuttonoffsetx";
+    private static final String CLOSE_BUTTON_OFFSET_Y = "closebuttonoffsety";
     private static final String CLOSE_BUTTON_COLOR = "closebuttoncolor";
     private static final String LEFT_TO_RIGHT = "lefttoright";
     private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
@@ -131,8 +134,17 @@ public class InAppBrowser extends CordovaPlugin {
 
     private static final int TOOLBAR_HEIGHT = 48;
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR,
-            CLOSE_BUTTON_COLOR, FOOTER_COLOR, BASICAUTH, HEADERS);
+    private static final List customizableOptions = Arrays.asList(
+            CLOSE_BUTTON_CAPTION,
+            CLOSE_BUTTON_SIZE,
+            CLOSE_BUTTON_OFFSET_X,
+            CLOSE_BUTTON_OFFSET_Y,
+            CLOSE_BUTTON_COLOR,
+            TOOLBAR_COLOR,
+            NAVIGATION_COLOR,
+            FOOTER_COLOR,
+            BASICAUTH,
+            HEADERS);
 
     private static final List urlEncodedOptions = Arrays.asList(BASICAUTH, HEADERS);
 
@@ -152,6 +164,9 @@ public class InAppBrowser extends CordovaPlugin {
     private ValueCallback<Uri[]> mUploadCallback;
     private final static int FILECHOOSER_REQUESTCODE = 1;
     private String closeButtonCaption = "";
+    private float closeButtonSize = 20;
+    private int closeButtonOffsetX = 0;
+    private int closeButtonOffsetY = 0;
     private String closeButtonColor = "";
     private boolean leftToRight = false;
     private int toolbarColor = android.graphics.Color.LTGRAY;
@@ -770,6 +785,18 @@ public class InAppBrowser extends CordovaPlugin {
             if (closeButtonCaptionSet != null) {
                 closeButtonCaption = closeButtonCaptionSet;
             }
+            String closeButtonSizeSet = features.get(CLOSE_BUTTON_SIZE);
+            if (closeButtonSizeSet != null) {
+                closeButtonSize = Float.parseFloat(closeButtonSizeSet);
+            }
+            String closeButtonOffsetXSet = features.get(CLOSE_BUTTON_OFFSET_X);
+            if (closeButtonOffsetXSet != null) {
+                closeButtonOffsetX = Integer.parseInt(closeButtonOffsetXSet);
+            }
+            String closeButtonOffsetYSet = features.get(CLOSE_BUTTON_OFFSET_Y);
+            if (closeButtonOffsetYSet != null) {
+                closeButtonOffsetY = Integer.parseInt(closeButtonOffsetYSet);
+            }
             String closeButtonColorSet = features.get(CLOSE_BUTTON_COLOR);
             if (closeButtonColorSet != null) {
                 closeButtonColor = closeButtonColorSet;
@@ -835,11 +862,16 @@ public class InAppBrowser extends CordovaPlugin {
                     // Use TextView for text
                     TextView close = new TextView(cordova.getActivity());
                     close.setText(closeButtonCaption);
-                    close.setTextSize(20);
+                    close.setTextSize(closeButtonSize);
                     if (closeButtonColor != "")
                         close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
                     close.setGravity(android.view.Gravity.CENTER_VERTICAL);
                     close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
+                    // close.setPadding(
+                    // this.dpToPixels(10 + 0),
+                    // this.dpToPixels(-0),
+                    // this.dpToPixels(10 - 0),
+                    // this.dpToPixels(0));
                     _close = close;
                 } else {
                     ImageButton close = new ImageButton(cordova.getActivity());
