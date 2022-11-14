@@ -866,12 +866,11 @@ public class InAppBrowser extends CordovaPlugin {
                     if (closeButtonColor != "")
                         close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
                     close.setGravity(android.view.Gravity.CENTER_VERTICAL);
-                    close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
-                    // close.setPadding(
-                    // this.dpToPixels(10 + 0),
-                    // this.dpToPixels(-0),
-                    // this.dpToPixels(10 - 0),
-                    // this.dpToPixels(0));
+                    close.setPadding(
+                            this.dpToPixels(10 + closeButtonOffsetX),
+                            this.dpToPixels(-closeButtonOffsetY),
+                            this.dpToPixels(10 - closeButtonOffsetX),
+                            this.dpToPixels(closeButtonOffsetY));
                     _close = close;
                 } else {
                     ImageButton close = new ImageButton(cordova.getActivity());
