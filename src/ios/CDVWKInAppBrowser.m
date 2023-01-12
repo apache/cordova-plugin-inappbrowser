@@ -936,6 +936,11 @@ BOOL isExiting = FALSE;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
     
+    NSUInteger fontSize = 14;
+    UIFont *font = [UIFont systemFontOfSize:fontSize];
+    NSDictionary *attributes = @{NSFontAttributeName: font};
+    [self.closeButton setTitleTextAttributes:attributes forState:UIControlStateNormal];
+
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
     [self.toolbar setItems:items];

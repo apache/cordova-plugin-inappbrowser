@@ -740,7 +740,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // Use TextView for text
                     TextView close = new TextView(cordova.getActivity());
                     close.setText(closeButtonCaption);
-                    close.setTextSize(20);
+                    close.setTextSize(14);
                     if (closeButtonColor != "") close.setTextColor(android.graphics.Color.parseColor(closeButtonColor));
                     close.setGravity(android.view.Gravity.CENTER_VERTICAL);
                     close.setPadding(this.dpToPixels(10), 0, this.dpToPixels(10), 0);
