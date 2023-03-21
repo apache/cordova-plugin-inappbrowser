@@ -778,6 +778,14 @@ BOOL isExiting = FALSE;
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
     
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400
+    // Set "inspectable" to true for backwards compatibility with iOS <= 16.3, but allow an override.
+    // Preferably this would be set to the default "NO" or wrapped in an "#ifdef DEBUG",
+    // but that would be a breaking change and needs to wait till a (next) major release.
+    if (@available(iOS 16.4, *)) {
+        self.webView.inspectable = [settings cordovaBoolSettingForKey:@"InspectableWebview" defaultValue:YES];;
+    }
+#endif
     
     self.webView.navigationDelegate = self;
     self.webView.UIDelegate = self.webViewUIDelegate;
