@@ -454,20 +454,46 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public String openExternal(String url) {
         try {
-            Intent intent = null;
-            intent = new Intent(Intent.ACTION_VIEW);
-            // Omitting the MIME type for file: URLs causes "No Activity found to handle Intent".
-            // Adding the MIME type to http: URLs causes them to not be handled by the downloader.
-            Uri uri = Uri.parse(url);
-            if ("file".equals(uri.getScheme())) {
-                intent.setDataAndType(uri, webView.getResourceApi().getMimeType(uri));
-            } else {
-                intent.setData(uri);
-            }
-            intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
-            // CB-10795: Avoid circular loops by preventing it from opening in the current app
-            this.openExternalExcludeCurrentApp(intent);
-            return "";
+//             Intent intent = null;
+//             intent = new Intent(Intent.ACTION_VIEW);
+//             // Omitting the MIME type for file: URLs causes "No Activity found to handle Intent".
+//             // Adding the MIME type to http: URLs causes them to not be handled by the downloader.
+//             Uri uri = Uri.parse(url);
+//             if ("file".equals(uri.getScheme())) {
+//                 intent.setDataAndType(uri, webView.getResourceApi().getMimeType(uri));
+//             } else {
+//                 intent.setData(uri);
+//             }
+//             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
+//             // CB-10795: Avoid circular loops by preventing it from opening in the current app
+//             this.openExternalExcludeCurrentApp(intent);
+//             return "";
+                Intent intent = null; 
+                Uri uri = Uri.parse(url);//"googlechrome://navigate?url="+ url
+                 intent = "data".equals(scheme)
+                    ? Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Build.VERSION.SDK_INT >= 33 ? Intent.CATEGORY_BROWSABLE : Intent.CATEGORY_APP_BROWSER)
+                    : new Intent(Intent.ACTION_VIEW);
+                   if ("file".equals(scheme)) {
+                intent.setDataAndType(uri, webView.getResourceApi().getMimeType(uri));
+                LOG.d(LOG_TAG,"if loop on java_______________*******");
+            } else {
+                intent.setData(uri);
+                LOG.d(LOG_TAG,"else loop on java_________________*****");
+            }
+            LOG.d(LOG_TAG,"before putExtra");
+            //intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
+            LOG.d(LOG_TAG,"after putExtra__________________"+intent+"+++"+cordova.getActivity().getPackageName());
+            // CB-10795: Avoid circular loops by preventing it from opening in the current app
+             if (intent.resolveActivity( cordova.getActivity().getPackageManager()) == null) {
+                 LOG.d(LOG_TAG," Not null loop code aadded java_________________*****"+intent);
+                        // intent.setPackage("com.android.chrome");
+                      //intent.setSelector(emptyBrowserIntent);
+                      cordova.getActivity().startActivity(intent);
+              }
+           // this.openExternalExcludeCurrentApp(intent);
+            //intent.setPackage("com.android.chrome");
+            this.cordova.getActivity().startActivity(intent);
+            return "";
             // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
         } catch (java.lang.RuntimeException e) {
             LOG.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
