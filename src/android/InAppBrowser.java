@@ -35,10 +35,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -56,6 +59,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -116,6 +120,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String VIDEO_FULLSCREEN = "videofullscreen";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
@@ -149,6 +154,11 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+
+    //Video FullScreen
+    private boolean useVideoFullScreen = false;
+    private FullscreenHolder fullscreenHolder;
+    private InAppVideoChromeClient.InAppVideoFullScreenHelper videoHelper;
 
     /**
      * Executes the request and returns PluginResult.
@@ -558,6 +568,14 @@ public class InAppBrowser extends CordovaPlugin {
      * Checks to see if it is possible to go back one page in history, then does so.
      */
     public void goBack() {
+        //if useVideo FullScreen
+        if (useVideoFullScreen) {
+            //check fullscreen and goback
+            if(videoHelper.goBack()) {
+                return;
+            }
+        }
+
         if (this.inAppWebView.canGoBack()) {
             this.inAppWebView.goBack();
         }
@@ -711,6 +729,10 @@ public class InAppBrowser extends CordovaPlugin {
             String fullscreenSet = features.get(FULLSCREEN);
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
+            }
+            String videoFullscreen = features.get(VIDEO_FULLSCREEN);
+            if (videoFullscreen != null) {
+                useVideoFullScreen = videoFullscreen.equals("yes") ? true : false;
             }
         }
 
@@ -922,23 +944,25 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
-                        LOG.d(LOG_TAG, "File Chooser 5.0+");
-                        // If callback exists, finish it.
-                        if(mUploadCallback != null) {
-                            mUploadCallback.onReceiveValue(null);
-                        }
-                        mUploadCallback = filePathCallback;
-
-                        // Create File Chooser Intent
-                        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
-                        content.addCategory(Intent.CATEGORY_OPENABLE);
-                        content.setType("*/*");
-
-                        // Run cordova startActivityForResult
-                        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
+                        openFileChooser(filePathCallback);
                         return true;
                     }
                 });
+                // if useVideoFullScreen  
+                if (useVideoFullScreen) {
+                    // init holder
+                    fullscreenHolder = new FullscreenHolder(cordova.getContext());
+                    // init videoHelper
+                    videoHelper = new InAppVideoChromeClient.InAppVideoFullScreenHelper(cordova.getActivity(), fullscreenHolder);
+                    // change to InAppVideoChromeClient
+                    inAppWebView.setWebChromeClient(new InAppVideoChromeClient(thatWebView,videoHelper) {
+                        public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
+                        {
+                            openFileChooser(filePathCallback);
+                            return true;
+                        }
+                    });
+                }
                 currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
                 inAppWebView.setWebViewClient(currentClient);
                 WebSettings settings = inAppWebView.getSettings();
@@ -1021,6 +1045,10 @@ public class InAppBrowser extends CordovaPlugin {
                 // Add our webview to our main view/layout
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
                 webViewLayout.addView(inAppWebView);
+                if(useVideoFullScreen) {
+                    // if useVideoFullSceen add FullScreenHolder
+                    webViewLayout.addView(fullscreenHolder,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+                }
                 main.addView(webViewLayout);
 
                 // Don't add the footer unless it's been enabled
@@ -1459,6 +1487,37 @@ public class InAppBrowser extends CordovaPlugin {
 
             // By default handle 401 like we'd normally do!
             super.onReceivedHttpAuthRequest(view, handler, host, realm);
+        }
+    }
+
+    // bind the same function For ChromeClient
+    private void openFileChooser(ValueCallback<Uri[]> filePathCallback) {
+        LOG.d(LOG_TAG, "File Chooser 5.0+");
+        // If callback exists, finish it.
+        if(mUploadCallback != null) {
+            mUploadCallback.onReceiveValue(null);
+        }
+        mUploadCallback = filePathCallback;
+
+        // Create File Chooser Intent
+        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
+        content.addCategory(Intent.CATEGORY_OPENABLE);
+        content.setType("*/*");
+
+        // Run cordova startActivityForResult
+        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
+    }
+
+    //FullScreen Video Helper Method
+    private static class FullscreenHolder extends FrameLayout {
+        public FullscreenHolder(Context context) {
+            super(context);
+            setBackgroundColor(Color.BLACK);
+            setVisibility(View.INVISIBLE);
+        }
+        @Override
+        public boolean onTouchEvent(MotionEvent evt) {
+            return true;
         }
     }
 }
