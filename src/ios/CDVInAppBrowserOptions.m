@@ -45,6 +45,7 @@
         self.toolbarcolor = nil;
         self.toolbartranslucent = YES;
         self.beforeload = @"";
+        self.appenduseragent = @"";
 
         self.basicauth = @{};
         self.headers = @[];
