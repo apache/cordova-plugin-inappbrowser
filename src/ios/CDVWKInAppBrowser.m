@@ -746,7 +746,7 @@ BOOL isExiting = FALSE;
         [self settingForKey:@"AppendUserAgent"] != nil) {
         userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [self settingForKey:@"AppendUserAgent"]];
     }
-    if (![_browserOptions.appenduseragent isEqualToString:@""]) {
+    if ([_browserOptions.appenduseragent length] > 0) {
         userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, _browserOptions.appenduseragent];
     }
     configuration.applicationNameForUserAgent = userAgent;
