@@ -746,6 +746,9 @@ BOOL isExiting = FALSE;
         [self settingForKey:@"AppendUserAgent"] != nil) {
         userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [self settingForKey:@"AppendUserAgent"]];
     }
+    if ([_browserOptions.appenduseragent length] > 0) {
+        userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, _browserOptions.appenduseragent];
+    }
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
 #if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)

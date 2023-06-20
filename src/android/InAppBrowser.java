@@ -131,6 +131,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FULLSCREEN = "fullscreen";
     private static final String BASICAUTH = "basicauth";
     private static final String HEADERS = "headers";
+    private static final String APPEND_USER_AGENT = "appenduseragent";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
@@ -144,6 +145,7 @@ public class InAppBrowser extends CordovaPlugin {
             NAVIGATION_COLOR,
             FOOTER_COLOR,
             BASICAUTH,
+            APPEND_USER_AGENT,
             HEADERS);
 
     private static final List urlEncodedOptions = Arrays.asList(BASICAUTH, HEADERS);
@@ -179,6 +181,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+    private String appendUserAgent = "";
 
     private class BasicAuthLogin {
         public String user;
@@ -835,6 +838,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (headersSet != null) {
                 additionalHeaders = new Gson().fromJson(headersSet, additionalHeadersType);
             }
+            String appendUserAgentSet = features.get(APPEND_USER_AGENT);
+            if (appendUserAgentSet != null) {
+                appendUserAgent = appendUserAgentSet;
+            }
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -1111,13 +1118,16 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setMediaPlaybackRequiresUserGesture(mediaPlaybackRequiresUserGesture);
                 inAppWebView.addJavascriptInterface(new JsObject(), "cordova_iab");
 
-                String overrideUserAgent = preferences.getString("OverrideUserAgent", null);
-                String appendUserAgent = preferences.getString("AppendUserAgent", null);
+                String overrideUserAgentPreference = preferences.getString("OverrideUserAgent", null);
+                String appendUserAgentPreference = preferences.getString("AppendUserAgent", null);
 
-                if (overrideUserAgent != null) {
-                    settings.setUserAgentString(overrideUserAgent);
+                if (overrideUserAgentPreference != null) {
+                    settings.setUserAgentString(overrideUserAgentPreference);
                 }
-                if (appendUserAgent != null) {
+                if (appendUserAgentPreference != null) {
+                    settings.setUserAgentString(settings.getUserAgentString() + " " + appendUserAgentPreference);
+                }
+                if (appendUserAgent != null && !appendUserAgent.isEmpty()) {
                     settings.setUserAgentString(settings.getUserAgentString() + " " + appendUserAgent);
                 }
 
