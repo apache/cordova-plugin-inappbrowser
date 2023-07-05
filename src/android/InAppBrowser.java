@@ -17,6 +17,10 @@
        under the License.
 */
 package org.apache.cordova.inappbrowser;
+import android.graphics.Typeface;
+import android.text.TextUtils;
+import android.util.Log;
+
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -34,16 +38,12 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
@@ -55,7 +55,6 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,6 +80,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -123,7 +123,10 @@ public class InAppBrowser extends CordovaPlugin {
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
-    private EditText edittext;
+    private TextView tvLinkUrl;
+
+    private TextView tvHeaderUrl;
+
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
     private boolean showZoomControls = true;
@@ -139,7 +142,7 @@ public class InAppBrowser extends CordovaPlugin {
     private String closeButtonCaption = "";
     private String closeButtonColor = "";
     private boolean leftToRight = false;
-    private int toolbarColor = android.graphics.Color.LTGRAY;
+    private int toolbarColor = Color.WHITE;
     private boolean hideNavigationButtons = false;
     private String navigationButtonColor = "";
     private boolean hideUrlBar = false;
@@ -159,6 +162,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        Log.d("AN TEST", "action is: " + action);
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
@@ -594,9 +598,9 @@ public class InAppBrowser extends CordovaPlugin {
      * @param url to load
      */
     private void navigate(String url) {
-        InputMethodManager imm = (InputMethodManager)this.cordova.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+       /* InputMethodManager imm = (InputMethodManager)this.cordova.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
-
+*/
         if (!url.startsWith("http") && !url.startsWith("file:")) {
             this.inAppWebView.loadUrl("http://" + url);
         } else {
@@ -747,7 +751,7 @@ public class InAppBrowser extends CordovaPlugin {
                     _close = close;
                 }
                 else {
-                    ImageButton close = new ImageButton(cordova.getActivity());
+                    ImageView close = new ImageView(cordova.getActivity());
                     int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
                     Drawable closeIcon = activityRes.getDrawable(closeResId);
                     if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
@@ -802,7 +806,7 @@ public class InAppBrowser extends CordovaPlugin {
                 //Please, no more black!
                 toolbar.setBackgroundColor(toolbarColor);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
-                toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
+                toolbar.setPadding(this.dpToPixels(5), this.dpToPixels(0), this.dpToPixels(5), this.dpToPixels(0));
                 if (leftToRight) {
                     toolbar.setHorizontalGravity(Gravity.LEFT);
                 } else {
@@ -812,7 +816,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Action Button Container layout
                 RelativeLayout actionButtonContainer = new RelativeLayout(cordova.getActivity());
-                RelativeLayout.LayoutParams actionButtonLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams actionButtonLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 if (leftToRight) actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 else actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 actionButtonContainer.setLayoutParams(actionButtonLayoutParams);
@@ -821,9 +825,10 @@ public class InAppBrowser extends CordovaPlugin {
                 actionButtonContainer.setId(leftToRight ? Integer.valueOf(5) : Integer.valueOf(1));
 
                 // Back button
-                ImageButton back = new ImageButton(cordova.getActivity());
-                RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
+                ImageView back = new ImageView(cordova.getActivity());
+                RelativeLayout.LayoutParams backLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
                 backLayoutParams.addRule(RelativeLayout.ALIGN_LEFT);
+                backLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
                 back.setLayoutParams(backLayoutParams);
                 back.setContentDescription("Back Button");
                 back.setId(Integer.valueOf(2));
@@ -834,7 +839,7 @@ public class InAppBrowser extends CordovaPlugin {
                 back.setBackground(null);
                 back.setImageDrawable(backIcon);
                 back.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
+              //  back.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
                 back.getAdjustViewBounds();
 
                 back.setOnClickListener(new View.OnClickListener() {
@@ -844,7 +849,7 @@ public class InAppBrowser extends CordovaPlugin {
                 });
 
                 // Forward button
-                ImageButton forward = new ImageButton(cordova.getActivity());
+           /*     ImageButton forward = new ImageButton(cordova.getActivity());
                 RelativeLayout.LayoutParams forwardLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
                 forwardLayoutParams.addRule(RelativeLayout.RIGHT_OF, 2);
                 forward.setLayoutParams(forwardLayoutParams);
@@ -863,30 +868,76 @@ public class InAppBrowser extends CordovaPlugin {
                     public void onClick(View v) {
                         goForward();
                     }
-                });
+                });*/
 
-                // Edit Text Box
-                edittext = new EditText(cordova.getActivity());
-                RelativeLayout.LayoutParams textLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-                textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
+
+                // ImageView Lock SSL
+                ImageView ivLockSsl = new ImageView(cordova.getActivity());
+                RelativeLayout.LayoutParams lockSSLLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                lockSSLLayoutParams.addRule(RelativeLayout.RIGHT_OF, 1);
+                lockSSLLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+                lockSSLLayoutParams.setMargins(this.dpToPixels(5), this.dpToPixels(0), this.dpToPixels(0), this.dpToPixels(0));
+                ivLockSsl.setLayoutParams(lockSSLLayoutParams);
+                ivLockSsl.setContentDescription("Lock SLL Image");
+                ivLockSsl.setId(Integer.valueOf(8));
+                int lockSSLResId = activityRes.getIdentifier("ic_lock_ssl", "drawable", cordova.getActivity().getPackageName());
+                Drawable lockSSLIcon = activityRes.getDrawable(lockSSLResId);
+                if (navigationButtonColor != "") ivLockSsl.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
+                ivLockSsl.setBackground(null);
+                ivLockSsl.setImageDrawable(lockSSLIcon);
+                ivLockSsl.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                //ivLockSsl.setVisibility(View.GONE);
+                //     ivLockSsl.setPadding(0, this.dpToPixels(10), 0, this.dpToPixels(10));
+                ivLockSsl.getAdjustViewBounds();
+
+                // TextView Title Header URL
+
+                tvHeaderUrl = new TextView(cordova.getActivity());
+                RelativeLayout.LayoutParams textLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                textLayoutParams.addRule(RelativeLayout.RIGHT_OF, 8);
                 textLayoutParams.addRule(RelativeLayout.LEFT_OF, 5);
-                edittext.setLayoutParams(textLayoutParams);
-                edittext.setId(Integer.valueOf(4));
-                edittext.setSingleLine(true);
-                edittext.setText(url);
-                edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
-                edittext.setImeOptions(EditorInfo.IME_ACTION_GO);
-                edittext.setInputType(InputType.TYPE_NULL); // Will not except input... Makes the text NON-EDITABLE
-                edittext.setOnKeyListener(new View.OnKeyListener() {
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        // If the event is a key-down event on the "enter" button
-                        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                            navigate(edittext.getText().toString());
-                            return true;
-                        }
-                        return false;
-                    }
-                });
+                textLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                textLayoutParams.setMargins(this.dpToPixels(5), this.dpToPixels(2), this.dpToPixels(5), this.dpToPixels(0));
+                tvHeaderUrl.setLayoutParams(textLayoutParams);
+                tvHeaderUrl.setId(Integer.valueOf(9));
+                tvHeaderUrl.setSingleLine(true);
+              //  tvHeaderUrl.setText(url);
+                tvHeaderUrl.setTextColor(Color.BLACK);
+                tvHeaderUrl.setTextSize(18);
+                tvHeaderUrl.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                tvHeaderUrl.setTypeface(null, Typeface.BOLD);
+                tvHeaderUrl.setEllipsize(TextUtils.TruncateAt.END);
+
+                // TextView Description link URL
+                tvLinkUrl = new TextView(cordova.getActivity());
+                RelativeLayout.LayoutParams textLayoutParamsLink = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                textLayoutParamsLink.addRule(RelativeLayout.RIGHT_OF, 8);
+                textLayoutParamsLink.addRule(RelativeLayout.LEFT_OF, 5);
+                textLayoutParamsLink.addRule(RelativeLayout.BELOW,9);
+                textLayoutParamsLink.setMargins(this.dpToPixels(5), this.dpToPixels(2), this.dpToPixels(5), this.dpToPixels(0));
+                tvLinkUrl.setLayoutParams(textLayoutParamsLink);
+                tvLinkUrl.setId(Integer.valueOf(4));
+                tvLinkUrl.setSingleLine(true);
+                tvLinkUrl.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                //   tvLinkUrl.setText(url);
+                tvLinkUrl.setTextColor(Color.BLACK);
+                tvLinkUrl.setTextSize(11);
+                tvLinkUrl.setEllipsize(TextUtils.TruncateAt.END);
+
+
+            //    edittext.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+            //    edittext.setImeOptions(EditorInfo.IME_ACTION_GO);
+            //    edittext.setInputType(InputType.TYPE_NULL); // Will not except input... Makes the text NON-EDITABLE
+//                edittext.setOnKeyListener(new View.OnKeyListener() {
+//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                        // If the event is a key-down event on the "enter" button
+//                        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+//                            navigate(edittext.getText().toString());
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
 
 
                 // Header Close/Done button
@@ -918,10 +969,12 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
+
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
+
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
                         // If callback exists, finish it.
                         if(mUploadCallback != null) {
@@ -938,8 +991,11 @@ public class InAppBrowser extends CordovaPlugin {
                         cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
                         return true;
                     }
+
+
+
                 });
-                currentClient = new InAppBrowserClient(thatWebView, edittext, beforeload);
+                currentClient = new InAppBrowserClient(thatWebView,tvHeaderUrl, tvLinkUrl, beforeload,ivLockSsl);
                 inAppWebView.setWebViewClient(currentClient);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -1006,11 +1062,14 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Add the back and forward buttons to our action button container layout
                 actionButtonContainer.addView(back);
-                actionButtonContainer.addView(forward);
+            //    actionButtonContainer.addView(forward);
 
                 // Add the views to our toolbar if they haven't been disabled
                 if (!hideNavigationButtons) toolbar.addView(actionButtonContainer);
-                if (!hideUrlBar) toolbar.addView(edittext);
+                if (!hideUrlBar) toolbar.addView(tvHeaderUrl);
+                if (!hideUrlBar) toolbar.addView(tvLinkUrl);
+                if (!hideUrlBar) toolbar.addView(ivLockSsl);
+
 
                 // Don't add the toolbar if its been disabled
                 if (getShowLocationBar()) {
@@ -1097,54 +1156,74 @@ public class InAppBrowser extends CordovaPlugin {
      * The webview client receives notifications about appView
      */
     public class InAppBrowserClient extends WebViewClient {
-        EditText edittext;
+        TextView tvLinkUrl;
+
+
+        TextView tvHeaderUrl;
         CordovaWebView webView;
         String beforeload;
         boolean waitForBeforeload;
+        ImageView ivLockSsl;
 
         /**
          * Constructor.
          *
          * @param webView
-         * @param mEditText
+         * @param mTvHeader
+         * @param mTvLink
          */
-        public InAppBrowserClient(CordovaWebView webView, EditText mEditText, String beforeload) {
+        public InAppBrowserClient(CordovaWebView webView,TextView mTvHeader, TextView mTvLink, String beforeload,ImageView mIvSsl) {
             this.webView = webView;
-            this.edittext = mEditText;
+            this.tvLinkUrl = mTvLink;
+            this.tvHeaderUrl = mTvHeader;
+            this.ivLockSsl=mIvSsl;
             this.beforeload = beforeload;
             this.waitForBeforeload = beforeload != null;
         }
 
-        /**
-         * Override the URL that should be loaded
-         *
-         * Legacy (deprecated in API 24)
-         * For Android 6 and below.
-         *
-         * @param webView
-         * @param url
-         */
+
+        @Override
+        public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
+            tvHeaderUrl.setText(view.getTitle());
+            tvLinkUrl.setText(url);
+
+            super.doUpdateVisitedHistory(view, url, isReload);
+        }
+
+
+
+//            *
+//         * Override the URL that should be loaded
+//         *
+//         * Legacy (deprecated in API 24)
+//         * For Android 6 and below.
+//         *
+//         * @param webView
+//         * @param url
+
         @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+
+
             return shouldOverrideUrlLoading(url, null);
         }
 
-        /**
-         * Override the URL that should be loaded
-         *
-         * New (added in API 24)
-         * For Android 7 and above.
-         *
-         * @param webView
-         * @param request
-         */
+//        *
+//         * Override the URL that should be loaded
+//         *
+//         * New (added in API 24)
+//         * For Android 7 and above.
+//         *
+//         * @param webView
+//         * @param request
+
         @TargetApi(Build.VERSION_CODES.N)
         @Override
         public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+
             return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
         }
-
         /**
          * Override the URL that should be loaded
          *
@@ -1154,6 +1233,8 @@ public class InAppBrowser extends CordovaPlugin {
          * @param method
          */
         public boolean shouldOverrideUrlLoading(String url, String method) {
+
+
             boolean override = false;
             boolean useBeforeload = false;
             String errorMessage = null;
@@ -1299,6 +1380,7 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
             return shouldInterceptRequest(request.getUrl().toString(), super.shouldInterceptRequest(view, request), request.getMethod());
         }
 
@@ -1316,6 +1398,12 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+
+            boolean hasSsl = url.toLowerCase().startsWith("https://");
+            if(hasSsl){
+                ivLockSsl.setVisibility(View.VISIBLE);
+            }
+
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
@@ -1329,9 +1417,9 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             // Update the UI if we haven't already
-            if (!newloc.equals(edittext.getText().toString())) {
-                edittext.setText(newloc);
-            }
+//            if (!newloc.equals(tvLinkUrl.getText().toString())) {
+//                tvLinkUrl.setText(newloc);
+//            }
 
             try {
                 JSONObject obj = new JSONObject();
@@ -1342,6 +1430,8 @@ public class InAppBrowser extends CordovaPlugin {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
         }
+
+
 
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
@@ -1365,6 +1455,8 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+
+
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -1386,6 +1478,10 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
             super.onReceivedSslError(view, handler, error);
+
+            ivLockSsl.setVisibility(View.GONE);
+            //Hide Image security
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_ERROR_EVENT);
@@ -1428,7 +1524,6 @@ public class InAppBrowser extends CordovaPlugin {
          */
         @Override
         public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-
             // Check if there is some plugin which can resolve this auth challenge
             PluginManager pluginManager = null;
             try {
