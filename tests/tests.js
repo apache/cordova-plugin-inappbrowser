@@ -657,49 +657,49 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         '* target=Default',
         function () {
-            doOpen('http://cordova.apache.org');
+            doopen('https://cordova.apache.org');
         },
         'openWhiteListed'
     );
     createActionButton(
         '* target=Default (window.open)',
         function () {
-            doHookOpen('http://cordova.apache.org');
+            doHookopen('https://cordova.apache.org');
         },
         'openWhiteListedHook'
     );
     createActionButton(
         '* target=_self',
         function () {
-            doOpen('http://cordova.apache.org', '_self');
+            doopen('https://cordova.apache.org', '_self');
         },
         'openWhiteListedSelf'
     );
     createActionButton(
         'target=_system',
         function () {
-            doOpen('http://cordova.apache.org', '_system');
+            doopen('https://cordova.apache.org', '_system');
         },
         'openWhiteListedSystem'
     );
     createActionButton(
         'target=_blank',
         function () {
-            doOpen('http://cordova.apache.org', '_blank');
+            doopen('https://cordova.apache.org', '_blank');
         },
         'openWhiteListedBlank'
     );
     createActionButton(
         'target=Random',
         function () {
-            doOpen('http://cordova.apache.org', 'random_string');
+            doopen('https://cordova.apache.org', 'random_string');
         },
         'openWhiteListedRandom'
     );
     createActionButton(
         '* target=Random, no location bar',
         function () {
-            doOpen('http://cordova.apache.org', 'random_string', 'location=no');
+            doopen('https://cordova.apache.org', 'random_string', 'location=no');
         },
         'openWhiteListedRandomNoLocation'
     );
@@ -708,49 +708,49 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'target=Default',
         function () {
-            doOpen('http://www.apple.com');
+            doopen('https://www.apple.com');
         },
         'openNonWhiteListed'
     );
     createActionButton(
         'target=Default (window.open)',
         function () {
-            doHookOpen('http://www.apple.com');
+            doHookopen('https://www.apple.com');
         },
         'openNonWhiteListedHook'
     );
     createActionButton(
         'target=_self',
         function () {
-            doOpen('http://www.apple.com', '_self');
+            doopen('https://www.apple.com', '_self');
         },
         'openNonWhiteListedSelf'
     );
     createActionButton(
         'target=_system',
         function () {
-            doOpen('http://www.apple.com', '_system');
+            doopen('https://www.apple.com', '_system');
         },
         'openNonWhiteListedSystem'
     );
     createActionButton(
         'target=_blank',
         function () {
-            doOpen('http://www.apple.com', '_blank');
+            doopen('https://www.apple.com', '_blank');
         },
         'openNonWhiteListedBlank'
     );
     createActionButton(
         'target=Random',
         function () {
-            doOpen('http://www.apple.com', 'random_string');
+            doopen('https://www.apple.com', 'random_string');
         },
         'openNonWhiteListedRandom'
     );
     createActionButton(
         '* target=Random, no location bar',
         function () {
-            doOpen('http://www.apple.com', 'random_string', 'location=no');
+            doopen('https://www.apple.com', 'random_string', 'location=no');
         },
         'openNonWhiteListedRandomNoLocation'
     );
@@ -759,14 +759,14 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'http://google.co.uk',
         function () {
-            doOpen('http://google.co.uk', 'random_string', '', 1);
+            doopen('https://google.co.uk', 'random_string', '', 1);
         },
         'openRedirect301'
     );
     createActionButton(
         'http://goo.gl/pUFqg',
         function () {
-            doOpen('http://goo.gl/pUFqg', 'random_string', '', 2);
+            doopen('https://goo.gl/pUFqg', 'random_string', '', 2);
         },
         'openRedirect302'
     );
@@ -775,7 +775,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'Remote URL',
         function () {
-            doOpen('http://www.stluciadance.com/prospectus_file/sample.pdf');
+            doopen('https://www.stluciadance.com/prospectus_file/sample.pdf');
         },
         'openPDF'
     );
@@ -798,7 +798,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'Invalid Host',
         function () {
-            doOpen('http://www.inv;alid.com/', '_blank');
+            doopen('https://www.inv;alid.com/', '_blank');
         },
         'openInvalidHost'
     );
@@ -974,21 +974,21 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'no hardwareback (defaults to yes)',
         function () {
-            doOpen('http://cordova.apache.org', '_blank');
+            doopen('https://cordova.apache.org', '_blank');
         },
         'openHardwareBackDefault'
     );
     createActionButton(
         'hardwareback=yes',
         function () {
-            doOpen('http://cordova.apache.org', '_blank', 'hardwareback=yes');
+            doopen('https://cordova.apache.org', '_blank', 'hardwareback=yes');
         },
         'openHardwareBackYes'
     );
     createActionButton(
         'hardwareback=no',
         function () {
-            doOpen('http://cordova.apache.org', '_blank', 'hardwareback=no');
+            doopen('https://cordova.apache.org', '_blank', 'hardwareback=no');
         },
         'openHardwareBackNo'
     );
