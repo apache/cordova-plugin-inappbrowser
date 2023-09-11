@@ -18,6 +18,7 @@
  */
 
 #import "CDVWKInAppBrowser.h"
+#import <Cordova/NSDictionary+CordovaPreferences.h>
 
 #if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>) // Cordova-iOS >=6
   #import <Cordova/CDVWebViewProcessPoolFactory.h>
@@ -774,6 +775,21 @@ BOOL isExiting = FALSE;
     
 
     self.webView = [[WKWebView alloc] initWithFrame:webViewBounds configuration:configuration];
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400
+    // With the introduction of iOS 16.4 the webview is no longer inspectable by default.
+    // We'll honor that change for release builds, but will still allow inspection on debug builds by default.
+    // We also introduce an override option, so consumers can influence this decision in their own build.
+    if (@available(iOS 16.4, *)) {
+#ifdef DEBUG
+        BOOL allowWebviewInspectionDefault = YES;
+#else
+        BOOL allowWebviewInspectionDefault = NO;
+#endif
+        self.webView.inspectable = [_settings cordovaBoolSettingForKey:@"InspectableWebview" defaultValue:allowWebviewInspectionDefault];
+    }
+#endif
+
     
     [self.view addSubview:self.webView];
     [self.view sendSubviewToBack:self.webView];
