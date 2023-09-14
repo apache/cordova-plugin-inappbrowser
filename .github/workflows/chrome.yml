@@ -1,0 +1,73 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Chrome Testsuite
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.eslint*'
+
+jobs:
+  test:
+    name: Chrome Latest Test
+    runs-on: ubuntu-latest
+
+    # hoist configurations to top that are expected to be updated
+    env:
+      # Storing a copy of the repo
+      repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+
+      node-version: 16
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.node-version }}
+
+      - name: Run install xvfb
+        run: sudo apt-get install xvfb
+
+      - name: Run Environment Information
+        run: |
+          node --version
+          npm --version
+
+      - name: Run npm install
+        run: |
+          npm i -g cordova@latest
+          npm ci
+
+      - name: Run paramedic install
+        if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
+        run: npm i -g github:apache/cordova-paramedic
+
+      - name: Run paramedic tests
+        env:
+          test_config: 'browser.config.json'
+          # Generally, this should automatically work for cordova-paramedic & plugins. If the path is unique, this can be manually changed.
+          test_plugin_path: ${{ endswith(env.repo, '/cordova-paramedic') && './spec/testable-plugin/' || './' }}
+          paramedic: ${{ endswith(env.repo, '/cordova-paramedic') && 'node main.js' || 'cordova-paramedic' }}
+        run: xvfb-run --auto-servernum ${{ env.paramedic }} --config ./pr/local/${{ env.test_config }} --plugin ${{ env.test_plugin_path }}

@@ -21,11 +21,10 @@ description: Open an in-app browser window.
 #         under the License.
 -->
 
-|AppVeyor|Travis CI|
-|:-:|:-:|
-|[![Build status](https://ci.appveyor.com/api/projects/status/github/apache/cordova-plugin-inappbrowser?branch=master)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-plugin-inappbrowser)|[![Build Status](https://travis-ci.org/apache/cordova-plugin-inappbrowser.svg?branch=master)](https://travis-ci.org/apache/cordova-plugin-inappbrowser)|
 
 # cordova-plugin-inappbrowser
+
+[![Android Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml) [![Chrome Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml) [![iOS Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml) [![Lint Test](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml)
 
 You can show helpful articles, videos, and web resources inside of your app. Users can view web pages without leaving your app.
 
@@ -33,7 +32,7 @@ You can show helpful articles, videos, and web resources inside of your app. Use
 
 This plugin provides a web browser view that displays when calling `cordova.InAppBrowser.open()`.
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
 
 ### `window.open`
 
@@ -67,6 +66,14 @@ simply hook `window.open` during initialization.  For example:
     function onDeviceReady() {
         window.open = cordova.InAppBrowser.open;
     }
+
+### Preferences
+
+#### <b>config.xml</b>
+- <b>InAppBrowserStatusBarStyle [iOS only]</b>: (string, options 'lightcontent', 'darkcontent' or 'default'. Defaults to 'default') set text color style for iOS. 'lightcontent' is intended for use on dark backgrounds. 'darkcontent' is only available since iOS 13 and intended for use on light backgrounds.
+```xml
+<preference name="InAppBrowserStatusBarStyle" value="lightcontent" />
+```
 
 ## cordova.InAppBrowser.open
 
@@ -159,7 +166,7 @@ instance, or the system browser.
 
 ### Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     var ref2 = cordova.InAppBrowser.open(encodeURI('http://ja.m.wikipedia.org/wiki/ハングル'), '_blank', 'location=yes');
 
 ### OSX Quirks
@@ -167,6 +174,16 @@ instance, or the system browser.
 At the moment the only supported target in OSX is `_system`.
 
 `_blank` and `_self` targets are not yet implemented and are ignored silently. Pull requests and patches to get these to work are greatly appreciated.
+
+### iOS Quirks
+
+Since the introduction of iPadOS 13, iPads try to adapt their content mode / user agent for the optimal browsing experience. This may result in iPads having their user agent set to Macintosh, making it hard to detect them as mobile devices using user agent string sniffing. You can change this with the `PreferredContentMode` preference in `config.xml`.
+
+```xml
+<preference name="PreferredContentMode" value="mobile" />
+```
+
+The example above forces the user agent to contain `iPad`. The other option is to use the value `desktop` to turn the user agent to `Macintosh`.
 
 ### Browser Quirks
 
@@ -360,7 +377,7 @@ function downloadListener(params){
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstart', function(event) { alert(event.url); });
 
 ## InAppBrowser.removeEventListener
@@ -392,7 +409,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     var myCallback = function(event) { alert(event.url); }
     ref.addEventListener('loadstart', myCallback);
     ref.removeEventListener('loadstart', myCallback);
@@ -414,7 +431,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     ref.close();
 
 ## InAppBrowser.show
@@ -434,7 +451,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'hidden=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'hidden=yes');
     // some time later...
     ref.show();
 
@@ -454,7 +471,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank');
     // some time later...
     ref.hide();
 
@@ -486,7 +503,7 @@ The function is passed an `InAppBrowserEvent` object.
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.executeScript({file: "myscript.js"});
     });
@@ -521,7 +538,7 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
 
 ### Quick Example
 
-    var ref = cordova.InAppBrowser.open('http://apache.org', '_blank', 'location=yes');
+    var ref = cordova.InAppBrowser.open('https://apache.org', '_blank', 'location=yes');
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });
@@ -703,13 +720,13 @@ iab.open('local-url.html', 'random_string', 'location=no'); // loads in the InAp
 ```
 var iab = cordova.InAppBrowser;
 
-iab.open('http://whitelisted-url.com');                  // loads in the Cordova WebView
-iab.open('http://whitelisted-url.com', '_self');         // loads in the Cordova WebView
-iab.open('http://whitelisted-url.com', '_system');       // loads in the system browser
-iab.open('http://whitelisted-url.com', '_blank');        // loads in the InAppBrowser
-iab.open('http://whitelisted-url.com', 'random_string'); // loads in the InAppBrowser
+iab.open('https://whitelisted-url.com');                  // loads in the Cordova WebView
+iab.open('https://whitelisted-url.com', '_self');         // loads in the Cordova WebView
+iab.open('https://whitelisted-url.com', '_system');       // loads in the system browser
+iab.open('https://whitelisted-url.com', '_blank');        // loads in the InAppBrowser
+iab.open('https://whitelisted-url.com', 'random_string'); // loads in the InAppBrowser
 
-iab.open('http://whitelisted-url.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+iab.open('https://whitelisted-url.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```
 
@@ -718,11 +735,11 @@ iab.open('http://whitelisted-url.com', 'random_string', 'location=no'); // loads
 ```
 var iab = cordova.InAppBrowser;
 
-iab.open('http://url-that-fails-whitelist.com');                  // loads in the InAppBrowser
-iab.open('http://url-that-fails-whitelist.com', '_self');         // loads in the InAppBrowser
-iab.open('http://url-that-fails-whitelist.com', '_system');       // loads in the system browser
-iab.open('http://url-that-fails-whitelist.com', '_blank');        // loads in the InAppBrowser
-iab.open('http://url-that-fails-whitelist.com', 'random_string'); // loads in the InAppBrowser
-iab.open('http://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
+iab.open('https://url-that-fails-whitelist.com');                  // loads in the InAppBrowser
+iab.open('https://url-that-fails-whitelist.com', '_self');         // loads in the InAppBrowser
+iab.open('https://url-that-fails-whitelist.com', '_system');       // loads in the system browser
+iab.open('https://url-that-fails-whitelist.com', '_blank');        // loads in the InAppBrowser
+iab.open('https://url-that-fails-whitelist.com', 'random_string'); // loads in the InAppBrowser
+iab.open('https://url-that-fails-whitelist.com', 'random_string', 'location=no'); // loads in the InAppBrowser, no location bar
 
 ```

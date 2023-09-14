@@ -17,11 +17,10 @@
  * specific language governing permissions and limitations
  * under the License.
  *
-*/
+ */
 
-/* jslint sloppy:true */
-/* global Windows:true, setImmediate */
-/* eslint standard/no-callback-literal : 0 */
+/* eslint-disable standard/no-callback-literal */
+/* global Windows, setImmediate */
 
 var cordova = require('cordova');
 var urlutil = require('cordova/urlutil');
@@ -44,21 +43,32 @@ var isWebViewAvailable = cordova.platformId === 'windows';
 function attachNavigationEvents (element, callback) {
     if (isWebViewAvailable) {
         element.addEventListener('MSWebViewNavigationStarting', function (e) {
-            callback({ type: 'loadstart', url: e.uri }, {keepCallback: true});
+            callback({ type: 'loadstart', url: e.uri }, { keepCallback: true });
         });
 
         element.addEventListener('MSWebViewNavigationCompleted', function (e) {
             if (e.isSuccess) {
                 callback({ type: 'loadstop', url: e.uri }, { keepCallback: true });
             } else {
-                callback({ type: 'loaderror', url: e.uri, code: e.webErrorStatus, message: 'Navigation failed with error code ' + e.webErrorStatus }, { keepCallback: true });
+                callback(
+                    {
+                        type: 'loaderror',
+                        url: e.uri,
+                        code: e.webErrorStatus,
+                        message: 'Navigation failed with error code ' + e.webErrorStatus
+                    },
+                    { keepCallback: true }
+                );
             }
         });
 
         element.addEventListener('MSWebViewUnviewableContentIdentified', function (e) {
             // WebView found the content to be not HTML.
             // http://msdn.microsoft.com/en-us/library/windows/apps/dn609716.aspx
-            callback({ type: 'loaderror', url: e.uri, code: e.webErrorStatus, message: 'Navigation failed with error code ' + e.webErrorStatus }, { keepCallback: true });
+            callback(
+                { type: 'loaderror', url: e.uri, code: e.webErrorStatus, message: 'Navigation failed with error code ' + e.webErrorStatus },
+                { keepCallback: true }
+            );
         });
 
         element.addEventListener('MSWebViewContentLoading', function (e) {
@@ -78,15 +88,15 @@ function attachNavigationEvents (element, callback) {
         });
     } else {
         var onError = function () {
-            callback({ type: 'loaderror', url: this.contentWindow.location }, {keepCallback: true});
+            callback({ type: 'loaderror', url: this.contentWindow.location }, { keepCallback: true });
         };
 
         element.addEventListener('unload', function () {
-            callback({ type: 'loadstart', url: this.contentWindow.location }, {keepCallback: true});
+            callback({ type: 'loadstart', url: this.contentWindow.location }, { keepCallback: true });
         });
 
         element.addEventListener('load', function () {
-            callback({ type: 'loadstop', url: this.contentWindow.location }, {keepCallback: true});
+            callback({ type: 'loadstop', url: this.contentWindow.location }, { keepCallback: true });
         });
 
         element.addEventListener('error', onError);
@@ -175,7 +185,8 @@ var IAB = {
                 }
 
                 popup = document.createElement(isWebViewAvailable ? 'x-ms-webview' : 'iframe');
-                if (popup instanceof HTMLIFrameElement) { // eslint-disable-line no-undef
+                if (popup instanceof HTMLIFrameElement) {
+                    // eslint-disable-line no-undef
                     // For iframe we need to override bacground color of parent element here
                     // otherwise pages without background color set will have transparent background
                     popup.style.backgroundColor = 'white';
@@ -240,14 +251,18 @@ var IAB = {
                     backButton.innerText = 'back';
                     backButton.className = 'app-bar-action action-back';
                     backButton.addEventListener('click', function (e) {
-                        if (popup.canGoBack) { popup.goBack(); }
+                        if (popup.canGoBack) {
+                            popup.goBack();
+                        }
                     });
 
                     forwardButton = document.createElement('div');
                     forwardButton.innerText = 'forward';
                     forwardButton.className = 'app-bar-action action-forward';
                     forwardButton.addEventListener('click', function (e) {
-                        if (popup.canGoForward) { popup.goForward(); }
+                        if (popup.canGoForward) {
+                            popup.goForward();
+                        }
                     });
 
                     closeButton = document.createElement('div');
@@ -292,11 +307,11 @@ var IAB = {
                 op.oncomplete = function (e) {
                     if (hasCallback) {
                         // return null if event target is unavailable by some reason
-                        var result = (e && e.target) ? [e.target.result] : [null];
+                        var result = e && e.target ? [e.target.result] : [null];
                         win(result);
                     }
                 };
-                op.onerror = function () { };
+                op.onerror = function () {};
                 op.start();
             }
         });
@@ -323,7 +338,7 @@ var IAB = {
                                 win(result);
                             }
                         };
-                        op.onerror = function () { };
+                        op.onerror = function () {};
                         op.start();
                     });
                 });
@@ -352,13 +367,18 @@ var IAB = {
             if (isWebViewAvailable && browserWrap && popup) {
                 // CB-12364 getFileFromApplicationUriAsync does not support ms-appx-web
                 var uri = new Windows.Foundation.Uri(filePath.replace('ms-appx-web:', 'ms-appx:'));
-                Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri).then(function (file) {
-                    return Windows.Storage.FileIO.readTextAsync(file);
-                }).done(function (code) {
-                    injectCSS(popup, code, hasCallback && win);
-                }, function () {
-                    // no-op, just catch an error
-                });
+                Windows.Storage.StorageFile.getFileFromApplicationUriAsync(uri)
+                    .then(function (file) {
+                        return Windows.Storage.FileIO.readTextAsync(file);
+                    })
+                    .done(
+                        function (code) {
+                            injectCSS(popup, code, hasCallback && win);
+                        },
+                        function () {
+                            // no-op, just catch an error
+                        }
+                    );
             }
         });
     }
@@ -367,8 +387,10 @@ var IAB = {
 function injectCSS (webView, cssCode, callback) {
     // This will automatically escape all thing that we need (quotes, slashes, etc.)
     var escapedCode = JSON.stringify(cssCode);
-    var evalWrapper = '(function(d){var c=d.createElement(\'style\');c.innerHTML=%s;d.head.appendChild(c);})(document)'
-        .replace('%s', escapedCode);
+    var evalWrapper = "(function(d){var c=d.createElement('style');c.innerHTML=%s;d.head.appendChild(c);})(document)".replace(
+        '%s',
+        escapedCode
+    );
 
     var op = webView.invokeScriptAsync('eval', evalWrapper);
     op.oncomplete = function () {
@@ -376,7 +398,7 @@ function injectCSS (webView, cssCode, callback) {
             callback([]);
         }
     };
-    op.onerror = function () { };
+    op.onerror = function () {};
     op.start();
 }
 
