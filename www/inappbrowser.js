@@ -33,7 +33,8 @@
             loaderror: channel.create('loaderror'),
             exit: channel.create('exit'),
             customscheme: channel.create('customscheme'),
-            message: channel.create('message')
+            message: channel.create('message'),
+            download: channel.create('download')
         };
     }
 
@@ -89,6 +90,10 @@
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
+        },
+
+        addDownloadListener: function (success, error) {
+            exec(success, error, 'InAppBrowser', 'downloadListener');
         }
     };
 

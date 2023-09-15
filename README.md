@@ -221,6 +221,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __exit__: event fires when the `InAppBrowser` window is closed.
   - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload` set).
   - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
+  - __download__: _(Android Only)_ event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
@@ -321,19 +322,42 @@ function messageCallBack(params){
 }
 
 ```
+#### Download event Example
+
+Whenever the InAppBrowser receives or locates to a url which leads in downloading a file, the callback assigned to the "download" event is called. The parameter passed to this callback is an object with the the following properties
+
+- **type** _it contains the String value "download" always_
+- **url** _The url that leaded to the downloading of file. Basically, the download link of file_
+- **userAgent** _User Agent of the webview_
+- **contentDisposition** _If the url contains "content-disposition" header, then this property holds the value of that field else this field is empty_
+- **contentLength** _If the link of the file allows to obtain file size then this property holds the file size else it contains int value 0_
+- **mimetype** _The MIME type of the file_
+
+```
+
+function downloadListener(params){
+    var url = params.url;
+    var mimetype = params.mimetype;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", params.url);
+    xhr.onload = function() {
+        var content = xhr.responseText;
+    };
+    xhr.send();
+
+}
+
+```
+
 
 ### InAppBrowserEvent Properties
 
 - __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `message` or `exit`. _(String)_
-
 - __url__: the URL that was loaded. _(String)_
-
 - __code__: the error code, only in the case of `loaderror`. _(Number)_
-
 - __message__: the error message, only in the case of `loaderror`. _(String)_
-
 - __data__: the message contents , only in the case of `message`. A stringified JSON object. _(String)_
-
 
 ### Supported Platforms
 
@@ -371,6 +395,7 @@ function messageCallBack(params){
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
   - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
+  - __download__: _(Android only)_ event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
 
 - __callback__: the function to execute when the event fires.
 The function is passed an `InAppBrowserEvent` object.
