@@ -62,12 +62,16 @@ jobs:
             ios-version: 15.x
             xcode-version: 13.x
 
+          - os-version: macos-12
+            ios-version: 16.x
+            xcode-version: 14.x
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.node-version }}
-      - uses: maxim-lobanov/setup-xcode@881be567d30efed8fb3f12b5099d68c3fb72aa3d
+      - uses: maxim-lobanov/setup-xcode@9a697e2b393340c3cacd97468baa318e4c883d98
         env:
           xcode-version: ${{ matrix.versions.xcode-version == '' && env.default_xcode-version || matrix.versions.xcode-version }}
         with:

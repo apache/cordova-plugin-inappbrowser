@@ -42,8 +42,8 @@ jobs:
       node-version: 16
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
 
@@ -61,7 +61,7 @@ jobs:
           npm ci
 
       - name: Run paramedic install
-        if: ${{ endswith(env.repo, '/cordova-paramedic')　!= true }}
+        if: ${{ endswith(env.repo, '/cordova-paramedic') != true }}
         run: npm i -g github:apache/cordova-paramedic
 
       - name: Run paramedic tests
