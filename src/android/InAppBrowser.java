@@ -62,6 +62,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.print.PrintManager;
+import android.print.PrintJob;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintAttributes;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
@@ -971,9 +975,9 @@ public class InAppBrowser extends CordovaPlugin {
                             }
                         }
                     }
-                );        
+                );
 
-                // Add postMessage interface
+                // Add print/postMessage interfaces
                 class JsObject {
                     @JavascriptInterface
                     public void postMessage(String data) {
@@ -985,6 +989,21 @@ public class InAppBrowser extends CordovaPlugin {
                         } catch (JSONException ex) {
                             LOG.e(LOG_TAG, "data object passed to postMessage has caused a JSON error.");
                         }
+                    }
+
+                    @JavascriptInterface
+                    public void print(String jobName) {
+                        inAppWebView.post(() -> {
+                            // Get a PrintManager instance
+                            PrintManager printManager = (PrintManager) cordova.getActivity()
+                                    .getSystemService(Context.PRINT_SERVICE);
+
+                            PrintDocumentAdapter printAdapter = inAppWebView.createPrintDocumentAdapter(jobName);
+
+                            // Create a print job with name and adapter instance
+                            printManager.print(jobName, printAdapter,
+                                    new PrintAttributes.Builder().build());
+                        });
                     }
                 }
 
@@ -1374,6 +1393,9 @@ public class InAppBrowser extends CordovaPlugin {
 
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
+
+            // override window.print
+            injectDeferredObject("window.print=()=>{cordova_iab.print(window.document.title);}", null);
 
             // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
             CookieManager.getInstance().flush();
