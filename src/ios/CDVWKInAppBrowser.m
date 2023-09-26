@@ -218,17 +218,19 @@ static CDVWKInAppBrowser* instance = nil;
                 
                 NSURL* url = [NSURL URLWithString:key];
                 if(!url){
-                    NSLog(@"Cookie key is not a proper NSURL!");
+                    NSLog(@"Cookie key %@ is not a proper NSURL!",key);
                     continue;
                 }
                 
                 NSArray<NSHTTPCookie*> *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{ @"Set-Cookie" : browserOptions.cookies[key] } forURL:url];
 
                 if(cookies.count == 0) {
-                    NSLog(@"No cookies to process!");
+                    NSLog(@"No cookies to process for url %@!",url);
                 }
                 
                 for(NSHTTPCookie* cookie in cookies){
+                    //Is not possible to wait for completion because it seems the handler is called after the WKWebView is loaded
+                    //See: https://stackoverflow.com/questions/49452968/wkhttpcookiestore-setcookie-completion-handler-not-called
                     [cookieStore setCookie:cookie completionHandler:nil];
                 }
                 
@@ -1164,7 +1166,6 @@ BOOL isExiting = FALSE;
 
 - (void)navigateTo:(NSURL*)url options:(CDVInAppBrowserOptions*)options
 {
-    NSLog(@"options headers: %@", options.headers);
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
@@ -1173,7 +1174,6 @@ BOOL isExiting = FALSE;
             NSString* value = options.headers[key];
             [request setValue:value forHTTPHeaderField:key];
         }
-        NSLog(@"request headers: %@", request.allHTTPHeaderFields);
         [self.webView loadRequest:request];
     }
 }
