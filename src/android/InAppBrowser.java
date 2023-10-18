@@ -187,12 +187,16 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, String> features = parseFeature(args.optString(2));
+            parseHeadersAndCookies(features);
 
             LOG.d(LOG_TAG, "target = " + target);
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    setCookies(clearAllCache, clearSessionCache, cookies);
+
                     String result = "";
                     // SELF
                     if (SELF.equals(target)) {
@@ -290,7 +294,7 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
-                    inAppWebView.loadUrl(url);
+                    inAppWebView.loadUrl(url,headers);
 
                 }
             });
@@ -395,6 +399,18 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public void onDestroy() {
         closeDialog();
+    }
+
+    private void parseHeadersAndCookies(HashMap<String, String> features){
+        String headersSet = features.get(HEADERS);
+        if (headersSet != null) {
+            headers = deserializeMapOption(headersSet);
+        }
+
+        String cookiesSet = features.get(COOKIES);
+        if (cookiesSet != null) {
+            cookies = deserializeMapOption(cookiesSet);
+        }
     }
 
     /**
@@ -731,16 +747,6 @@ public class InAppBrowser extends CordovaPlugin {
             String fullscreenSet = features.get(FULLSCREEN);
             if (fullscreenSet != null) {
                 fullscreen = fullscreenSet.equals("yes") ? true : false;
-            }
-
-            String headersSet = features.get(HEADERS);
-            if (headersSet != null) {
-                headers = deserializeMapOption(headersSet);
-            }
-
-            String cookiesSet = features.get(COOKIES);
-            if (cookiesSet != null) {
-                cookies = deserializeMapOption(cookiesSet);
             }
         }
 
@@ -1092,8 +1098,6 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
         };
-
-        setCookies(clearAllCache, clearSessionCache, cookies);
 
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
