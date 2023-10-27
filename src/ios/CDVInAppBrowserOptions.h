@@ -17,7 +17,6 @@
  under the License.
  */
 
-
 @interface CDVInAppBrowserOptions : NSObject {}
 
 @property (nonatomic, assign) BOOL location;
@@ -44,6 +43,13 @@
 @property (nonatomic, assign) BOOL hidden;
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, copy) NSString* beforeload;
+
+@property (nonatomic, copy) NSDictionary* headers;
+
+/**
+ Key is the cookie name, value is a Set-Cookie HTTP header string representation.
+ */
+@property (nonatomic, copy) NSDictionary* cookies;
 
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 

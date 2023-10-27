@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.content.res.Resources;
@@ -35,6 +37,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -63,6 +66,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
@@ -80,9 +86,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.CountDownLatch;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class InAppBrowser extends CordovaPlugin {
@@ -120,8 +129,10 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FULLSCREEN = "fullscreen";
 
     private static final int TOOLBAR_HEIGHT = 48;
+    private static final String COOKIES = "cookies";
+    private static final String HEADERS = "headers";
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, COOKIES, HEADERS);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -152,6 +163,12 @@ public class InAppBrowser extends CordovaPlugin {
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
+    @Nullable
+    private Map<String, String> headers;
+    @Nullable
+    private Map<String, String> cookies;
+
+
     /**
      * Executes the request and returns PluginResult.
      *
@@ -170,12 +187,16 @@ public class InAppBrowser extends CordovaPlugin {
             }
             final String target = t;
             final HashMap<String, String> features = parseFeature(args.optString(2));
+            parseHeadersAndCookies(features);
 
             LOG.d(LOG_TAG, "target = " + target);
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    setCookies(clearAllCache, clearSessionCache, cookies);
+
                     String result = "";
                     // SELF
                     if (SELF.equals(target)) {
@@ -273,7 +294,7 @@ public class InAppBrowser extends CordovaPlugin {
                     } else {
                         ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
                     }
-                    inAppWebView.loadUrl(url);
+                    inAppWebView.loadUrl(url,headers);
 
                 }
             });
@@ -378,6 +399,18 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public void onDestroy() {
         closeDialog();
+    }
+
+    private void parseHeadersAndCookies(HashMap<String, String> features){
+        String headersSet = features.get(HEADERS);
+        if (headersSet != null) {
+            headers = deserializeMapOption(headersSet);
+        }
+
+        String cookiesSet = features.get(COOKIES);
+        if (cookiesSet != null) {
+            cookies = deserializeMapOption(cookiesSet);
+        }
     }
 
     /**
@@ -948,30 +981,30 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
-                
+
                 // download event
-                
+
                 inAppWebView.setDownloadListener(
-                    new DownloadListener(){
-                        public void onDownloadStart(
-                                String url, String userAgent, String contentDisposition, String mimetype, long contentLength
-                        ){
-                            try{
-                                JSONObject succObj = new JSONObject();
-                                succObj.put("type", DOWNLOAD_EVENT);
-                                succObj.put("url",url);
-                                succObj.put("userAgent",userAgent);
-                                succObj.put("contentDisposition",contentDisposition);
-                                succObj.put("mimetype",mimetype);
-                                succObj.put("contentLength",contentLength);
-                                sendUpdate(succObj, true);
-                            }
-                            catch(Exception e){
-                                LOG.e(LOG_TAG,e.getMessage());
+                        new DownloadListener(){
+                            public void onDownloadStart(
+                                    String url, String userAgent, String contentDisposition, String mimetype, long contentLength
+                            ){
+                                try{
+                                    JSONObject succObj = new JSONObject();
+                                    succObj.put("type", DOWNLOAD_EVENT);
+                                    succObj.put("url",url);
+                                    succObj.put("userAgent",userAgent);
+                                    succObj.put("contentDisposition",contentDisposition);
+                                    succObj.put("mimetype",mimetype);
+                                    succObj.put("contentLength",contentLength);
+                                    sendUpdate(succObj, true);
+                                }
+                                catch(Exception e){
+                                    LOG.e(LOG_TAG,e.getMessage());
+                                }
                             }
                         }
-                    }
-                );        
+                );
 
                 // Add postMessage interface
                 class JsObject {
@@ -1011,16 +1044,10 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 settings.setDomStorageEnabled(true);
 
-                if (clearAllCache) {
-                    CookieManager.getInstance().removeAllCookie();
-                } else if (clearSessionCache) {
-                    CookieManager.getInstance().removeSessionCookie();
-                }
-
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
 
-                inAppWebView.loadUrl(url);
+                inAppWebView.loadUrl(url, headers);
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
@@ -1071,8 +1098,105 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
         };
+
         this.cordova.getActivity().runOnUiThread(runnable);
         return "";
+    }
+
+    private void setCookies(boolean clearAllCache,
+                            boolean clearSessionCache,
+                            @Nullable Map<String, String> cookies) {
+
+        int operations = 0;
+        if (clearAllCache) {
+            operations++;
+        }
+        if (clearSessionCache) {
+            operations++;
+        }
+        if (cookies != null) {
+            operations += cookies.size();
+        }
+
+        CountDownLatch cookiesCountdown = new CountDownLatch(operations);
+
+        Runnable cookiesRunnable = cookiesRunnable(
+                cookiesCountdown,
+                clearAllCache,
+                clearSessionCache,
+                cookies);
+
+        //CookieManager setCookie needs a background Looper to await completion
+        HandlerThread handlerThread = new HandlerThread("backgroundThread");
+        if (!handlerThread.isAlive())
+            handlerThread.start();
+        Handler threadHandler = new Handler(handlerThread.getLooper());
+        threadHandler.post(cookiesRunnable); //runs on main thread
+        try {
+            cookiesCountdown.await();
+        } catch (InterruptedException e) {
+            LOG.e(LOG_TAG, "cookies set was interrupted by timeout.", e);
+        }
+        handlerThread.quitSafely();
+    }
+
+    @NonNull
+    private Runnable cookiesRunnable(
+            CountDownLatch cookiesCountdown,
+            boolean clearAllCache,
+            boolean clearSessionCache,
+            @Nullable Map<String, String> cookies) {
+
+        return () -> {
+
+            if (clearAllCache) {
+                CookieManager.getInstance().removeAllCookies(value -> {
+                    if (!value) {
+                        LOG.e(LOG_TAG, "unable to removeAllCookies in CookieManager!");
+                    }
+                    cookiesCountdown.countDown();
+                });
+            } else if (clearSessionCache) {
+                CookieManager.getInstance().removeSessionCookies(value -> {
+                    if (!value) {
+                        LOG.e(LOG_TAG, "unable to removeSessionCookies in CookieManager!");
+                    }
+                    cookiesCountdown.countDown();
+                });
+            }
+
+            //Set all cookies from options
+            if (cookies != null && cookies.size() > 0) {
+
+                for (String cookieKey : cookies.keySet()) {
+                    CookieManager.getInstance().setCookie(cookieKey, cookies.get(cookieKey), value -> {
+                        if (!value) {
+                            LOG.e(LOG_TAG, "unable to set the cookie in CookieManager!");
+                        }
+                        cookiesCountdown.countDown();
+                    });
+                }
+            }
+
+        };
+    }
+
+    @Nullable
+    private Map<String, String> deserializeMapOption(@NonNull String serializedMapOption) {
+        Map<String, String> result = new HashMap<>();
+        String base64 = serializedMapOption.replace("@", "=");
+        String json = new String(Base64.decode(base64, Base64.DEFAULT));
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            for (Iterator<String> keys = jsonObject.keys(); keys.hasNext(); ) {
+                String key = keys.next();
+                result.put(key, jsonObject.getString(key));
+            }
+        } catch (JSONException e) {
+            LOG.e(LOG_TAG, "headers options are not serialized as a valid json.", e);
+            return null;
+        }
+        return result;
     }
 
     /**
