@@ -17,7 +17,6 @@
  under the License.
  */
 
-#import <UIKit/UINavigationController.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
 
 
