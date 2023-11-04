@@ -8,9 +8,7 @@
     "platforms": [
       "android",
       "browser",
-      "ios",
-      "osx",
-      "windows"
+      "ios"
     ]
   },
   "repository": "github:apache/cordova-plugin-inappbrowser",
@@ -24,9 +22,7 @@
     "ecosystem:cordova",
     "cordova-android",
     "cordova-browser",
-    "cordova-ios",
-    "cordova-osx",
-    "cordova-windows"
+    "cordova-ios"
   ],
   "scripts": {
     "test": "npm run lint",
