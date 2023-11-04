@@ -37,11 +37,6 @@
 
 #pragma mark CDVWKInAppBrowser
 
-@interface CDVWKInAppBrowser () {
-    NSInteger _previousStatusBarStyle;
-}
-@end
-
 @implementation CDVWKInAppBrowser
 
 static CDVWKInAppBrowser* instance = nil;
@@ -53,7 +48,6 @@ static CDVWKInAppBrowser* instance = nil;
 - (void)pluginInitialize
 {
     instance = self;
-    _previousStatusBarStyle = -1;
     _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
@@ -236,14 +230,6 @@ static CDVWKInAppBrowser* instance = nil;
         NSLog(@"Tried to show IAB after it was closed.");
         return;
     }
-    if (_previousStatusBarStyle != -1) {
-        NSLog(@"Tried to show IAB while already shown");
-        return;
-    }
-    
-    if(!initHidden){
-        _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
-    }
     
     __block CDVInAppBrowserNavigationController* nav = [[CDVInAppBrowserNavigationController alloc]
                                                         initWithRootViewController:self.inAppBrowserViewController];
@@ -291,17 +277,10 @@ static CDVWKInAppBrowser* instance = nil;
         
         
     }
-    if (_previousStatusBarStyle == -1) {
-        NSLog(@"Tried to hide IAB while already hidden");
-        return;
-    }
-    
-    _previousStatusBarStyle = [UIApplication sharedApplication].statusBarStyle;
     
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
-            self->_previousStatusBarStyle = -1;
             [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         }
     });
@@ -640,15 +619,6 @@ static CDVWKInAppBrowser* instance = nil;
     // Based on https://stackoverflow.com/questions/4544489/how-to-remove-a-uiwindow
     self->tmpWindow.hidden = YES;
     self->tmpWindow = nil;
-
-    if (_previousStatusBarStyle != -1) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
-#pragma clang diagnostic pop
-    }
-
-    _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
 @end //CDVWKInAppBrowser
