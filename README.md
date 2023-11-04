@@ -149,20 +149,12 @@ instance, or the system browser.
     - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
     - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
 
-    Windows supports these additional options:
-
-    - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
-    - __hardwareback__: works the same way as on Android platform.
-    - __fullscreen__: set to `yes` to create the browser control without a border around it. Please note that if __location=no__ is also specified, there will be no control presented to user to close IAB window.
-
 
 ### Supported Platforms
 
 - Android
 - Browser
 - iOS
-- OSX
-- Windows
 
 ### Example
 
@@ -364,16 +356,10 @@ function downloadListener(params){
 - Android
 - Browser
 - iOS
-- Windows
-- OSX
 
 ### Browser Quirks
 
 `loadstart`, `loaderror`, `message` events are not fired.
-
-### Windows Quirks
-
-`message` event is not fired.
 
 ### Quick Example
 
@@ -405,7 +391,6 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - Browser
 - iOS
-- Windows
 
 ### Quick Example
 
@@ -427,7 +412,6 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - Browser
 - iOS
-- Windows
 
 ### Quick Example
 
@@ -447,7 +431,6 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - Browser
 - iOS
-- Windows
 
 ### Quick Example
 
@@ -467,7 +450,6 @@ The function is passed an `InAppBrowserEvent` object.
 
 - Android
 - iOS
-- Windows
 
 ### Quick Example
 
@@ -499,7 +481,6 @@ The function is passed an `InAppBrowserEvent` object.
 - Android
 - Browser
 - iOS
-- Windows
 
 ### Quick Example
 
@@ -511,10 +492,6 @@ The function is passed an `InAppBrowserEvent` object.
 ### Browser Quirks
 
 - only __code__ key is supported.
-
-### Windows Quirks
-
-Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.controls.webview.invokescriptasync.aspx) the invoked script can return only string values, otherwise the parameter, passed to __callback__ will be `[null]`.
 
 ## InAppBrowser.insertCSS
 
@@ -534,7 +511,6 @@ Due to [MSDN docs](https://msdn.microsoft.com/en-us/library/windows.ui.xaml.cont
 
 - Android
 - iOS
-- Windows
 
 ### Quick Example
 

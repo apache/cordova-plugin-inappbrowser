@@ -19,19 +19,12 @@
  *
  */
 
-/* global MSApp */
-
 var cordova = require('cordova');
-var isWindows = cordova.platformId === 'windows';
 var isIos = cordova.platformId === 'ios';
 var isAndroid = cordova.platformId === 'android';
 var isBrowser = cordova.platformId === 'browser';
 
 window.alert = window.alert || navigator.notification.alert;
-if (isWindows && navigator && navigator.notification && navigator.notification.alert) {
-    // window.alert is defined but not functional on UWP
-    window.alert = navigator.notification.alert;
-}
 
 exports.defineAutoTests = function () {
     var createTests = function (platformOpts) {
@@ -539,43 +532,21 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
         'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
 
-    // CB-7490 We need to wrap this code due to Windows security restrictions
-    // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
-    if (window.MSApp && window.MSApp.execUnsafeLocalFunction) {
-        MSApp.execUnsafeLocalFunction(function () {
-            contentEl.innerHTML =
-                info_div +
-                platform_info +
-                local_tests +
-                white_listed_tests +
-                non_white_listed_tests +
-                page_with_redirects_tests +
-                pdf_url_tests +
-                invalid_url_tests +
-                css_js_injection_tests +
-                open_hidden_tests +
-                clearing_cache_tests +
-                video_tag_tests +
-                local_with_anchor_tag_tests +
-                hardwareback_tests;
-        });
-    } else {
-        contentEl.innerHTML =
-            info_div +
-            platform_info +
-            local_tests +
-            white_listed_tests +
-            non_white_listed_tests +
-            page_with_redirects_tests +
-            pdf_url_tests +
-            invalid_url_tests +
-            css_js_injection_tests +
-            open_hidden_tests +
-            clearing_cache_tests +
-            video_tag_tests +
-            local_with_anchor_tag_tests +
-            hardwareback_tests;
-    }
+    contentEl.innerHTML =
+        info_div +
+        platform_info +
+        local_tests +
+        white_listed_tests +
+        non_white_listed_tests +
+        page_with_redirects_tests +
+        pdf_url_tests +
+        invalid_url_tests +
+        css_js_injection_tests +
+        open_hidden_tests +
+        clearing_cache_tests +
+        video_tag_tests +
+        local_with_anchor_tag_tests +
+        hardwareback_tests;
 
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
@@ -584,8 +555,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     var localhtml = basePath + 'local.html';
     var localpdf = basePath + 'local.pdf';
     var injecthtml = basePath + 'inject.html';
-    var injectjs = isWindows ? basePath + 'inject.js' : 'inject.js';
-    var injectcss = isWindows ? basePath + 'inject.css' : 'inject.css';
+    var injectjs = 'inject.js';
+    var injectcss = 'inject.css';
     var videohtml = basePath + 'video.html';
 
     // Local
