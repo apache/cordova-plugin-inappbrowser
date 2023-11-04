@@ -19,13 +19,7 @@
 
 #import "CDVWKInAppBrowser.h"
 #import <Cordova/NSDictionary+CordovaPreferences.h>
-
-#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>) // Cordova-iOS >=6
-  #import <Cordova/CDVWebViewProcessPoolFactory.h>
-#elif __has_include("CDVWKProcessPoolFactory.h") // Cordova-iOS <6 with WKWebView plugin
-  #import "CDVWKProcessPoolFactory.h"
-#endif
-
+#import <Cordova/CDVWebViewProcessPoolFactory.h>
 #import <Cordova/CDVPluginResult.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
@@ -140,64 +134,27 @@ static CDVWKInAppBrowser* instance = nil;
     }
     
     if (browserOptions.clearcache) {
-        bool isAtLeastiOS11 = false;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-        if (@available(iOS 11.0, *)) {
-            isAtLeastiOS11 = true;
-        }
-#endif
-            
-        if(isAtLeastiOS11){
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-            // Deletes all cookies
-            WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
-            [cookieStore getAllCookies:^(NSArray* cookies) {
-                NSHTTPCookie* cookie;
-                for(cookie in cookies){
-                    [cookieStore deleteCookie:cookie completionHandler:nil];
-                }
-            }];
-#endif
-        }else{
-            // https://stackoverflow.com/a/31803708/777265
-            // Only deletes domain cookies (not session cookies)
-            [dataStore fetchDataRecordsOfTypes:[WKWebsiteDataStore allWebsiteDataTypes]
-             completionHandler:^(NSArray<WKWebsiteDataRecord *> * __nonnull records) {
-                 for (WKWebsiteDataRecord *record  in records){
-                     NSSet<NSString*>* dataTypes = record.dataTypes;
-                     if([dataTypes containsObject:WKWebsiteDataTypeCookies]){
-                         [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:record.dataTypes
-                               forDataRecords:@[record]
-                               completionHandler:^{}];
-                     }
-                 }
-             }];
-        }
+        // Deletes all cookies
+        WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
+        [cookieStore getAllCookies:^(NSArray* cookies) {
+            NSHTTPCookie* cookie;
+            for(cookie in cookies){
+                [cookieStore deleteCookie:cookie completionHandler:nil];
+            }
+        }];
     }
     
     if (browserOptions.clearsessioncache) {
-        bool isAtLeastiOS11 = false;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-        if (@available(iOS 11.0, *)) {
-            isAtLeastiOS11 = true;
-        }
-#endif
-        if (isAtLeastiOS11) {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-            // Deletes session cookies
-            WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
-            [cookieStore getAllCookies:^(NSArray* cookies) {
-                NSHTTPCookie* cookie;
-                for(cookie in cookies){
-                    if(cookie.sessionOnly){
-                        [cookieStore deleteCookie:cookie completionHandler:nil];
-                    }
+        // Deletes session cookies
+        WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
+        [cookieStore getAllCookies:^(NSArray* cookies) {
+            NSHTTPCookie* cookie;
+            for(cookie in cookies){
+                if(cookie.sessionOnly){
+                    [cookieStore deleteCookie:cookie completionHandler:nil];
                 }
-            }];
-#endif
-        }else{
-            NSLog(@"clearsessioncache not available below iOS 11.0");
-        }
+            }
+        }];
     }
 
     if (self.inAppBrowserViewController == nil) {
@@ -344,7 +301,7 @@ static CDVWKInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
-            _previousStatusBarStyle = -1;
+            self->_previousStatusBarStyle = -1;
             [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         }
     });
@@ -354,16 +311,17 @@ static CDVWKInAppBrowser* instance = nil;
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
     // the webview engine itself will filter for this according to <allow-navigation> policy
-    // in config.xml for cordova-ios-4.0
+    // in config.xml
     [self.webViewEngine loadRequest:request];
 }
 
 - (void)openInSystem:(NSURL*)url
 {
-    if ([[UIApplication sharedApplication] openURL:url] == NO) {
-        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-        [[UIApplication sharedApplication] openURL:url];
-    }
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+        }
+    }];
 }
 
 - (void)loadAfterBeforeload:(CDVInvokedUrlCommand*)command
@@ -683,13 +641,13 @@ static CDVWKInAppBrowser* instance = nil;
     self->tmpWindow.hidden = YES;
     self->tmpWindow = nil;
 
-    if (IsAtLeastiOSVersion(@"7.0")) {
-        if (_previousStatusBarStyle != -1) {
-            [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
-            
-        }
+    if (_previousStatusBarStyle != -1) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        [[UIApplication sharedApplication] setStatusBarStyle:_previousStatusBarStyle];
+#pragma clang diagnostic pop
     }
-    
+
     _previousStatusBarStyle = -1; // this value was reset before reapplying it. caused statusbar to stay black on ios7
 }
 
@@ -752,15 +710,11 @@ BOOL isExiting = FALSE;
     
     //WKWebView options
     configuration.allowsInlineMediaPlayback = _browserOptions.allowinlinemediaplayback;
-    if (IsAtLeastiOSVersion(@"10.0")) {
-        configuration.ignoresViewportScaleLimits = _browserOptions.enableviewportscale;
-        if(_browserOptions.mediaplaybackrequiresuseraction == YES){
-            configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeAll;
-        }else{
-            configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
-        }
-    }else{ // iOS 9
-        configuration.mediaPlaybackRequiresUserAction = _browserOptions.mediaplaybackrequiresuseraction;
+    configuration.ignoresViewportScaleLimits = _browserOptions.enableviewportscale;
+    if(_browserOptions.mediaplaybackrequiresuseraction == YES){
+        configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeAll;
+    }else{
+        configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
     }
     
     if (@available(iOS 13.0, *)) {
@@ -813,11 +767,7 @@ BOOL isExiting = FALSE;
     self.webView.allowsLinkPreview = NO;
     self.webView.allowsBackForwardNavigationGestures = NO;
     
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-   if (@available(iOS 11.0, *)) {
-       [self.webView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-   }
-#endif
+    [self.webView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
     
     self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.spinner.alpha = 1.000;
@@ -947,7 +897,7 @@ BOOL isExiting = FALSE;
     // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
     self.closeButton = nil;
     // Initialize with title if title is set, otherwise the title will be 'Done' localized
-    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleBordered target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
@@ -1148,13 +1098,8 @@ BOOL isExiting = FALSE;
     [super viewWillAppear:animated];
 }
 
-//
-// On iOS 7 the status bar is part of the view's dimensions, therefore it's height has to be taken into account.
-// The height of it could be hardcoded as 20 pixels, but that would assume that the upcoming releases of iOS won't
-// change that value.
-//
 - (float) getStatusBarOffset {
-    return (float) IsAtLeastiOSVersion(@"7.0") ? [[UIApplication sharedApplication] statusBarFrame].size.height : 0.0;
+    return (float) [[UIApplication sharedApplication] statusBarFrame].size.height;
 }
 
 - (void) rePositionViews {
