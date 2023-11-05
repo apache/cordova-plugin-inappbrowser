@@ -19,35 +19,35 @@
  *
  */
 
-var modulemapper = require('cordova/modulemapper');
+const modulemapper = require('cordova/modulemapper');
 
-var browserWrap, popup, navigationButtonsDiv, navigationButtonsDivInner, backButton, forwardButton, closeButton;
+let browserWrap, popup, navigationButtonsDiv, navigationButtonsDivInner, backButton, forwardButton, closeButton;
 
 function attachNavigationEvents (element, callback) {
-    var onError = function () {
+    const onError = function () {
         try {
-            callback({ type: 'loaderror', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loaderror', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loaderror', url: null }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loaderror', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         }
     };
 
     element.addEventListener('pageshow', function () {
         try {
-            callback({ type: 'loadstart', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loadstart', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loadstart', url: null }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loadstart', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         }
     });
 
     element.addEventListener('load', function () {
         try {
-            callback({ type: 'loadstop', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loadstop', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loadstop', url: null }, { keepCallback: true }); // eslint-disable-line standard/no-callback-literal
+            callback({ type: 'loadstop', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
         }
     });
 
@@ -55,7 +55,7 @@ function attachNavigationEvents (element, callback) {
     element.addEventListener('abort', onError);
 }
 
-var IAB = {
+const IAB = {
     close: function (win, lose) {
         if (browserWrap) {
             // use the "open" function callback so that the exit event is fired properly
@@ -74,9 +74,9 @@ var IAB = {
     },
 
     open: function (win, lose, args) {
-        var strUrl = args[0];
-        var target = args[1];
-        var features = args[2];
+        const strUrl = args[0];
+        const target = args[1];
+        const features = args[2];
 
         IAB._win = win;
 
@@ -200,8 +200,8 @@ var IAB = {
     },
 
     injectScriptCode: function (win, fail, args) {
-        var code = args[0];
-        var hasCallback = args[1];
+        const code = args[0];
+        const hasCallback = args[1];
 
         if (browserWrap && popup) {
             try {
@@ -216,7 +216,7 @@ var IAB = {
     },
 
     injectScriptFile: function (win, fail, args) {
-        var msg = 'Browser cordova-plugin-inappbrowser injectScriptFile is not yet implemented';
+        const msg = 'Browser cordova-plugin-inappbrowser injectScriptFile is not yet implemented';
         console.warn(msg);
         if (fail) {
             fail(msg);
@@ -224,7 +224,7 @@ var IAB = {
     },
 
     injectStyleCode: function (win, fail, args) {
-        var msg = 'Browser cordova-plugin-inappbrowser injectStyleCode is not yet implemented';
+        const msg = 'Browser cordova-plugin-inappbrowser injectStyleCode is not yet implemented';
         console.warn(msg);
         if (fail) {
             fail(msg);
@@ -232,7 +232,7 @@ var IAB = {
     },
 
     injectStyleFile: function (win, fail, args) {
-        var msg = 'Browser cordova-plugin-inappbrowser injectStyleFile is not yet implemented';
+        const msg = 'Browser cordova-plugin-inappbrowser injectStyleFile is not yet implemented';
         console.warn(msg);
         if (fail) {
             fail(msg);
