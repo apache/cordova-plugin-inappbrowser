@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser",
-  "version": "5.0.1-dev",
+  "version": "6.0.1-dev",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
@@ -8,9 +8,7 @@
     "platforms": [
       "android",
       "browser",
-      "ios",
-      "osx",
-      "windows"
+      "ios"
     ]
   },
   "repository": "github:apache/cordova-plugin-inappbrowser",
@@ -24,9 +22,7 @@
     "ecosystem:cordova",
     "cordova-android",
     "cordova-browser",
-    "cordova-ios",
-    "cordova-osx",
-    "cordova-windows"
+    "cordova-ios"
   ],
   "scripts": {
     "test": "npm run lint",
@@ -46,7 +42,12 @@
         "cordova-ios": ">=6.0.0",
         "cordova": ">=9.0.0"
       },
-      "6.0.0": {
+      "6.0.1-dev": {
+        "cordova-android": ">=10.0.0",
+        "cordova-ios": ">=6.0.0",
+        "cordova": ">=9.0.0"
+      },
+      "7.0.0": {
         "cordova": ">100"
       }
     }
@@ -54,6 +55,6 @@
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cordova/eslint-config": "^3.0.0"
+    "@cordova/eslint-config": "^5.0.0"
   }
 }

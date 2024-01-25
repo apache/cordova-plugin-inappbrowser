@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser-tests",
-  "version": "5.0.1-dev",
+  "version": "6.0.1-dev",
   "description": "",
   "cordova": {
     "id": "cordova-plugin-inappbrowser-tests",
