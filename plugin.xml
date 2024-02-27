@@ -30,8 +30,8 @@
     <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
-        <engine name="cordova" version=">=9.0.0"/>
-        <engine name="cordova-android" version=">=9.0.0" />
+        <engine name="cordova" version=">=6.0.0"/>
+        <engine name="cordova-android" version=">=6.0.0" />
         <engine name="cordova-ios" version=">=6.0.0" />
     </engines>
 
@@ -46,9 +46,28 @@
             </feature>
         </config-file>
 
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="application">
+            <provider
+                android:name="org.apache.cordova.inappbrowser.FileProvider"
+                android:authorities="${applicationId}.cordova.plugin.camera.provider"
+                android:exported="false"
+                android:grantUriPermissions="true" >
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/camera_provider_paths"/>
+            </provider>
+        </config-file>
+
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <source-file src="src/android/FileProvider.java" target-dir="src/org/apache/cordova/inappbrowser" />
 
         <!-- drawable src/android/resources -->
         <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
@@ -65,6 +84,7 @@
         <resource-file src="src/android/res/drawable-mdpi/ic_action_remove.png" target="res/drawable-mdpi/ic_action_remove.png" />
         <resource-file src="src/android/res/drawable-xhdpi/ic_action_remove.png" target="res/drawable-xhdpi/ic_action_remove.png" />
         <resource-file src="src/android/res/drawable-xxhdpi/ic_action_remove.png" target="res/drawable-xxhdpi/ic_action_remove.png" />
+        <source-file src="src/android/xml/camera_provider_paths.xml" target-dir="res/xml" />
 
     </platform>
 
