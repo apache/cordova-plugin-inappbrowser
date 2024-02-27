@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Open Technologies Inc
 // Licensed under the MIT license.
 // TypeScript Version: 2.3
-type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme";
+type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "close" | "message" | "customscheme";
 
 /**
  * The object returned from a call to cordova.InAppBrowser.open.
@@ -28,6 +28,7 @@ interface InAppBrowser {
     onloadstop(type: InAppBrowserEvent): void;
     onloaderror(type: InAppBrowserEvent): void;
     onexit(type: InAppBrowserEvent): void;
+    close(type: InAppBrowserEvent): void;
     // addEventListener overloads
     /**
      * Adds a listener for an event from the InAppBrowser.
