@@ -973,7 +973,7 @@ public class InAppBrowser extends CordovaPlugin {
                                 }
                             } else {
                                 Log.d(LOG_TAG, "------> 4");
-                                ArrayList<String> permissions = new ArrayList<>();
+                                ArrayList<String> permissions = new ArrayList<String>();
                                 permissions.add(Manifest.permission.CAMERA);
                                 PermissionHelper.requestPermissions(InAppBrowser.this, TAKE_PIC_SEC, permissions.toArray(new String[0]));
                             }
