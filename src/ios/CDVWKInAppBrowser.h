@@ -69,7 +69,7 @@
 @property (nonatomic) NSURL* currentURL;
 
 - (void)forceClose;
-- (void)navigateTo:(NSURL*)url;
+- (void)navigateTo:(NSURL*)url preloadCode:(NSString *)preloadCode;
 - (void)updateNavigationButtons;
 
 - (id)initWithBrowserOptions: (CDVInAppBrowserOptions*) browserOptions andSettings:(NSDictionary*) settings;
