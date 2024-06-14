@@ -23,14 +23,11 @@
 
 @property (nonatomic, assign) BOOL location;
 @property (nonatomic, assign) BOOL toolbar;
+@property (nonatomic, copy) NSString* backbuttoncaption;
 @property (nonatomic, copy) NSString* closebuttoncaption;
-@property (nonatomic, copy) NSString* closebuttoncolor;
 @property (nonatomic, assign) BOOL lefttoright;
 @property (nonatomic, copy) NSString* toolbarposition;
-@property (nonatomic, copy) NSString* toolbarcolor;
 @property (nonatomic, assign) BOOL toolbartranslucent;
-@property (nonatomic, assign) BOOL hidenavigationbuttons;
-@property (nonatomic, copy) NSString* navigationbuttoncolor;
 @property (nonatomic, assign) BOOL cleardata;
 @property (nonatomic, assign) BOOL clearcache;
 @property (nonatomic, assign) BOOL clearsessioncache;
@@ -38,6 +35,11 @@
 
 @property (nonatomic, copy) NSString* presentationstyle;
 @property (nonatomic, copy) NSString* transitionstyle;
+
+@property (nonatomic, copy) NSString* title;
+@property (nonatomic, copy) NSString* subtitle;
+@property (nonatomic, copy) NSString* shareurl;
+@property (nonatomic, copy) NSString* theme;
 
 @property (nonatomic, assign) BOOL enableviewportscale;
 @property (nonatomic, assign) BOOL mediaplaybackrequiresuseraction;
