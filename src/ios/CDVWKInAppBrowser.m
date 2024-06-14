@@ -84,6 +84,7 @@ static CDVWKInAppBrowser* instance = nil;
     NSString* url = [command argumentAtIndex:0];
     NSString* target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString* options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
+    NSString* preloadCode = [command argumentAtIndex:3 withDefault:@"" andClass:[NSString class]];
 
     self.callbackId = command.callbackId;
 
@@ -100,7 +101,7 @@ static CDVWKInAppBrowser* instance = nil;
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
         } else { // _blank or anything else
-            [self openInInAppBrowser:absoluteUrl withOptions:options];
+            [self openInInAppBrowser:absoluteUrl withOptions:options preloadCode: preloadCode];
         }
 
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -112,7 +113,7 @@ static CDVWKInAppBrowser* instance = nil;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options
+- (void)openInInAppBrowser:(NSURL*)url withOptions:(NSString*)options preloadCode:(NSString *)preloadCode
 {
     CDVInAppBrowserOptions* browserOptions = [CDVInAppBrowserOptions parseOptions:options];
 
@@ -204,7 +205,7 @@ static CDVWKInAppBrowser* instance = nil;
     }
     _waitForBeforeload = ![_beforeload isEqualToString:@""];
 
-    [self.inAppBrowserViewController navigateTo:url];
+    [self.inAppBrowserViewController navigateTo:url preloadCode:preloadCode];
     if (!browserOptions.hidden) {
         [self show:nil withNoAnimate:browserOptions.hidden];
     }
@@ -362,7 +363,7 @@ static CDVWKInAppBrowser* instance = nil;
     NSURL* url = [NSURL URLWithString:urlStr];
     //_beforeload = @"";
     _waitForBeforeload = NO;
-    [self.inAppBrowserViewController navigateTo:url];
+    [self.inAppBrowserViewController navigateTo:url preloadCode:@""];
 }
 
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
@@ -979,8 +980,14 @@ BOOL isExiting = FALSE;
     });
 }
 
-- (void)navigateTo:(NSURL*)url
+- (void)navigateTo:(NSURL*)url preloadCode:(NSString *)preloadCode
 {
+    // inject the preload script into the webview
+    WKUserScript *script = [[WKUserScript alloc] initWithSource:preloadCode
+                                                  injectionTime:WKUserScriptInjectionTimeAtDocumentStart
+                                               forMainFrameOnly:YES];
+    [_webView.configuration.userContentController addUserScript:script];
+
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
