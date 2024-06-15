@@ -1346,7 +1346,11 @@ public class InAppBrowser extends CordovaPlugin {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
-            String newloc = "";
+
+          if (!preloadCode.isEmpty())
+            view.evaluateJavascript(preloadCode, null);
+
+          String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
             }
@@ -1375,9 +1379,6 @@ public class InAppBrowser extends CordovaPlugin {
 
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-
-            if (!preloadCode.isEmpty())
-                view.evaluateJavascript(preloadCode, null);
 
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
