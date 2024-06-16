@@ -937,7 +937,7 @@ public class InAppBrowser extends CordovaPlugin {
                 titleTextView.setGravity(Gravity.CENTER_VERTICAL);
                 titleTextView.setLayoutParams(textLayoutParams);
                 titleTextView.setId(Integer.valueOf(4));
-                titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+                titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
                 titleTextView.setTypeface(null, Typeface.BOLD);
                 titleTextView.setText(title);
 
