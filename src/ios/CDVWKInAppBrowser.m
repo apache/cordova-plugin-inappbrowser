@@ -842,7 +842,7 @@ BOOL isExiting = FALSE;
 
     // Create actions for the menu items
     __weak typeof(self) weakSelf = self;
-    UIAction *reloadAction = [UIAction actionWithTitle:@"Reload Page"
+    UIAction *reloadAction = [UIAction actionWithTitle:_browserOptions.reloadcaption
                                                  image:[UIImage systemImageNamed:@"arrow.clockwise"]
                                             identifier:nil
                                                handler:^(__kindof UIAction * _Nonnull action) {
@@ -851,7 +851,7 @@ BOOL isExiting = FALSE;
             return;
         [strongSelf.webView reload];
     }];
-    UIAction *openInSafariAction = [UIAction actionWithTitle:@"Open in Safari"
+    UIAction *openInSafariAction = [UIAction actionWithTitle:_browserOptions.openinbrowsercaption
                                                  image:[UIImage systemImageNamed:@"safari"]
                                             identifier:nil
                                                handler:^(__kindof UIAction * _Nonnull action) {
@@ -865,7 +865,7 @@ BOOL isExiting = FALSE;
             [[UIApplication sharedApplication] openURL:shareUrl options:@{} completionHandler:nil];
         }
     }];
-    UIAction *copyAction = [UIAction actionWithTitle:@"Copy URL"
+    UIAction *copyAction = [UIAction actionWithTitle:_browserOptions.copyurlcaption
                                                  image:[UIImage systemImageNamed:@"doc.on.doc"]
                                             identifier:nil
                                                handler:^(__kindof UIAction * _Nonnull action) {
@@ -874,7 +874,7 @@ BOOL isExiting = FALSE;
             return;
         [UIPasteboard generalPasteboard].string = [strongSelf->_browserOptions.shareurl stringByRemovingPercentEncoding];
     }];
-    UIAction *shareAction = [UIAction actionWithTitle:@"Share"
+    UIAction *shareAction = [UIAction actionWithTitle:_browserOptions.sharecaption
                                                      image:[UIImage systemImageNamed:@"square.and.arrow.up"]
                                                 identifier:nil
                                                    handler:^(__kindof UIAction * _Nonnull action) {
