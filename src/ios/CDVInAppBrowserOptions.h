@@ -23,8 +23,12 @@
 
 @property (nonatomic, assign) BOOL location;
 @property (nonatomic, assign) BOOL toolbar;
-@property (nonatomic, copy) NSString* backbuttoncaption;
 @property (nonatomic, copy) NSString* closebuttoncaption;
+@property (nonatomic, copy) NSString* backbuttoncaption;
+@property (nonatomic, copy) NSString* reloadcaption;
+@property (nonatomic, copy) NSString* openinbrowsercaption;
+@property (nonatomic, copy) NSString* copyurlcaption;
+@property (nonatomic, copy) NSString* sharecaption;
 @property (nonatomic, assign) BOOL lefttoright;
 @property (nonatomic, copy) NSString* toolbarposition;
 @property (nonatomic, assign) BOOL toolbartranslucent;
