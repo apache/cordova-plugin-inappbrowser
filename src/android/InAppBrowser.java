@@ -735,9 +735,13 @@ public class InAppBrowser extends CordovaPlugin {
             }
             if (features.get(TITLE) != null) {
                 title = features.get(TITLE);
+            } else {
+                title = "";
             }
             if (features.get(SUBTITLE) != null) {
                 subtitle = features.get(SUBTITLE);
+            } else {
+                subtitle = "";
             }
             if (features.get(THEME) != null) {
                 theme = features.get(THEME);
@@ -789,6 +793,7 @@ public class InAppBrowser extends CordovaPlugin {
                 subtitleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
                 subtitleTextView.setTypeface(null, Typeface.BOLD);
                 subtitleTextView.setText(subtitle);
+                subtitleTextView.setVisibility(subtitle.isEmpty() ? View.GONE : View.VISIBLE);
                 titleView.addView(subtitleTextView);
                 return titleView;
             }
@@ -1005,25 +1010,25 @@ public class InAppBrowser extends CordovaPlugin {
                 // download event
 
                 inAppWebView.setDownloadListener(
-                    new DownloadListener(){
-                        public void onDownloadStart(
-                                String url, String userAgent, String contentDisposition, String mimetype, long contentLength
-                        ){
-                            try{
-                                JSONObject succObj = new JSONObject();
-                                succObj.put("type", DOWNLOAD_EVENT);
-                                succObj.put("url",url);
-                                succObj.put("userAgent",userAgent);
-                                succObj.put("contentDisposition",contentDisposition);
-                                succObj.put("mimetype",mimetype);
-                                succObj.put("contentLength",contentLength);
-                                sendUpdate(succObj, true);
-                            }
-                            catch(Exception e){
-                                LOG.e(LOG_TAG,e.getMessage());
+                        new DownloadListener(){
+                            public void onDownloadStart(
+                                    String url, String userAgent, String contentDisposition, String mimetype, long contentLength
+                            ){
+                                try{
+                                    JSONObject succObj = new JSONObject();
+                                    succObj.put("type", DOWNLOAD_EVENT);
+                                    succObj.put("url",url);
+                                    succObj.put("userAgent",userAgent);
+                                    succObj.put("contentDisposition",contentDisposition);
+                                    succObj.put("mimetype",mimetype);
+                                    succObj.put("contentLength",contentLength);
+                                    sendUpdate(succObj, true);
+                                }
+                                catch(Exception e){
+                                    LOG.e(LOG_TAG,e.getMessage());
+                                }
                             }
                         }
-                    }
                 );
 
                 // Add postMessage interface
@@ -1429,10 +1434,10 @@ public class InAppBrowser extends CordovaPlugin {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
 
-          if (!preloadCode.isEmpty())
-            view.evaluateJavascript(preloadCode, null);
+            if (!preloadCode.isEmpty())
+                view.evaluateJavascript(preloadCode, null);
 
-          String newloc = "";
+            String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
             }
@@ -1505,25 +1510,25 @@ public class InAppBrowser extends CordovaPlugin {
                 obj.put("sslerror", error.getPrimaryError());
                 String message;
                 switch (error.getPrimaryError()) {
-                case SslError.SSL_DATE_INVALID:
-                    message = "The date of the certificate is invalid";
-                    break;
-                case SslError.SSL_EXPIRED:
-                    message = "The certificate has expired";
-                    break;
-                case SslError.SSL_IDMISMATCH:
-                    message = "Hostname mismatch";
-                    break;
-                default:
-                case SslError.SSL_INVALID:
-                    message = "A generic error occurred";
-                    break;
-                case SslError.SSL_NOTYETVALID:
-                    message = "The certificate is not yet valid";
-                    break;
-                case SslError.SSL_UNTRUSTED:
-                    message = "The certificate authority is not trusted";
-                    break;
+                    case SslError.SSL_DATE_INVALID:
+                        message = "The date of the certificate is invalid";
+                        break;
+                    case SslError.SSL_EXPIRED:
+                        message = "The certificate has expired";
+                        break;
+                    case SslError.SSL_IDMISMATCH:
+                        message = "Hostname mismatch";
+                        break;
+                    default:
+                    case SslError.SSL_INVALID:
+                        message = "A generic error occurred";
+                        break;
+                    case SslError.SSL_NOTYETVALID:
+                        message = "The certificate is not yet valid";
+                        break;
+                    case SslError.SSL_UNTRUSTED:
+                        message = "The certificate authority is not trusted";
+                        break;
                 }
                 obj.put("message", message);
 
