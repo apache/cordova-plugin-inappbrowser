@@ -1,0 +1,270 @@
+From f02f5fed0b8a2acb059864550c1a863f48566241 Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Sun, 27 Jun 2021 04:13:34 +0300
+Subject: [PATCH 1/7] [Android] Inappbrowser can handle intent scheme links
+
+---
+ src/android/InAppBrowser.java | 48 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index 9a9fc7a8f..10837470d 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -20,6 +20,7 @@ Licensed to the Apache Software Foundation (ASF) under one
+ 
+ import android.annotation.SuppressLint;
+ import android.annotation.TargetApi;
++import android.content.ComponentName;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.pm.PackageManager;
+@@ -29,6 +30,8 @@ Licensed to the Apache Software Foundation (ASF) under one
+ import android.content.res.Resources;
+ import android.graphics.Bitmap;
+ import android.graphics.drawable.Drawable;
++import android.graphics.PorterDuff;
++import android.graphics.PorterDuffColorFilter;
+ import android.graphics.Color;
+ import android.net.http.SslError;
+ import android.net.Uri;
+@@ -45,6 +48,7 @@ Licensed to the Apache Software Foundation (ASF) under one
+ import android.view.inputmethod.EditorInfo;
+ import android.view.inputmethod.InputMethodManager;
+ import android.webkit.CookieManager;
++import android.webkit.CookieSyncManager;
+ import android.webkit.HttpAuthHandler;
+ import android.webkit.JavascriptInterface;
+ import android.webkit.SslErrorHandler;
+@@ -996,9 +1000,6 @@ public void postMessage(String data) {
+                 inAppWebView.setId(Integer.valueOf(6));
+                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
+                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
+-                // Multiple Windows set to true to mitigate Chromium security bug.
+-                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
+-                inAppWebView.getSettings().setSupportMultipleWindows(true);
+                 inAppWebView.requestFocus();
+                 inAppWebView.requestFocusFromTouch();
+ 
+@@ -1140,7 +1141,46 @@ public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+         @TargetApi(Build.VERSION_CODES.N)
+         @Override
+         public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest request) {
+-            return shouldOverrideUrlLoading(request.getUrl().toString(), request.getMethod());
++            String url = request.getUrl().toString();
++
++            if (url.startsWith("http") || url.startsWith("https") ) return false;//open web links as usual
++
++            // If activity exists for a browsable URL then open the URL.
++            Uri parsedUri = Uri.parse(url);
++            PackageManager packageManager = cordova.getActivity().getPackageManager();
++            Intent browseIntent = new Intent(Intent.ACTION_VIEW).setData(parsedUri);
++            if (browseIntent.resolveActivity(packageManager) != null) {
++                    cordova.getActivity().startActivity(browseIntent);
++                    return true;
++            }
++
++            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
++            if (url.startsWith("intent:")) {
++                    try {
++                        // Try to find an installed app
++                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
++                        if (intent.resolveActivity(packageManager) != null) {
++                                cordova.getActivity().startActivity(intent);
++                                return true;
++                        }
++                        // Try to open the fallback URL
++                        String fallbackUrl = intent.getStringExtra("browser_fallback_url");
++                        if (fallbackUrl != null) {
++                                webView.loadUrl(fallbackUrl);
++                                return true;
++                        }
++                        // Head to the Abdroid Store and look for an app.
++                        Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
++                        if (marketIntent.resolveActivity(packageManager) != null) {
++                                cordova.getActivity().startActivity(marketIntent);
++                                return true;
++                        }
++                    } catch (Exception e) {
++                        // Failed to do anything useful with it.
++                        LOG.e(LOG_TAG, "Failed to handle INTENT: " + e.toString() );
++                    }
++            }
++            return true;
+         }
+ 
+         /**
+
+From 513e0893cd7d5af279848b7513388ebc756087cf Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Sun, 27 Jun 2021 05:11:13 +0300
+Subject: [PATCH 2/7] Update InAppBrowser.java
+
+---
+ src/android/InAppBrowser.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index 10837470d..c8b21c6a3 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -1169,7 +1169,7 @@ public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest requ
+                                 webView.loadUrl(fallbackUrl);
+                                 return true;
+                         }
+-                        // Head to the Abdroid Store and look for an app.
++                        // Try to open the app link
+                         Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
+                         if (marketIntent.resolveActivity(packageManager) != null) {
+                                 cordova.getActivity().startActivity(marketIntent);
+
+From 017ef82c3b589c7517979003f4cca85c045b528e Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Sun, 27 Jun 2021 05:27:33 +0300
+Subject: [PATCH 3/7] Update InAppBrowser.java
+
+---
+ src/android/InAppBrowser.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index c8b21c6a3..224bf8a44 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -1154,7 +1154,7 @@ public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest requ
+                     return true;
+             }
+ 
+-            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
++            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go tothe store link app
+             if (url.startsWith("intent:")) {
+                     try {
+                         // Try to find an installed app
+
+From 8b7366d05a023dd7827bfab1b706ead7208f0222 Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Mon, 28 Jun 2021 01:10:46 +0300
+Subject: [PATCH 4/7] Handle intent links
+
+---
+ src/android/InAppBrowser.java | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index 224bf8a44..7e0b43cce 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -20,7 +20,6 @@ Licensed to the Apache Software Foundation (ASF) under one
+ 
+ import android.annotation.SuppressLint;
+ import android.annotation.TargetApi;
+-import android.content.ComponentName;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.pm.PackageManager;
+@@ -30,8 +29,6 @@ Licensed to the Apache Software Foundation (ASF) under one
+ import android.content.res.Resources;
+ import android.graphics.Bitmap;
+ import android.graphics.drawable.Drawable;
+-import android.graphics.PorterDuff;
+-import android.graphics.PorterDuffColorFilter;
+ import android.graphics.Color;
+ import android.net.http.SslError;
+ import android.net.Uri;
+@@ -48,7 +45,6 @@ Licensed to the Apache Software Foundation (ASF) under one
+ import android.view.inputmethod.EditorInfo;
+ import android.view.inputmethod.InputMethodManager;
+ import android.webkit.CookieManager;
+-import android.webkit.CookieSyncManager;
+ import android.webkit.HttpAuthHandler;
+ import android.webkit.JavascriptInterface;
+ import android.webkit.SslErrorHandler;
+@@ -1154,7 +1150,7 @@ public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest requ
+                     return true;
+             }
+ 
+-            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go tothe store link app
++            // If link is an INTENT then handle as 1) open the associated app, 2) open the fallback URL or 3) go to Store and look for an app
+             if (url.startsWith("intent:")) {
+                     try {
+                         // Try to find an installed app
+@@ -1169,7 +1165,7 @@ public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest requ
+                                 webView.loadUrl(fallbackUrl);
+                                 return true;
+                         }
+-                        // Try to open the app link
++                        // Head to the Abdroid Store and look for an app.
+                         Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
+                         if (marketIntent.resolveActivity(packageManager) != null) {
+                                 cordova.getActivity().startActivity(marketIntent);
+
+From 959b14fb8835e47e34a767b34709c9f18305f88f Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Mon, 28 Jun 2021 01:12:29 +0300
+Subject: [PATCH 5/7] Handle intent links
+
+---
+ src/android/InAppBrowser.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index 7e0b43cce..65e9e6aeb 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -1165,7 +1165,7 @@ public boolean shouldOverrideUrlLoading(WebView webView, WebResourceRequest requ
+                                 webView.loadUrl(fallbackUrl);
+                                 return true;
+                         }
+-                        // Head to the Abdroid Store and look for an app.
++                        // Head to the Play Store and look for an app.
+                         Intent marketIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://details?id=" + intent.getPackage()));
+                         if (marketIntent.resolveActivity(packageManager) != null) {
+                                 cordova.getActivity().startActivity(marketIntent);
+
+From ed73f58825c80bab382e98d4e3bdd454f1a499df Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Sun, 18 Jul 2021 03:37:45 +0300
+Subject: [PATCH 6/7] Update InAppBrowser.java
+
+---
+ src/android/InAppBrowser.java | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index 65e9e6aeb..ccda810ba 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -996,6 +996,9 @@ public void postMessage(String data) {
+                 inAppWebView.setId(Integer.valueOf(6));
+                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
+                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
++                // Multiple Windows set to true to mitigate Chromium security bug.
++                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
++                inAppWebView.getSettings().setSupportMultipleWindows(false);
+                 inAppWebView.requestFocus();
+                 inAppWebView.requestFocusFromTouch();
+ 
+
+From fd673093df34dfc85456df7e9ef9e6e61f8ae2c0 Mon Sep 17 00:00:00 2001
+From: Mosab A <47486787+mosabab@users.noreply.github.com>
+Date: Fri, 11 Feb 2022 15:21:00 +0200
+Subject: [PATCH 7/7] Update InAppBrowser.java
+
+---
+ src/android/InAppBrowser.java | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/android/InAppBrowser.java b/src/android/InAppBrowser.java
+index ccda810ba..65e9e6aeb 100644
+--- a/src/android/InAppBrowser.java
++++ b/src/android/InAppBrowser.java
+@@ -996,9 +996,6 @@ public void postMessage(String data) {
+                 inAppWebView.setId(Integer.valueOf(6));
+                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
+                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);
+-                // Multiple Windows set to true to mitigate Chromium security bug.
+-                //  See: https://bugs.chromium.org/p/chromium/issues/detail?id=1083819
+-                inAppWebView.getSettings().setSupportMultipleWindows(false);
+                 inAppWebView.requestFocus();
+                 inAppWebView.requestFocusFromTouch();
+ 
