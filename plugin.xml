@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-inappbrowser"
-      version="5.0.1-dev">
+      version="6.0.1-dev">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -90,32 +90,6 @@
 	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
 
 	    <framework src="CoreGraphics.framework" />
-    </platform>
-
-    <!-- osx -->
-    <platform name="osx">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-        </js-module>
-        <config-file target="config.xml" parent="/*">
-            <feature name="InAppBrowser">
-                <param name="osx-package" value="CDVInAppBrowser" />
-            </feature>
-        </config-file>
-
-        <header-file src="src/osx/CDVInAppBrowser.h" />
-        <source-file src="src/osx/CDVInAppBrowser.m" />
-    </platform>
-
-    <!-- windows -->
-    <platform name="windows">
-        <js-module src="www/inappbrowser.js" name="inappbrowser">
-            <clobbers target="cordova.InAppBrowser.open" />
-        </js-module>
-        <js-module src="src/windows/InAppBrowserProxy.js" name="InAppBrowserProxy">
-            <runs />
-        </js-module>
-        <asset src="www/inappbrowser.css" target="css/inappbrowser.css" />
     </platform>
 
     <!-- browser -->
