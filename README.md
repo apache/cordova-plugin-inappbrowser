@@ -30,7 +30,7 @@ That's why we did following things:
 - Created a [fork](https://github.com/edorex/cordova-plugin-inappbrowser): 
 - Created a feature branch `headers-cookies`
 - Included all the changes from the inital [PR](https://github.com/apache/cordova-plugin-inappbrowser/pull/1024)
-- Created [PR](https://github.com/edorex/cordova-plugin-inappbrowser/pull/1) to merge it into master
+- Created [PR](https://github.com/edorex/cordova-plugin-inappbrowser/pull/1062) to merge it into master
 - Referrencing our forked and updated master branch in the project.
 
 
