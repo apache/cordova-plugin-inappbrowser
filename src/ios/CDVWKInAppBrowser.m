@@ -151,6 +151,30 @@ static CDVWKInAppBrowser* instance = nil;
         }];
     }
 
+    // Set all cookies
+    WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
+    for(NSString* key in browserOptions.cookies){
+
+        NSURL* url = [NSURL URLWithString:key];
+        if(!url){
+            NSLog(@"Cookie key %@ is not a proper NSURL!",key);
+            continue;
+        }
+
+        NSArray<NSHTTPCookie*> *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{ @"Set-Cookie" : browserOptions.cookies[key] } forURL:url];
+
+        if(cookies.count == 0) {
+            NSLog(@"No cookies to process for url %@!",url);
+        }
+
+        for(NSHTTPCookie* cookie in cookies){
+            //Is not possible to wait for completion because it seems the handler is called after the WKWebView is loaded
+            //See: https://stackoverflow.com/questions/49452968/wkhttpcookiestore-setcookie-completion-handler-not-called
+            [cookieStore setCookie:cookie completionHandler:nil];
+        }
+
+    }
+
     if (self.inAppBrowserViewController == nil) {
         self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithBrowserOptions: browserOptions andSettings:self.commandDelegate.settings];
         self.inAppBrowserViewController.navigationDelegate = self;
@@ -209,7 +233,7 @@ static CDVWKInAppBrowser* instance = nil;
     }
     _waitForBeforeload = ![_beforeload isEqualToString:@""];
     
-    [self.inAppBrowserViewController navigateTo:url];
+    [self.inAppBrowserViewController navigateTo:url options:browserOptions];
     if (!browserOptions.hidden) {
         [self show:nil withNoAnimate:browserOptions.hidden];
     }
@@ -322,7 +346,7 @@ static CDVWKInAppBrowser* instance = nil;
     NSURL* url = [NSURL URLWithString:urlStr];
     //_beforeload = @"";
     _waitForBeforeload = NO;
-    [self.inAppBrowserViewController navigateTo:url];
+    [self.inAppBrowserViewController navigateTo:url options:nil];
 }
 
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
@@ -1041,12 +1065,16 @@ BOOL isExiting = FALSE;
     });
 }
 
-- (void)navigateTo:(NSURL*)url
+- (void)navigateTo:(NSURL*)url options:(CDVInAppBrowserOptions*)options
 {
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
-        NSURLRequest* request = [NSURLRequest requestWithURL:url];
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:url];
+        for(NSString* key in options.headers) {
+            NSString* value = options.headers[key];
+            [request setValue:value forHTTPHeaderField:key];
+        }
         [self.webView loadRequest:request];
     }
 }

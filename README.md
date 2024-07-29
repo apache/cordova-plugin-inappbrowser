@@ -22,6 +22,18 @@ description: Open an in-app browser window.
 -->
 
 
+# Reason for fork
+[PR](https://github.com/apache/cordova-plugin-inappbrowser/pull/1024) for passing cookies to the InAppBrowser was already available.  
+However it is not getting merged.
+
+That's why we did following things:
+- Created a [fork](https://github.com/edorex/cordova-plugin-inappbrowser): 
+- Created a feature branch `headers-cookies`
+- Included all the changes from the inital [PR](https://github.com/apache/cordova-plugin-inappbrowser/pull/1024)
+- Created [PR](https://github.com/edorex/cordova-plugin-inappbrowser/pull/1) to merge it into master
+- Referrencing our forked and updated master branch in the project.
+
+
 # cordova-plugin-inappbrowser
 
 [![Android Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml) [![Chrome Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml) [![iOS Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml) [![Lint Test](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/lint.yml)

@@ -46,6 +46,13 @@
 @property (nonatomic, assign) BOOL disallowoverscroll;
 @property (nonatomic, copy) NSString* beforeload;
 
+@property (nonatomic, copy) NSDictionary* headers;
+
+/**
+ Key is the cookie name, value is a Set-Cookie HTTP header string representation.
+ */
+@property (nonatomic, copy) NSDictionary* cookies;
+
 + (CDVInAppBrowserOptions*)parseOptions:(NSString*)options;
 
 @end
