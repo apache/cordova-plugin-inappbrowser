@@ -44,6 +44,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -151,6 +152,7 @@ public class InAppBrowser extends CordovaPlugin {
     private ImageButton closeButton;
     private CallbackContext callbackContext;
     private View backView;
+    private RelativeLayout toolbarContainer;
     private RelativeLayout toolbar;
     private GradientDrawable actionButtonContainerBackground;
     private boolean showLocationBar = true;
@@ -931,7 +933,7 @@ public class InAppBrowser extends CordovaPlugin {
                 if (fullscreen) {
                   dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-                  dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                    // dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
                   dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                   dialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
@@ -942,7 +944,14 @@ public class InAppBrowser extends CordovaPlugin {
                       if (decorView.isAttachedToWindow()) {
                         WindowInsets insets = decorView.getRootWindowInsets();
                         if (insets != null) {
-                          main.setPadding(0, insets.getSystemWindowInsetTop(), 0 ,0);
+                          toolbarContainer.setPadding(0,
+                            insets.getSystemWindowInsetTop(),
+                            0,
+                            0
+                          );
+                          ViewGroup.LayoutParams toolbarContainerLayoutParams = toolbarContainer.getLayoutParams();
+                          toolbarContainerLayoutParams.height = insets.getSystemWindowInsetTop() + dpToPixels(TOOLBAR_HEIGHT);
+                          toolbarContainer.setLayoutParams(toolbarContainerLayoutParams);
                         }
                       }
                       decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -953,8 +962,10 @@ public class InAppBrowser extends CordovaPlugin {
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
+                toolbarContainer = new RelativeLayout(cordova.getActivity());
+                toolbarContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
                 toolbar = new RelativeLayout(cordova.getActivity());
-                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
+                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 if (leftToRight) {
                     toolbar.setHorizontalGravity(Gravity.LEFT);
@@ -962,11 +973,13 @@ public class InAppBrowser extends CordovaPlugin {
                     toolbar.setHorizontalGravity(Gravity.RIGHT);
                 }
                 toolbar.setVerticalGravity(Gravity.TOP);
+                toolbarContainer.addView(toolbar);
 
                 // Action Button Container layout
                 LinearLayout actionButtonContainer = new LinearLayout(cordova.getActivity());
                 RelativeLayout.LayoutParams actionButtonLayoutParams = new RelativeLayout.LayoutParams(this.dpToPixels(64), this.dpToPixels(32));
-                if (leftToRight) actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                if (leftToRight)
+                  actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 else actionButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 actionButtonLayoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
                 if (leftToRight)
@@ -1137,7 +1150,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Don't add the toolbar if its been disabled
                 if (getShowLocationBar()) {
                     // Add our toolbar to our main view/layout
-                    main.addView(toolbar);
+                    main.addView(toolbarContainer);
                 }
 
                 // Add our webview to our main view/layout
@@ -1193,7 +1206,7 @@ public class InAppBrowser extends CordovaPlugin {
         int actionsColor = parseColor(isDark ? "#8799B3" : "#8399AE");
         titleTextView.setTextColor(color);
         subtitleTextView.setTextColor(secondaryColor);
-        toolbar.setBackgroundColor(backgroundColor);
+        toolbarContainer.setBackgroundColor(backgroundColor);
         closeButton.setColorFilter(actionsColor);
         actionsSeparatorView.setBackgroundColor(actionsColor);
         moreButton.setColorFilter(actionsColor);
