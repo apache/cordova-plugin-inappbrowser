@@ -40,7 +40,7 @@ jobs:
       # Storing a copy of the repo
       repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
-      node-version: 16
+      node-version: 20
 
       # > Starting April 26, 2021, all iOS and iPadOS apps submitted to the App Store must be built with Xcode 12 and the iOS 14 SDK.
       # Because of Apple's requirement, listed above, We will only be using the latest Xcode release for testing.
@@ -50,28 +50,24 @@ jobs:
     strategy:
       matrix:
         versions:
-          - os-version: macos-11
-            ios-version: 13.x
-            xcode-version: 11.x
-
-          - os-version: macos-11
-            ios-version: 14.x
-            xcode-version: 12.x
-
-          - os-version: macos-11
+          - os-version: macos-12
             ios-version: 15.x
             xcode-version: 13.x
 
-          - os-version: macos-12
+          - os-version: macos-14
             ios-version: 16.x
             xcode-version: 14.x
 
+          - os-version: macos-14
+            ios-version: 17.x
+            xcode-version: 15.x
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node-version }}
-      - uses: maxim-lobanov/setup-xcode@9a697e2b393340c3cacd97468baa318e4c883d98
+      - uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd
         env:
           xcode-version: ${{ matrix.versions.xcode-version == '' && env.default_xcode-version || matrix.versions.xcode-version }}
         with:
