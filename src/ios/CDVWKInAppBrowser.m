@@ -246,11 +246,20 @@ static CDVWKInAppBrowser* instance = nil;
             float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
-                CGRect frame = [[UIScreen mainScreen] bounds];
-                if(initHidden && osVersion < 11){
-                   frame.origin.x = -10000;
+                if (@available(iOS 13.0, *)) {
+                    UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
+                    if (scene) {
+                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
+                    }
                 }
-                strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+
+                if (!strongSelf->tmpWindow) {
+                    CGRect frame = [[UIScreen mainScreen] bounds];
+                    if(initHidden && osVersion < 11){
+                       frame.origin.x = -10000;
+                    }
+                    strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
+                }
             }
             UIViewController *tmpController = [[UIViewController alloc] init];
             [strongSelf->tmpWindow setRootViewController:tmpController];
