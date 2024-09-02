@@ -267,12 +267,6 @@ public class InAppBrowser extends CordovaPlugin {
                 @SuppressLint("NewApi")
                 @Override
                 public void run() {
-                    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
-                        currentClient.waitForBeforeload = false;
-                        inAppWebView.setWebViewClient(currentClient);
-                    } else {
-                        ((InAppBrowserClient)inAppWebView.getWebViewClient()).waitForBeforeload = false;
-                    }
                     inAppWebView.loadUrl(url);
 
                 }
@@ -1126,7 +1120,6 @@ public class InAppBrowser extends CordovaPlugin {
         EditText edittext;
         CordovaWebView webView;
         String beforeload;
-        boolean waitForBeforeload;
 
         /**
          * Constructor.
@@ -1138,7 +1131,6 @@ public class InAppBrowser extends CordovaPlugin {
             this.webView = webView;
             this.edittext = mEditText;
             this.beforeload = beforeload;
-            this.waitForBeforeload = beforeload != null;
         }
 
         /**
@@ -1199,7 +1191,7 @@ public class InAppBrowser extends CordovaPlugin {
             }
 
             // On first URL change, initiate JS callback. Only after the beforeload event, continue.
-            if (useBeforeload && this.waitForBeforeload) {
+            if (useBeforeload) {
                 if(sendBeforeLoad(url, method)) {
                     return true;
                 }
@@ -1294,9 +1286,6 @@ public class InAppBrowser extends CordovaPlugin {
                 }
             }
 
-            if (useBeforeload) {
-                this.waitForBeforeload = true;
-            }
             return override;
         }
 
