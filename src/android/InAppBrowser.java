@@ -45,9 +45,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.webkit.CookieManager;
@@ -69,7 +67,12 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
@@ -152,7 +155,7 @@ public class InAppBrowser extends CordovaPlugin {
     private ImageButton closeButton;
     private CallbackContext callbackContext;
     private View backView;
-    private RelativeLayout toolbarContainer;
+    private LinearLayout main;
     private RelativeLayout toolbar;
     private GradientDrawable actionButtonContainerBackground;
     private boolean showLocationBar = true;
@@ -910,54 +913,24 @@ public class InAppBrowser extends CordovaPlugin {
                 if (dialog != null) {
                     dialog.dismiss();
                 }
-                ;
 
                 // Let's create the main dialog
                 dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
                 dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                if (fullscreen) {
+                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+                    dialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+                }
                 dialog.setCancelable(true);
                 dialog.setInAppBroswer(getInAppBrowser());
 
                 // Main container layout
-                LinearLayout main = new LinearLayout(cordova.getActivity());
-
-                if (fullscreen) {
-                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-                    // dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                    dialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-
-                    dialog.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                        @Override
-                        public void onGlobalLayout() {
-                            View decorView = dialog.getWindow().getDecorView();
-                            if (decorView.isAttachedToWindow()) {
-                                WindowInsets insets = decorView.getRootWindowInsets();
-                                if (insets != null) {
-                                    toolbarContainer.setPadding(0,
-                                            insets.getSystemWindowInsetTop(),
-                                            0,
-                                            0
-                                    );
-                                    ViewGroup.LayoutParams toolbarContainerLayoutParams = toolbarContainer.getLayoutParams();
-                                    toolbarContainerLayoutParams.height = insets.getSystemWindowInsetTop() + dpToPixels(TOOLBAR_HEIGHT);
-                                    toolbarContainer.setLayoutParams(toolbarContainerLayoutParams);
-                                }
-                            }
-                            decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        }
-                    });
-                }
-
+                main = new LinearLayout(cordova.getActivity());
                 main.setOrientation(LinearLayout.VERTICAL);
 
                 // Toolbar layout
-                toolbarContainer = new RelativeLayout(cordova.getActivity());
-                toolbarContainer.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
                 toolbar = new RelativeLayout(cordova.getActivity());
-                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+                toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
                 if (leftToRight) {
                     toolbar.setHorizontalGravity(Gravity.LEFT);
@@ -965,7 +938,6 @@ public class InAppBrowser extends CordovaPlugin {
                     toolbar.setHorizontalGravity(Gravity.RIGHT);
                 }
                 toolbar.setVerticalGravity(Gravity.TOP);
-                toolbarContainer.addView(toolbar);
 
                 // Action Button Container layout
                 LinearLayout actionButtonContainer = new LinearLayout(cordova.getActivity());
@@ -1140,7 +1112,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Don't add the toolbar if its been disabled
                 if (getShowLocationBar()) {
                     // Add our toolbar to our main view/layout
-                    main.addView(toolbarContainer);
+                    main.addView(toolbar);
                 }
 
                 // Add our webview to our main view/layout
@@ -1163,6 +1135,16 @@ public class InAppBrowser extends CordovaPlugin {
                     dialog.setContentView(main);
                     dialog.show();
                     dialog.getWindow().setAttributes(lp);
+                    View rootView = dialog.getWindow().getDecorView();
+                    ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+                        Insets systemBars = insets.getInsets(
+                                WindowInsetsCompat.Type.displayCutout() |
+                                        WindowInsetsCompat.Type.systemBars()
+                        );
+                        main.setPadding(0, systemBars.top, 0, systemBars.bottom);
+
+                        return insets;
+                    });
                 }
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
@@ -1196,11 +1178,23 @@ public class InAppBrowser extends CordovaPlugin {
         int actionsColor = parseColor(isDark ? "#8799B3" : "#8399AE");
         titleTextView.setTextColor(color);
         subtitleTextView.setTextColor(secondaryColor);
-        toolbarContainer.setBackgroundColor(backgroundColor);
+        main.setBackgroundColor(backgroundColor);
         closeButton.setColorFilter(actionsColor);
         actionsSeparatorView.setBackgroundColor(actionsColor);
         moreButton.setColorFilter(actionsColor);
         actionButtonContainerBackground.setColor(parseColor(isDark ? "#1E2732" : "#E6ECF2"));
+        updateStatusBarStyle(isDark);
+    }
+
+    private void updateStatusBarStyle(Boolean isDark) {
+        Window window = dialog.getWindow();
+        if (window == null)
+            return;
+        View decorView = window.getDecorView();
+
+        WindowInsetsControllerCompat windowInsetsControllerCompat = WindowCompat.getInsetsController(window, decorView);
+        windowInsetsControllerCompat.setAppearanceLightStatusBars(!isDark);
+        windowInsetsControllerCompat.setAppearanceLightNavigationBars(!isDark);
     }
 
     /**
