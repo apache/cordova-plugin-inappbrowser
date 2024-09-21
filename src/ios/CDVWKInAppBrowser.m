@@ -1047,6 +1047,10 @@ BOOL isExiting = FALSE;
         } else {
             [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
         }
+
+        if (_browserOptions.hidden) {
+            [self viewDidDisappear:NO];
+        }
     });
 }
 
