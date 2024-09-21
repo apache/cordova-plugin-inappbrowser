@@ -539,6 +539,15 @@ public class InAppBrowser extends CordovaPlugin {
                             dialog.dismiss();
                             dialog = null;
                         }
+
+                        // https://github.com/apache/cordova-plugin-inappbrowser/issues/290
+                        if (url.equals("about:blank")) {
+                            inAppWebView.onPause();
+                            inAppWebView.removeAllViews();
+                            inAppWebView.destroyDrawingCache();
+                            inAppWebView.destroy();
+                            inAppWebView = null;
+                        }
                     }
                 });
                 // NB: From SDK 19: "If you call methods on WebView from any thread
@@ -948,9 +957,9 @@ public class InAppBrowser extends CordovaPlugin {
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
                 settings.setBuiltInZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
-                
+
                 // download event
-                
+
                 inAppWebView.setDownloadListener(
                     new DownloadListener(){
                         public void onDownloadStart(
@@ -971,7 +980,7 @@ public class InAppBrowser extends CordovaPlugin {
                             }
                         }
                     }
-                );        
+                );
 
                 // Add postMessage interface
                 class JsObject {
