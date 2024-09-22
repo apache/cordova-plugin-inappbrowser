@@ -60,6 +60,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -126,6 +127,7 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private EditText edittext;
+    private ProgressBar progressBar;
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
     private boolean showZoomControls = true;
@@ -1044,6 +1046,13 @@ public class InAppBrowser extends CordovaPlugin {
                     main.addView(toolbar);
                 }
 
+                // Progress Bar
+                progressBar = new ProgressBar(webView.getContext(), null, android.R.attr.progressBarStyleHorizontal);
+                progressBar.setIndeterminate(true);
+                progressBar.setVisibility(View.GONE);
+
+                main.addView(progressBar);
+
                 // Add our webview to our main view/layout
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
                 webViewLayout.addView(inAppWebView);
@@ -1367,6 +1376,7 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.e(LOG_TAG, "URI passed in has caused a JSON error.");
             }
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         public void onPageFinished(WebView view, String url) {
@@ -1391,6 +1401,7 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+            progressBar.setVisibility(View.GONE);
         }
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -1407,6 +1418,7 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
+            progressBar.setVisibility(View.GONE);
         }
 
         @Override
