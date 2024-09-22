@@ -1059,8 +1059,48 @@ BOOL isExiting = FALSE;
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
-        NSURLRequest* request = [NSURLRequest requestWithURL:url];
-        [self.webView loadRequest:request];
+        // Modified from https://stackoverflow.com/a/55805178/814589.
+        id blockRules = @[
+            @{
+                @"trigger": @{
+                    @"url-filter": @".*",
+                    @"resource-type": @[@"image"]
+                },
+                @"action": @{
+                    @"type": @"block"
+                }
+            }
+        ];
+
+        NSError *error;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:blockRules options:0 error:&error];
+        NSString *blockRulesString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+
+        if (error) {
+            // The above `blockRules` are fixed, so there should never be an error.
+            NSLog(@"Error encoding block rules: %@", error.localizedDescription);
+        }
+
+        [[WKContentRuleListStore defaultStore]
+            compileContentRuleListForIdentifier: @"ContentBlockingRules"
+            encodedContentRuleList:blockRulesString
+            completionHandler:^(WKContentRuleList *contentRuleList, NSError *error) {
+
+                if (error != nil) {
+                    NSLog(@"Error = %@", error.localizedDescription);
+                    NSURLRequest* request = [NSURLRequest requestWithURL:url];
+                    [self.webView loadRequest:request];
+                } else {
+                    WKWebViewConfiguration *configuration = self.webView.configuration;
+                    [[configuration userContentController] addContentRuleList:contentRuleList];
+
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSURLRequest* request = [NSURLRequest requestWithURL:url];
+                        [self.webView loadRequest:request];
+                    });
+                }
+            }
+        ];
     }
 }
 
