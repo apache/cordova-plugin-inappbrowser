@@ -75,13 +75,19 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -151,6 +157,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+    // The default pattern doesn't match any URLs.
+    private Pattern defaultRequestBlockPattern = Pattern.compile("(?!)");
 
     /**
      * Executes the request and returns PluginResult.
@@ -1326,6 +1334,35 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         /**
+         * Generate a regex pattern to match URLs with specific file extensions.
+         *
+         * @param extensions comma seperated list of file extensions
+         */
+        protected Pattern requestBlockPattern() {
+            String[] fileExtensions = {"png", "jpg", "jpeg", "svg", "gif", "webp"};
+            StringBuilder patternBuilder = new StringBuilder();
+
+            patternBuilder.append("(");
+            for (int i = 0; i < fileExtensions.length; i++) {
+                patternBuilder.append("\\.");
+                patternBuilder.append(fileExtensions[i]);
+                if (i < fileExtensions.length - 1) {
+                    patternBuilder.append("|");
+                }
+            }
+
+            patternBuilder.append(")");
+            patternBuilder.append("(\\?.*)?$");
+
+            try {
+                return Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE);
+            } catch (PatternSyntaxException ex) {
+                LOG.e(LOG_TAG, "Failed to compile request blocking pattern for extensions: " + fileExtensions, ex);
+                return defaultRequestBlockPattern;
+            }
+        }
+
+        /**
          * New (added in API 21)
          * For Android 5.0 and above.
          *
@@ -1338,6 +1375,12 @@ public class InAppBrowser extends CordovaPlugin {
         }
 
         public WebResourceResponse shouldInterceptRequest(String url, WebResourceResponse response, String method) {
+            if (requestBlockPattern().matcher(url).find()) {
+                Map<String, String> responseHeaders = new HashMap<String, String>();
+                InputStream data = new ByteArrayInputStream("REQUEST BLOCKED".getBytes(StandardCharsets.UTF_8));
+                return new WebResourceResponse("text/html", "UTF-8", 500, "Request blocked.", responseHeaders, data);
+            }
+
             return response;
         }
 
