@@ -67,6 +67,7 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.graphics.Insets;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
@@ -78,6 +79,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaHttpAuthHandler;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
@@ -131,12 +133,12 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SUBTITLE = "subtitle";
     private static final String THEME = "theme";
     private static final String SHARE_URL = "shareurl";
-    private static final String FULLSCREEN = "fullscreen";
     private static final String BACK_BUTTON_CAPTION = "backbuttoncaption";
     private static final String RELOAD_CAPTION = "reloadcaption";
     private static final String OPEN_IN_BROWSER_CAPTION = "openinbrowsercaption";
     private static final String COPY_URL_CAPTION = "copyurlcaption";
     private static final String SHARE_CAPTION = "sharecaption";
+    private static final String ANIMATED = "animated";
 
     private static final int TOOLBAR_HEIGHT = 64;
     private static final int MENU_RELOAD = 101;
@@ -144,8 +146,9 @@ public class InAppBrowser extends CordovaPlugin {
     private static final int MENU_COPY = 103;
     private static final int MENU_SHARE = 104;
 
-    private static final List customizableOptions = Arrays.asList(TOOLBAR_COLOR, FOOTER_COLOR, TITLE, SUBTITLE, THEME, SHARE_URL, BACK_BUTTON_CAPTION, RELOAD_CAPTION, OPEN_IN_BROWSER_CAPTION, COPY_URL_CAPTION, SHARE_CAPTION);
+    private static final List customizableOptions = Arrays.asList(TOOLBAR_COLOR, FOOTER_COLOR, TITLE, SUBTITLE, THEME, SHARE_URL, BACK_BUTTON_CAPTION, RELOAD_CAPTION, OPEN_IN_BROWSER_CAPTION, COPY_URL_CAPTION, SHARE_CAPTION, ANIMATED);
 
+    private OnBackPressedCallback onBackPressedCallback;
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
     private TextView titleTextView;
@@ -188,6 +191,32 @@ public class InAppBrowser extends CordovaPlugin {
     private String openInBrowserCaption = "";
     private String copyUrlCaption = "";
     private String shareCaption = "";
+    private Boolean animated = true;
+
+    @Override
+    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+        super.initialize(cordova, webView);
+
+        onBackPressedCallback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                if (dialog != null && dialog.isVisible) {
+                    // Delegate to InAppBrowser for back handling
+                    if (hardwareBack() && canGoBack()) {
+                        goBack();
+                    } else {
+                        closeDialog();
+                    }
+                }
+            }
+        };
+        this.cordova.getActivity().runOnUiThread(() -> {
+            cordova.getActivity().getOnBackPressedDispatcher().addCallback(
+                    cordova.getActivity(),
+                    onBackPressedCallback
+            );
+        });
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -348,7 +377,8 @@ public class InAppBrowser extends CordovaPlugin {
                 @Override
                 public void run() {
                     if (dialog != null && !cordova.getActivity().isFinishing()) {
-                        dialog.show();
+                        dialog.show(animated);
+                        onBackPressedCallback.setEnabled(true);
                     }
                 }
             });
@@ -564,8 +594,9 @@ public class InAppBrowser extends CordovaPlugin {
                     // NB: wait for about:blank before dismissing
                     public void onPageFinished(WebView view, String url) {
                         if (dialog != null && !cordova.getActivity().isFinishing()) {
-                            dialog.dismiss();
+                            dialog.dismiss(animated);
                             dialog = null;
+                            onBackPressedCallback.setEnabled(false);
                         }
                     }
                 });
@@ -748,10 +779,6 @@ public class InAppBrowser extends CordovaPlugin {
                     shareUrl = url;
                 }
             }
-            String fullscreenSet = features.get(FULLSCREEN);
-            if (fullscreenSet != null) {
-                fullscreen = fullscreenSet.equals("yes") ? true : false;
-            }
             if (features.get(BACK_BUTTON_CAPTION) != null) {
                 backButtonCaption = features.get(BACK_BUTTON_CAPTION);
             }
@@ -766,6 +793,9 @@ public class InAppBrowser extends CordovaPlugin {
             }
             if (features.get(SHARE_CAPTION) != null) {
                 shareCaption = features.get(SHARE_CAPTION);
+            }
+            if (features.get(ANIMATED) != null) {
+                animated = features.get(ANIMATED).equals("yes");
             }
         }
 
@@ -911,18 +941,11 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // CB-6702 InAppBrowser hangs when opening more than one instance
                 if (dialog != null) {
-                    dialog.dismiss();
+                    dialog.dismiss(animated);
                 }
 
                 // Let's create the main dialog
-                dialog = new InAppBrowserDialog(cordova.getActivity(), android.R.style.Theme_NoTitleBar);
-                dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
-                if (fullscreen) {
-                    dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
-                    dialog.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-                }
-                dialog.setCancelable(true);
-                dialog.setInAppBroswer(getInAppBrowser());
+                dialog = new InAppBrowserDialog(cordova.getActivity());
 
                 // Main container layout
                 main = new LinearLayout(cordova.getActivity());
@@ -1125,17 +1148,12 @@ public class InAppBrowser extends CordovaPlugin {
                     webViewLayout.addView(footer);
                 }
 
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-
                 if (dialog != null) {
                     updateTheme();
                     dialog.setContentView(main);
-                    dialog.show();
-                    dialog.getWindow().setAttributes(lp);
-                    View rootView = dialog.getWindow().getDecorView();
+                    dialog.show(animated);
+                    onBackPressedCallback.setEnabled(true);
+                    View rootView = dialog.getView();
                     ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
                         Insets systemBars = insets.getInsets(
                                 WindowInsetsCompat.Type.displayCutout() |
@@ -1150,6 +1168,7 @@ public class InAppBrowser extends CordovaPlugin {
                 // Show() needs to be called to cause the URL to be loaded
                 if (openWindowHidden && dialog != null) {
                     dialog.hide();
+                    onBackPressedCallback.setEnabled(false);
                 }
             }
         };
@@ -1183,18 +1202,6 @@ public class InAppBrowser extends CordovaPlugin {
         actionsSeparatorView.setBackgroundColor(actionsColor);
         moreButton.setColorFilter(actionsColor);
         actionButtonContainerBackground.setColor(parseColor(isDark ? "#1E2732" : "#E6ECF2"));
-        updateStatusBarStyle(isDark);
-    }
-
-    private void updateStatusBarStyle(Boolean isDark) {
-        Window window = dialog.getWindow();
-        if (window == null)
-            return;
-        View decorView = window.getDecorView();
-
-        WindowInsetsControllerCompat windowInsetsControllerCompat = WindowCompat.getInsetsController(window, decorView);
-        windowInsetsControllerCompat.setAppearanceLightStatusBars(!isDark);
-        windowInsetsControllerCompat.setAppearanceLightNavigationBars(!isDark);
     }
 
     /**

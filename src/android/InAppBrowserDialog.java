@@ -1,57 +1,93 @@
-/*
-       Licensed to the Apache Software Foundation (ASF) under one
-       or more contributor license agreements.  See the NOTICE file
-       distributed with this work for additional information
-       regarding copyright ownership.  The ASF licenses this file
-       to you under the Apache License, Version 2.0 (the
-       "License"); you may not use this file except in compliance
-       with the License.  You may obtain a copy of the License at
-
-         http://www.apache.org/licenses/LICENSE-2.0
-
-       Unless required by applicable law or agreed to in writing,
-       software distributed under the License is distributed on an
-       "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-       KIND, either express or implied.  See the License for the
-       specific language governing permissions and limitations
-       under the License.
-*/
 package org.apache.cordova.inappbrowser;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+public class InAppBrowserDialog {
+    private final Context context;
+    private final FrameLayout dialogContainer;
+    boolean isVisible = false;
 
-/**
- * Created by Oliver on 22/11/2013.
- */
-public class InAppBrowserDialog extends Dialog {
-    Context context;
-    InAppBrowser inAppBrowser = null;
-
-    public InAppBrowserDialog(Context context, int theme) {
-        super(context, theme);
+    public InAppBrowserDialog(Context context) {
         this.context = context;
+
+        dialogContainer = new FrameLayout(context);
+        dialogContainer.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
     }
 
-    public void setInAppBroswer(InAppBrowser browser) {
-        this.inAppBrowser = browser;
+    public void setContentView(View contentView) {
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        );
+        dialogContainer.removeAllViews();
+        dialogContainer.addView(contentView, params);
     }
 
-    public void onBackPressed () {
-        if (this.inAppBrowser == null) {
-            this.dismiss();
-        } else {
-            // better to go through the in inAppBrowser
-            // because it does a clean up
-            if (this.inAppBrowser.hardwareBack() && this.inAppBrowser.canGoBack()) {
-                this.inAppBrowser.goBack();
-            }  else {
-                this.inAppBrowser.closeDialog();
+    public void show(Boolean animated) {
+        if (!isVisible) {
+            if (dialogContainer.getParent() == null) {
+                if (animated) {
+                    dialogContainer.setTranslationY(dpToPx(40));
+                    dialogContainer.setAlpha(0);
+
+                    dialogContainer.animate()
+                            .alpha(1)
+                            .translationY(0)
+                            .setDuration(150)
+                            .setListener(null);
+                }
+
+                ViewGroup rootView = ((ViewGroup) ((android.app.Activity) context).getWindow().getDecorView().getRootView());
+                rootView.addView(dialogContainer);
             }
+
+            isVisible = true;
+            dialogContainer.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void hide() {
+        if (isVisible) {
+            isVisible = false;
+            dialogContainer.setVisibility(View.GONE);
+        }
+    }
+
+    public void dismiss(Boolean animated) {
+        if (isVisible && animated) {
+            dialogContainer.animate()
+                    .alpha(0)
+                    .translationY(dpToPx(40))
+                    .setDuration(150)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            isVisible = false;
+                            dismiss(true);
+                        }
+                    });
+            return;
+        }
+        isVisible = false;
+        dialogContainer.removeAllViews();
+
+        ViewGroup rootView = ((ViewGroup) ((android.app.Activity) context).getWindow().getDecorView().getRootView());
+        if (rootView != null && dialogContainer.getParent() != null) {
+            rootView.removeView(dialogContainer);
+        }
+    }
+
+    public View getView() {
+        return dialogContainer;
+    }
+
+    private float dpToPx(int dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 }
