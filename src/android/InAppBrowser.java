@@ -1202,6 +1202,18 @@ public class InAppBrowser extends CordovaPlugin {
         actionsSeparatorView.setBackgroundColor(actionsColor);
         moreButton.setColorFilter(actionsColor);
         actionButtonContainerBackground.setColor(parseColor(isDark ? "#1E2732" : "#E6ECF2"));
+
+        updateStatusBarStyle(isDark);
+    }
+
+    private void updateStatusBarStyle(Boolean isDark) {
+        Window window = this.cordova.getActivity().getWindow();
+        if (window == null)
+            return;
+        View decorView = window.getDecorView();
+        WindowInsetsControllerCompat windowInsetsControllerCompat = WindowCompat.getInsetsController(window, decorView);
+        windowInsetsControllerCompat.setAppearanceLightStatusBars(!isDark);
+        windowInsetsControllerCompat.setAppearanceLightNavigationBars(!isDark);
     }
 
     /**
