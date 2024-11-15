@@ -20,10 +20,10 @@
  */
 
 (function () {
-    var exec = require('cordova/exec');
-    var channel = require('cordova/channel');
-    var modulemapper = require('cordova/modulemapper');
-    var urlutil = require('cordova/urlutil');
+    const exec = require('cordova/exec');
+    const channel = require('cordova/channel');
+    const modulemapper = require('cordova/modulemapper');
+    const urlutil = require('cordova/urlutil');
 
     function InAppBrowser () {
         this.channels = {
@@ -33,7 +33,8 @@
             loaderror: channel.create('loaderror'),
             exit: channel.create('exit'),
             customscheme: channel.create('customscheme'),
-            message: channel.create('message')
+            message: channel.create('message'),
+            download: channel.create('download')
         };
     }
 
@@ -89,25 +90,29 @@
             } else {
                 throw new Error('insertCSS requires exactly one of code or file to be specified');
             }
+        },
+
+        addDownloadListener: function (success, error) {
+            exec(success, error, 'InAppBrowser', 'downloadListener');
         }
     };
 
     module.exports = function (strUrl, strWindowName, strWindowFeatures, callbacks) {
         // Don't catch calls that write to existing frames (e.g. named iframes).
         if (window.frames && window.frames[strWindowName]) {
-            var origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
+            const origOpenFunc = modulemapper.getOriginalSymbol(window, 'open');
             return origOpenFunc.apply(window, arguments);
         }
 
         strUrl = urlutil.makeAbsolute(strUrl);
-        var iab = new InAppBrowser();
+        const iab = new InAppBrowser();
 
         callbacks = callbacks || {};
-        for (var callbackName in callbacks) {
+        for (const callbackName in callbacks) {
             iab.addEventListener(callbackName, callbacks[callbackName]);
         }
 
-        var cb = function (eventname) {
+        const cb = function (eventname) {
             iab._eventHandler(eventname);
         };
 

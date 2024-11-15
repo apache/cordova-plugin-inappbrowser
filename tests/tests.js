@@ -19,22 +19,15 @@
  *
  */
 
-/* global MSApp */
-
-var cordova = require('cordova');
-var isWindows = cordova.platformId === 'windows';
-var isIos = cordova.platformId === 'ios';
-var isAndroid = cordova.platformId === 'android';
-var isBrowser = cordova.platformId === 'browser';
+const cordova = require('cordova');
+const isIos = cordova.platformId === 'ios';
+const isAndroid = cordova.platformId === 'android';
+const isBrowser = cordova.platformId === 'browser';
 
 window.alert = window.alert || navigator.notification.alert;
-if (isWindows && navigator && navigator.notification && navigator.notification.alert) {
-    // window.alert is defined but not functional on UWP
-    window.alert = navigator.notification.alert;
-}
 
 exports.defineAutoTests = function () {
-    var createTests = function (platformOpts) {
+    const createTests = function (platformOpts) {
         platformOpts = platformOpts || '';
 
         describe('cordova.InAppBrowser', function () {
@@ -54,10 +47,10 @@ exports.defineAutoTests = function () {
                 return;
             }
 
-            var iabInstance;
-            var originalTimeout;
-            var url = 'https://dist.apache.org/repos/dist/dev/cordova/';
-            var badUrl = 'http://bad-uri/';
+            let iabInstance;
+            let originalTimeout;
+            const url = 'https://dist.apache.org/repos/dist/dev/cordova/';
+            const badUrl = 'http://bad-uri/';
 
             beforeEach(function () {
                 // increase timeout to ensure test url could be loaded within test time
@@ -111,7 +104,7 @@ exports.defineAutoTests = function () {
             });
 
             it('inappbrowser.spec.4 should support loadstart and loadstop events', function (done) {
-                var onLoadStart = jasmine.createSpy('loadstart event callback').and.callFake(function (evt) {
+                const onLoadStart = jasmine.createSpy('loadstart event callback').and.callFake(function (evt) {
                     verifyEvent(evt, 'loadstart');
                 });
 
@@ -157,8 +150,8 @@ exports.defineAutoTests = function () {
                 if (!isAndroid && !isIos) {
                     return pending(cordova.platformId + " platform doesn't support message event");
                 }
-                var messageKey = 'my_message';
-                var messageValue = 'is_this';
+                const messageKey = 'my_message';
+                const messageValue = 'is_this';
                 iabInstance = cordova.InAppBrowser.open(url, '_blank', platformOpts);
                 iabInstance.addEventListener('message', function (evt) {
                     // Verify message event
@@ -170,7 +163,7 @@ exports.defineAutoTests = function () {
                     done();
                 });
                 iabInstance.addEventListener('loadstop', function (evt) {
-                    var code =
+                    const code =
                         '(function(){\n' +
                         '    var message = {' +
                         messageKey +
@@ -179,7 +172,7 @@ exports.defineAutoTests = function () {
                         '"};\n' +
                         '    webkit.messageHandlers.cordova_iab.postMessage(JSON.stringify(message));\n' +
                         '})()';
-                    iabInstance.executeScript({ code: code });
+                    iabInstance.executeScript({ code });
                 });
             });
         });
@@ -188,17 +181,17 @@ exports.defineAutoTests = function () {
 };
 
 exports.defineManualTests = function (contentEl, createActionButton) {
-    var platformOpts = '';
-    var platform_info = '';
+    const platformOpts = '';
+    const platform_info = '';
 
     function doOpen (url, target, params, numExpectedRedirects, useWindowOpen) {
         numExpectedRedirects = numExpectedRedirects || 0;
         useWindowOpen = useWindowOpen || false;
         console.log('Opening ' + url);
 
-        var counts;
-        var lastLoadStartURL;
-        var wasReset = false;
+        let counts;
+        let lastLoadStartURL;
+        let wasReset = false;
         function reset () {
             counts = {
                 loaderror: 0,
@@ -210,8 +203,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
         reset();
 
-        var iab;
-        var callbacks = {
+        let iab;
+        const callbacks = {
             loaderror: logEvent,
             loadstart: logEvent,
             loadstop: logEvent,
@@ -265,7 +258,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             }
             // Verify that loadend / loaderror was called.
             if (e.type === 'exit') {
-                var numStopEvents = counts.loadstop + counts.loaderror;
+                const numStopEvents = counts.loadstop + counts.loaderror;
                 if (numStopEvents === 0 && !wasReset) {
                     alert('Unexpected: browser closed without a loadstop or loaderror.'); // eslint-disable-line no-undef
                 } else if (numStopEvents > 1) {
@@ -278,8 +271,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     }
 
     function doHookOpen (url, target, params, numExpectedRedirects) {
-        var originalFunc = window.open;
-        var wasClobbered = Object.prototype.hasOwnProperty.call(window, 'open');
+        const originalFunc = window.open;
+        const wasClobbered = Object.prototype.hasOwnProperty.call(window, 'open');
         window.open = cordova.InAppBrowser.open;
 
         try {
@@ -295,8 +288,8 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     }
 
     function openWithStyle (url, cssUrl, useCallback) {
-        var iab = doOpen(url, '_blank', 'location=yes');
-        var callback = function (results) {
+        const iab = doOpen(url, '_blank', 'location=yes');
+        const callback = function (results) {
             if (results && results.length === 0) {
                 alert('Results verified'); // eslint-disable-line no-undef
             } else {
@@ -316,7 +309,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     }
 
     function openWithScript (url, jsUrl, useCallback) {
-        var iab = doOpen(url, '_blank', 'location=yes');
+        const iab = doOpen(url, '_blank', 'location=yes');
         if (jsUrl) {
             iab.addEventListener('loadstop', function (event) {
                 iab.executeScript(
@@ -334,14 +327,14 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             });
         } else {
             iab.addEventListener('loadstop', function (event) {
-                var code =
+                const code =
                     '(function(){\n' +
                     '    var header = document.getElementById("header");\n' +
                     '    header.innerHTML = "Script literal successfully injected";\n' +
                     '    return "abc";\n' +
                     '})()';
                 iab.executeScript(
-                    { code: code },
+                    { code },
                     useCallback &&
                         function (results) {
                             if (results && results.length === 1 && results[0] === 'abc') {
@@ -355,12 +348,12 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             });
         }
     }
-    var hiddenwnd = null;
-    var loadlistener = function (event) {
+    let hiddenwnd = null;
+    const loadlistener = function (event) {
         alert('background window loaded ');
     }; // eslint-disable-line no-undef
     function openHidden (url, startHidden) {
-        var shopt = startHidden ? 'hidden=yes' : '';
+        let shopt = startHidden ? 'hidden=yes' : '';
         if (platformOpts) {
             shopt += (shopt ? ',' : '') + platformOpts;
         }
@@ -384,7 +377,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
     }
 
-    var info_div =
+    const info_div =
         '<h1>InAppBrowser</h1>' +
         '<div id="info">' +
         'Make sure http://cordova.apache.org and http://google.co.uk and https://www.google.co.uk are white listed. </br>' +
@@ -393,7 +386,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<h4>User-Agent: <span id="user-agent"> </span></hr>' +
         '</div>';
 
-    var local_tests =
+    const local_tests =
         '<h1>Local URL</h1>' +
         '<div id="openLocal"></div>' +
         'Expected result: opens successfully in CordovaWebView.' +
@@ -414,7 +407,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/><div id="openLocalRandomToolBarTopNoLocation"></div>' +
         'Expected result: open successfully in InAppBrowser with no locationBar. On iOS the toolbar is at the top.';
 
-    var white_listed_tests =
+    const white_listed_tests =
         '<h1>White Listed URL</h1>' +
         '<div id="openWhiteListed"></div>' +
         'Expected result: open successfully in CordovaWebView to cordova.apache.org' +
@@ -431,7 +424,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openWhiteListedRandomNoLocation"></div>' +
         'Expected result: open successfully in InAppBrowser to cordova.apache.org with no location bar.';
 
-    var non_white_listed_tests =
+    const non_white_listed_tests =
         '<h1>Non White Listed URL</h1>' +
         '<div id="openNonWhiteListed"></div>' +
         'Expected result: open successfully in InAppBrowser to apple.com.' +
@@ -448,21 +441,21 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openNonWhiteListedRandomNoLocation"></div>' +
         'Expected result: open successfully in InAppBrowser to apple.com without locationBar.';
 
-    var page_with_redirects_tests =
+    const page_with_redirects_tests =
         '<h1>Page with redirect</h1>' +
         '<div id="openRedirect301"></div>' +
         'Expected result: should 301 and open successfully in InAppBrowser to https://www.google.co.uk.' +
         '<p/> <div id="openRedirect302"></div>' +
         'Expected result: should 302 and open successfully in InAppBrowser to www.zhihu.com/answer/16714076.';
 
-    var pdf_url_tests =
+    const pdf_url_tests =
         '<h1>PDF URL</h1>' +
         '<div id="openPDF"></div>' +
         'Expected result: InAppBrowser opens. PDF should render on iOS.' +
         '<p/> <div id="openPDFBlank"></div>' +
         'Expected result: InAppBrowser opens. PDF should render on iOS.';
 
-    var invalid_url_tests =
+    const invalid_url_tests =
         '<h1>Invalid URL</h1>' +
         '<div id="openInvalidScheme"></div>' +
         'Expected result: fail to load in InAppBrowser.' +
@@ -471,7 +464,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openInvalidMissing"></div>' +
         'Expected result: fail to load in InAppBrowser (404).';
 
-    var css_js_injection_tests =
+    const css_js_injection_tests =
         '<h1>CSS / JS Injection</h1>' +
         '<div id="openOriginalDocument"></div>' +
         'Expected result: open successfully in InAppBrowser without text "Style updated from..."' +
@@ -492,7 +485,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openScriptLiteralInjectionCallback"></div>' +
         'Expected result: open successfully in InAppBrowser with the text "Script literal successfully injected" and alert dialog with the text "Results verified".';
 
-    var open_hidden_tests =
+    const open_hidden_tests =
         '<h1>Open Hidden </h1>' +
         '<div id="openHidden"></div>' +
         'Expected result: no additional browser window. Alert appears with the text "background window loaded".' +
@@ -505,14 +498,14 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openVisibleAndHide"></div>' +
         'Expected result: open successfully in InAppBrowser to https://www.google.co.uk. Hide after 2 seconds';
 
-    var clearing_cache_tests =
+    const clearing_cache_tests =
         '<h1>Clearing Cache</h1>' +
         '<div id="openClearCache"></div>' +
         'Expected result: ?' +
         '<p/> <div id="openClearSessionCache"></div>' +
         'Expected result: ?';
 
-    var video_tag_tests =
+    const video_tag_tests =
         '<h1>Video tag</h1>' +
         '<div id="openRemoteVideo"></div>' +
         'Expected result: open successfully in InAppBrowser with an embedded video plays automatically on iOS and Android.' +
@@ -521,14 +514,14 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<div id="openRemoteNeedUserYesVideo"></div>' +
         'Expected result: open successfully in InAppBrowser with an embedded video does not play automatically on iOS and Android but rather works after clicking the "play" button.';
 
-    var local_with_anchor_tag_tests =
+    const local_with_anchor_tag_tests =
         '<h1>Local with anchor tag</h1>' +
         '<div id="openAnchor1"></div>' +
         'Expected result: open successfully in InAppBrowser to the local page, scrolled to the top as normal.' +
         '<p/> <div id="openAnchor2"></div>' +
         'Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.';
 
-    var hardwareback_tests =
+    const hardwareback_tests =
         '<h1>HardwareBack</h1>' +
         '<p/> <div id="openHardwareBackDefault"></div>' +
         'Expected result: By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser' +
@@ -539,54 +532,32 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         '<p/> <div id="openHardwareBackDefaultAfterNo"></div>' +
         'Expected result: consistently open browsers with with the appropriate option: hardwareback=defaults to yes then hardwareback=no then hardwareback=defaults to yes. By default hardwareback is yes so pressing back button should navigate backwards in history then close InAppBrowser';
 
-    // CB-7490 We need to wrap this code due to Windows security restrictions
-    // see http://msdn.microsoft.com/en-us/library/windows/apps/hh465380.aspx#differences for details
-    if (window.MSApp && window.MSApp.execUnsafeLocalFunction) {
-        MSApp.execUnsafeLocalFunction(function () {
-            contentEl.innerHTML =
-                info_div +
-                platform_info +
-                local_tests +
-                white_listed_tests +
-                non_white_listed_tests +
-                page_with_redirects_tests +
-                pdf_url_tests +
-                invalid_url_tests +
-                css_js_injection_tests +
-                open_hidden_tests +
-                clearing_cache_tests +
-                video_tag_tests +
-                local_with_anchor_tag_tests +
-                hardwareback_tests;
-        });
-    } else {
-        contentEl.innerHTML =
-            info_div +
-            platform_info +
-            local_tests +
-            white_listed_tests +
-            non_white_listed_tests +
-            page_with_redirects_tests +
-            pdf_url_tests +
-            invalid_url_tests +
-            css_js_injection_tests +
-            open_hidden_tests +
-            clearing_cache_tests +
-            video_tag_tests +
-            local_with_anchor_tag_tests +
-            hardwareback_tests;
-    }
+    contentEl.innerHTML =
+        info_div +
+        platform_info +
+        local_tests +
+        white_listed_tests +
+        non_white_listed_tests +
+        page_with_redirects_tests +
+        pdf_url_tests +
+        invalid_url_tests +
+        css_js_injection_tests +
+        open_hidden_tests +
+        clearing_cache_tests +
+        video_tag_tests +
+        local_with_anchor_tag_tests +
+        hardwareback_tests;
 
     document.getElementById('user-agent').textContent = navigator.userAgent;
 
     // we are already in cdvtests directory
-    var basePath = 'iab-resources/';
-    var localhtml = basePath + 'local.html';
-    var localpdf = basePath + 'local.pdf';
-    var injecthtml = basePath + 'inject.html';
-    var injectjs = isWindows ? basePath + 'inject.js' : 'inject.js';
-    var injectcss = isWindows ? basePath + 'inject.css' : 'inject.css';
-    var videohtml = basePath + 'video.html';
+    const basePath = 'iab-resources/';
+    const localhtml = basePath + 'local.html';
+    const localpdf = basePath + 'local.pdf';
+    const injecthtml = basePath + 'inject.html';
+    const injectjs = 'inject.js';
+    const injectcss = 'inject.css';
+    const videohtml = basePath + 'video.html';
 
     // Local
     createActionButton(
@@ -657,49 +628,49 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         '* target=Default',
         function () {
-            doOpen('http://cordova.apache.org');
+            doOpen('https://cordova.apache.org');
         },
         'openWhiteListed'
     );
     createActionButton(
         '* target=Default (window.open)',
         function () {
-            doHookOpen('http://cordova.apache.org');
+            doHookOpen('https://cordova.apache.org');
         },
         'openWhiteListedHook'
     );
     createActionButton(
         '* target=_self',
         function () {
-            doOpen('http://cordova.apache.org', '_self');
+            doOpen('https://cordova.apache.org', '_self');
         },
         'openWhiteListedSelf'
     );
     createActionButton(
         'target=_system',
         function () {
-            doOpen('http://cordova.apache.org', '_system');
+            doOpen('https://cordova.apache.org', '_system');
         },
         'openWhiteListedSystem'
     );
     createActionButton(
         'target=_blank',
         function () {
-            doOpen('http://cordova.apache.org', '_blank');
+            doOpen('https://cordova.apache.org', '_blank');
         },
         'openWhiteListedBlank'
     );
     createActionButton(
         'target=Random',
         function () {
-            doOpen('http://cordova.apache.org', 'random_string');
+            doOpen('https://cordova.apache.org', 'random_string');
         },
         'openWhiteListedRandom'
     );
     createActionButton(
         '* target=Random, no location bar',
         function () {
-            doOpen('http://cordova.apache.org', 'random_string', 'location=no');
+            doOpen('https://cordova.apache.org', 'random_string', 'location=no');
         },
         'openWhiteListedRandomNoLocation'
     );
@@ -708,49 +679,49 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'target=Default',
         function () {
-            doOpen('http://www.apple.com');
+            doOpen('https://www.apple.com');
         },
         'openNonWhiteListed'
     );
     createActionButton(
         'target=Default (window.open)',
         function () {
-            doHookOpen('http://www.apple.com');
+            doHookOpen('https://www.apple.com');
         },
         'openNonWhiteListedHook'
     );
     createActionButton(
         'target=_self',
         function () {
-            doOpen('http://www.apple.com', '_self');
+            doOpen('https://www.apple.com', '_self');
         },
         'openNonWhiteListedSelf'
     );
     createActionButton(
         'target=_system',
         function () {
-            doOpen('http://www.apple.com', '_system');
+            doOpen('https://www.apple.com', '_system');
         },
         'openNonWhiteListedSystem'
     );
     createActionButton(
         'target=_blank',
         function () {
-            doOpen('http://www.apple.com', '_blank');
+            doOpen('https://www.apple.com', '_blank');
         },
         'openNonWhiteListedBlank'
     );
     createActionButton(
         'target=Random',
         function () {
-            doOpen('http://www.apple.com', 'random_string');
+            doOpen('https://www.apple.com', 'random_string');
         },
         'openNonWhiteListedRandom'
     );
     createActionButton(
         '* target=Random, no location bar',
         function () {
-            doOpen('http://www.apple.com', 'random_string', 'location=no');
+            doOpen('https://www.apple.com', 'random_string', 'location=no');
         },
         'openNonWhiteListedRandomNoLocation'
     );
@@ -759,14 +730,14 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'http://google.co.uk',
         function () {
-            doOpen('http://google.co.uk', 'random_string', '', 1);
+            doOpen('https://google.co.uk', 'random_string', '', 1);
         },
         'openRedirect301'
     );
     createActionButton(
         'http://goo.gl/pUFqg',
         function () {
-            doOpen('http://goo.gl/pUFqg', 'random_string', '', 2);
+            doOpen('https://goo.gl/pUFqg', 'random_string', '', 2);
         },
         'openRedirect302'
     );
@@ -775,7 +746,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'Remote URL',
         function () {
-            doOpen('http://www.stluciadance.com/prospectus_file/sample.pdf');
+            doOpen('https://www.stluciadance.com/prospectus_file/sample.pdf');
         },
         'openPDF'
     );
@@ -798,7 +769,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'Invalid Host',
         function () {
-            doOpen('http://www.inv;alid.com/', '_blank');
+            doOpen('https://www.inv;alid.com/', '_blank');
         },
         'openInvalidHost'
     );
@@ -907,7 +878,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'google.co.uk shown for 2 seconds than hidden',
         function () {
-            var iab = doOpen('https://www.google.co.uk/', 'random_sting');
+            const iab = doOpen('https://www.google.co.uk/', 'random_sting');
             setTimeout(function () {
                 iab.hide();
             }, 2000);
@@ -974,33 +945,33 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     createActionButton(
         'no hardwareback (defaults to yes)',
         function () {
-            doOpen('http://cordova.apache.org', '_blank');
+            doOpen('https://cordova.apache.org', '_blank');
         },
         'openHardwareBackDefault'
     );
     createActionButton(
         'hardwareback=yes',
         function () {
-            doOpen('http://cordova.apache.org', '_blank', 'hardwareback=yes');
+            doOpen('https://cordova.apache.org', '_blank', 'hardwareback=yes');
         },
         'openHardwareBackYes'
     );
     createActionButton(
         'hardwareback=no',
         function () {
-            doOpen('http://cordova.apache.org', '_blank', 'hardwareback=no');
+            doOpen('https://cordova.apache.org', '_blank', 'hardwareback=no');
         },
         'openHardwareBackNo'
     );
     createActionButton(
         'no hardwareback -> hardwareback=no -> no hardwareback',
         function () {
-            var ref = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes' + (platformOpts ? ',' + platformOpts : ''));
+            const ref = cordova.InAppBrowser.open('https://google.com', '_blank', 'location=yes' + (platformOpts ? ',' + platformOpts : ''));
             ref.addEventListener('loadstop', function () {
                 ref.close();
             });
             ref.addEventListener('exit', function () {
-                var ref2 = cordova.InAppBrowser.open(
+                const ref2 = cordova.InAppBrowser.open(
                     'https://google.com',
                     '_blank',
                     'location=yes,hardwareback=no' + (platformOpts ? ',' + platformOpts : '')
