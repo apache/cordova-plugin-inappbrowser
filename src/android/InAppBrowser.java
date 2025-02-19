@@ -195,6 +195,7 @@ public class InAppBrowser extends CordovaPlugin {
     private String copyUrlCaption = "";
     private String shareCaption = "";
     private Boolean animated = true;
+    private Boolean loadedOnce = false;
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -800,6 +801,7 @@ public class InAppBrowser extends CordovaPlugin {
             if (features.get(ANIMATED) != null) {
                 animated = features.get(ANIMATED).equals("yes");
             }
+            loadedOnce = false;
         }
 
         final CordovaWebView thatWebView = this.webView;
@@ -1017,6 +1019,17 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
+                    @Override
+                    public void onReceivedTitle(WebView view, String title) {
+                      super.onReceivedTitle(view, title);
+
+                      if (!loadedOnce && subtitleTextView.getVisibility() == View.GONE) {
+                        loadedOnce = true;
+                        fadeTextView(titleTextView, view.getTitle());
+                        fadeTextView(subtitleTextView, titleTextView.getText().toString());
+                      }
+                    }
+
                     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
                         // If callback exists, finish it.
@@ -1526,15 +1539,8 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
-        private Boolean loadedOnce = false;
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-
-            if (!loadedOnce && subtitleTextView.getVisibility() == View.GONE) {
-                loadedOnce = true;
-                fadeTextView(titleTextView, view.getTitle());
-                fadeTextView(subtitleTextView, titleTextView.getText().toString());
-            }
 
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
