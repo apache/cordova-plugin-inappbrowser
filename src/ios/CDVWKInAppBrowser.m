@@ -735,6 +735,7 @@ BOOL isExiting = FALSE;
 
     self.webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
     self.webView.translatesAutoresizingMaskIntoConstraints = false;
+    [self.webView addObserver:self forKeyPath:@"title" options:NSKeyValueObservingOptionNew context:nil];;
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 160400
     // With the introduction of iOS 16.4 the webview is no longer inspectable by default.
@@ -1039,9 +1040,20 @@ BOOL isExiting = FALSE;
                        context:(void *)context {
     if ([keyPath isEqualToString:@"canGoBack"]) {
         [self updateNavigationButtons];
-    } else {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        return;
     }
+
+    if ([keyPath isEqualToString:@"title"]) {
+        if (!_loadedOnce && _subtitleLabel.text.length == 0) {
+            _loadedOnce = YES;
+            NSString *newTitle = _webView.title ?: @"";
+            [self fadeLabel:_subtitleLabel toText:_titleLabel.text];
+            [self fadeLabel:_titleLabel toText:newTitle];
+        }
+        return;
+    }
+
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 - (void)fadeLabel:(UILabel *)label toText:(NSString *)newText {
@@ -1105,12 +1117,6 @@ BOOL isExiting = FALSE;
     [self.spinner stopAnimating];
 
     [self.navigationDelegate didFinishNavigation:theWebView];
-
-    if (!_loadedOnce && [_subtitleLabel.text isEqual: @""]) {
-        _loadedOnce = TRUE;
-        [self fadeLabel:_subtitleLabel toText:_titleLabel.text];
-        [self fadeLabel:_titleLabel toText:theWebView.title];
-    }
 }
 
 - (void)webView:(WKWebView*)theWebView failedNavigation:(NSString*) delegateName withError:(nonnull NSError *)error{
