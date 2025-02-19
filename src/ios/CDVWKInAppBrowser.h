@@ -62,11 +62,14 @@
 @property (nonatomic, strong) IBOutlet UIButton* closeInnerButton;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem* optionsButton;
 @property (nonatomic, strong) IBOutlet UIActivityIndicatorView* spinner;
+@property (nonatomic, strong) IBOutlet UILabel* titleLabel;
+@property (nonatomic, strong) IBOutlet UILabel* subtitleLabel;
 @property (nonatomic, strong) IBOutlet CDVWKInAppBrowserUIDelegate* webViewUIDelegate;
 
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVWKInAppBrowser* navigationDelegate;
 @property (nonatomic) NSURL* currentURL;
+@property (nonatomic) BOOL loadedOnce;
 
 - (void)forceClose;
 - (void)navigateTo:(NSURL*)url preloadCode:(NSString *)preloadCode;

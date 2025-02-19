@@ -820,24 +820,24 @@ BOOL isExiting = FALSE;
     titleView.axis = UILayoutConstraintAxisVertical;
 
     if (_browserOptions.title) {
-        UILabel *titleLabel = [[UILabel alloc] init];
-        titleLabel.text = _browserOptions.title;
-        titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.font = [UIFont boldSystemFontOfSize:17];
-        titleLabel.textColor = [UIColor labelColor];
-        titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [titleView addArrangedSubview:titleLabel];
+        _titleLabel = [[UILabel alloc] init];
+        _titleLabel.text = _browserOptions.title;
+        _titleLabel.textAlignment = NSTextAlignmentCenter;
+        _titleLabel.font = [UIFont boldSystemFontOfSize:17];
+        _titleLabel.textColor = [UIColor labelColor];
+        _titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [titleView addArrangedSubview:_titleLabel];
     }
 
     if (_browserOptions.subtitle) {
-        UILabel *subtitleLabel = [[UILabel alloc] init];
-        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false;
-        subtitleLabel.text = _browserOptions.subtitle;
-        subtitleLabel.textAlignment = NSTextAlignmentCenter;
-        subtitleLabel.font = [UIFont systemFontOfSize:13];
-        subtitleLabel.textColor = [UIColor secondaryLabelColor];
-        subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [titleView addArrangedSubview:subtitleLabel];
+        _subtitleLabel = [[UILabel alloc] init];
+        _subtitleLabel.translatesAutoresizingMaskIntoConstraints = false;
+        _subtitleLabel.text = _browserOptions.subtitle;
+        _subtitleLabel.textAlignment = NSTextAlignmentCenter;
+        _subtitleLabel.font = [UIFont systemFontOfSize:13];
+        _subtitleLabel.textColor = [UIColor secondaryLabelColor];
+        _subtitleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [titleView addArrangedSubview:_subtitleLabel];
     }
 
     // Create actions for the menu items
@@ -1044,6 +1044,20 @@ BOOL isExiting = FALSE;
     }
 }
 
+- (void)fadeLabel:(UILabel *)label toText:(NSString *)newText {
+    [UIView animateWithDuration:0.3 animations:^{
+        label.alpha = 0.0;
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [label setText:newText];
+
+            [UIView animateWithDuration:0.3 animations:^{
+                label.alpha = 1.0;
+            }];
+        }
+    }];
+}
+
 #pragma mark - UISheetPresentationControllerDelegate
 
 - (void)sheetPresentationControllerDidChangeSelectedDetentIdentifier:(UISheetPresentationController *)sheetPresentationController  API_AVAILABLE(ios(15.0)){
@@ -1091,6 +1105,12 @@ BOOL isExiting = FALSE;
     [self.spinner stopAnimating];
 
     [self.navigationDelegate didFinishNavigation:theWebView];
+
+    if (!_loadedOnce && [_subtitleLabel.text isEqual: @""]) {
+        _loadedOnce = TRUE;
+        [self fadeLabel:_subtitleLabel toText:_titleLabel.text];
+        [self fadeLabel:_titleLabel toText:theWebView.title];
+    }
 }
 
 - (void)webView:(WKWebView*)theWebView failedNavigation:(NSString*) delegateName withError:(nonnull NSError *)error{

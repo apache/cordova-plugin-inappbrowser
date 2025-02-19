@@ -20,6 +20,9 @@ package org.apache.cordova.inappbrowser;
 
 import static android.graphics.Color.parseColor;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ClipData;
@@ -1260,6 +1263,23 @@ public class InAppBrowser extends CordovaPlugin {
         mUploadCallback = null;
     }
 
+    private void fadeTextView(final TextView textView, final String newText) {
+        if (textView.getText().equals(newText))
+            return;
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(textView, "alpha", 1f, 0f).setDuration(300);
+        fadeOut.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (textView.getVisibility() != View.VISIBLE)
+                    textView.setVisibility(View.VISIBLE);
+                textView.setText(newText);
+                ObjectAnimator fadeIn = ObjectAnimator.ofFloat(textView, "alpha", 0f, 1f).setDuration(300);
+                fadeIn.start();
+            }
+        });
+        fadeOut.start();
+    }
+
     /**
      * The webview client receives notifications about appView
      */
@@ -1506,8 +1526,15 @@ public class InAppBrowser extends CordovaPlugin {
             }
         }
 
+        private Boolean loadedOnce = false;
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+
+            if (!loadedOnce && subtitleTextView.getVisibility() == View.GONE) {
+                loadedOnce = true;
+                fadeTextView(titleTextView, view.getTitle());
+                fadeTextView(subtitleTextView, titleTextView.getText().toString());
+            }
 
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
