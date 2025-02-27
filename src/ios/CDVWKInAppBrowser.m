@@ -974,7 +974,11 @@ BOOL isExiting = FALSE;
     dispatch_async(dispatch_get_main_queue(), ^{
         isExiting = TRUE;
         if ([weakSelf respondsToSelector:@selector(presentingViewController)]) {
+          if (weakSelf.presentingViewController) {
             [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+          } else {
+            [weakSelf viewDidDisappear:false];
+          }
         } else {
             [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
         }
