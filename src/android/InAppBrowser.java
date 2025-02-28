@@ -20,6 +20,9 @@ package org.apache.cordova.inappbrowser;
 
 import static android.graphics.Color.parseColor;
 
+import static androidx.core.content.ContextCompat.checkSelfPermission;
+
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -54,6 +57,7 @@ import android.view.WindowManager.LayoutParams;
 import android.webkit.CookieManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -1047,6 +1051,11 @@ public class InAppBrowser extends CordovaPlugin {
                         cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
                         return true;
                     }
+
+                    @Override
+                    public void onPermissionRequest(final PermissionRequest request) {
+                        handlePermissionRequest(request);
+                    }
                 });
                 currentClient = new InAppBrowserClient(thatWebView, titleTextView, beforeload);
                 inAppWebView.setWebViewClient(currentClient);
@@ -1274,6 +1283,55 @@ public class InAppBrowser extends CordovaPlugin {
         }
         mUploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
         mUploadCallback = null;
+    }
+
+    private static final int CAMERA_REQUEST_CODE = 100;
+    private PermissionRequest pendingRequest;
+
+    private void handlePermissionRequest(PermissionRequest request) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean requiresCamera = false;
+            for (String resource : request.getResources()) {
+                if (resource.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)) {
+                    requiresCamera = true;
+                    break;
+                }
+            }
+
+            if (requiresCamera) {
+                if (checkSelfPermission(cordova.getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    request.grant(request.getResources());
+                } else {
+                    pendingRequest = request;
+                    cordova.requestPermission(this, CAMERA_REQUEST_CODE, Manifest.permission.CAMERA);
+                }
+                return;
+            }
+        }
+        request.grant(request.getResources());
+    }
+
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        super.onRequestPermissionResult(requestCode, permissions, grantResults);
+        onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == CAMERA_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (pendingRequest != null) {
+                    pendingRequest.grant(pendingRequest.getResources());
+                    pendingRequest = null;
+                }
+            } else {
+                if (pendingRequest != null) {
+                    pendingRequest.deny();
+                    pendingRequest = null;
+                }
+            }
+        }
     }
 
     private void fadeTextView(final TextView textView, final String newText) {
