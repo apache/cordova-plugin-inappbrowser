@@ -1119,6 +1119,11 @@ public class InAppBrowser extends CordovaPlugin {
         mUploadCallback = null;
     }
 
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        Log.e("Error", "Received SSL error"+ error.toString());
+        handler.proceed();
+    }
+
     /**
      * The webview client receives notifications about appView
      */
@@ -1407,46 +1412,6 @@ public class InAppBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
                 LOG.d(LOG_TAG, "Should never happen");
             }
-        }
-
-        @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-            super.onReceivedSslError(view, handler, error);
-            try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", LOAD_ERROR_EVENT);
-                obj.put("url", error.getUrl());
-                obj.put("code", 0);
-                obj.put("sslerror", error.getPrimaryError());
-                String message;
-                switch (error.getPrimaryError()) {
-                case SslError.SSL_DATE_INVALID:
-                    message = "The date of the certificate is invalid";
-                    break;
-                case SslError.SSL_EXPIRED:
-                    message = "The certificate has expired";
-                    break;
-                case SslError.SSL_IDMISMATCH:
-                    message = "Hostname mismatch";
-                    break;
-                default:
-                case SslError.SSL_INVALID:
-                    message = "A generic error occurred";
-                    break;
-                case SslError.SSL_NOTYETVALID:
-                    message = "The certificate is not yet valid";
-                    break;
-                case SslError.SSL_UNTRUSTED:
-                    message = "The certificate authority is not trusted";
-                    break;
-                }
-                obj.put("message", message);
-
-                sendUpdate(obj, true, PluginResult.Status.ERROR);
-            } catch (JSONException ex) {
-                LOG.d(LOG_TAG, "Should never happen");
-            }
-            handler.cancel();
         }
 
         /**
