@@ -23,6 +23,7 @@ on:
       - '**.md'
       - 'LICENSE'
       - '.eslint*'
+
   pull_request:
     paths-ignore:
       - '**.md'
@@ -32,7 +33,7 @@ on:
 jobs:
   test:
     name: Android ${{ matrix.versions.android }} Test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     continue-on-error: true
 
     # hoist configurations to top that are expected to be updated
@@ -40,12 +41,12 @@ jobs:
       # Storing a copy of the repo
       repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
-      node-version: 16
+      node-version: 20
 
       # These are the default Java configurations used by most tests.
       # To customize these options, add "java-distro" or "java-version" to the strategy matrix with its overriding value.
       default_java-distro: temurin
-      default_java-version: 11
+      default_java-version: 17
 
       # These are the default Android System Image configurations used by most tests.
       # To customize these options, add "system-image-arch" or "system-image-target" to the strategy matrix with its overriding value.
@@ -56,16 +57,30 @@ jobs:
     strategy:
       matrix:
         versions:
-          # Test the lowest minimum supported APIs
           - android: 7
             android-api: 24
 
-          # Test the last 3-4 supported APIs
+          - android: 7.1
+            android-api: 25
+
+          - android: 8
+            android-api: 26
+
+          - android: 8.1
+            android-api: 27
+            system-image-arch: x86
+
+          - android: 9
+            android-api: 28
+
           - android: 10
             android-api: 29
 
           - android: 11
             android-api: 30
+
+          - android: 12
+            android-api: 31
 
           - android: 12L
             android-api: 32
@@ -73,20 +88,29 @@ jobs:
           - android: 13
             android-api: 33
 
+          - android: 14
+            android-api: 34
+
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node-version }}
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         env:
           java-version: ${{ matrix.versions.java-version == '' && env.default_java-version || matrix.versions.java-version }}
           java-distro: ${{ matrix.versions.java-distro == '' && env.default_java-distro || matrix.versions.java-distro }}
         with:
           distribution: ${{ env.java-distro }}
           java-version: ${{ env.java-version }}
+
+      - name: Enable KVM group perms
+        run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
 
       - name: Run Environment Information
         run: |
@@ -105,7 +129,7 @@ jobs:
         if: ${{ endswith(env.repo, '/cordova-paramedic') != true }}
         run: npm i -g github:apache/cordova-paramedic
 
-      - uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b
+      - uses: reactivecircus/android-emulator-runner@v2
         env:
           system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
           system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}
@@ -119,7 +143,7 @@ jobs:
           script: echo "Pregenerate the AVD before running Paramedic"
 
       - name: Run paramedic tests
-        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b
+        uses: reactivecircus/android-emulator-runner@v2
         env:
           system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
           system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}

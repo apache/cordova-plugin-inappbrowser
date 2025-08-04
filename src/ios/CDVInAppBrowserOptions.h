@@ -17,6 +17,7 @@
  under the License.
  */
 
+#import <Foundation/Foundation.h>
 
 @interface CDVInAppBrowserOptions : NSObject {}
 
