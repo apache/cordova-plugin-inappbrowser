@@ -158,7 +158,7 @@ public class InAppBrowser extends CordovaPlugin {
 
     // IAB Multi-Instance support
     private String windowId;
-    private CallbackContext observeEventCallback;
+    private CallbackContext observeEventsCallback;
 
     // IAB Multi-Instance support
     public void setPluginData (CordovaInterface cordova, CordovaWebView webView, CordovaPreferences preferences) {
@@ -172,7 +172,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public void setObserveEventsCallback(CallbackContext callbackContext) {
-        this.observeEventCallback = callbackContext;
+        this.observeEventsCallback = callbackContext;
     }
 
     /**
@@ -347,7 +347,7 @@ public class InAppBrowser extends CordovaPlugin {
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
             // IAB Multi-Instance support
-            if (this.observeEventCallback != null) {
+            if (this.observesEventCallback != null) {
                 callbackContext.sendPluginResult(pluginResult);
             } else {
                 this.callbackContext.sendPluginResult(pluginResult);
@@ -365,7 +365,7 @@ public class InAppBrowser extends CordovaPlugin {
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
             // IAB Multi-Instance support
-            if (this.observeEventCallback != null) {
+            if (this.observeEventsCallback != null) {
                 callbackContext.sendPluginResult(pluginResult);
 
                 JSONObject obj = new JSONObject();
@@ -1129,17 +1129,17 @@ public class InAppBrowser extends CordovaPlugin {
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
         // IAB Multi-Instance support
-        if (observeEventCallback != null) {
+        if (observeEventsCallback != null) {
             try {
                 obj.put("windowId", this.windowId);
             } catch (JSONException e) {
                 PluginResult result = new PluginResult(status, "Cannot set windowId in result");
                 result.setKeepCallback(true);
-                observeEventCallback.sendPluginResult(result);
+                observeEventsCallback.sendPluginResult(result);
             }
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(true);
-            observeEventCallback.sendPluginResult(result);
+            observeEventsCallback.sendPluginResult(result);
         } else if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(keepCallback);

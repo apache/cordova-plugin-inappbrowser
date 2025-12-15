@@ -6,6 +6,7 @@
 #import "CDVInAppBrowserWindowManager.h"
 #import <objc/runtime.h>
 
+// IAB Multi-Instance support
 @implementation CDVMultiInAppBrowser
 
 static CDVMultiInAppBrowser* _sharedInstance = nil;

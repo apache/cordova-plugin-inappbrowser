@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser",
-  "version": "7.1.0",
+  "version": "7.2.0",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
@@ -26,7 +26,9 @@
   ],
   "scripts": {
     "test": "npm run lint",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test-unit": "jest --config=tests/unit/jest.config.js --coverage",
+    "test-types": "tsd ./tests --typings ../types/InAppBrowserMulti.d.ts"
   },
   "engines": {
     "cordovaDependencies": {
@@ -60,6 +62,8 @@
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@cordova/eslint-config": "^5.0.0"
+    "@cordova/eslint-config": "^5.0.0",
+    "jest": "^30.2.0",
+    "tsd": "^0.33.0"
   }
 }
