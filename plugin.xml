@@ -19,8 +19,8 @@
 -->
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="cordova-plugin-inappbrowser"
-      version="6.0.1-dev">
+    id="cordova-plugin-inappbrowser"
+    version="7.0.0">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -30,9 +30,9 @@
     <issue>https://github.com/apache/cordova-plugin-inappbrowser/issues</issue>
 
     <engines>
-        <engine name="cordova" version=">=9.0.0"/>
-        <engine name="cordova-android" version=">=9.0.0" />
-        <engine name="cordova-ios" version=">=6.0.0" />
+        <engine name="cordova" version=">=12.0.0"/>
+        <engine name="cordova-android" version=">=14.0.0" />
+        <engine name="cordova-ios" version=">=7.0.0" />
     </engines>
 
     <!-- android -->
@@ -73,9 +73,16 @@
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
         </js-module>
+        <js-module src="www/InAppBrowserMulti.js" name="InAppBrowserMulti">
+            <clobbers target="cordova.InAppBrowserMulti" />
+        </js-module>
         <config-file target="config.xml" parent="/*">
             <feature name="InAppBrowser">
                 <param name="ios-package" value="CDVWKInAppBrowser" />
+                <param name="onload" value="true" />
+            </feature>
+            <feature name="InAppBrowserMulti">
+                <param name="ios-package" value="CDVMultiInAppBrowser" />
                 <param name="onload" value="true" />
             </feature>
         </config-file>
@@ -87,6 +94,14 @@
 	    <source-file src="src/ios/CDVWKInAppBrowser.m" />
 	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
 	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
+        <header-file src="src/ios/CDVInAppBrowserWindowManager.h" />
+        <source-file src="src/ios/CDVInAppBrowserWindowManager.m" />
+        <source-file src="src/ios/CDVMultiInAppBrowser.h" />
+        <source-file src="src/ios/CDVMultiInAppBrowser.m" />
+        <source-file src="src/ios/CDVWKInAppBrowser+Expose.h" />
+        <source-file src="src/ios/CDVWKInAppBrowser+Expose.m" />
+        <source-file src="src/ios/CDVWKInAppBrowser+Events.m" />
+        <source-file src="src/ios/CDVWKInAppBrowser+Events.h" />
 
 	    <framework src="CoreGraphics.framework" />
     </platform>

@@ -196,6 +196,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 - hide
 - executeScript
 - insertCSS
+- loadAfterBeforeload
 
 ## InAppBrowser.addEventListener
 
@@ -211,6 +212,7 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error when loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __hide__: event fires when the `InAppBrowser` window is hidden.
   - __beforeload__: event fires when the `InAppBrowser` decides whether to load an URL or not (only with option `beforeload` set).
   - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
   - __download__: _(Android Only)_ event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
@@ -380,6 +382,7 @@ function downloadListener(params){
   - __loadstop__: event fires when the `InAppBrowser` finishes loading a URL.
   - __loaderror__: event fires when the `InAppBrowser` encounters an error loading a URL.
   - __exit__: event fires when the `InAppBrowser` window is closed.
+  - __hide__: event fires when the `InAppBrowser` window is hidden.
   - __message__: event fires when the `InAppBrowser` receives a message posted from the page loaded inside the `InAppBrowser` Webview.
   - __download__: _(Android only)_ event fires when the `InAppBrowser` loads a URL that leads in downloading of a file.
 
@@ -518,6 +521,13 @@ The function is passed an `InAppBrowserEvent` object.
     ref.addEventListener('loadstop', function() {
         ref.insertCSS({file: "mystyles.css"});
     });
+
+### Multi-instance support
+
+When you use cordova.InAppBrowser.open it reuses the same browser instance. 
+In case you want to have multi-instances support you can use cordova.InAppBrowserMulti.open which returns different browser instance. 
+On js side it is IABWindow object which has all known API + windowId property. 
+
 __
 
 ## <a id="sample"></a>Sample: Show help pages with an InAppBrowser
