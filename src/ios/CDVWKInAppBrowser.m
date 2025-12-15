@@ -21,6 +21,8 @@
 #import <Cordova/NSDictionary+CordovaPreferences.h>
 #import <Cordova/CDVWebViewProcessPoolFactory.h>
 #import <Cordova/CDVPluginResult.h>
+#import "CDVWKInAppBrowser+Events.h"
+#import <objc/runtime.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
 #define    kInAppBrowserTargetSystem @"_system"
@@ -269,6 +271,13 @@ static CDVWKInAppBrowser* instance = nil;
                 [self->tmpWindow makeKeyAndVisible];
             }
             [tmpController presentViewController:nav animated:!noAnimate completion:nil];
+            
+            // IAB Multi-Instance support
+            // https://github.com/apache/cordova-plugin-inappbrowser/issues/649
+            // https://github.com/apache/cordova-plugin-inappbrowser/issues/423
+            // https://github.com/apache/cordova-plugin-inappbrowser/issues/290
+            // https://github.com/apache/cordova-plugin-inappbrowser/issues/844
+            objc_setAssociatedObject(self, "wasHidden", @(NO), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
     });
 }
@@ -290,7 +299,15 @@ static CDVWKInAppBrowser* instance = nil;
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.inAppBrowserViewController != nil) {
-            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [self.inAppBrowserViewController.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                // IAB Multi-Instance support
+                [self notifyEvent:@"hide"];
+                // https://github.com/apache/cordova-plugin-inappbrowser/issues/649
+                // https://github.com/apache/cordova-plugin-inappbrowser/issues/423
+                // https://github.com/apache/cordova-plugin-inappbrowser/issues/290
+                // https://github.com/apache/cordova-plugin-inappbrowser/issues/844
+                objc_setAssociatedObject(self, "wasHidden", @(YES), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }];
         }
     });
 }
@@ -474,6 +491,10 @@ static CDVWKInAppBrowser* instance = nil;
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
+        // IAB Multi-Instance support
+        [self notifyEvent:@"beforeload" url:[url absoluteString]];
+        
         decisionHandler(WKNavigationActionPolicyCancel);
         return;
     }
@@ -500,6 +521,9 @@ static CDVWKInAppBrowser* instance = nil;
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
+        // IAB Multi-Instance support
+        [self notifyEvent:@"loadstart" url:[url absoluteString]];
     }
 
     if (useBeforeLoad) {
@@ -554,6 +578,9 @@ static CDVWKInAppBrowser* instance = nil;
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dResult];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+            
+            // IAB Multi-Instance support
+            [self notifyEvent:@"message" data:dResult];
         }
     }
 }
@@ -580,6 +607,9 @@ static CDVWKInAppBrowser* instance = nil;
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
+        // IAB Multi-Instance support
+        [self notifyEvent:@"loadstop" url:url];
     }
 }
 
@@ -599,6 +629,9 @@ static CDVWKInAppBrowser* instance = nil;
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
+        // IAB Multi-Instance support
+        [self notifyEvent:@"loaderror" url:url data:@{@"code": @(error.code ?: 0), @"message": error.localizedDescription ?: @""}];
     }
 }
 
@@ -608,6 +641,10 @@ static CDVWKInAppBrowser* instance = nil;
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"exit"}];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
+        // IAB Multi-Instance support
+        [self notifyEvent:@"exit" url:nil];
+        
         self.callbackId = nil;
     }
     
@@ -1046,6 +1083,10 @@ BOOL isExiting = FALSE;
             [[weakSelf presentingViewController] dismissViewControllerAnimated:YES completion:nil];
         } else {
             [[weakSelf parentViewController] dismissViewControllerAnimated:YES completion:nil];
+        }
+        
+        if (_browserOptions.hidden) {
+            [weakSelf viewDidDisappear:NO];
         }
     });
 }
