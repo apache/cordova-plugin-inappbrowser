@@ -20,7 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin-inappbrowser"
-    version="7.0.0">
+    version="7.1.0">
 
     <name>InAppBrowser</name>
     <description>Cordova InAppBrowser Plugin</description>
@@ -40,15 +40,26 @@
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
         </js-module>
+        <js-module src="www/InAppBrowserMulti.js" name="InAppBrowserMulti">
+            <clobbers target="cordova.InAppBrowserMulti" />
+        </js-module>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="InAppBrowser">
                 <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
+            </feature>
+            <!-- IAB Multi-Instance support -->
+            <feature name="InAppBrowserMulti">
+                <param name="android-package" value="org.apache.cordova.inappbrowsermulti.InAppBrowserMulti" />
             </feature>
         </config-file>
 
         <source-file src="src/android/InAppBrowser.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppBrowserDialog.java" target-dir="src/org/apache/cordova/inappbrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/org/apache/cordova/inappbrowser" />
+        <!-- IAB Multi-Instance support -->
+        <source-file src="src/android/InAppBrowserMulti.java" target-dir="src/org/apache/cordova/inappbrowsermulti" />
+        <source-file src="src/android/InAppBrowserWindowManager.java" target-dir="src/org/apache/cordova/inappbrowsermulti" />
+        <source-file src="src/android/InAppBrowserMultiInstance.java" target-dir="src/org/apache/cordova/inappbrowsermulti" />
 
         <!-- drawable src/android/resources -->
         <resource-file src="src/android/res/drawable-hdpi/ic_action_next_item.png" target="res/drawable-hdpi/ic_action_next_item.png" />
@@ -73,6 +84,7 @@
         <js-module src="www/inappbrowser.js" name="inappbrowser">
             <clobbers target="cordova.InAppBrowser.open" />
         </js-module>
+        <!-- IAB Multi-Instance support -->
         <js-module src="www/InAppBrowserMulti.js" name="InAppBrowserMulti">
             <clobbers target="cordova.InAppBrowserMulti" />
         </js-module>
@@ -81,6 +93,7 @@
                 <param name="ios-package" value="CDVWKInAppBrowser" />
                 <param name="onload" value="true" />
             </feature>
+            <!-- IAB Multi-Instance support -->
             <feature name="InAppBrowserMulti">
                 <param name="ios-package" value="CDVMultiInAppBrowser" />
                 <param name="onload" value="true" />
@@ -94,6 +107,7 @@
 	    <source-file src="src/ios/CDVWKInAppBrowser.m" />
 	    <header-file src="src/ios/CDVWKInAppBrowserUIDelegate.h" />
 	    <source-file src="src/ios/CDVWKInAppBrowserUIDelegate.m" />
+        <!-- IAB Multi-Instance support -->
         <header-file src="src/ios/CDVInAppBrowserWindowManager.h" />
         <source-file src="src/ios/CDVInAppBrowserWindowManager.m" />
         <source-file src="src/ios/CDVMultiInAppBrowser.h" />

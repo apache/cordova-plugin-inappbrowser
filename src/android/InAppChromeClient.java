@@ -116,7 +116,8 @@ public class InAppChromeClient extends WebChromeClient {
             if(defaultValue.startsWith("gap-iab://")) {
                 PluginResult scriptResult;
                 String scriptCallbackId = defaultValue.substring(10);
-                if (scriptCallbackId.matches("^InAppBrowser[0-9]{1,10}$")) {
+                // IAB Multi-Instance support
+                if (scriptCallbackId.matches("^InAppBrowser[0-9]{1,10}$") || scriptCallbackId.matches("^InAppBrowserMulti[0-9]{1,10}$")) {
                     if(message == null || message.length() == 0) {
                         scriptResult = new PluginResult(PluginResult.Status.OK, new JSONArray());
                     } else {

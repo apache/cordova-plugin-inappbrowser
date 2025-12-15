@@ -67,7 +67,9 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
 import org.apache.cordova.CordovaHttpAuthHandler;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaPreferences;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginManager;
@@ -92,6 +94,8 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SELF = "_self";
     private static final String SYSTEM = "_system";
     private static final String EXIT_EVENT = "exit";
+    // IAB Multi-Instance support
+    private static final String HIDE_EVENT = "hide";
     private static final String LOCATION = "location";
     private static final String ZOOM = "zoom";
     private static final String HIDDEN = "hidden";
@@ -151,6 +155,25 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean fullscreen = true;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
+
+    // IAB Multi-Instance support
+    private String windowId;
+    private CallbackContext observeEventCallback;
+
+    // IAB Multi-Instance support
+    public void setPluginData (CordovaInterface cordova, CordovaWebView webView, CordovaPreferences preferences) {
+        this.cordova = cordova;
+        this.webView = webView;
+        this.preferences = preferences;
+    }
+
+    public void setWindowId (String windowId) {
+        this.windowId = windowId;
+    }
+
+    public void setObserveEventsCallback(CallbackContext callbackContext) {
+        this.observeEventCallback = callbackContext;
+    }
 
     /**
      * Executes the request and returns PluginResult.
@@ -323,7 +346,12 @@ public class InAppBrowser extends CordovaPlugin {
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            // IAB Multi-Instance support
+            if (this.observeEventCallback != null) {
+                callbackContext.sendPluginResult(pluginResult);
+            } else {
+                this.callbackContext.sendPluginResult(pluginResult);
+            }
         }
         else if (action.equals("hide")) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -336,7 +364,16 @@ public class InAppBrowser extends CordovaPlugin {
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            // IAB Multi-Instance support
+            if (this.observeEventCallback != null) {
+                callbackContext.sendPluginResult(pluginResult);
+
+                JSONObject obj = new JSONObject();
+                obj.put("type", HIDE_EVENT);
+                this.sendUpdate(obj, true);
+            } else {
+                this.callbackContext.sendPluginResult(pluginResult);
+            }
         }
         else {
             return false;
@@ -1091,7 +1128,19 @@ public class InAppBrowser extends CordovaPlugin {
      * @param status the status code to return to the JavaScript environment
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
-        if (callbackContext != null) {
+        // IAB Multi-Instance support
+        if (observeEventCallback != null) {
+            try {
+                obj.put("windowId", this.windowId);
+            } catch (JSONException e) {
+                PluginResult result = new PluginResult(status, "Cannot set windowId in result");
+                result.setKeepCallback(true);
+                observeEventCallback.sendPluginResult(result);
+            }
+            PluginResult result = new PluginResult(status, obj);
+            result.setKeepCallback(true);
+            observeEventCallback.sendPluginResult(result);
+        } else if (callbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(keepCallback);
             callbackContext.sendPluginResult(result);

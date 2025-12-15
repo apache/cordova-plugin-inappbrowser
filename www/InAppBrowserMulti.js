@@ -90,10 +90,9 @@ class IABWindow {
     executeScript (details, success, fail) {
         if (this.closed) return _noRef();
 
-        exec(success, fail, SERVICE, 'injectScriptCode', [
-            this.windowId,
-            details.code || details.file
-        ]);
+        const method = details.code ? 'injectScriptCode' : 'injectScriptFile';
+        const arg = details.code || details.file;
+        exec(success, fail, SERVICE, method, [this.windowId, arg, !!success]);
     }
 
     insertCSS (details, success, fail) {
@@ -101,7 +100,7 @@ class IABWindow {
 
         const method = details.code ? 'injectStyleCode' : 'injectStyleFile';
         const arg = details.code || details.file;
-        exec(success, fail, SERVICE, method, [this.windowId, arg]);
+        exec(success, fail, SERVICE, method, [this.windowId, arg, !!success]);
     }
 
     // Events handling
@@ -238,7 +237,10 @@ const InAppBrowserMulti = {
 
 // Monitor and coordinate events for all browsers
 exec((event) => {
-    if (!event?.windowId) return;
+    if (!event?.windowId) {
+        console.debug('received in observerEvents callback', event);
+        return;
+    }
 
     const ref = _instances[event.windowId];
 
