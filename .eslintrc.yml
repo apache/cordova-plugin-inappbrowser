@@ -16,8 +16,8 @@
 # under the License.
 
 root: true
-extends: '@cordova/eslint-config/browser'
+extends: "@cordova/eslint-config/browser"
 
 overrides:
-    - files: [tests/**/*.js]
-      extends: '@cordova/eslint-config/node-tests'
+  - files: [tests/**/*.js]
+    extends: "@cordova/eslint-config/node-tests"

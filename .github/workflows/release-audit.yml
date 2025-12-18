@@ -15,45 +15,41 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Lint Test
+name: Release Auditing
 
 on:
   push:
-    paths:
-      - '**.js'
-      - '.eslint*'
-      - '.github/workflow/lint.yml'
+    branches-ignore:
+      - 'dependabot/**'
   pull_request:
-    paths:
-      - '**.js'
-      - '.eslint*'
-      - '.github/workflow/lint.yml'
+    branches:
+      - '*'
 
 permissions:
   contents: read
 
 jobs:
   test:
-    name: Lint Test
+    name: Audit Licenses
     runs-on: ubuntu-latest
-    env:
-      node-version: 24
-
     steps:
+      # Checkout project
       - uses: actions/checkout@v6
+
+      # Check license headers (v2.0.0)
+      - uses: erisu/apache-rat-action@46fb01ce7d8f76bdcd7ab10e7af46e1ea95ca01c
+
+      # Setup environment with node
       - uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.node-version }}
+          node-version: 24
 
-      - name: Run Environment Information
-        run: |
-          node --version
-          npm --version
+      # Install node packages
+      - name: npm install packages
+        run: npm ci
 
-      - name: Run npm install
-        run: |
-          npm ci
-
-      - name: Run lint test
-        run: |
-          npm run lint
+      # Check node package licenses (v2.0.1)
+      - uses: erisu/license-checker-action@99cffa11264fe545fd0baa6c13bca5a00ae608f2
+        with:
+          license-config: 'licence_checker.yml'
+          include-asf-category-a: true

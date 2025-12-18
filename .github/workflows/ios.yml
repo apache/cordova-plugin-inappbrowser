@@ -6,12 +6,12 @@
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-#  KIND, either express or implied.  See the License for the
+# KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
 
@@ -23,11 +23,15 @@ on:
       - '**.md'
       - 'LICENSE'
       - '.eslint*'
+
   pull_request:
     paths-ignore:
       - '**.md'
       - 'LICENSE'
       - '.eslint*'
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -40,7 +44,7 @@ jobs:
       # Storing a copy of the repo
       repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
-      node-version: 20
+      node-version: 24
 
       # > Starting April 26, 2021, all iOS and iPadOS apps submitted to the App Store must be built with Xcode 12 and the iOS 14 SDK.
       # Because of Apple's requirement, listed above, We will only be using the latest Xcode release for testing.
@@ -50,21 +54,21 @@ jobs:
     strategy:
       matrix:
         versions:
-          - os-version: macos-12
-            ios-version: 15.x
-            xcode-version: 13.x
-
-          - os-version: macos-14
-            ios-version: 16.x
-            xcode-version: 14.x
-
           - os-version: macos-14
             ios-version: 17.x
             xcode-version: 15.x
 
+          - os-version: macos-15
+            ios-version: 18.x
+            xcode-version: 16.x
+
+          - os-version: macos-26
+            ios-version: 26.x
+            xcode-version: 26.1
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.node-version }}
       - uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd
