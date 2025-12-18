@@ -6,12 +6,12 @@
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-#  KIND, either express or implied.  See the License for the
+# KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
 
@@ -30,6 +30,9 @@ on:
       - 'LICENSE'
       - '.eslint*'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Android ${{ matrix.versions.android }} Test
@@ -41,7 +44,7 @@ jobs:
       # Storing a copy of the repo
       repo: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
-      node-version: 20
+      node-version: 24
 
       # These are the default Java configurations used by most tests.
       # To customize these options, add "java-distro" or "java-version" to the strategy matrix with its overriding value.
@@ -57,28 +60,6 @@ jobs:
     strategy:
       matrix:
         versions:
-          - android: 7
-            android-api: 24
-
-          - android: 7.1
-            android-api: 25
-
-          - android: 8
-            android-api: 26
-
-          - android: 8.1
-            android-api: 27
-            system-image-arch: x86
-
-          - android: 9
-            android-api: 28
-
-          - android: 10
-            android-api: 29
-
-          - android: 11
-            android-api: 30
-
           - android: 12
             android-api: 31
 
@@ -91,14 +72,20 @@ jobs:
           - android: 14
             android-api: 34
 
+          - android: 15
+            android-api: 35
+
+          - android: 16
+            android-api: 36
+
     timeout-minutes: 60
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.node-version }}
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         env:
           java-version: ${{ matrix.versions.java-version == '' && env.default_java-version || matrix.versions.java-version }}
           java-distro: ${{ matrix.versions.java-distro == '' && env.default_java-distro || matrix.versions.java-distro }}
@@ -129,7 +116,7 @@ jobs:
         if: ${{ endswith(env.repo, '/cordova-paramedic') != true }}
         run: npm i -g github:apache/cordova-paramedic
 
-      - uses: reactivecircus/android-emulator-runner@v2
+      - uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b
         env:
           system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
           system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}
@@ -143,7 +130,7 @@ jobs:
           script: echo "Pregenerate the AVD before running Paramedic"
 
       - name: Run paramedic tests
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@b530d96654c385303d652368551fb075bc2f0b6b
         env:
           system-image-arch: ${{ matrix.versions.system-image-arch == '' && env.default_system-image-arch || matrix.versions.system-image-arch }}
           system-image-target: ${{ matrix.versions.system-image-target == '' && env.default_system-image-target || matrix.versions.system-image-target }}
