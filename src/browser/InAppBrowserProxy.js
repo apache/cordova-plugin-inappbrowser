@@ -24,28 +24,28 @@ let browserWrap, popup, navigationButtonsDiv, navigationButtonsDivInner, backBut
 function attachNavigationEvents (element, callback) {
     const onError = function () {
         try {
-            callback({ type: 'loaderror', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loaderror', url: this.contentWindow.location.href }, { keepCallback: true });
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loaderror', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loaderror', url: null }, { keepCallback: true });
         }
     };
 
     element.addEventListener('pageshow', function () {
         try {
-            callback({ type: 'loadstart', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loadstart', url: this.contentWindow.location.href }, { keepCallback: true });
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loadstart', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loadstart', url: null }, { keepCallback: true });
         }
     });
 
     element.addEventListener('load', function () {
         try {
-            callback({ type: 'loadstop', url: this.contentWindow.location.href }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loadstop', url: this.contentWindow.location.href }, { keepCallback: true });
         } catch (err) {
             // blocked by CORS :\
-            callback({ type: 'loadstop', url: null }, { keepCallback: true }); // eslint-disable-line n/no-callback-literal
+            callback({ type: 'loadstop', url: null }, { keepCallback: true });
         }
     });
 
