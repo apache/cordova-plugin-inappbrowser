@@ -765,6 +765,11 @@ BOOL isExiting = FALSE;
     
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
+
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.closeButton.hidesSharedBackground = YES;
+    }
     
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
@@ -791,6 +796,11 @@ BOOL isExiting = FALSE;
     }
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
       self.toolbar.translucent = NO;
+      
+      // Fixes the Liquid Glass issue on iOS version >= 26 where the top bar becomes transparent
+      if (@available(iOS 26.0, *)) {
+        self.toolbar.backgroundColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+      }
     }
     
     CGFloat labelInset = 5.0;
@@ -833,12 +843,22 @@ BOOL isExiting = FALSE;
       self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.forwardButton.hidesSharedBackground = YES;
+    }
+
     NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
+
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.backButton.hidesSharedBackground = YES;
     }
 
     // Filter out Navigation Buttons if user requests so
@@ -881,6 +901,11 @@ BOOL isExiting = FALSE;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
     
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.closeButton.hidesSharedBackground = YES;
+    }
+
     NSMutableArray* items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
     [self.toolbar setItems:items];
