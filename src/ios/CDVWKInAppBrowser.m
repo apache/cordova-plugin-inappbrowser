@@ -765,6 +765,11 @@ BOOL isExiting = FALSE;
     
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
+
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.closeButton.hidesSharedBackground = YES;
+    }
     
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
@@ -838,12 +843,22 @@ BOOL isExiting = FALSE;
       self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.forwardButton.hidesSharedBackground = YES;
+    }
+
     NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
+    }
+
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.backButton.hidesSharedBackground = YES;
     }
 
     // Filter out Navigation Buttons if user requests so
