@@ -218,7 +218,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             iab = cordova.InAppBrowser.open(url, target, params, callbacks);
         }
         if (!iab) {
-            alert('open returned ' + iab); // eslint-disable-line no-undef
+            alert('open returned ' + iab);
             return;
         }
 
@@ -228,19 +228,19 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             // Verify that event.url gets updated on redirects.
             if (e.type === 'loadstart') {
                 if (e.url === lastLoadStartURL) {
-                    alert('Unexpected: loadstart fired multiple times for the same URL.'); // eslint-disable-line no-undef
+                    alert('Unexpected: loadstart fired multiple times for the same URL.');
                 }
                 lastLoadStartURL = e.url;
             }
             // Verify the right number of loadstart events were fired.
             if (e.type === 'loadstop' || e.type === 'loaderror') {
                 if (e.url !== lastLoadStartURL) {
-                    alert('Unexpected: ' + e.type + " event.url != loadstart's event.url"); // eslint-disable-line no-undef
+                    alert('Unexpected: ' + e.type + " event.url != loadstart's event.url");
                 }
                 if (numExpectedRedirects === 0 && counts.loadstart !== 1) {
                     // Do allow a loaderror without a loadstart (e.g. in the case of an invalid URL).
                     if (!(e.type === 'loaderror' && counts.loadstart === 0)) {
-                        alert('Unexpected: got multiple loadstart events. (' + counts.loadstart + ')'); // eslint-disable-line no-undef
+                        alert('Unexpected: got multiple loadstart events. (' + counts.loadstart + ')');
                     }
                 } else if (numExpectedRedirects > 0 && counts.loadstart < numExpectedRedirects + 1) {
                     alert(
@@ -248,7 +248,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                             (numExpectedRedirects + 1) +
                             ' loadstart events, but got ' +
                             counts.loadstart
-                    ); // eslint-disable-line no-undef
+                    );
                 }
                 wasReset = true;
                 numExpectedRedirects = 0;
@@ -258,9 +258,9 @@ exports.defineManualTests = function (contentEl, createActionButton) {
             if (e.type === 'exit') {
                 const numStopEvents = counts.loadstop + counts.loaderror;
                 if (numStopEvents === 0 && !wasReset) {
-                    alert('Unexpected: browser closed without a loadstop or loaderror.'); // eslint-disable-line no-undef
+                    alert('Unexpected: browser closed without a loadstop or loaderror.');
                 } else if (numStopEvents > 1) {
-                    alert('Unexpected: got multiple loadstop/loaderror events.'); // eslint-disable-line no-undef
+                    alert('Unexpected: got multiple loadstop/loaderror events.');
                 }
             }
         }
@@ -289,10 +289,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         const iab = doOpen(url, '_blank', 'location=yes');
         const callback = function (results) {
             if (results && results.length === 0) {
-                alert('Results verified'); // eslint-disable-line no-undef
+                alert('Results verified');
             } else {
                 console.log(results);
-                alert('Got: ' + typeof results + '\n' + JSON.stringify(results)); // eslint-disable-line no-undef
+                alert('Got: ' + typeof results + '\n' + JSON.stringify(results));
             }
         };
         if (cssUrl) {
@@ -315,10 +315,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                     useCallback &&
                         function (results) {
                             if (results && results.length === 0) {
-                                alert('Results verified'); // eslint-disable-line no-undef
+                                alert('Results verified');
                             } else {
                                 console.log(results);
-                                alert('Got: ' + typeof results + '\n' + JSON.stringify(results)); // eslint-disable-line no-undef
+                                alert('Got: ' + typeof results + '\n' + JSON.stringify(results));
                             }
                         }
                 );
@@ -336,10 +336,10 @@ exports.defineManualTests = function (contentEl, createActionButton) {
                     useCallback &&
                         function (results) {
                             if (results && results.length === 1 && results[0] === 'abc') {
-                                alert('Results verified'); // eslint-disable-line no-undef
+                                alert('Results verified');
                             } else {
                                 console.log(results);
-                                alert('Got: ' + typeof results + '\n' + JSON.stringify(results)); // eslint-disable-line no-undef
+                                alert('Got: ' + typeof results + '\n' + JSON.stringify(results));
                             }
                         }
                 );
@@ -349,7 +349,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
     let hiddenwnd = null;
     const loadlistener = function (event) {
         alert('background window loaded ');
-    }; // eslint-disable-line no-undef
+    };
     function openHidden (url, startHidden) {
         let shopt = startHidden ? 'hidden=yes' : '';
         if (platformOpts) {
@@ -357,7 +357,7 @@ exports.defineManualTests = function (contentEl, createActionButton) {
         }
         hiddenwnd = cordova.InAppBrowser.open(url, 'random_string', shopt);
         if (!hiddenwnd) {
-            alert('cordova.InAppBrowser.open returned ' + hiddenwnd); // eslint-disable-line no-undef
+            alert('cordova.InAppBrowser.open returned ' + hiddenwnd);
             return;
         }
         if (startHidden) hiddenwnd.addEventListener('loadstop', loadlistener);
