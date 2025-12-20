@@ -811,7 +811,7 @@ BOOL isExiting = FALSE;
             : [UIColor clearColor];
             blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
             blurView.userInteractionEnabled = NO;
-            
+
             // Put blur at the very back so buttons stay on top
             [self.toolbar insertSubview:blurView atIndex:0];
         } else {
@@ -819,7 +819,6 @@ BOOL isExiting = FALSE;
         }
         
     } else {
-        self.toolbar.backgroundColor = _browserOptions.toolbarcolor ? [self colorFromHexString:_browserOptions.toolbarcolor] : [UIColor clearColor];
         if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
             self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
         }
