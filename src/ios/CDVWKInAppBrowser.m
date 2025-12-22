@@ -835,20 +835,12 @@ BOOL isExiting = FALSE;
     }
 
     // Setup Auto Layout constraints
-
+    
     // WebView horizontal constraints
-    if (@available(iOS 11.0, *)) {
-        UILayoutGuide *guide = self.view.safeAreaLayoutGuide;
-        [NSLayoutConstraint activateConstraints:@[
-            [self.webView.leadingAnchor constraintEqualToAnchor:guide.leadingAnchor],
-            [self.webView.trailingAnchor constraintEqualToAnchor:guide.trailingAnchor]
-        ]];
-    } else {
-        [NSLayoutConstraint activateConstraints:@[
-            [self.webView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
-        ]];
-    }
+    [NSLayoutConstraint activateConstraints:@[
+        [self.webView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
+        [self.webView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor]
+    ]];
 
     // Toolbar horizontal constraints and height
     [NSLayoutConstraint activateConstraints:@[
@@ -872,60 +864,40 @@ BOOL isExiting = FALSE;
 
     BOOL locationbarVisible = !self.addressLabel.hidden;
 
-    if (@available(iOS 11.0, *)) {
-        UILayoutGuide *guide = self.view.safeAreaLayoutGuide;
-        if (toolbarIsAtBottom) {
-            toolbarBottomConstraint = [self.toolbar.bottomAnchor constraintEqualToAnchor:guide.bottomAnchor];
-            toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:self.addressLabel.bottomAnchor];
-            if (locationbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:guide.topAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
-            } else {
-                // Address bar hidden, webView bottom to toolbar top
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:guide.topAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor];
-            }
+    UILayoutGuide *safeAreaLayoutGuide = self.view.safeAreaLayoutGuide;
+  
+    if (toolbarIsAtBottom) {
+        toolbarBottomConstraint = [self.toolbar.bottomAnchor constraintEqualToAnchor:safeAreaLayoutGuide.bottomAnchor];
+        toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:self.addressLabel.bottomAnchor];
+        
+        if (locationbarVisible) {
+            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+            webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor];
+            webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
         } else {
-            toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:guide.topAnchor];
-            if (locationbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:guide.bottomAnchor].active = YES;
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
-            } else {
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:guide.bottomAnchor];
-            }
+            // Address bar hidden, webView bottom to toolbar top
+            webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor];
+            webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor];
         }
     } else {
-        if (toolbarIsAtBottom) {
-            toolbarBottomConstraint = [self.toolbar.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor];
-            toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:self.addressLabel.bottomAnchor];
-            if (locationbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
-            } else {
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor];
-            }
+        toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor];
+        
+        if (locationbarVisible) {
+            [self.addressLabel.bottomAnchor constraintEqualToAnchor:safeAreaLayoutGuide.bottomAnchor].active = YES;
+            webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
+            webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
         } else {
-            toolbarTopConstraint = [self.toolbar.topAnchor constraintEqualToAnchor:self.topLayoutGuide.bottomAnchor];
-            if (locationbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor].active = YES;
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor];
-            } else {
-                webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
-                webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:self.bottomLayoutGuide.topAnchor];
-            }
+            webViewTopConstraint = [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor];
+            webViewBottomConstraint = [self.webView.bottomAnchor constraintEqualToAnchor:safeAreaLayoutGuide.bottomAnchor];
         }
     }
 
     toolbarTopConstraint.active = YES;
+    
     if (toolbarBottomConstraint) {
         toolbarBottomConstraint.active = toolbarIsAtBottom;
     }
+    
     webViewTopConstraint.active = YES;
     webViewBottomConstraint.active = YES;
 
@@ -1205,3 +1177,5 @@ BOOL isExiting = FALSE;
 }
 
 @end //CDVWKInAppBrowserViewController
+
+
