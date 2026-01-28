@@ -26,7 +26,8 @@
 
 @class CDVWKInAppBrowserViewController;
 
-@interface CDVWKInAppBrowser : CDVPlugin {
+@interface CDVWKInAppBrowser : CDVPlugin
+{
     UIWindow * tmpWindow;
 
     @private
@@ -49,7 +50,8 @@
 
 @end
 
-@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler,UIAdaptivePresentationControllerDelegate>{
+@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler,UIAdaptivePresentationControllerDelegate>
+{
     @private
     CDVInAppBrowserOptions *_browserOptions;
     NSDictionary *_settings;
@@ -72,9 +74,8 @@
 - (void)close;
 - (void)navigateTo:(NSURL*)url;
 - (void)showLocationBar:(BOOL)show;
-- (void)showToolBar:(BOOL)show : (NSString *) toolbarPosition;
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex;
-
-- (id)initWithBrowserOptions: (CDVInAppBrowserOptions*) browserOptions andSettings:(NSDictionary*) settings;
+- (void)showToolBar:(BOOL)show atPosition:(NSString*)toolbarPosition;
+- (void)setCloseButtonTitle:(NSString*)title withColor:(NSString*)colorString atIndex:(int)buttonIndex;
+- (id)initWithBrowserOptions:(CDVInAppBrowserOptions*)browserOptions andSettings:(NSDictionary*)settings;
 
 @end
