@@ -1040,11 +1040,13 @@ BOOL isExiting = FALSE;
     }
 }
 
-- (void)goBack:(id)sender {
+- (void)goBack:(id)sender
+{
     [self.webView goBack];
 }
 
-- (void)goForward:(id)sender {
+- (void)goForward:(id)sender
+{
     [self.webView goForward];
 }
 
@@ -1061,7 +1063,8 @@ BOOL isExiting = FALSE;
 
 #pragma mark WKNavigationDelegate
 
-- (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation {
+- (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation
+{
     // loading url, start spinner, update back/forward
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
