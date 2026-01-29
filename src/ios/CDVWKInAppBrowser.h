@@ -50,7 +50,11 @@
 
 @end
 
-@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,WKNavigationDelegate,WKUIDelegate,WKScriptMessageHandler,UIAdaptivePresentationControllerDelegate>
+@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,
+                                                               WKNavigationDelegate,
+                                                               WKUIDelegate,
+                                                               WKScriptMessageHandler,
+                                                               UIAdaptivePresentationControllerDelegate>
 {
     @private
     CDVInAppBrowserOptions *_browserOptions;
