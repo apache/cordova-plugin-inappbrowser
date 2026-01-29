@@ -718,55 +718,12 @@ BOOL isExiting = FALSE;
     // Since the webview is added first, this is already the case.
     // sendSubviewToBack is normally not necessary
     [self.view sendSubviewToBack:self.webView];
-    
-    
-    self.webView.navigationDelegate = self;
-    self.webView.UIDelegate = self.webViewUIDelegate;
-    self.webView.backgroundColor = [UIColor whiteColor];
-    if ([self settingForKey:@"OverrideUserAgent"] != nil) {
-        self.webView.customUserAgent = [self settingForKey:@"OverrideUserAgent"];
-    }
-    
-    self.webView.clearsContextBeforeDrawing = YES;
-    self.webView.clipsToBounds = YES;
-    self.webView.contentMode = UIViewContentModeScaleToFill;
-    self.webView.multipleTouchEnabled = YES;
-    self.webView.opaque = YES;
-    self.webView.userInteractionEnabled = YES;
-    self.automaticallyAdjustsScrollViewInsets = YES ;
-    [self.webView setAutoresizingMask:UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth];
-    self.webView.allowsLinkPreview = NO;
-    self.webView.allowsBackForwardNavigationGestures = NO;
-    
-    [self.webView.scrollView setContentInsetAdjustmentBehavior:UIScrollViewContentInsetAdjustmentNever];
-    
-    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.spinner.alpha = 1.000;
-    self.spinner.autoresizesSubviews = YES;
-    self.spinner.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin);
-    self.spinner.clearsContextBeforeDrawing = NO;
-    self.spinner.clipsToBounds = NO;
-    self.spinner.contentMode = UIViewContentModeScaleToFill;
-    self.spinner.frame = CGRectMake(CGRectGetMidX(self.webView.frame), CGRectGetMidY(self.webView.frame), 20.0, 20.0);
-    self.spinner.hidden = NO;
-    self.spinner.hidesWhenStopped = YES;
-    self.spinner.multipleTouchEnabled = NO;
-    self.spinner.opaque = NO;
-    self.spinner.userInteractionEnabled = NO;
-    [self.spinner stopAnimating];
-    
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
-    
-    UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    
-    UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
-    fixedSpaceButton.width = 20;
-    
-    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
-    CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
-    
-    self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
+
+    // We add our own constraints, they should not be determined from the frame
+    self.webView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Toolbar init without frame
+    self.toolbar = [[UIToolbar alloc] init];
     self.toolbar.alpha = 1.000;
     self.toolbar.barStyle = UIBarStyleBlackOpaque;
     self.toolbar.clearsContextBeforeDrawing = NO;
@@ -776,17 +733,52 @@ BOOL isExiting = FALSE;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the top bar becomes transparent
+    if (@available(iOS 26.0, *)) {
+        if (_browserOptions.toolbartranslucent) {
+            self.toolbar.backgroundColor =  _browserOptions.toolbarcolor
+            ? [self colorFromHexString:_browserOptions.toolbarcolor]
+            : [UIColor clearColor];
+            
+            // Add blur view behind everything
+            UIVisualEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
+            UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
+            blurView.frame = self.toolbar.bounds;
+            blurView.backgroundColor =  _browserOptions.toolbarcolor
+            ? [self colorFromHexString:_browserOptions.toolbarcolor]
+            : [UIColor clearColor];
+            blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            blurView.userInteractionEnabled = NO;
+
+            // Put blur at the very back so buttons stay on top
+            [self.toolbar insertSubview:blurView atIndex:0];
+        } else {
+            self.toolbar.backgroundColor = _browserOptions.toolbarcolor ? [self colorFromHexString:_browserOptions.toolbarcolor]: [UIColor blackColor];;
+        }
+        
+    } else {
+        if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
+            self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+        }
+        if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
+            self.toolbar.translucent = NO;
+        }
+    }
+#else
     if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
-      self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+        self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
     }
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
-      self.toolbar.translucent = NO;
+        self.toolbar.translucent = NO;
     }
-    
-    CGFloat labelInset = 5.0;
-    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
-    
-    self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
+#endif
+    [self.view addSubview:self.toolbar];
+    // We add our own constraints, they should not be determined from the frame
+    self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.addressLabel = [[UILabel alloc] init];
     self.addressLabel.adjustsFontSizeToFitWidth = NO;
     self.addressLabel.alpha = 1.000;
     self.addressLabel.backgroundColor = [UIColor clearColor];
@@ -854,6 +846,13 @@ BOOL isExiting = FALSE;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.forwardButton.hidesSharedBackground = YES;
+    }
+#endif
 
     NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
@@ -862,6 +861,13 @@ BOOL isExiting = FALSE;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.backButton.hidesSharedBackground = YES;
+    }
+#endif
 
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
@@ -875,53 +881,60 @@ BOOL isExiting = FALSE;
     } else {
         [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
     }
-    
-    self.view.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:self.toolbar];
-    [self.view addSubview:self.addressLabel];
-    [self.view addSubview:self.spinner];
-}
 
-- (id)settingForKey:(NSString*)key
-{
-    return [_settings objectForKey:[key lowercaseString]];
-}
-
-- (void) setWebViewFrame : (CGRect) frame {
-    NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
-    [self.webView setFrame:frame];
-}
-
-- (void)setCloseButtonTitle:(NSString*)title : (NSString*) colorString : (int) buttonIndex
-{
-    // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
-    // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
-    self.closeButton = nil;
-    // Initialize with title if title is set, otherwise the title will be 'Done' localized
-    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
-    // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
-    self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
-    
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
-    [self.toolbar setItems:items];
-}
-
-- (void)showLocationBar:(BOOL)show
-{
-    CGRect locationbarFrame = self.addressLabel.frame;
-    
-    BOOL toolbarVisible = !self.toolbar.hidden;
-    
-    // prevent double show/hide
-    if (show == !(self.addressLabel.hidden)) {
-        return;
+    self.webView.navigationDelegate = self;
+    self.webView.UIDelegate = self.webViewUIDelegate;
+    self.webView.backgroundColor = [UIColor whiteColor];
+    if ([self settingForKey:@"OverrideUserAgent"] != nil) {
+        self.webView.customUserAgent = [self settingForKey:@"OverrideUserAgent"];
     }
     
-    if (show) {
-        self.addressLabel.hidden = NO;
-        
+    self.webView.clearsContextBeforeDrawing = YES;
+    self.webView.clipsToBounds = YES;
+    self.webView.contentMode = UIViewContentModeScaleToFill;
+    self.webView.multipleTouchEnabled = YES;
+    self.webView.opaque = YES;
+    self.webView.userInteractionEnabled = YES;
+    self.webView.allowsLinkPreview = NO;
+    self.webView.allowsBackForwardNavigationGestures = NO;
+    
+    // Setup Auto Layout constraints
+    //
+    // Setup horizontal constraints
+    // WebView horizontal constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [self.webView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
+        [self.webView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor]
+    ]];
+    
+    // Toolbar horizontal constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
+
+    // Address label horizontal constraints
+    [NSLayoutConstraint activateConstraints:@[
+        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:5.0],
+        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-5.0]
+    ]];
+
+    // Define vertical constraints, in order from top to bottom
+    // The addresslabel and toolbar are optional
+    UILayoutGuide *safeArea = self.view.safeAreaLayoutGuide;
+    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarVisible = _browserOptions.toolbar;
+    BOOL addressLabelVisible = _browserOptions.location;
+    
+    
+    
+    // Center spinner in webview
+    [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
+    [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
+    
+    // Toolbar can be at top
+    if (toolbarIsAtTop) {
+        // Toolbar visible
         if (toolbarVisible) {
             // Toolbar top to safearea top
             [self.toolbar.topAnchor constraintEqualToAnchor:safeArea.topAnchor].active = YES;
