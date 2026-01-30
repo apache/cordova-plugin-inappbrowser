@@ -86,8 +86,8 @@ static CDVWKInAppBrowser *instance = nil;
     self.callbackId = command.callbackId;
     
     if (url != nil) {
-        NSURL* baseUrl = [self.webViewEngine URL];
-        NSURL* absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+        NSURL *baseUrl = [self.webViewEngine URL];
+        NSURL *absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
         
         if ([self isSystemUrl:absoluteUrl]) {
             target = kInAppBrowserTargetSystem;
@@ -125,10 +125,10 @@ static CDVWKInAppBrowser *instance = nil;
     
     if (browserOptions.clearcache) {
         // Deletes all cookies
-        WKHTTPCookieStore* cookieStore = dataStore.httpCookieStore;
-        [cookieStore getAllCookies:^(NSArray* cookies) {
-            NSHTTPCookie* cookie;
-            for(cookie in cookies){
+        WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
+        [cookieStore getAllCookies:^(NSArray *cookies) {
+            NSHTTPCookie *cookie;
+            for (cookie in cookies) {
                 [cookieStore deleteCookie:cookie completionHandler:nil];
             }
         }];
@@ -139,8 +139,8 @@ static CDVWKInAppBrowser *instance = nil;
         WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
         [cookieStore getAllCookies:^(NSArray *cookies) {
             NSHTTPCookie *cookie;
-            for(cookie in cookies){
-                if(cookie.sessionOnly){
+            for (cookie in cookies) {
+                if (cookie.sessionOnly) {
                     [cookieStore deleteCookie:cookie completionHandler:nil];
                 }
             }
@@ -187,11 +187,11 @@ static CDVWKInAppBrowser *instance = nil;
     //prevent webView from bouncing
     if (browserOptions.disallowoverscroll) {
         if ([self.inAppBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
-            ((UIScrollView*)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
+            ((UIScrollView *)[self.inAppBrowserViewController.webView scrollView]).bounces = NO;
         } else {
             for (id subview in self.inAppBrowserViewController.webView.subviews) {
                 if ([[subview class] isSubclassOfClass:[UIScrollView class]]) {
-                    ((UIScrollView*)subview).bounces = NO;
+                    ((UIScrollView *)subview).bounces = NO;
                 }
             }
         }
@@ -252,7 +252,7 @@ static CDVWKInAppBrowser *instance = nil;
 
                 if (!strongSelf->tmpWindow) {
                     CGRect frame = [[UIScreen mainScreen] bounds];
-                    if(initHidden && osVersion < 11){
+                    if (initHidden && osVersion < 11) {
                        frame.origin.x = -10000;
                     }
                     strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
@@ -262,7 +262,7 @@ static CDVWKInAppBrowser *instance = nil;
             [strongSelf->tmpWindow setRootViewController:tmpController];
             [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            if(!initHidden || osVersion < 11){
+            if (!initHidden || osVersion < 11) {
                 [self->tmpWindow makeKeyAndVisible];
             }
             [tmpController presentViewController:nav animated:!noAnimate completion:nil];
@@ -343,7 +343,7 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)injectDeferredObject:(NSString *)source withWrapper:(NSString *)jsWrapper
 {
     // Ensure a message handler bridge is created to communicate with the CDVWKInAppBrowserViewController
-    [self evaluateJavaScript: [NSString stringWithFormat:@"(function(w){if(!w._cdvMessageHandler) {w._cdvMessageHandler = function(id,d){w.webkit.messageHandlers.%@.postMessage({d:d, id:id});}}})(window)", IAB_BRIDGE_NAME]];
+    [self evaluateJavaScript: [NSString stringWithFormat:@"(function(w){if (!w._cdvMessageHandler) {w._cdvMessageHandler = function(id,d){w.webkit.messageHandlers.%@.postMessage({d:d, id:id});}}})(window)", IAB_BRIDGE_NAME]];
     
     if (jsWrapper != nil) {
         NSData *jsonData = [NSJSONSerialization dataWithJSONObject:@[source] options:0 error:nil];
@@ -467,7 +467,7 @@ static CDVWKInAppBrowser *instance = nil;
 
     // When beforeload, on first URL change, initiate JS callback. Only after the beforeload event, continue.
     if (_waitForBeforeload && useBeforeLoad) {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"beforeload", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
@@ -478,21 +478,21 @@ static CDVWKInAppBrowser *instance = nil;
     
     if (errorMessage != nil) {
         NSLog(@"%@", errorMessage);
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                                       messageAsDictionary:@{@"type":@"loaderror", @"url":[url absoluteString], @"code": @"-1", @"message": errorMessage}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
     
     //if is an app store, tel, sms, mailto or geo link, let the system handle it, otherwise it fails to load it
-    NSArray * allowedSchemes = @[@"itms-appss", @"itms-apps", @"tel", @"sms", @"mailto", @"geo"];
+    NSArray *allowedSchemes = @[@"itms-appss", @"itms-apps", @"tel", @"sms", @"mailto", @"geo"];
     if ([allowedSchemes containsObject:[url scheme]]) {
         [theWebView stopLoading];
         [self openInSystem:url];
         shouldStart = NO;
     } else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstart", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
@@ -506,7 +506,7 @@ static CDVWKInAppBrowser *instance = nil;
     if (shouldStart) {
         // Fix GH-417 & GH-424: Handle non-default target attribute
         // Based on https://stackoverflow.com/a/25713070/777265
-        if (!navigationAction.targetFrame){
+        if (!navigationAction.targetFrame) {
             [theWebView loadRequest:navigationAction.request];
             decisionHandler(WKNavigationActionPolicyCancel);
         } else {
@@ -522,11 +522,11 @@ static CDVWKInAppBrowser *instance = nil;
 {    
     CDVPluginResult *pluginResult = nil;
     
-    if([message.body isKindOfClass:[NSDictionary class]]){
+    if ([message.body isKindOfClass:[NSDictionary class]]) {
         NSDictionary *messageContent = (NSDictionary *) message.body;
         NSString *scriptCallbackId = messageContent[@"id"];
         
-        if([messageContent objectForKey:@"d"]){
+        if ([messageContent objectForKey:@"d"]) {
             NSString *scriptResult = messageContent[@"d"];
             NSError * __autoreleasing error = nil;
             NSData *decodedResult = [NSJSONSerialization JSONObjectWithData:[scriptResult dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
@@ -572,7 +572,7 @@ static CDVWKInAppBrowser *instance = nil;
                 url = @"";
             }
         }
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
@@ -591,7 +591,7 @@ static CDVWKInAppBrowser *instance = nil;
                 url = @"";
             }
         }
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                                       messageAsDictionary:@{@"type":@"loaderror", @"url":url, @"code": [NSNumber numberWithInteger:error.code], @"message": error.localizedDescription}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
@@ -602,7 +602,7 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)browserExit
 {
     if (self.callbackId != nil) {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"exit"}];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         self.callbackId = nil;
@@ -682,7 +682,7 @@ BOOL isExiting = FALSE;
     configuration.allowsInlineMediaPlayback = _browserOptions.allowinlinemediaplayback;
     configuration.ignoresViewportScaleLimits = _browserOptions.enableviewportscale;
     
-    if(_browserOptions.mediaplaybackrequiresuseraction == YES) {
+    if (_browserOptions.mediaplaybackrequiresuseraction == YES) {
         configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeAll;
     } else {
         configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
@@ -960,7 +960,7 @@ BOOL isExiting = FALSE;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
     
-    NSMutableArray* items = [self.toolbar.items mutableCopy];
+    NSMutableArray *items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
     [self.toolbar setItems:items];
 }
@@ -1038,7 +1038,7 @@ BOOL isExiting = FALSE;
     if ([url.scheme isEqualToString:@"file"]) {
         [self.webView loadFileURL:url allowingReadAccessToURL:url];
     } else {
-        NSURLRequest* request = [NSURLRequest requestWithURL:url];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
         [self.webView loadRequest:request];
     }
 }

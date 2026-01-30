@@ -21,17 +21,20 @@
 
 @implementation CDVInAppBrowserNavigationController : UINavigationController
 
-- (void) dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
-    if ( self.presentedViewController) {
+- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
+{
+    if (self.presentedViewController) {
         [super dismissViewControllerAnimated:flag completion:completion];
     }
 }
 
-- (void) viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
 }
 
-- (CGRect) invertFrameIfNeeded:(CGRect)rect {
+- (CGRect)invertFrameIfNeeded:(CGRect)rect
+{
     if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
         CGFloat temp = rect.size.width;
         rect.size.width = rect.size.height;
