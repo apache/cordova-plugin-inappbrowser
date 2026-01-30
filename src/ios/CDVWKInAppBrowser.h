@@ -19,7 +19,6 @@
 
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
-#import <Cordova/CDVScreenOrientationDelegate.h>
 #import "CDVWKInAppBrowserUIDelegate.h"
 #import "CDVInAppBrowserOptions.h"
 #import "CDVInAppBrowserNavigationController.h"
@@ -50,8 +49,7 @@
 
 @end
 
-@interface CDVWKInAppBrowserViewController : UIViewController <CDVScreenOrientationDelegate,
-                                                               WKNavigationDelegate,
+@interface CDVWKInAppBrowserViewController : UIViewController <WKNavigationDelegate,
                                                                WKUIDelegate,
                                                                WKScriptMessageHandler,
                                                                UIAdaptivePresentationControllerDelegate>
@@ -71,7 +69,6 @@
 @property (nonatomic, strong) IBOutlet UIToolbar *toolbar;
 @property (nonatomic, strong) IBOutlet CDVWKInAppBrowserUIDelegate *webViewUIDelegate;
 
-@property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 @property (nonatomic, weak) CDVWKInAppBrowser *navigationDelegate;
 @property (nonatomic) NSURL *currentURL;
 

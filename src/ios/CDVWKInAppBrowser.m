@@ -150,10 +150,6 @@ static CDVWKInAppBrowser *instance = nil;
     if (self.inAppBrowserViewController == nil) {
         self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithBrowserOptions: browserOptions andSettings:self.commandDelegate.settings];
         self.inAppBrowserViewController.navigationDelegate = self;
-        
-        if ([self.viewController conformsToProtocol:@protocol(CDVScreenOrientationDelegate)]) {
-            self.inAppBrowserViewController.orientationDelegate = (UIViewController <CDVScreenOrientationDelegate> *)self.viewController;
-        }
     }
     
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
@@ -230,7 +226,6 @@ static CDVWKInAppBrowser *instance = nil;
     
     __block CDVInAppBrowserNavigationController *nav = [[CDVInAppBrowserNavigationController alloc]
                                                         initWithRootViewController:self.inAppBrowserViewController];
-    nav.orientationDelegate = self.inAppBrowserViewController;
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = self.inAppBrowserViewController.modalPresentationStyle;
     nav.presentationController.delegate = self.inAppBrowserViewController;
@@ -1132,25 +1127,6 @@ BOOL isExiting = FALSE;
     }
     //NSLog(@"Received script message %@", message.body);
     [self.navigationDelegate userContentController:userContentController didReceiveScriptMessage:message];
-}
-
-#pragma mark CDVScreenOrientationDelegate
-
-- (BOOL)shouldAutorotate
-{
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(shouldAutorotate)]) {
-        return [self.orientationDelegate shouldAutorotate];
-    }
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations
-{
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)]) {
-        return [self.orientationDelegate supportedInterfaceOrientations];
-    }
-    
-    return 1 << UIInterfaceOrientationPortrait;
 }
 
 #pragma mark UIAdaptivePresentationControllerDelegate
