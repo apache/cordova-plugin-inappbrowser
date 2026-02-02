@@ -991,6 +991,46 @@ BOOL isExiting = FALSE;
         // Toolbar bottom to safeArea bottom
         if (toolbarVisible) {
             [self.toolbar.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor].active = YES;
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+            // Fixes the Liquid Glass issue on iOS version >= 26 where the top bar becomes transparent
+            if (@available(iOS 26.0, *)) {
+                // Always: solid fill for the bottom safe-area strip
+                UIToolbar *bottomSolid = [[UIToolbar alloc] init];
+                bottomSolid.alpha = 1.000;
+                bottomSolid.barStyle = self.toolbar.barStyle;
+                bottomSolid.backgroundColor = self.toolbar.backgroundColor;
+                bottomSolid.translatesAutoresizingMaskIntoConstraints = NO;
+                bottomSolid.userInteractionEnabled = NO;
+                bottomSolid.clearsContextBeforeDrawing = NO;
+                bottomSolid.clipsToBounds = NO;
+                bottomSolid.contentMode = UIViewContentModeScaleToFill;
+                
+                // Only when translucent: add blur over the same color
+                if (_browserOptions.toolbartranslucent) {
+                    // Add blur view behind everything
+                    UIVisualEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
+                    UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
+                    blurView.frame = bottomSolid.bounds;
+                    blurView.backgroundColor =  _browserOptions.toolbarcolor
+                    ? [self colorFromHexString:_browserOptions.toolbarcolor]
+                    : [UIColor clearColor];
+                    blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+                    blurView.userInteractionEnabled = NO;
+
+                    // Put blur at the very back so buttons stay on top
+                    [bottomSolid insertSubview:blurView atIndex:0];
+                }
+                
+                [self.view insertSubview:bottomSolid belowSubview:self.toolbar];
+                
+                [NSLayoutConstraint activateConstraints:@[
+                    [bottomSolid.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+                    [bottomSolid.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+                    [bottomSolid.topAnchor constraintEqualToAnchor:safeArea.bottomAnchor],
+                    [bottomSolid.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+                ]];
+            }
+#endif
         }
     }
 }
