@@ -647,6 +647,8 @@ BOOL isExiting = FALSE;
         self.webViewUIDelegate = [[CDVWKInAppBrowserUIDelegate alloc] initWithTitle:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"]];
         [self.webViewUIDelegate setViewController:self];
         [self createViews];
+        
+        self.modalInPopover = TRUE;
     }
     
     return self;
