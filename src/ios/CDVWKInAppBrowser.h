@@ -20,11 +20,15 @@
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
 #ifdef __CORDOVA_8_0_0
-    // cordova-ios 8 introduced CDVSettingsDictionary, which should be used instead of NSDictionary+CordovaPreferences
+    // cordova-ios 8 introduced CDVSettingsDictionary, which should be used
+    // instead of NSDictionary+CordovaPreferences
     #import <Cordova/CDVSettingsDictionary.h>
 #else
     // cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
     #import <Cordova/NSDictionary+CordovaPreferences.h>
+    // For cordova-ios 7 and earlier, create a type alias so CDVSettingsDictionary can be used
+    // to write version-agnostic code
+    typedef NSDictionary CDVSettingsDictionary;
 #endif
 #import "CDVWKInAppBrowserUIDelegate.h"
 #import "CDVInAppBrowserOptions.h"
@@ -63,13 +67,7 @@
 {
     @private
     CDVInAppBrowserOptions *_browserOptions;
-#ifdef __CORDOVA_8_0_0
-    // cordova-ios 8 introduced CDVSettingsDictionary, which should be used instead of NSDictionary+CordovaPreferences
     CDVSettingsDictionary *_settings;
-#else
-    // cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
-    NSDictionary *_settings;
-#endif
 }
 
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
@@ -90,12 +88,6 @@
 - (void)showLocationBar:(BOOL)show;
 - (void)showToolBar:(BOOL)show atPosition:(NSString *)toolbarPosition;
 - (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString atIndex:(int)buttonIndex;
-#ifdef __CORDOVA_8_0_0
-// cordova-ios 8 introduced CDVSettingsDictionary, which should be used instead of NSDictionary+CordovaPreferences
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(CDVSettingsDictionary *)settings;
-#else
-// cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
-- (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(NSDictionary *)settings;
-#endif
 
 @end

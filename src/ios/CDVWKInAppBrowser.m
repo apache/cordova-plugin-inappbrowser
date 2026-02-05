@@ -632,13 +632,7 @@ static CDVWKInAppBrowser *instance = nil;
 CGFloat lastReducedStatusBarHeight = 0.0;
 BOOL isExiting = FALSE;
 
-#ifdef __CORDOVA_8_0_0
-// cordova-ios 8 introduced CDVSettingsDictionary, which should be used instead of NSDictionary+CordovaPreferences
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(CDVSettingsDictionary *)settings
-#else
-// cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
-- (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(NSDictionary *)settings
-#endif
 {
     self = [super init];
     if (self != nil) {
