@@ -769,7 +769,7 @@ BOOL isExiting = FALSE;
     // We add our own constraints, they should not be determined from the frame
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
-    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.spinner = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
     self.spinner.alpha = 1.000;
     self.spinner.clearsContextBeforeDrawing = NO;
     self.spinner.clipsToBounds = NO;
