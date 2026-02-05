@@ -18,7 +18,6 @@
 */
 
 #import "CDVWKInAppBrowser.h"
-#import <Cordova/NSDictionary+CordovaPreferences.h>
 #import <Cordova/CDVWebViewProcessPoolFactory.h>
 #import <Cordova/CDVPluginResult.h>
 
@@ -633,7 +632,13 @@ static CDVWKInAppBrowser *instance = nil;
 CGFloat lastReducedStatusBarHeight = 0.0;
 BOOL isExiting = FALSE;
 
+#ifdef __CORDOVA_8_0_0
+// cordova-ios 8 introduced CDVSettingsDictionary, which should be used instead of NSDictionary+CordovaPreferences
+- (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(CDVSettingsDictionary *)settings
+#else
+// cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(NSDictionary *)settings
+#endif
 {
     self = [super init];
     if (self != nil) {
@@ -933,6 +938,9 @@ BOOL isExiting = FALSE;
     }
 }
 
+// Helper method to lowercase the key before getting the value from settings.
+// TODO: Can be replaced by calling `[_settings cordovaSettingForKey:]` which does this already.
+// cordovaSettingForKey: is available since cordova-ios 6 where NSDictionary+CordovaPreferences is used
 - (id)settingForKey:(NSString *)key
 {
     return [_settings objectForKey:[key lowercaseString]];
