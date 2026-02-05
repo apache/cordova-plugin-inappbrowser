@@ -721,7 +721,7 @@ BOOL isExiting = FALSE;
     // Toolbar init without frame
     self.toolbar = [[UIToolbar alloc] init];
     self.toolbar.alpha = 1.000;
-    self.toolbar.barStyle = UIBarStyleBlackOpaque;
+    self.toolbar.barStyle = UIBarStyleBlack;
     self.toolbar.clearsContextBeforeDrawing = NO;
     self.toolbar.clipsToBounds = NO;
     self.toolbar.contentMode = UIViewContentModeScaleToFill;
