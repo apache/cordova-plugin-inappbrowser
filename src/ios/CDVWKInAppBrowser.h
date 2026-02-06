@@ -19,16 +19,13 @@
 
 #import <Cordova/CDVPlugin.h>
 #import <Cordova/CDVInvokedUrlCommand.h>
-#ifdef __CORDOVA_8_0_0
-    // cordova-ios 8 introduced CDVSettingsDictionary, which should be used
-    // instead of NSDictionary+CordovaPreferences
-    #import <Cordova/CDVSettingsDictionary.h>
-#else
-    // cordova-ios 7 and earlier uses NSDictionary+CordovaPreferences
-    #import <Cordova/NSDictionary+CordovaPreferences.h>
-    // For cordova-ios 7 and earlier, create a type alias so CDVSettingsDictionary can be used
-    // to write version-agnostic code
-    typedef NSDictionary CDVSettingsDictionary;
+#ifndef __CORDOVA_8_0_0
+#import <Cordova/NSDictionary+CordovaPreferences.h>
+// cordova-ios 8 introduced CDVSettingsDictionary, which should be used
+// instead of NSDictionary+CordovaPreferences
+// For cordova-ios 7 and earlier, we create a type alias for NSDictionary to CDVSettingsDictionary,
+// so that a symbolic "CDVSettingsDictionary" can be used in these older cordova-ios versions.
+typedef NSDictionary CDVSettingsDictionary;
 #endif
 #import "CDVWKInAppBrowserUIDelegate.h"
 #import "CDVInAppBrowserOptions.h"
