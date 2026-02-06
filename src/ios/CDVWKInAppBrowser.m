@@ -664,9 +664,9 @@ BOOL isExiting = FALSE;
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     NSString *userAgent = configuration.applicationNameForUserAgent;
     
-    if ([self settingForKey:@"OverrideUserAgent"] == nil &&
-        [self settingForKey:@"AppendUserAgent"] != nil) {
-        userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [self settingForKey:@"AppendUserAgent"]];
+    if ([_settings cordovaSettingForKey:@"OverrideUserAgent"] == nil &&
+        [_settings cordovaSettingForKey:@"AppendUserAgent"] != nil) {
+        userAgent = [NSString stringWithFormat:@"%@ %@", userAgent, [_settings cordovaSettingForKey:@"AppendUserAgent"]];
     }
     
     configuration.applicationNameForUserAgent = userAgent;
@@ -689,7 +689,7 @@ BOOL isExiting = FALSE;
     }
     
     if (@available(iOS 13.0, *)) {
-        NSString *contentMode = [self settingForKey:@"PreferredContentMode"];
+        NSString *contentMode = [_settings cordovaSettingForKey:@"PreferredContentMode"];
         if ([contentMode isEqual: @"mobile"]) {
             configuration.defaultWebpagePreferences.preferredContentMode = WKContentModeMobile;
         } else if ([contentMode  isEqual: @"desktop"]) {
@@ -829,8 +829,8 @@ BOOL isExiting = FALSE;
     self.webView.navigationDelegate = self;
     self.webView.UIDelegate = self.webViewUIDelegate;
     self.webView.backgroundColor = [UIColor whiteColor];
-    if ([self settingForKey:@"OverrideUserAgent"] != nil) {
-        self.webView.customUserAgent = [self settingForKey:@"OverrideUserAgent"];
+    if ([_settings cordovaSettingForKey:@"OverrideUserAgent"] != nil) {
+        self.webView.customUserAgent = [_settings cordovaSettingForKey:@"OverrideUserAgent"];
     }
     
     self.webView.clearsContextBeforeDrawing = YES;
@@ -938,14 +938,6 @@ BOOL isExiting = FALSE;
     }
 }
 
-// Helper method to lowercase the key before getting the value from settings.
-// TODO: Can be replaced by calling `[_settings cordovaSettingForKey:]` which does this already.
-// cordovaSettingForKey: is available since cordova-ios 6 where NSDictionary+CordovaPreferences is used
-- (id)settingForKey:(NSString *)key
-{
-    return [_settings objectForKey:[key lowercaseString]];
-}
-
 - (void)setWebViewFrame:(CGRect)frame
 {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
@@ -999,7 +991,7 @@ BOOL isExiting = FALSE;
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
-    NSString *statusBarStylePreference = [self settingForKey:@"InAppBrowserStatusBarStyle"];
+    NSString *statusBarStylePreference = [_settings cordovaSettingForKey:@"InAppBrowserStatusBarStyle"];
     if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"lightcontent"]) {
         return UIStatusBarStyleLightContent;
     } else if (statusBarStylePreference && [statusBarStylePreference isEqualToString:@"darkcontent"]) {
