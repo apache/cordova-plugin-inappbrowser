@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-inappbrowser",
-  "version": "6.0.1-dev",
+  "version": "6.0.1-ppdev",
   "description": "Cordova InAppBrowser Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
@@ -11,8 +11,8 @@
       "ios"
     ]
   },
-  "repository": "github:apache/cordova-plugin-inappbrowser",
-  "bugs": "https://github.com/apache/cordova-plugin-inappbrowser/issues",
+  "repository": "github:Perfect-Portal/cordova-plugin-inappbrowser",
+  "bugs": "https://github.com/Perfect-Portal/cordova-plugin-inappbrowser/issues",
   "keywords": [
     "cordova",
     "in",
@@ -42,7 +42,7 @@
         "cordova-ios": ">=6.0.0",
         "cordova": ">=9.0.0"
       },
-      "6.0.1-dev": {
+      "6.0.1-ppdev": {
         "cordova-android": ">=10.0.0",
         "cordova-ios": ">=6.0.0",
         "cordova": ">=9.0.0"
