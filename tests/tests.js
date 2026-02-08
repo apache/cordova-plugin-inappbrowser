@@ -40,11 +40,6 @@ exports.defineAutoTests = function () {
         });
 
         describe('open method', function () {
-            if (cordova.platformId === 'osx') {
-                pending('Open method not fully supported on OSX.');
-                return;
-            }
-
             let iabInstance;
             let originalTimeout;
             const url = 'https://dist.apache.org/repos/dist/dev/cordova/';
