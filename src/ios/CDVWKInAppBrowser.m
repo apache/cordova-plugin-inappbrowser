@@ -44,7 +44,6 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)pluginInitialize
 {
     instance = self;
-    _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
 }
