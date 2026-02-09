@@ -413,14 +413,14 @@ static CDVWKInAppBrowser *instance = nil;
     [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 }
 
-- (BOOL)isAllowedScheme:(NSString*)scheme
+- (BOOL)isAllowedScheme:(NSString *)scheme
 {
-    NSString* allowedSchemesPreference = [self.commandDelegate.settings objectForKey:@"AllowedSchemes"];
+    NSString *allowedSchemesPreference = [_settings cordovaSettingForKey:@"AllowedSchemes"];
     if (allowedSchemesPreference == nil || [allowedSchemesPreference isEqualToString:@""]) {
         // Preference missing.
         return NO;
     }
-    for (NSString* allowedScheme in [allowedSchemesPreference componentsSeparatedByString:@","]) {
+    for (NSString *allowedScheme in [allowedSchemesPreference componentsSeparatedByString:@","]) {
         if ([allowedScheme isEqualToString:scheme]) {
             return YES;
         }
@@ -481,9 +481,9 @@ static CDVWKInAppBrowser *instance = nil;
         [theWebView stopLoading];
         [self openInSystem:url];
         shouldStart = NO;
-    } else if ((self.callbackId != nil) && ![[ url scheme] isEqualToString:@"http"] && ![[ url scheme] isEqualToString:@"https"] && [self isAllowedScheme:[url scheme]]) {
+    } else if ((self.callbackId != nil) && ![[url scheme] isEqualToString:@"http"] && ![[url scheme] isEqualToString:@"https"] && [self isAllowedScheme:[url scheme]]) {
         // Send a customscheme event.
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"customscheme", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
         
