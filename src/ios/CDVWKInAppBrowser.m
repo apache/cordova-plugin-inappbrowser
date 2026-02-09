@@ -482,7 +482,7 @@ static CDVWKInAppBrowser *instance = nil;
         [self openInSystem:url];
         shouldStart = NO;
     } else if ((self.callbackId != nil) && ![[url scheme] isEqualToString:@"http"] && ![[url scheme] isEqualToString:@"https"] && [self isAllowedScheme:[url scheme]]) {
-        // Send a customscheme event.
+        // Send a customscheme event for allowed schemes that are not http/https.
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"customscheme", @"url":[url absoluteString]}];
         [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
