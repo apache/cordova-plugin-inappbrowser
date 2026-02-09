@@ -45,7 +45,6 @@ typedef NSDictionary CDVSettingsDictionary;
 @property (nonatomic, retain) CDVWKInAppBrowser *instance;
 @property (nonatomic, retain) CDVWKInAppBrowserViewController *inAppBrowserViewController;
 @property (nonatomic, copy) NSString *callbackId;
-@property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
 
 + (id) getInstance;
 - (void)open:(CDVInvokedUrlCommand *)command;

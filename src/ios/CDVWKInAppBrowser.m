@@ -44,7 +44,6 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)pluginInitialize
 {
     instance = self;
-    _callbackIdPattern = nil;
     _beforeload = @"";
     _waitForBeforeload = NO;
 }
@@ -412,23 +411,6 @@ static CDVWKInAppBrowser *instance = nil;
         jsWrapper = @"(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)";
     }
     [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
-}
-
-- (BOOL)isValidCallbackId:(NSString *)callbackId
-{
-    NSError *err = nil;
-    // Initialize on first use
-    if (self.callbackIdPattern == nil) {
-        self.callbackIdPattern = [NSRegularExpression regularExpressionWithPattern:@"^InAppBrowser[0-9]{1,10}$" options:0 error:&err];
-        if (err != nil) {
-            // Couldn't initialize Regex; No is safer than Yes.
-            return NO;
-        }
-    }
-    if ([self.callbackIdPattern firstMatchInString:callbackId options:0 range:NSMakeRange(0, [callbackId length])]) {
-        return YES;
-    }
-    return NO;
 }
 
 /**
