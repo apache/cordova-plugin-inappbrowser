@@ -415,7 +415,7 @@ static CDVWKInAppBrowser *instance = nil;
 
 - (BOOL)isAllowedScheme:(NSString *)scheme
 {
-    NSString *allowedSchemesPreference = [_settings cordovaSettingForKey:@"AllowedSchemes"];
+    NSString *allowedSchemesPreference = [self.commandDelegate.settings cordovaSettingForKey:@"AllowedSchemes"];
     if (allowedSchemesPreference == nil || [allowedSchemesPreference isEqualToString:@""]) {
         // Preference missing.
         return NO;
