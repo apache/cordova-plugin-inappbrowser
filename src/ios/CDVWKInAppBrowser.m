@@ -413,6 +413,21 @@ static CDVWKInAppBrowser *instance = nil;
     [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 }
 
+- (BOOL)isAllowedScheme:(NSString *)scheme
+{
+    NSString *allowedSchemesPreference = [self.commandDelegate.settings cordovaSettingForKey:@"AllowedSchemes"];
+    if (allowedSchemesPreference == nil || [allowedSchemesPreference isEqualToString:@""]) {
+        // Preference missing.
+        return NO;
+    }
+    for (NSString *allowedScheme in [allowedSchemesPreference componentsSeparatedByString:@","]) {
+        if ([allowedScheme isEqualToString:scheme]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 /**
  * The message handler bridge provided for the InAppBrowser is capable of executing any oustanding callback belonging
  * to the InAppBrowser plugin. Care has been taken that other callbacks cannot be triggered, and that no
@@ -465,6 +480,15 @@ static CDVWKInAppBrowser *instance = nil;
     if ([allowedSchemes containsObject:[url scheme]]) {
         [theWebView stopLoading];
         [self openInSystem:url];
+        shouldStart = NO;
+    } else if ((self.callbackId != nil) && ![[url scheme] isEqualToString:@"http"] && ![[url scheme] isEqualToString:@"https"] && [self isAllowedScheme:[url scheme]]) {
+        // Send a customscheme event for allowed schemes that are not http/https.
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                      messageAsDictionary:@{@"type":@"customscheme", @"url":[url absoluteString]}];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+        
         shouldStart = NO;
     } else if ((self.callbackId != nil) && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
