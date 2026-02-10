@@ -114,12 +114,12 @@ completionHandler:(void (^)(NSString *result))completionHandler
     [[self getViewController] presentViewController:alert animated:YES completion:nil];
 }
 
--(UIViewController *) getViewController
+- (UIViewController *)getViewController
 {
     return _viewController;
 }
 
--(void) setViewController:(UIViewController *) viewController
+- (void)setViewController:(UIViewController *)viewController
 {
     _viewController = viewController;
 }
