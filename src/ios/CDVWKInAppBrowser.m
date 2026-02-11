@@ -560,10 +560,10 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)didFinishNavigation:(WKWebView *)theWebView
 {
     if (self.callbackId != nil) {
-        NSString *url = [theWebView.URL absoluteString];
+        NSString *url = theWebView.URL.absoluteString;
         if (url == nil) {
             if (self.inAppBrowserViewController.currentURL != nil) {
-                url = [self.inAppBrowserViewController.currentURL absoluteString];
+                url = self.inAppBrowserViewController.currentURL.absoluteString;
             } else {
                 url = @"";
             }
@@ -1086,7 +1086,7 @@ BOOL isExiting = NO;
 - (void)webView:(WKWebView *)theWebView didFinishNavigation:(WKNavigation *)navigation
 {
     // Update URL, stop spinner, update back/forward
-    self.addressLabel.text = [self.currentURL absoluteString];
+    self.addressLabel.text = self.currentURL.absoluteString;
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
     theWebView.scrollView.contentInset = UIEdgeInsetsZero;
