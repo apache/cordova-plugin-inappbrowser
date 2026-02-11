@@ -104,7 +104,7 @@ static CDVWKInAppBrowser *instance = nil;
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"incorrect number of arguments"];
     }
 
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [pluginResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -457,7 +457,7 @@ static CDVWKInAppBrowser *instance = nil;
     if (_waitForBeforeload && useBeforeLoad) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"beforeload", @"url":url.absoluteString}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         decisionHandler(WKNavigationActionPolicyCancel);
@@ -468,7 +468,7 @@ static CDVWKInAppBrowser *instance = nil;
         NSLog(@"%@", errorMessage);
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                                       messageAsDictionary:@{@"type":@"loaderror", @"url":url.absoluteString, @"code": @"-1", @"message": errorMessage}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
 
@@ -482,7 +482,7 @@ static CDVWKInAppBrowser *instance = nil;
         // Send a customscheme event for allowed schemes that are not http/https.
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"customscheme", @"url":url.absoluteString}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
 
@@ -491,7 +491,7 @@ static CDVWKInAppBrowser *instance = nil;
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstart", @"url":url.absoluteString}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
@@ -546,7 +546,7 @@ static CDVWKInAppBrowser *instance = nil;
             [dResult setValue:@"message" forKey:@"type"];
             [dResult setObject:decodedResult forKey:@"data"];
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:dResult];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
         }
     }
@@ -570,7 +570,7 @@ static CDVWKInAppBrowser *instance = nil;
         }
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstop", @"url":url}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
@@ -589,7 +589,7 @@ static CDVWKInAppBrowser *instance = nil;
         }
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR
                                                       messageAsDictionary:@{@"type":@"loaderror", @"url":url, @"code": [NSNumber numberWithInteger:error.code], @"message": error.localizedDescription}];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [pluginResult setKeepCallbackAsBool:YES];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
