@@ -478,7 +478,7 @@ static CDVWKInAppBrowser *instance = nil;
         [theWebView stopLoading];
         [self openInSystem:url];
         shouldStart = NO;
-    } else if ((self.callbackId != nil) && ![url.scheme isEqualToString:@"http"] && ![url.scheme isEqualToString:@"https"] && [self isAllowedScheme:url.scheme]) {
+    } else if (self.callbackId != nil && ![url.scheme isEqualToString:@"http"] && ![url.scheme isEqualToString:@"https"] && [self isAllowedScheme:url.scheme]) {
         // Send a customscheme event for allowed schemes that are not http/https.
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"customscheme", @"url":url.absoluteString}];
@@ -487,7 +487,7 @@ static CDVWKInAppBrowser *instance = nil;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
 
         shouldStart = NO;
-    } else if ((self.callbackId != nil) && isTopLevelNavigation) {
+    } else if (self.callbackId != nil && isTopLevelNavigation) {
         // Send a loadstart event for each top-level navigation (includes redirects).
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK
                                                       messageAsDictionary:@{@"type":@"loadstart", @"url":url.absoluteString}];
