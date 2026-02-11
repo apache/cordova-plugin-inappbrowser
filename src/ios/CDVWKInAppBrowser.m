@@ -406,7 +406,7 @@ static CDVWKInAppBrowser *instance = nil;
     if ((command.callbackId != nil) && ![command.callbackId isEqualToString:@"INVALID"]) {
         jsWrapper = [NSString stringWithFormat:@"(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %%@; c.onload = function() { _cdvMessageHandler('%@'); }; d.body.appendChild(c); })(document)", command.callbackId];
     } else {
-        jsWrapper = @"(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)";
+        jsWrapper = @"(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)";
     }
     [self injectDeferredObject:[command argumentAtIndex:0] withWrapper:jsWrapper];
 }
