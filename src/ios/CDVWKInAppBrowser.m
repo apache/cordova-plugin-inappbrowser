@@ -117,7 +117,7 @@ static CDVWKInAppBrowser *instance = nil;
         NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
         [dataStore removeDataOfTypes:[WKWebsiteDataStore allWebsiteDataTypes] modifiedSince:dateFrom completionHandler:^{
             NSLog(@"Removed all WKWebView data");
-            self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+            self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // Create new process pool to flush all data
         }];
     }
 
@@ -286,7 +286,7 @@ static CDVWKInAppBrowser *instance = nil;
 - (void)openInCordovaWebView:(NSURL *)url withOptions:(NSString *)options
 {
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    // the WebView engine itself will filter for this according to <allow-navigation> policy
+    // The WebView engine itself will filter for this according to <allow-navigation> policy
     // in config.xml
     [self.webViewEngine loadRequest:request];
 }
@@ -317,7 +317,6 @@ static CDVWKInAppBrowser *instance = nil;
     }
 
     NSURL *url = [NSURL URLWithString:urlStr];
-    //_beforeload = @"";
     _waitForBeforeload = NO;
     [self.inAppBrowserViewController navigateTo:url];
 }
@@ -350,7 +349,7 @@ static CDVWKInAppBrowser *instance = nil;
 }
 
 
-//Synchronus helper for javascript evaluation
+// Synchronous helper for javascript evaluation
 - (void)evaluateJavaScript:(NSString *)script
 {
     __block NSString *_script = script;
@@ -442,12 +441,12 @@ static CDVWKInAppBrowser *instance = nil;
     NSString *errorMessage = nil;
 
     if ([_beforeload isEqualToString:@"post"]) {
-        //TODO handle POST requests by preserving POST data then remove this condition
+        // TODO: Handle POST requests by preserving POST data then remove this condition.
         errorMessage = @"beforeload doesn't yet support POST requests";
     } else if (isTopLevelNavigation && (
         [_beforeload isEqualToString:@"yes"]
         || ([_beforeload isEqualToString:@"get"] && [httpMethod isEqualToString:@"GET"])
-        // TODO comment in when POST requests are handled
+        // TODO: Comment in when POST requests are handled.
         // || ([_beforeload isEqualToString:@"post"] && [httpMethod isEqualToString:@"POST"])
     )) {
         useBeforeLoad = YES;
@@ -623,7 +622,7 @@ static CDVWKInAppBrowser *instance = nil;
     self->tmpWindow = nil;
 }
 
-@end //CDVWKInAppBrowser
+@end // CDVWKInAppBrowser
 
 #pragma mark CDVWKInAppBrowserViewController
 
@@ -655,7 +654,7 @@ BOOL isExiting = NO;
 
 - (void)createViews
 {
-    // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
+    // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included.
     WKUserContentController *userContentController = [[WKUserContentController alloc] init];
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     NSString *userAgent = configuration.applicationNameForUserAgent;
@@ -674,7 +673,7 @@ BOOL isExiting = NO;
 #endif
     [configuration.userContentController addScriptMessageHandler:self name:IAB_BRIDGE_NAME];
 
-    //WKWebView options
+    // WKWebView options
     configuration.allowsInlineMediaPlayback = _browserOptions.allowinlinemediaplayback;
     configuration.ignoresViewportScaleLimits = _browserOptions.enableviewportscale;
 
@@ -713,10 +712,10 @@ BOOL isExiting = NO;
     [self.view addSubview:self.webView];
     // The WebView should be behind the other elements like toolbar, address label, spinner
     // Since the WebView is added first, this is already the case.
-    // sendSubviewToBack is normally not necessary
+    // sendSubviewToBack is normally not necessary.
     [self.view sendSubviewToBack:self.webView];
 
-    // We add our own constraints, they should not be determined from the frame
+    // We add our own constraints, they should not be determined from the frame.
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
 
     // Toolbar init without frame
@@ -737,7 +736,7 @@ BOOL isExiting = NO;
         self.toolbar.translucent = NO;
     }
     [self.view addSubview:self.toolbar];
-    // We add our own constraints, they should not be determined from the frame
+    // We add our own constraints, they should not be determined from the frame.
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.addressLabel = [[UILabel alloc] init];
@@ -767,7 +766,7 @@ BOOL isExiting = NO;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
     [self.view addSubview:self.addressLabel];
-    // We add our own constraints, they should not be determined from the frame
+    // We add our own constraints, they should not be determined from the frame.
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.spinner = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
@@ -782,7 +781,7 @@ BOOL isExiting = NO;
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
     [self.view addSubview:self.spinner];
-    // We add our own constraints, they should not be determined from the frame
+    // We add our own constraints, they should not be determined from the frame.
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
@@ -793,7 +792,7 @@ BOOL isExiting = NO;
     UIBarButtonItem *fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpaceButton.width = 20;
 
-    NSString *frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
+    NSString *frontArrowString = NSLocalizedString(@"►", nil); // Create arrow from Unicode char
     self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
     self.forwardButton.enabled = YES;
     self.forwardButton.imageInsets = UIEdgeInsetsZero;
@@ -801,7 +800,7 @@ BOOL isExiting = NO;
         self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-    NSString *backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
+    NSString *backArrowString = NSLocalizedString(@"◄", nil); // Create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
     self.backButton.enabled = YES;
     self.backButton.imageInsets = UIEdgeInsetsZero;
@@ -942,13 +941,13 @@ BOOL isExiting = NO;
 
 - (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString atIndex:(int)buttonIndex
 {
-    // the advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
-    // but, if you want to set this yourself, knock yourself out (we can't set the title for a system Done button, so we have to create a new one)
+    // The advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
+    // but, if you want to set this yourself, knock yourself out. (We can't set the title for a system Done button, so we have to create a new one.)
     self.closeButton = nil;
-    // Initialize with title if title is set, otherwise the title will be 'Done' localized
+    // Initialize with title if title is set, otherwise the title will be 'Done' localized.
     self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
-    // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
+    // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default.
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
 
     NSMutableArray *items = [self.toolbar.items mutableCopy];
@@ -966,7 +965,7 @@ BOOL isExiting = NO;
 - (void)showToolBar:(BOOL)show atPosition:(NSString *)toolbarPosition
 {
     self.toolbar.hidden = !show;
-    _browserOptions.toolbarposition = toolbarPosition; // keep state consistent if needed
+    _browserOptions.toolbarposition = toolbarPosition; // Keep state consistent if needed
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
@@ -1131,4 +1130,4 @@ BOOL isExiting = NO;
     isExiting = YES;
 }
 
-@end //CDVWKInAppBrowserViewController
+@end // CDVWKInAppBrowserViewController
