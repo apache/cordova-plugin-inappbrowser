@@ -371,11 +371,11 @@ function downloadListener(params){
 
 ### InAppBrowserEvent Properties
 
-- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `message`, `customscheme` or `exit`. _(String)_
+- __type__: the eventname, either `loadstart`, `loadstop`, `loaderror`, `exit`, `message` or `customscheme`. _(String)_
 - __url__: the URL that was loaded. _(String)_
 - __code__: the error code, only in the case of `loaderror`. _(Number)_
 - __message__: the error message, only in the case of `loaderror`. _(String)_
-- __data__: the message contents , only in the case of `message`. A stringified JSON object. _(String)_
+- __data__: the message contents, only in the case of `message`. A stringified JSON object. _(String)_
 
 ### Supported Platforms
 
