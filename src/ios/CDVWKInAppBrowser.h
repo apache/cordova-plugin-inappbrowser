@@ -42,11 +42,9 @@ typedef NSDictionary CDVSettingsDictionary;
     BOOL _waitForBeforeload;
 }
 
-@property (nonatomic, retain) CDVWKInAppBrowser *instance;
 @property (nonatomic, retain) CDVWKInAppBrowserViewController *inAppBrowserViewController;
 @property (nonatomic, copy) NSString *callbackId;
 
-+ (id) getInstance;
 - (void)open:(CDVInvokedUrlCommand *)command;
 - (void)close:(CDVInvokedUrlCommand *)command;
 - (void)injectScriptCode:(CDVInvokedUrlCommand *)command;

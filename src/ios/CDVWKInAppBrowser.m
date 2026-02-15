@@ -34,16 +34,8 @@
 
 @implementation CDVWKInAppBrowser
 
-static CDVWKInAppBrowser *instance = nil;
-
-+ (id)getInstance
-{
-    return instance;
-}
-
 - (void)pluginInitialize
 {
-    instance = self;
     _beforeload = @"";
     _waitForBeforeload = NO;
 }
