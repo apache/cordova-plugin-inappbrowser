@@ -684,6 +684,7 @@ BOOL isExiting = FALSE;
     
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
     if (@available(iOS 15.0, *)) {
         // Since iOS 15 WKProcessPool is deprecated and has no effect
     } else {
@@ -694,6 +695,7 @@ BOOL isExiting = FALSE;
         configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
 #pragma clang diagnostic pop
     }
+#endif
     [configuration.userContentController addScriptMessageHandler:self name:IAB_BRIDGE_NAME];
     
     //WKWebView options
