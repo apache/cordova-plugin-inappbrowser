@@ -18,7 +18,15 @@
 */
 
 #import "CDVWKInAppBrowser.h"
+
+#if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
+/*
+  CDVWebViewProcessPoolFactory is deprecated since cordova-ios 8.0.0
+  and will be removed in a future release.
+*/
 #import <Cordova/CDVWebViewProcessPoolFactory.h>
+#endif
+
 #import <Cordova/CDVPluginResult.h>
 
 #define    kInAppBrowserTargetSelf @"_self"
@@ -109,7 +117,12 @@
         NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
         [dataStore removeDataOfTypes:[WKWebsiteDataStore allWebsiteDataTypes] modifiedSince:dateFrom completionHandler:^{
             NSLog(@"Removed all WKWebView data");
-            self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+            if (@available(iOS 15.0, *)) {
+                // Since iOS 15 WKProcessPool is deprecated and has no effect
+            } else {
+                // Set for iOS 14 and below a new process pool
+                self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+            }
         }];
     }
     
@@ -664,9 +677,16 @@ BOOL isExiting = FALSE;
     configuration.applicationNameForUserAgent = userAgent;
     configuration.userContentController = userContentController;
 #if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
-    configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
-#elif __has_include("CDVWKProcessPoolFactory.h")
-    configuration.processPool = [[CDVWKProcessPoolFactory sharedFactory] sharedProcessPool];
+    if (@available(iOS 15.0, *)) {
+        // Since iOS 15 WKProcessPool is deprecated and has no effect
+    } else {
+        // Set for iOS 14 and 15 a shared process pool
+        // CDVWebViewProcessPoolFactory is deprecated since cordova-ios 8.0.0
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        configuration.processPool = [[CDVWebViewProcessPoolFactory sharedFactory] sharedProcessPool];
+#pragma clang diagnostic pop
+    }
 #endif
     [configuration.userContentController addScriptMessageHandler:self name:IAB_BRIDGE_NAME];
     
