@@ -746,12 +746,48 @@ BOOL isExiting = FALSE;
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the top bar becomes transparent
+    if (@available(iOS 26.0, *)) {
+        if (_browserOptions.toolbartranslucent) {
+            self.toolbar.backgroundColor =  _browserOptions.toolbarcolor
+            ? [self colorFromHexString:_browserOptions.toolbarcolor]
+            : [UIColor clearColor];
+            
+            // Add blur view behind everything
+            UIVisualEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
+            UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
+            blurView.frame = self.toolbar.bounds;
+            blurView.backgroundColor =  _browserOptions.toolbarcolor
+            ? [self colorFromHexString:_browserOptions.toolbarcolor]
+            : [UIColor clearColor];
+            blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            blurView.userInteractionEnabled = NO;
+
+            // Put blur at the very back so buttons stay on top
+            [self.toolbar insertSubview:blurView atIndex:0];
+        } else {
+            self.toolbar.backgroundColor = _browserOptions.toolbarcolor ? [self colorFromHexString:_browserOptions.toolbarcolor]: [UIColor blackColor];;
+        }
+        
+    } else {
+        if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
+            self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+        }
+        if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
+            self.toolbar.translucent = NO;
+        }
+    }
+#else
     if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
-      self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+        self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
     }
     if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
-      self.toolbar.translucent = NO;
+        self.toolbar.translucent = NO;
     }
+#endif
+    
     [self.view addSubview:self.toolbar];
     // We add our own constraints, they should not be determined from the frame
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
@@ -804,6 +840,13 @@ BOOL isExiting = FALSE;
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
     
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.closeButton.hidesSharedBackground = YES;
+    }
+#endif
+    
     UIBarButtonItem *flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
     UIBarButtonItem *fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
@@ -816,6 +859,13 @@ BOOL isExiting = FALSE;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.forwardButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.forwardButton.hidesSharedBackground = YES;
+    }
+#endif
 
     NSString *backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
     self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
@@ -824,6 +874,13 @@ BOOL isExiting = FALSE;
     if (_browserOptions.navigationbuttoncolor != nil) { // Set button color if user sets it in options
       self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.backButton.hidesSharedBackground = YES;
+    }
+#endif
 
     // Filter out Navigation Buttons if user requests so
     if (_browserOptions.hidenavigationbuttons) {
@@ -946,6 +1003,46 @@ BOOL isExiting = FALSE;
         // Toolbar bottom to safeArea bottom
         if (toolbarVisible) {
             [self.toolbar.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor].active = YES;
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+            // Fixes the Liquid Glass issue on iOS version >= 26 where the top bar becomes transparent
+            if (@available(iOS 26.0, *)) {
+                // Always: solid fill for the bottom safe-area strip
+                UIToolbar *bottomSolid = [[UIToolbar alloc] init];
+                bottomSolid.alpha = 1.000;
+                bottomSolid.barStyle = self.toolbar.barStyle;
+                bottomSolid.backgroundColor = self.toolbar.backgroundColor;
+                bottomSolid.translatesAutoresizingMaskIntoConstraints = NO;
+                bottomSolid.userInteractionEnabled = NO;
+                bottomSolid.clearsContextBeforeDrawing = NO;
+                bottomSolid.clipsToBounds = NO;
+                bottomSolid.contentMode = UIViewContentModeScaleToFill;
+                
+                // Only when translucent: add blur over the same color
+                if (_browserOptions.toolbartranslucent) {
+                    // Add blur view behind everything
+                    UIVisualEffect *effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
+                    UIVisualEffectView *blurView = [[UIVisualEffectView alloc] initWithEffect:effect];
+                    blurView.frame = bottomSolid.bounds;
+                    blurView.backgroundColor =  _browserOptions.toolbarcolor
+                    ? [self colorFromHexString:_browserOptions.toolbarcolor]
+                    : [UIColor clearColor];
+                    blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+                    blurView.userInteractionEnabled = NO;
+
+                    // Put blur at the very back so buttons stay on top
+                    [bottomSolid insertSubview:blurView atIndex:0];
+                }
+                
+                [self.view insertSubview:bottomSolid belowSubview:self.toolbar];
+                
+                [NSLayoutConstraint activateConstraints:@[
+                    [bottomSolid.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+                    [bottomSolid.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+                    [bottomSolid.topAnchor constraintEqualToAnchor:safeArea.bottomAnchor],
+                    [bottomSolid.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+                ]];
+            }
+#endif
         }
     }
 }
@@ -966,6 +1063,13 @@ BOOL isExiting = FALSE;
     self.closeButton.enabled = YES;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
+    
+#if defined(__IPHONE_26_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_26_0
+    // Fixes the Liquid Glass issue on iOS version >= 26 where the buttons have a translucent background
+    if (@available(iOS 26.0, *)) {
+      self.closeButton.hidesSharedBackground = YES;
+    }
+#endif
     
     NSMutableArray *items = [self.toolbar.items mutableCopy];
     [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
