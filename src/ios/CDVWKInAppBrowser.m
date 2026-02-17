@@ -1043,7 +1043,8 @@ BOOL isExiting = FALSE;
 - (void)navigateTo:(NSURL *)url
 {
     if ([url.scheme isEqualToString:@"file"]) {
-        [self.webView loadFileURL:url allowingReadAccessToURL:url];
+        NSURL* directoryURL = [url URLByDeletingLastPathComponent];
+        [self.webView loadFileURL:url allowingReadAccessToURL:directoryURL];
     } else {
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
         [self.webView loadRequest:request];
