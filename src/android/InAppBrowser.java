@@ -103,6 +103,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String MESSAGE_EVENT = "message";
     private static final String CLEAR_ALL_CACHE = "clearcache";
     private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
+    private static final String ENABLE_THIRD_PARTY_COOKIES = "enablethirdpartycookies";
     private static final String HARDWARE_BACK_BUTTON = "hardwareback";
     private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
@@ -122,7 +123,13 @@ public class InAppBrowser extends CordovaPlugin {
 
     private static final int TOOLBAR_HEIGHT = 48;
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(
+        CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+
+    // Resources
+    private static final String TOOLBAR_CLOSE_BUTTON = "ic_action_remove";
+    private static final String TOOLBAR_BACK_BUTTON = "ic_action_previous_item";
+    private static final String TOOLBAR_FORWARD_BUTTON = "ic_action_next_item";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -133,7 +140,8 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
-    private boolean hadwareBackButton = true;
+    private boolean enableThirdPartyCookies = true;
+    private boolean hardwareBackButton = true;
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
@@ -580,7 +588,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @return boolean
      */
     public boolean hardwareBack() {
-        return hadwareBackButton;
+        return hardwareBackButton;
     }
 
     /**
@@ -622,6 +630,15 @@ public class InAppBrowser extends CordovaPlugin {
     private InAppBrowser getInAppBrowser() {
         return this;
     }
+	
+    /**
+     * Get a drawable by name from the main package.
+     */
+    private Drawable getDrawableFromResources(String name){
+        Resources activityRes = cordova.getActivity().getResources();
+        int resId = activityRes.getIdentifier(name, "drawable", cordova.getActivity().getPackageName());
+        return activityRes.getDrawable(resId, cordova.getActivity().getTheme());
+    }
 
     /**
      * Display a new browser with the specified URL.
@@ -630,12 +647,6 @@ public class InAppBrowser extends CordovaPlugin {
      * @param features jsonObject
      */
     public String showWebPage(final String url, HashMap<String, String> features) {
-        // Determine if we should hide the location bar.
-        showLocationBar = true;
-        showZoomControls = true;
-        openWindowHidden = false;
-        mediaPlaybackRequiresUserGesture = false;
-
         if (features != null) {
             String show = features.get(LOCATION);
             if (show != null) {
@@ -657,9 +668,9 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
-                hadwareBackButton = hardwareBack.equals("yes") ? true : false;
+                hardwareBackButton = hardwareBack.equals("yes") ? true : false;
             } else {
-                hadwareBackButton = DEFAULT_HARDWARE_BACK;
+                hardwareBackButton = DEFAULT_HARDWARE_BACK;
             }
             String mediaPlayback = features.get(MEDIA_PLAYBACK_REQUIRES_USER_ACTION);
             if (mediaPlayback != null) {
@@ -673,6 +684,10 @@ public class InAppBrowser extends CordovaPlugin {
                 if (cache != null) {
                     clearSessionCache = cache.equals("yes") ? true : false;
                 }
+            }
+            String thirdPartyCookies = features.get(ENABLE_THIRD_PARTY_COOKIES);
+            if (thirdPartyCookies != null) {
+                enableThirdPartyCookies = thirdPartyCookies.equals("yes") ? true : false;
             }
             String shouldPause = features.get(SHOULD_PAUSE);
             if (shouldPause != null) {
@@ -752,8 +767,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 else {
                     ImageButton close = new ImageButton(cordova.getActivity());
-                    int closeResId = activityRes.getIdentifier("ic_action_remove", "drawable", cordova.getActivity().getPackageName());
-                    Drawable closeIcon = activityRes.getDrawable(closeResId);
+                    Drawable closeIcon = getDrawableFromResources(TOOLBAR_CLOSE_BUTTON);
                     if (closeButtonColor != "") close.setColorFilter(android.graphics.Color.parseColor(closeButtonColor));
                     close.setImageDrawable(closeIcon);
                     close.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -803,7 +817,7 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
-                //Please, no more black!
+                //"Please, no more black!" <- who said this?!? Black is awesome, especially on OLED! ^^
                 toolbar.setBackgroundColor(toolbarColor);
                 toolbar.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(TOOLBAR_HEIGHT)));
                 toolbar.setPadding(this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2), this.dpToPixels(2));
@@ -832,8 +846,7 @@ public class InAppBrowser extends CordovaPlugin {
                 back.setContentDescription("Back Button");
                 back.setId(Integer.valueOf(2));
                 Resources activityRes = cordova.getActivity().getResources();
-                int backResId = activityRes.getIdentifier("ic_action_previous_item", "drawable", cordova.getActivity().getPackageName());
-                Drawable backIcon = activityRes.getDrawable(backResId);
+                Drawable backIcon = getDrawableFromResources(TOOLBAR_BACK_BUTTON);
                 if (navigationButtonColor != "") back.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 back.setBackground(null);
                 back.setImageDrawable(backIcon);
@@ -854,8 +867,7 @@ public class InAppBrowser extends CordovaPlugin {
                 forward.setLayoutParams(forwardLayoutParams);
                 forward.setContentDescription("Forward Button");
                 forward.setId(Integer.valueOf(3));
-                int fwdResId = activityRes.getIdentifier("ic_action_next_item", "drawable", cordova.getActivity().getPackageName());
-                Drawable fwdIcon = activityRes.getDrawable(fwdResId);
+                Drawable fwdIcon = getDrawableFromResources(TOOLBAR_FORWARD_BUTTON);
                 if (navigationButtonColor != "") forward.setColorFilter(android.graphics.Color.parseColor(navigationButtonColor));
                 forward.setBackground(null);
                 forward.setImageDrawable(fwdIcon);
@@ -1019,7 +1031,7 @@ public class InAppBrowser extends CordovaPlugin {
                 }
 
                 // Enable Thirdparty Cookies
-                CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
+                CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView, enableThirdPartyCookies);
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.setId(Integer.valueOf(6));
