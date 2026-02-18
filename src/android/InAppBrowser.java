@@ -324,7 +324,7 @@ public class InAppBrowser extends CordovaPlugin {
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            callbackContext.sendPluginResult(pluginResult);
         }
         else if (action.equals("hide")) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -337,7 +337,7 @@ public class InAppBrowser extends CordovaPlugin {
             });
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
+            callbackContext.sendPluginResult(pluginResult);
         }
         else {
             return false;
@@ -1092,12 +1092,13 @@ public class InAppBrowser extends CordovaPlugin {
      * @param status the status code to return to the JavaScript environment
      */
     private void sendUpdate(JSONObject obj, boolean keepCallback, PluginResult.Status status) {
-        if (callbackContext != null) {
+        final CallbackContext localCallbackContext = callbackContext;
+        if (localCallbackContext != null) {
             PluginResult result = new PluginResult(status, obj);
             result.setKeepCallback(keepCallback);
-            callbackContext.sendPluginResult(result);
+            localCallbackContext.sendPluginResult(result);
             if (!keepCallback) {
-                callbackContext = null;
+                this.callbackContext = null;
             }
         }
     }
