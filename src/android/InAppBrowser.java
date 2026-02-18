@@ -19,8 +19,10 @@
 
 package org.apache.cordova.inappbrowser;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,6 +37,7 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -64,6 +67,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
+
+import org.apache.cordova.BuildHelper;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.Config;
 import org.apache.cordova.CordovaArgs;
@@ -71,16 +77,20 @@ import org.apache.cordova.CordovaHttpAuthHandler;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
+import org.apache.cordova.PermissionHelper;
 import org.apache.cordova.PluginManager;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -139,6 +149,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean useWideViewPort = true;
     private ValueCallback<Uri[]> mUploadCallback;
     private final static int FILECHOOSER_REQUESTCODE = 1;
+    private final static int FILECHOOSER_CAMERACODE = 2;
     private String closeButtonCaption = "";
     private String closeButtonColor = "";
     private boolean leftToRight = false;
@@ -153,6 +164,10 @@ public class InAppBrowser extends CordovaPlugin {
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
+    private static final int REQ_CAMERA_SEC = 1;
+    private String applicationId;
+    private File cameraCaptureFile;
+
     /**
      * Executes the request and returns PluginResult.
      *
@@ -162,6 +177,8 @@ public class InAppBrowser extends CordovaPlugin {
      * @return A PluginResult object with a status and message.
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+        this.applicationId = (String) BuildHelper.getBuildConfigValue(cordova.getActivity(), "APPLICATION_ID");
+        this.applicationId = preferences.getString("applicationId", this.applicationId);
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
@@ -932,13 +949,56 @@ public class InAppBrowser extends CordovaPlugin {
                         }
                         mUploadCallback = filePathCallback;
 
-                        // Create File Chooser Intent
-                        Intent content = new Intent(Intent.ACTION_GET_CONTENT);
-                        content.addCategory(Intent.CATEGORY_OPENABLE);
-                        content.setType("*/*");
+                        Boolean selectMultiple = false;
+                        if (fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE) {
+                            selectMultiple = true;
+                        }
+
+                        String[] acceptTypes = fileChooserParams.getAcceptTypes();
+                        Intent intent = fileChooserParams.createIntent();
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, selectMultiple);
+
+                        if (acceptTypes.length > 1) {
+                            intent.setType("*/*"); // Accept all, filter mime types by Intent.EXTRA_MIME_TYPES.
+                            intent.putExtra(Intent.EXTRA_MIME_TYPES, acceptTypes);
+                        }
+
+                        ArrayList<Intent> intentList = new ArrayList<Intent>();
+
+                        Intent cameraIntent = null;
+                        if (fileChooserParams.isCaptureEnabled()) {
+                            if (!PermissionHelper.hasPermission(InAppBrowser.this, Manifest.permission.CAMERA)) {
+                                PermissionHelper.requestPermission(InAppBrowser.this, REQ_CAMERA_SEC, Manifest.permission.CAMERA);
+                                return true;
+                            }
+                            cameraCaptureFile = createTempImageFile();
+                            if (cameraCaptureFile != null) {
+                                cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                                Uri intentOutputUri = FileProvider.getUriForFile(cordova.getActivity(), applicationId + ".provider", cameraCaptureFile);
+                                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, intentOutputUri);
+                                cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                            }
+                        }
+
+                        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, selectMultiple);
+
+                        intentList.add(galleryIntent);
+                        intentList.add(intent);
+
+                        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+                        chooserIntent.putExtra(Intent.EXTRA_INTENT, intent);
+                        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentList.toArray());
 
                         // Run cordova startActivityForResult
-                        cordova.startActivityForResult(InAppBrowser.this, Intent.createChooser(content, "Select File"), FILECHOOSER_REQUESTCODE);
+                        if (fileChooserParams.isCaptureEnabled() && cameraIntent != null) {
+                            cordova.startActivityForResult(InAppBrowser.this, cameraIntent, FILECHOOSER_CAMERACODE);
+                        } else {
+                            cordova.startActivityForResult(InAppBrowser.this, chooserIntent, FILECHOOSER_REQUESTCODE);
+                        }
+
                         return true;
                     }
                 });
@@ -999,7 +1059,7 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setUserAgentString(overrideUserAgent);
                 }
                 if (appendUserAgent != null) {
-                    settings.setUserAgentString(settings.getUserAgentString() + " " + appendUserAgent);
+                    settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
                 }
 
                 //Toggle whether this is enabled or not!
@@ -1102,6 +1162,25 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 
+    private File createTempImageFile() {
+        File fileDir = cordova.getActivity().getExternalCacheDir();
+        File file;
+        try {
+            if (!fileDir.isDirectory() || !fileDir.exists())
+                fileDir.mkdir();
+        } catch (Exception e) {
+            return null;
+        }
+        try {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "camera_" + timeStamp;
+            file = new File(fileDir, imageFileName + ".jpg");
+        } catch (Exception e) {
+            return null;
+        }
+        return file;
+    }
+
     /**
      * Receive File Data from File Chooser
      *
@@ -1112,11 +1191,43 @@ public class InAppBrowser extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         LOG.d(LOG_TAG, "onActivityResult");
         // If RequestCode or Callback is Invalid
-        if(requestCode != FILECHOOSER_REQUESTCODE || mUploadCallback == null) {
+        if (mUploadCallback == null) {
             super.onActivityResult(requestCode, resultCode, intent);
             return;
         }
-        mUploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent));
+
+        switch (requestCode) {
+            case FILECHOOSER_REQUESTCODE:
+                Uri[] result = null;
+                if (intent.getClipData() != null) {
+                    // handle multiple-selected files
+                    final int numSelectedFiles = intent.getClipData().getItemCount();
+                    result = new Uri[numSelectedFiles];
+                    for (int i = 0; i < numSelectedFiles; i++) {
+                        result[i] = intent.getClipData().getItemAt(i).getUri();
+                        LOG.d(LOG_TAG, "Receive file chooser URL: " + result[i]);
+                    }
+                } else if (intent.getData() != null) {
+                    result = WebChromeClient.FileChooserParams.parseResult(resultCode, intent);
+                    LOG.d(LOG_TAG, "Receive file chooser URL: " + result);
+                }
+                mUploadCallback.onReceiveValue(result);
+                mUploadCallback = null;
+                break;
+            case FILECHOOSER_CAMERACODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    mUploadCallback.onReceiveValue(new Uri[]{Uri.fromFile(cameraCaptureFile)});
+                    cameraCaptureFile = null;
+                } else if (cameraCaptureFile != null) {
+                    if (cameraCaptureFile.exists()) {
+                        cameraCaptureFile.delete();
+                    }
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, intent);
+                return;
+        }
         mUploadCallback = null;
     }
 
