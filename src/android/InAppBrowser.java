@@ -61,6 +61,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -917,12 +918,23 @@ public class InAppBrowser extends CordovaPlugin {
                 View footerClose = createCloseButton(7);
                 footer.addView(footerClose);
 
+                // Progress of loading a page
+                ProgressBar progressBarLoadingPage = new ProgressBar(webView.getContext(), null, android.R.attr.progressBarStyleHorizontal);
+                progressBarLoadingPage.setLayoutParams((new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)));
+
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
+                inAppWebView.setBackgroundColor(Color.WHITE);
+                inAppWebView.addView(progressBarLoadingPage);
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
+                    public void onProgressChanged(WebView view, int progress)
+                    {
+                        progressBarLoadingPage.setProgress(progress);
+                        progressBarLoadingPage.setVisibility(progress == 100 ? ProgressBar.GONE : ProgressBar.VISIBLE);
+                    }
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
