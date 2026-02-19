@@ -21,8 +21,8 @@
 
 #if __has_include(<Cordova/CDVWebViewProcessPoolFactory.h>)
 /*
-  CDVWebViewProcessPoolFactory is deprecated since cordova-ios 8.0.0
-  and will be removed in a future release.
+    CDVWebViewProcessPoolFactory is deprecated since cordova-ios 8.0.0
+    and will be removed in a future release.
 */
 #import <Cordova/CDVWebViewProcessPoolFactory.h>
 #endif
