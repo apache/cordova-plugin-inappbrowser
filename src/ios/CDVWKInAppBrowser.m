@@ -652,11 +652,6 @@ BOOL isExiting = NO;
     return self;
 }
 
-- (void)dealloc
-{
-    // NOOP
-}
-
 - (void)createViews
 {
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included.
