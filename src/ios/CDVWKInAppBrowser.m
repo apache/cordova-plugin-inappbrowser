@@ -120,8 +120,11 @@
             if (@available(iOS 15.0, *)) {
                 // Since iOS 15 WKProcessPool is deprecated and has no effect
             } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 // Set for iOS 14 and below a new process pool
                 self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+#pragma clang diagnostic pop
             }
         }];
     }
@@ -849,7 +852,9 @@ BOOL isExiting = NO;
     // Setup horizontal constraints
     // WebView horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
+        // Left
         [self.webView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
+        // Right
         [self.webView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor]
     ]];
 
