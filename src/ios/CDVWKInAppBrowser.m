@@ -852,19 +852,25 @@ BOOL isExiting = NO;
     // Setup horizontal constraints
     // WebView horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
-        [self.webView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
-        [self.webView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor]
+        // Left
+        [self.webView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        // Right
+        [self.webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
 
     // Toolbar horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
+        // Left
         [self.toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        // Right
         [self.toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
 
     // Address label horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
+        // Left
         [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:5.0],
+        // Right
         [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-5.0]
     ]];
 
