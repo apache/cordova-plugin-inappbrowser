@@ -298,11 +298,20 @@
 
 - (void)openInSystem:(NSURL *)url
 {
-    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
-        if (!success) {
-            [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
-        }
-    }];
+    // Check if the URL can be opened
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        
+        // Use the new method to open the URL with completion handler
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+            if (!success) {
+                // Post a notification if the URL could not be opened
+                [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+            }
+        }];
+    } else {
+        // Post a notification if the URL can't be opened
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+    }
 }
 
 - (void)loadAfterBeforeload:(CDVInvokedUrlCommand *)command
