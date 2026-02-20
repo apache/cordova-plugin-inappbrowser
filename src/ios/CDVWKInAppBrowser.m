@@ -852,9 +852,7 @@ BOOL isExiting = NO;
     // Setup horizontal constraints
     // WebView horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
-        // Left
         [self.webView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor],
-        // Right
         [self.webView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor]
     ]];
 
