@@ -876,7 +876,6 @@ BOOL isExiting = NO;
 
     // Define vertical constraints, in order from top to bottom
     // The address label and toolbar are optional
-    UILayoutGuide *safeArea = self.view.safeAreaLayoutGuide;
     BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     BOOL toolbarVisible = _browserOptions.toolbar;
     BOOL addressLabelVisible = _browserOptions.location;
@@ -890,21 +889,21 @@ BOOL isExiting = NO;
         // Toolbar visible
         if (toolbarVisible) {
             // Toolbar top to safe area top
-            [self.toolbar.topAnchor constraintEqualToAnchor:safeArea.topAnchor].active = YES;
+            [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
             // Webview top to toolbar bottom
             [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
 
             // Toolbar not visible
         } else {
             // Webview top to safe area top
-            [self.webView.topAnchor constraintEqualToAnchor:safeArea.topAnchor].active = YES;
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
         }
 
         if (addressLabelVisible) {
             // Address label top to WebView bottom
             [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
             // Address label bottom to safe area bottom
-            [self.addressLabel.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor].active = YES;
+            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
 
             // Address label hidden
         } else {
@@ -915,7 +914,7 @@ BOOL isExiting = NO;
         // Toolbar can be at bottom
     } else {
         // WebView top to safe area top
-        [self.webView.topAnchor constraintEqualToAnchor:safeArea.topAnchor].active = YES;
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
 
         if (addressLabelVisible) {
             // WebView bottom to address label top
@@ -927,7 +926,7 @@ BOOL isExiting = NO;
 
                // Address label bottom to safe area bottom
             } else {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor].active = YES;
+                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
             }
 
             // Address label hidden
@@ -944,7 +943,7 @@ BOOL isExiting = NO;
 
         // Toolbar bottom to safe area bottom
         if (toolbarVisible) {
-            [self.toolbar.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor].active = YES;
+            [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
     }
 }
