@@ -161,8 +161,8 @@
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar atPosition:browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
-        int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption withColor:browserOptions.closebuttoncolor atIndex:closeButtonIndex];
+        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption
+                                                   withColor:browserOptions.closebuttoncolor];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -794,7 +794,12 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    // Init button with `initWithTitle` instead of `initWithBarButtonSystemItem`, which
+    // prevents contraint warnings in iOS 26 because the button wrapper width is 0
+    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
+                                                        style:UIBarButtonItemStyleDone
+                                                       target:self
+                                                       action:@selector(close)];
     self.closeButton.enabled = YES;
 
     UIBarButtonItem *flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -954,20 +959,11 @@ BOOL isExiting = NO;
     [self.webView setFrame:frame];
 }
 
-- (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString atIndex:(int)buttonIndex
+- (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString
 {
-    // The advantage of using UIBarButtonSystemItemDone is the system will localize it for you automatically
-    // but, if you want to set this yourself, knock yourself out. (We can't set the title for a system Done button, so we have to create a new one.)
-    self.closeButton = nil;
-    // Initialize with title if title is set, otherwise the title will be 'Done' localized.
-    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
-    self.closeButton.enabled = YES;
+    self.closeButton.title = title ? title : NSLocalizedString(@"Done", nil);
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default.
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
-
-    NSMutableArray *items = [self.toolbar.items mutableCopy];
-    [items replaceObjectAtIndex:buttonIndex withObject:self.closeButton];
-    [self.toolbar setItems:items];
 }
 
 - (void)showLocationBar:(BOOL)show
