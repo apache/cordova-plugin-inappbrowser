@@ -818,17 +818,26 @@ BOOL isExiting = NO;
         self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-    // Filter out Navigation Buttons if user requests so
+    // Add toolbar items
+    // Define the close button and flexible space button, they are reverted when lefttoright is set
+    NSArray *closeItems = _browserOptions.lefttoright ? @[flexibleSpaceButton, self.closeButton] : @[self.closeButton, flexibleSpaceButton];
+    // Navigation items are optional
+    NSArray *navigationItems = @[self.backButton, fixedSpaceButton, self.forwardButton];
+
+    // Add close items without navigation items
     if (_browserOptions.hidenavigationbuttons) {
-        if (_browserOptions.lefttoright) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
-        } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
-        }
-    } else if (_browserOptions.lefttoright) {
-        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        self.toolbar.items = closeItems;
+
+        // Add close items and navigation items
     } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        // left to right is set, first add navigation items, than close items
+        if (_browserOptions.lefttoright) {
+            self.toolbar.items = [navigationItems arrayByAddingObjectsFromArray:closeItems];
+
+            // Default order, first close items than navigation items
+        } else {
+            self.toolbar.items = [closeItems arrayByAddingObjectsFromArray:navigationItems];
+        }
     }
 
     self.webView.navigationDelegate = self;
