@@ -875,7 +875,7 @@ BOOL isExiting = NO;
     ]];
 
     // Define vertical constraints, in order from top to bottom
-    // The address label and toolbar are optional
+    // The Address label and Toolbar are optional
     BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     BOOL toolbarVisible = _browserOptions.toolbar;
     BOOL addressLabelVisible = _browserOptions.location;
@@ -884,65 +884,70 @@ BOOL isExiting = NO;
     [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
 
-    // Toolbar can be at top
-    if (toolbarIsAtTop) {
-        // Toolbar visible
-        if (toolbarVisible) {
+    // Constraints for different cases set by options when Toolbar and/or Address label is visible or not
+    //
+    // Case 1: Toolbar and Address label not visible
+    if (!toolbarVisible && !addressLabelVisible) {
+        // Webview top to safe area top
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+        // WebView bottom to bottom edge
+        [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    }
+
+    // Case 2: Toolbar visible, Address label not visible
+    if (toolbarVisible && !addressLabelVisible) {
+        // Toolbar is at top
+        if (toolbarIsAtTop) {
             // Toolbar top to safe area top
             [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // Webview top to toolbar bottom
+            // Webview top to Toolbar bottom
             [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
+            // WebView to bottom edge
+            [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 
-            // Toolbar not visible
+            // Toolbar is at bottom (default)
         } else {
-            // Webview top to safe area top
+            // WebView top to safe area top
             [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            // WebView bottom to Toolbar top
+            [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+            // Toolbar bottom to safe area bottom
+            [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
+    }
 
-        if (addressLabelVisible) {
+    // Case 3: Toolbar not visible, Address label visible
+    if (!toolbarVisible && addressLabelVisible) {
+        // Webview top to safe area top
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+        // Address label top to WebView bottom
+        [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
+        // Address label bottom to safe area bottom
+        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+    }
+
+    // Case 4: Toolbar visible and Address label visible
+    if (toolbarVisible && addressLabelVisible) {
+        // Toolbar is at top
+        if (toolbarIsAtTop) {
+            // Toolbar top to safe area top
+            [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            // Webview top to Toolbar bottom
+            [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
             // Address label top to WebView bottom
             [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
             // Address label bottom to safe area bottom
             [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
 
-            // Address label hidden
+            // Toolbar is at bottom (default)
         } else {
-            // WebView to view bottom
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        }
-
-        // Toolbar can be at bottom
-    } else {
-        // WebView top to safe area top
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-
-        if (addressLabelVisible) {
-            // WebView bottom to address label top
+            // WebView top to safe area top
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            // WebView bottom to Address label top
             [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor].active = YES;
-
-            // Address label bottom to toolbar top
-            if (toolbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-
-               // Address label bottom to safe area bottom
-            } else {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
-            }
-
-            // Address label hidden
-        } else {
-            // WebView bottom to toolbar top
-            if (toolbarVisible) {
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-
-                // WebView bottom to view bottom
-            } else {
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-            }
-        }
-
-        // Toolbar bottom to safe area bottom
-        if (toolbarVisible) {
+            // Address label bottom to Toolbar top
+            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+            // Toolbar bottom to safe area bottom
             [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
     }
