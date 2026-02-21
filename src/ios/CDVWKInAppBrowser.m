@@ -868,10 +868,10 @@ BOOL isExiting = NO;
 
     // Address label horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
-        // Left
-        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:5.0],
-        // Right
-        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-5.0]
+        // Left to safe area for propery layout on landscape
+        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:5.0],
+        // Right to safe area for propery layout on landscape
+        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-5.0]
     ]];
 
     // Define vertical constraints, in order from top to bottom
