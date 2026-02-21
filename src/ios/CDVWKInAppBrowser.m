@@ -161,8 +161,8 @@
     [self.inAppBrowserViewController showLocationBar:browserOptions.location];
     [self.inAppBrowserViewController showToolBar:browserOptions.toolbar atPosition:browserOptions.toolbarposition];
     if (browserOptions.closebuttoncaption != nil || browserOptions.closebuttoncolor != nil) {
-        int closeButtonIndex = browserOptions.lefttoright ? (browserOptions.hidenavigationbuttons ? 1 : 4) : 0;
-        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption withColor:browserOptions.closebuttoncolor atIndex:closeButtonIndex];
+        [self.inAppBrowserViewController setCloseButtonTitle:browserOptions.closebuttoncaption
+                                                   withColor:browserOptions.closebuttoncolor];
     }
     // Set Presentation Style
     UIModalPresentationStyle presentationStyle = UIModalPresentationFullScreen; // default
@@ -959,7 +959,7 @@ BOOL isExiting = NO;
     [self.webView setFrame:frame];
 }
 
-- (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString atIndex:(int)buttonIndex
+- (void)setCloseButtonTitle:(NSString *)title withColor:(NSString *)colorString
 {
     self.closeButton.title = title ? title : NSLocalizedString(@"Done", nil);
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default.
