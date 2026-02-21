@@ -794,6 +794,8 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
+    // Init button with `initWithTitle` instead of `initWithBarButtonSystemItem`, which
+    // prevents contraint warnings in iOS 26 because the button wrapper width is 0
     self.closeButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
                                                         style:UIBarButtonItemStyleDone
                                                        target:self
