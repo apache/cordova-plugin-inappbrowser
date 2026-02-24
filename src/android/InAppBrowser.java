@@ -119,6 +119,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String LAUNCH_NEW_TASK = "launchInNewTask";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
@@ -150,6 +151,7 @@ public class InAppBrowser extends CordovaPlugin {
     private String footerColor = "";
     private String beforeload = "";
     private boolean fullscreen = true;
+    private boolean launchInNewTask = false;
     private String[] allowedSchemes;
     private InAppBrowserClient currentClient;
 
@@ -242,7 +244,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // SYSTEM
                     else if (SYSTEM.equals(target)) {
                         LOG.d(LOG_TAG, "in system");
-                        result = openExternal(url);
+                        result = openExternal(url, features);
                     }
                     // BLANK - or anything else
                     else {
@@ -456,7 +458,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param url the url to load.
      * @return "" if ok, or error message.
      */
-    public String openExternal(String url) {
+    public String openExternal(String url, HashMap<String, String> features) {
         try {
             Intent intent = null;
             intent = new Intent(Intent.ACTION_VIEW);
@@ -469,6 +471,17 @@ public class InAppBrowser extends CordovaPlugin {
                 intent.setData(uri);
             }
             intent.putExtra(Browser.EXTRA_APPLICATION_ID, cordova.getActivity().getPackageName());
+
+            if (features != null) {
+                String launchNewTask = features.get(LAUNCH_NEW_TASK);
+                if (launchNewTask != null) {
+                    launchInNewTask = launchNewTask.equals("yes") ? true : false;
+                }
+            }
+
+            if (launchInNewTask) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
             // CB-10795: Avoid circular loops by preventing it from opening in the current app
             this.openExternalExcludeCurrentApp(intent);
             return "";
