@@ -728,8 +728,12 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    // Toolbar init without frame
-    self.toolbar = [[UIToolbar alloc] init];
+    // Toolbar init with a symbolic frame
+    // On iOS 18 and older contraint warnings are logged when a zero frame is set and toolbar items
+    // are added.
+    // This a known iOS Bug, see: https://stackoverflow.com/questions/54284029/uitoolbar-with-uibarbuttonitem-layoutconstraint-issue
+    // To avoid this a symbolic frame is set, which have no impact, because auto layout is used
+    self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 100.0, 100.0)];
     self.toolbar.alpha = 1.000;
     self.toolbar.barStyle = UIBarStyleBlack;
     self.toolbar.clearsContextBeforeDrawing = NO;
