@@ -819,7 +819,7 @@ BOOL isExiting = NO;
     }
 
     // Add toolbar items
-    // Define the close button and flexible space button, they are reverted when lefttoright is set
+    // Define the close button and flexible space button, they are swapped when lefttoright is set
     NSArray *closeItems = _browserOptions.lefttoright ? @[flexibleSpaceButton, self.closeButton] : @[self.closeButton, flexibleSpaceButton];
     // Navigation items are optional
     NSArray *navigationItems = @[self.backButton, fixedSpaceButton, self.forwardButton];
