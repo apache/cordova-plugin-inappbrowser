@@ -794,6 +794,8 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
+    // On iOS 26 adding `UIBarButtonItem` with `initWithBarButtonSystemItem` gives constraint warnings here,
+    // which seems to be an UIKit bug. See: https://stackoverflow.com/questions/79767518/simple-toolbar-population-causes-auto-layout-conflict
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
 
