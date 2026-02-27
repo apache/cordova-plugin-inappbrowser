@@ -749,12 +749,23 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
 
+    // Background view for address label
+    self.addressBackgroundView = [[UIView alloc] init];
+    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
+    self.addressBackgroundView.layer.cornerRadius = 15.0;
+    // Don't draw any content that would be outside the view’s rectangular bounds
+    self.addressBackgroundView.clipsToBounds = YES;
+    [self.view addSubview:self.addressBackgroundView];
+    // We add our own constraints, they should not be determined from the frame.
+    self.addressBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    
     self.addressLabel = [[UILabel alloc] init];
     self.addressLabel.adjustsFontSizeToFitWidth = NO;
     self.addressLabel.alpha = 1.000;
     self.addressLabel.backgroundColor = [UIColor clearColor];
     self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
     self.addressLabel.clearsContextBeforeDrawing = YES;
+    // Don't draw any content that would be outside the view’s rectangular bounds
     self.addressLabel.clipsToBounds = YES;
     self.addressLabel.contentMode = UIViewContentModeScaleToFill;
     self.addressLabel.enabled = YES;
@@ -775,7 +786,7 @@ BOOL isExiting = NO;
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
     self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
     self.addressLabel.userInteractionEnabled = NO;
-    [self.view addSubview:self.addressLabel];
+    [self.addressBackgroundView addSubview:self.addressLabel];
     // We add our own constraints, they should not be determined from the frame.
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -875,12 +886,22 @@ BOOL isExiting = NO;
         [self.toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
 
-    // Address label horizontal constraints
+    // Address background horizontal constraints with margin
     [NSLayoutConstraint activateConstraints:@[
         // Left to safe area for proper layout on landscape
-        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor constant:5.0],
+        [self.addressBackgroundView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor
+                                                                 constant:15.0],
         // Right to safe area for proper layout on landscape
-        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor constant:-5.0]
+        [self.addressBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor
+                                                                  constant:-15.0]
+    ]];
+    
+    // Constrain Address label inside Address background view with padding
+    [NSLayoutConstraint activateConstraints:@[
+        [self.addressLabel.topAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor constant:10.0],
+        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.bottomAnchor constant:-10.0],
+        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.addressBackgroundView.leadingAnchor constant:10.0],
+        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.addressBackgroundView.trailingAnchor constant:-10.0]
     ]];
 
     // Define vertical constraints, in order from top to bottom
@@ -888,7 +909,8 @@ BOOL isExiting = NO;
     BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     BOOL toolbarVisible = _browserOptions.toolbar;
     BOOL addressLabelVisible = _browserOptions.location;
-
+    const CGFloat addressBackgroundTopBottomMargin = 12.0;
+    
     // Center spinner in WebView
     [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
@@ -929,10 +951,12 @@ BOOL isExiting = NO;
     if (!toolbarVisible && addressLabelVisible) {
         // Webview top to safe area top
         [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-        // Address label top to WebView bottom
-        [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
-        // Address label bottom to safe area bottom
-        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+        // Address background top to WebView bottom with margin
+        [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
+                                                             constant:addressBackgroundTopBottomMargin].active = YES;
+        // Address background bottom to safe area bottom with margin, margin must be negativ here
+        [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor
+                                                                constant:addressBackgroundTopBottomMargin *-1].active = YES;
     }
 
     // Case 4: Toolbar visible and Address label visible
@@ -943,19 +967,23 @@ BOOL isExiting = NO;
             [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
             // Webview top to Toolbar bottom
             [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
-            // Address label top to WebView bottom
-            [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
-            // Address label bottom to safe area bottom
-            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+            // Address background top to WebView bottom with margin
+            [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
+                                                                 constant:addressBackgroundTopBottomMargin].active = YES;
+            // Address background bottom to safe area bottom with margin, margin must be negativ here
+            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor
+                                                                    constant:addressBackgroundTopBottomMargin *-1].active = YES;
 
             // Toolbar is at bottom (default)
         } else {
             // WebView top to safe area top
             [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // WebView bottom to Address label top
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor].active = YES;
-            // Address label bottom to Toolbar top
-            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
+            // Address background top to WebView bottom with margin
+            [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
+                                                                 constant:addressBackgroundTopBottomMargin].active = YES;
+            // Address background bottom to Toolbar top with margin, margin must be negativ here
+            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor
+                                                                    constant:addressBackgroundTopBottomMargin *-1].active = YES;
             // Toolbar bottom to safe area bottom
             [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
@@ -986,7 +1014,7 @@ BOOL isExiting = NO;
 
 - (void)showLocationBar:(BOOL)show
 {
-    self.addressLabel.hidden = !show;
+    self.addressBackgroundView.hidden = !show;
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
