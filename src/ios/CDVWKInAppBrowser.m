@@ -897,8 +897,8 @@ BOOL isExiting = NO;
     //
     // Case 1: Toolbar and Address label not visible
     if (!toolbarVisible && !addressLabelVisible) {
-        // Webview top to safe area top
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+        // Webview top to top edge
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         // WebView bottom to bottom edge
         [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
     }
@@ -911,13 +911,13 @@ BOOL isExiting = NO;
             [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
             // Webview top to Toolbar bottom
             [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
-            // WebView to bottom edge
+            // WebView bottom to bottom edge
             [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 
             // Toolbar is at bottom (default)
         } else {
-            // WebView top to safe area top
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            // WebView top to top edge
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
             // WebView bottom to Toolbar top
             [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
             // Toolbar bottom to safe area bottom
@@ -927,8 +927,8 @@ BOOL isExiting = NO;
 
     // Case 3: Toolbar not visible, Address label visible
     if (!toolbarVisible && addressLabelVisible) {
-        // Webview top to safe area top
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+        // Webview top to top edge
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
         // Address label top to WebView bottom
         [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
         // Address label bottom to safe area bottom
@@ -950,8 +950,8 @@ BOOL isExiting = NO;
 
             // Toolbar is at bottom (default)
         } else {
-            // WebView top to safe area top
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            // WebView top to top edge
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
             // WebView bottom to Address label top
             [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor].active = YES;
             // Address label bottom to Toolbar top
