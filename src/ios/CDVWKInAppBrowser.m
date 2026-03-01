@@ -754,7 +754,7 @@ BOOL isExiting = NO;
 
     // Background view for address label
     self.addressBackgroundView = [[UIView alloc] init];
-    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.4];
+    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
     self.addressBackgroundView.layer.cornerRadius = 15.0;
     // Don't draw any content that would be outside the view’s rectangular bounds
     self.addressBackgroundView.clipsToBounds = YES;
