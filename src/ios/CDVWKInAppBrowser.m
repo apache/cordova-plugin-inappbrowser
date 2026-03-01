@@ -38,6 +38,9 @@
 
 #define    IAB_BRIDGE_NAME @"cordova_iab"
 
+// Common margin for sub views
+#define    MARGIN 12.0
+
 #pragma mark CDVWKInAppBrowser
 
 @implementation CDVWKInAppBrowser
@@ -751,7 +754,7 @@ BOOL isExiting = NO;
 
     // Background view for address label
     self.addressBackgroundView = [[UIView alloc] init];
-    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
+    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.4];
     self.addressBackgroundView.layer.cornerRadius = 15.0;
     // Don't draw any content that would be outside the view’s rectangular bounds
     self.addressBackgroundView.clipsToBounds = YES;
@@ -909,85 +912,110 @@ BOOL isExiting = NO;
     BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     BOOL toolbarVisible = _browserOptions.toolbar;
     BOOL addressLabelVisible = _browserOptions.location;
-    const CGFloat addressBackgroundTopBottomMargin = 12.0;
     
     // Center spinner in WebView
     [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
 
     // Constraints for different cases set by options when Toolbar and/or Address label is visible or not
-    //
-    // Case 1: Toolbar and Address label not visible
-    if (!toolbarVisible && !addressLabelVisible) {
-        // Webview top to top edge
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        // WebView bottom to bottom edge
-        [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-    }
+    // Constraint WebView fullscreen and overlay Toolbar and Address label on it
+    // Webview top to top edge
+    [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    // WebView bottom to bottom edge
+    [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 
-    // Case 2: Toolbar visible, Address label not visible
+    // Case 1: Toolbar visible, Address label not visible
     if (toolbarVisible && !addressLabelVisible) {
         // Toolbar is at top
         if (toolbarIsAtTop) {
             // Toolbar top to safe area top
             [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // Webview top to Toolbar bottom
-            [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
-            // WebView bottom to bottom edge
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 
             // Toolbar is at bottom (default)
         } else {
-            // WebView top to top edge
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-            // WebView bottom to Toolbar top
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
             // Toolbar bottom to safe area bottom
             [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
     }
 
-    // Case 3: Toolbar not visible, Address label visible
+    // Case 2: Toolbar not visible, Address label visible
     if (!toolbarVisible && addressLabelVisible) {
-        // Webview top to top edge
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        // Address background top to WebView bottom with margin
-        [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
-                                                             constant:addressBackgroundTopBottomMargin].active = YES;
-        // Address background bottom to safe area bottom with margin, margin must be negativ here
-        [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor
-                                                                constant:addressBackgroundTopBottomMargin *-1].active = YES;
+        // Address background bottom to safe area bottom
+        [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
     }
 
-    // Case 4: Toolbar visible and Address label visible
+    // Case 3: Toolbar visible and Address label visible
     if (toolbarVisible && addressLabelVisible) {
         // Toolbar is at top
         if (toolbarIsAtTop) {
             // Toolbar top to safe area top
             [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // Webview top to Toolbar bottom
-            [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
-            // Address background top to WebView bottom with margin
-            [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
-                                                                 constant:addressBackgroundTopBottomMargin].active = YES;
-            // Address background bottom to safe area bottom with margin, margin must be negativ here
-            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor
-                                                                    constant:addressBackgroundTopBottomMargin *-1].active = YES;
+            // Address background bottom to safe area bottom
+            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
 
             // Toolbar is at bottom (default)
         } else {
-            // WebView top to top edge
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-            // Address background top to WebView bottom with margin
-            [self.addressBackgroundView.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor
-                                                                 constant:addressBackgroundTopBottomMargin].active = YES;
             // Address background bottom to Toolbar top with margin, margin must be negativ here
             [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor
-                                                                    constant:addressBackgroundTopBottomMargin *-1].active = YES;
+                                                                    constant:MARGIN*-1].active = YES;
             // Toolbar bottom to safe area bottom
             [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
         }
     }
+}
+
+- (void)viewDidLayoutSubviews
+{
+    // Setting the WebView insets must be done after the sub views are layed out,
+    // so their size are properly set and can be used for the inset calculation
+    [self setWebViewInsets];
+}
+
+/**
+    Sets `contentInset` and `verticalScrollIndicatorInsets` of the WebView for the optional
+    overlayed Toolbar and Address Bar controlled by options,  so the content can always be scrolled in the visible area.
+ */
+- (void)setWebViewInsets
+{
+    // Toolbar and Address label are optional
+    BOOL toolbarVisible = _browserOptions.toolbar;
+    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL addressLabelVisible = _browserOptions.location;
+    // Height and width of Toolbar and Address Background, which is needed to calculate the inset of the WebView
+    const CGFloat toolbarHeight = self.toolbar.bounds.size.height;
+    const CGFloat addressBackgroundHeight = self.addressBackgroundView.bounds.size.height;
+    // Insets for the WebView, which gets calcualted
+    CGFloat topInset = 0.0;
+    CGFloat bottomInset = 0.0;
+    
+    if (toolbarVisible) {
+        // Toolbar is at top
+        if (toolbarIsAtTop) {
+            topInset = toolbarHeight;
+
+            // Toolbar is at bottom (default)
+        } else {
+            bottomInset = toolbarHeight;
+        }
+    }
+
+    if (addressLabelVisible) {
+        bottomInset += addressBackgroundHeight;
+        
+        // If the Toolbar is at bottom, the Address Background View is separated to the Toolbar with
+        // a margin, which must also be added to the inset
+        if (toolbarVisible && !toolbarIsAtTop) {
+            bottomInset += MARGIN;
+        }
+    }
+    
+    // Add additional margin to insets, so there is always room between the overlayed views
+    // and the web content, when the start or end is reached
+    if (topInset) topInset += MARGIN;
+    if (bottomInset) bottomInset += MARGIN;
+    
+    self.webView.scrollView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
+    self.webView.scrollView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
 }
 
 - (void)setWebViewFrame:(CGRect)frame
@@ -1145,7 +1173,6 @@ BOOL isExiting = NO;
     self.addressLabel.text = self.currentURL.absoluteString;
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
-    theWebView.scrollView.contentInset = UIEdgeInsetsZero;
     [self.spinner stopAnimating];
     [self.navigationDelegate didFinishNavigation:theWebView];
 }
