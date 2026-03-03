@@ -246,6 +246,14 @@
             if (!strongSelf->tmpWindow) {
                 if (@available(iOS 13.0, *)) {
                     UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
+                    if (!scene) {
+                        for (UIScene *s in [UIApplication sharedApplication].connectedScenes) {
+                            if (s.activationState == UISceneActivationStateForegroundActive && [s isKindOfClass:[UIWindowScene class]]) {
+                                scene = (UIWindowScene *)s;
+                                break;
+                            }
+                        }
+                    }
                     if (scene) {
                         strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
                     }
