@@ -926,7 +926,11 @@ BOOL isExiting = NO;
                 [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor
                                                                     constant:MARGIN],
                 // Toolbar top to background safe area top
-                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor]
+                // For landscape add a margin to top, so it's not glued to the top
+                // On portrait this only adds a subtle margin. To implement this clean, we would have to listen
+                // to the orientation change and would have to change the constant in the constraint
+                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor
+                                                       constant:MARGIN]
             ]];
             // Toolbar is at bottom (default)
         } else {
@@ -961,7 +965,11 @@ BOOL isExiting = NO;
                 [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor
                                                                     constant:MARGIN],
                 // Toolbar top to backround safe area top
-                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor],
+                // For landscape add margin to top, so it's not glued to the top
+                // On portrait this only adds a subtle margin. To implement this clean, we would have to listen
+                // to the orientation change and would have to change the constant in the constraint
+                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor
+                                                       constant:MARGIN],
                 // Address background bottom to safe area bottom
                 [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
             ]];
