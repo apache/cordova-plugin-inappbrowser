@@ -564,7 +564,7 @@
 
 - (void)didStartProvisionalNavigation:(WKWebView *)theWebView
 {
-    NSLog(@"didStartProvisionalNavigation");
+    // Do nothing here
 }
 
 - (void)didFinishNavigation:(WKWebView *)theWebView
@@ -730,71 +730,56 @@ BOOL isExiting = NO;
 
     // We add our own constraints, they should not be determined from the frame.
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    // Toolbar init without frame
-    self.toolbar = [[UIToolbar alloc] init];
-    self.toolbar.alpha = 1.000;
+    
+    self.toolbarBackground = [UIView new];
+    // We add our own constraints, they should not be determined from the frame.
+    self.toolbarBackground.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    // Get toolbar background color by options or set default which is white
+    UIColor *toolbarBackgroundColor = _browserOptions.toolbarcolor ? [self colorFromHexString:_browserOptions.toolbarcolor] : UIColor.whiteColor;
+    
+    // Make toolbar semi-transparent by options, default is YES
+    if (_browserOptions.toolbartranslucent) {
+        // On iOS 18 and older, use a semi-transparent color
+        toolbarBackgroundColor = [toolbarBackgroundColor colorWithAlphaComponent:0.6];
+    }
+    
+    self.toolbarBackground.backgroundColor = toolbarBackgroundColor;
+    [self.view addSubview:self.toolbarBackground];
+    
+    self.toolbar = [UIToolbar new];
+    // Remove default background for toolbar on iOS 18 and older, since we provide our own
+    // backround
+    // Remove background
+    [self.toolbar setBackgroundImage:[UIImage new]
+                  forToolbarPosition:UIToolbarPositionAny
+                          barMetrics:UIBarMetricsDefault];
+    // barStyle has to be set to UIBarStyleBlack, otherwhise there would be a gray line left,
+    // after the background was removed
     self.toolbar.barStyle = UIBarStyleBlack;
-    self.toolbar.clearsContextBeforeDrawing = NO;
-    self.toolbar.clipsToBounds = NO;
-    self.toolbar.contentMode = UIViewContentModeScaleToFill;
-    self.toolbar.hidden = NO;
-    self.toolbar.multipleTouchEnabled = NO;
-    self.toolbar.opaque = NO;
-    self.toolbar.userInteractionEnabled = YES;
-    if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
-        self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
-    }
-    if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
-        self.toolbar.translucent = NO;
-    }
-    [self.view addSubview:self.toolbar];
     // We add our own constraints, they should not be determined from the frame.
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-
+    [self.toolbarBackground addSubview:self.toolbar];
+    
     // Background view for address label
-    self.addressBackgroundView = [[UIView alloc] init];
-    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.2];
+    self.addressBackgroundView = [UIView new];
+    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.6];
     self.addressBackgroundView.layer.cornerRadius = 15.0;
-    // Don't draw any content that would be outside the view’s rectangular bounds
-    self.addressBackgroundView.clipsToBounds = YES;
-    [self.view addSubview:self.addressBackgroundView];
     // We add our own constraints, they should not be determined from the frame.
     self.addressBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.addressBackgroundView];
     
-    self.addressLabel = [[UILabel alloc] init];
-    self.addressLabel.adjustsFontSizeToFitWidth = NO;
-    self.addressLabel.alpha = 1.000;
-    self.addressLabel.backgroundColor = [UIColor clearColor];
-    self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-    self.addressLabel.clearsContextBeforeDrawing = YES;
-    // Don't draw any content that would be outside the view’s rectangular bounds
-    self.addressLabel.clipsToBounds = YES;
-    self.addressLabel.contentMode = UIViewContentModeScaleToFill;
-    self.addressLabel.enabled = YES;
-    self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-
-    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
-        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
-    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
-        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
-    }
-
-    self.addressLabel.multipleTouchEnabled = NO;
-    self.addressLabel.numberOfLines = 1;
-    self.addressLabel.opaque = NO;
-    self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
+    self.addressLabel = [UILabel new];
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
+    self.addressLabel.textColor = UIColor.blackColor;
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
-    self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
-    self.addressLabel.userInteractionEnabled = NO;
-    [self.addressBackgroundView addSubview:self.addressLabel];
+    // Truncate at tail of line: "abcd..."
+    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     // We add our own constraints, they should not be determined from the frame.
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
+    [self.addressBackgroundView addSubview:self.addressLabel];
+    
     self.spinner = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
-    self.spinner.alpha = 1.000;
     self.spinner.clearsContextBeforeDrawing = NO;
     self.spinner.clipsToBounds = NO;
     self.spinner.contentMode = UIViewContentModeScaleToFill;
@@ -881,12 +866,18 @@ BOOL isExiting = NO;
         [self.webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
 
-    // Toolbar horizontal constraints
+    // Toolbar background horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
         // Left
-        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [self.toolbarBackground.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
         // Right
-        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+        [self.toolbarBackground.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+    ]];
+
+    // Constrain Toolbar inside Toolbar background view with padding
+    [NSLayoutConstraint activateConstraints:@[
+        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.toolbarBackground.leadingAnchor constant:10.0],
+        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.toolbarBackground.trailingAnchor constant:-10.0]
     ]];
 
     // Address background horizontal constraints with margin
@@ -898,7 +889,7 @@ BOOL isExiting = NO;
         [self.addressBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor
                                                                   constant:-15.0]
     ]];
-    
+
     // Constrain Address label inside Address background view with padding
     [NSLayoutConstraint activateConstraints:@[
         [self.addressLabel.topAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor constant:10.0],
@@ -928,38 +919,67 @@ BOOL isExiting = NO;
     if (toolbarVisible && !addressLabelVisible) {
         // Toolbar is at top
         if (toolbarIsAtTop) {
-            // Toolbar top to safe area top
-            [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-
+            [NSLayoutConstraint activateConstraints:@[
+                // Toolbar background top to top edge
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Toolbar background bottom to toolbar bottom with margin
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor
+                                                                    constant:MARGIN],
+                // Toolbar top to background safe area top
+                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor]
+            ]];
             // Toolbar is at bottom (default)
         } else {
-            // Toolbar bottom to safe area bottom
-            [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+            [NSLayoutConstraint activateConstraints:@[
+                // Toolbar background top to toolbar top with margin, margin must be negative here
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.toolbar.topAnchor
+                                                                 constant:MARGIN*-1],
+                // Toolbar background bottom to bottom edge
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+                // Toolbar bottom to background safe area bottom
+                [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.bottomAnchor]
+            ]];
         }
     }
 
-    // Case 2: Toolbar not visible, Address label visible
+    // Case 2: Toolbar not visible, Address label visible (default)
     if (!toolbarVisible && addressLabelVisible) {
-        // Address background bottom to safe area bottom
-        [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+        [NSLayoutConstraint activateConstraints:@[
+            // Address background bottom to safe area bottom
+            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+        ]];
     }
 
     // Case 3: Toolbar visible and Address label visible
     if (toolbarVisible && addressLabelVisible) {
         // Toolbar is at top
         if (toolbarIsAtTop) {
-            // Toolbar top to safe area top
-            [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // Address background bottom to safe area bottom
-            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+            [NSLayoutConstraint activateConstraints:@[
+                // Toolbar background top to top edge
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Toolbar background bottom to Toolbar bottom with margin
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor
+                                                                    constant:MARGIN],
+                // Toolbar top to backround safe area top
+                [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor],
+                // Address background bottom to safe area bottom
+                [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+            ]];
 
             // Toolbar is at bottom (default)
         } else {
-            // Address background bottom to Toolbar top with margin, margin must be negativ here
-            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor
-                                                                    constant:MARGIN*-1].active = YES;
-            // Toolbar bottom to safe area bottom
-            [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+            [NSLayoutConstraint activateConstraints:@[
+                // Address background bottom to Toolbar Background top with margin, margin must be negative here
+                [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.topAnchor
+                                                                        constant:MARGIN*-1],
+                // Toolbar background top to Toolbar top with margin, margin must be negative here
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.toolbar.topAnchor
+                                                                 constant:MARGIN*-1],
+                // Toolbar background bottom to bottom edge
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+                // Toolbar bottom to background safe area bottom
+                [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.bottomAnchor]
+            ]];
         }
     }
 }
@@ -982,38 +1002,34 @@ BOOL isExiting = NO;
     BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
     BOOL addressLabelVisible = _browserOptions.location;
     // Height and width of Toolbar and Address Background, which is needed to calculate the inset of the WebView
-    const CGFloat toolbarHeight = self.toolbar.bounds.size.height;
+    const CGFloat toolbarBackgroundHeight = self.toolbarBackground.bounds.size.height;
     const CGFloat addressBackgroundHeight = self.addressBackgroundView.bounds.size.height;
     // Insets for the WebView, which gets calcualted
     CGFloat topInset = 0.0;
     CGFloat bottomInset = 0.0;
-    
+
     if (toolbarVisible) {
         // Toolbar is at top
         if (toolbarIsAtTop) {
-            topInset = toolbarHeight;
+            topInset = toolbarBackgroundHeight - self.view.safeAreaInsets.top;
 
             // Toolbar is at bottom (default)
         } else {
-            bottomInset = toolbarHeight;
+            bottomInset = toolbarBackgroundHeight - self.view.safeAreaInsets.bottom;
         }
     }
 
     if (addressLabelVisible) {
-        bottomInset += addressBackgroundHeight;
-        
-        // If the Toolbar is at bottom, the Address Background View is separated to the Toolbar with
-        // a margin, which must also be added to the inset
+        // The scroll inset should have a margin to the address bar
+        bottomInset += addressBackgroundHeight + MARGIN;
+
+        // Add the margin between address bar and toolbar if toolbar is at bottom and visible
         if (toolbarVisible && !toolbarIsAtTop) {
             bottomInset += MARGIN;
         }
     }
-    
-    // Add additional margin to insets, so there is always room between the overlayed views
-    // and the web content, when the start or end is reached
-    if (topInset) topInset += MARGIN;
-    if (bottomInset) bottomInset += MARGIN;
-    
+
+    // Set insets to webview
     self.webView.scrollView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
     self.webView.scrollView.verticalScrollIndicatorInsets = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
 }
@@ -1049,7 +1065,7 @@ BOOL isExiting = NO;
 
 - (void)showToolBar:(BOOL)show atPosition:(NSString *)toolbarPosition
 {
-    self.toolbar.hidden = !show;
+    self.toolbarBackground.hidden = !show;
     _browserOptions.toolbarposition = toolbarPosition; // Keep state consistent if needed
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
@@ -1144,6 +1160,7 @@ BOOL isExiting = NO;
 
 - (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
+    NSLog(@"didStartProvisionalNavigation");
     // Loading URL, start spinner, update back/forward
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
@@ -1153,7 +1170,9 @@ BOOL isExiting = NO;
     return [self.navigationDelegate didStartProvisionalNavigation:theWebView];
 }
 
-- (void)webView:(WKWebView *)theWebView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+- (void)webView:(WKWebView *)theWebView
+decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
+decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     NSURL *url = navigationAction.request.URL;
     NSURL *mainDocumentURL = navigationAction.request.mainDocumentURL;
@@ -1169,6 +1188,7 @@ BOOL isExiting = NO;
 
 - (void)webView:(WKWebView *)theWebView didFinishNavigation:(WKNavigation *)navigation
 {
+    NSLog(@"didFinishNavigation");
     // Update URL, stop spinner, update back/forward
     self.addressLabel.text = self.currentURL.absoluteString;
     self.backButton.enabled = theWebView.canGoBack;
