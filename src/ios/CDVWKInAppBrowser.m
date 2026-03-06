@@ -856,7 +856,10 @@ BOOL isExiting = NO;
     self.webView.allowsBackForwardNavigationGestures = NO;
 
     // Setup Auto Layout constraints
-    //
+    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarVisible = _browserOptions.toolbar;
+    BOOL addressLabelVisible = _browserOptions.location;
+
     // Setup horizontal constraints
     // WebView horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
@@ -873,13 +876,28 @@ BOOL isExiting = NO;
         // Right
         [self.toolbarBackground.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
-
+    
     // Constrain Toolbar inside Toolbar background view with margin
+    // On iOS 26 add a margin to separate the buttons from the background view
+    CGFloat toolbarTopMargin = 0.0;
+    CGFloat toolbarBottomMargin = 0.0;
+
+    if (@available(iOS 26.0, *)) {
+        // Add always a top margin, also when the toolbar is at top, so a margin is applied
+        // when the device turns to landscape
+        toolbarTopMargin = MARGIN;
+
+        // Add a bottom margin only when the toolbar is at top
+        if (toolbarIsAtTop) {
+            toolbarBottomMargin = MARGIN;
+        }
+    }
+
     [NSLayoutConstraint activateConstraints:@[
         [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor
-                                               constant:MARGIN],
+                                               constant:toolbarTopMargin],
         [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.bottomAnchor
-                                                  constant:MARGIN*-1],
+                                                  constant:toolbarBottomMargin*-1],
         [self.toolbar.leadingAnchor constraintEqualToAnchor:self.toolbarBackground.leadingAnchor constant:MARGIN],
         [self.toolbar.trailingAnchor constraintEqualToAnchor:self.toolbarBackground.trailingAnchor constant:MARGIN*-1]
     ]];
@@ -905,16 +923,12 @@ BOOL isExiting = NO;
                                                          constant:MARGIN*.1]
     ]];
 
-    // Define vertical constraints, in order from top to bottom
-    // The Address label and Toolbar are optional
-    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    BOOL toolbarVisible = _browserOptions.toolbar;
-    BOOL addressLabelVisible = _browserOptions.location;
-    
     // Center spinner in WebView
     [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
 
+    // Define vertical constraints, in order from top to bottom
+    // The Address label and Toolbar are optional
     // Constraints for different cases set by options when Toolbar and/or Address label is visible or not
     //
     // Case 1: Toolbar and Address label not visible
