@@ -745,15 +745,19 @@ BOOL isExiting = NO;
     [self.view addSubview:self.toolbarBackground];
     
     self.toolbar = [UIToolbar new];
-    // Remove default background for toolbar on iOS 18 and older, since we provide our own
-    // backround
-    // Remove background
-    [self.toolbar setBackgroundImage:[UIImage new]
-                  forToolbarPosition:UIToolbarPositionAny
-                          barMetrics:UIBarMetricsDefault];
-    // barStyle has to be set to UIBarStyleBlack, otherwhise there would be a gray line left,
-    // after the background was removed
-    self.toolbar.barStyle = UIBarStyleBlack;
+    // Remove the toolbar background on iOS 18 and older
+    if (@available(iOS 26.0, *)) {
+        // Don't do anything on iOS 26 and newer, there is no background by default
+    } else {
+        // iOS 18 and older: Remove default background, since we provide our own backround
+        // Remove background
+        [self.toolbar setBackgroundImage:[UIImage new]
+                      forToolbarPosition:UIToolbarPositionAny
+                              barMetrics:UIBarMetricsDefault];
+        // barStyle has to be set to UIBarStyleBlack, otherwhise there would be a gray line left,
+        // after the background was removed
+        self.toolbar.barStyle = UIBarStyleBlack;
+    }
     // We add our own constraints, they should not be determined from the frame.
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.toolbarBackground addSubview:self.toolbar];
