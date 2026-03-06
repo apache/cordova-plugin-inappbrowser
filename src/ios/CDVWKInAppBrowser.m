@@ -38,9 +38,6 @@
 
 #define    IAB_BRIDGE_NAME @"cordova_iab"
 
-// Common margin for sub views
-#define    MARGIN 12.0
-
 #pragma mark CDVWKInAppBrowser
 
 @implementation CDVWKInAppBrowser
@@ -878,49 +875,27 @@ BOOL isExiting = NO;
     ]];
     
     // Constrain Toolbar inside Toolbar background view with margin
-    // On iOS 26 add a margin to separate the buttons from the background view
-    CGFloat toolbarTopMargin = 0.0;
-    CGFloat toolbarBottomMargin = 0.0;
-
-    if (@available(iOS 26.0, *)) {
-        // Add always a top margin, also when the toolbar is at top, so a margin is applied
-        // when the device turns to landscape
-        toolbarTopMargin = MARGIN;
-
-        // Add a bottom margin only when the toolbar is at top
-        if (toolbarIsAtTop) {
-            toolbarBottomMargin = MARGIN;
-        }
-    }
-
     [NSLayoutConstraint activateConstraints:@[
-        [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.topAnchor
-                                               constant:toolbarTopMargin],
-        [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.safeAreaLayoutGuide.bottomAnchor
-                                                  constant:toolbarBottomMargin*-1],
-        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.toolbarBackground.leadingAnchor constant:MARGIN],
-        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.toolbarBackground.trailingAnchor constant:MARGIN*-1]
+        [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.topAnchor],
+        [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.bottomAnchor],
+        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.leadingAnchor],
+        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.trailingAnchor]
     ]];
 
     // Address background horizontal constraints with margin
     [NSLayoutConstraint activateConstraints:@[
         // Left to safe area for proper layout on landscape
-        [self.addressBackgroundView.leadingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.leadingAnchor
-                                                                 constant:MARGIN],
+        [self.addressBackgroundView.leadingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.leadingAnchor],
         // Right to safe area for proper layout on landscape
-        [self.addressBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor
-                                                                  constant:MARGIN*-1]
+        [self.addressBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor]
     ]];
 
     // Constrain Address label inside Address background view with padding
     [NSLayoutConstraint activateConstraints:@[
-        [self.addressLabel.topAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor constant:MARGIN],
-        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.bottomAnchor
-                                                       constant:MARGIN*-1],
-        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.addressBackgroundView.leadingAnchor
-                                                        constant:MARGIN],
-        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.addressBackgroundView.trailingAnchor
-                                                         constant:MARGIN*.1]
+        [self.addressLabel.topAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.topAnchor],
+        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.bottomAnchor],
+        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.leadingAnchor],
+        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.trailingAnchor]
     ]];
 
     // Center spinner in WebView
@@ -969,9 +944,9 @@ BOOL isExiting = NO;
         [NSLayoutConstraint activateConstraints:@[
             // Webview top to top edge
             [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            // WebView bottom to Address background top with margin
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor
-                                                      constant:MARGIN*-1],
+            // Address background top to web view bottom with spacing
+            [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                 multiplier:1.0],
             // Address background bottom to safe area bottom
             [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
         ]];
@@ -986,9 +961,9 @@ BOOL isExiting = NO;
                 [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
                 // Webview top to Toolbar background bottom
                 [self.webView.topAnchor constraintEqualToAnchor:self.toolbarBackground.bottomAnchor],
-                // Webview bottom to Address background top with margin
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor
-                                                          constant:MARGIN*-1],
+                // Address background top to web view bottom with spacing
+                [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                     multiplier:1.0],
                 // Address background bottom to safe area bottom
                 [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
             ]];
@@ -998,12 +973,11 @@ BOOL isExiting = NO;
             [NSLayoutConstraint activateConstraints:@[
                 // WebView top to top edge
                 [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-                // WebView bottom to Address background top with margin
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.topAnchor
-                                                          constant:MARGIN*-1],
-                // Address background bottom to Toolbar Background top with margin
-                [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.topAnchor
-                                                                        constant:MARGIN*-1],
+                // Address background top to web view bottom with spacing
+                [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                     multiplier:1.0],
+                // Toolbar background top to address background bottom with spacing
+                [self.toolbarBackground.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.addressBackgroundView.bottomAnchor multiplier:1.0],
                 // Toolbar background bottom to bottom edge
                 [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
             ]];
