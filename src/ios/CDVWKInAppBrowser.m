@@ -245,20 +245,28 @@
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
                 if (@available(iOS 13.0, *)) {
-                    UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
-                    if (!scene) {
-                        for (UIScene *s in [UIApplication sharedApplication].connectedScenes) {
-                            if (s.activationState == UISceneActivationStateForegroundActive && [s isKindOfClass:[UIWindowScene class]]) {
-                                scene = (UIWindowScene *)s;
+                    UIWindowScene *windowScene = strongSelf.viewController.view.window.windowScene;
+                    // The main Cordova window's scene reference isn't always available at the time the InAppBrowser
+                    // creates its temporary UIWindow. Fallback to iterate through UIApplication.connectedScenes
+                    // to get an UIWindowScene.
+                    if (!windowScene) {
+                        for (UIScene *connectedScene in [UIApplication sharedApplication].connectedScenes) {
+                            if (connectedScene.activationState == UISceneActivationStateForegroundActive &&
+                                [connectedScene isKindOfClass:[UIWindowScene class]]) {
+                                windowScene = (UIWindowScene *)connectedScene;
                                 break;
                             }
                         }
                     }
-                    if (scene) {
-                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
+                    if (windowScene) {
+                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:windowScene];
                     }
                 }
 
+                // This code should only be executed on pre iOS 13.
+                // On scene-based iOS 13+ versions, initializing a window with initWithFrame:
+                // would produce a window with no scene association, which results that the
+                // window would never be displayed, which results in a white/blank screen.
                 if (!strongSelf->tmpWindow) {
                     CGRect frame = [[UIScreen mainScreen] bounds];
                     if (initHidden && osVersion < 11) {
