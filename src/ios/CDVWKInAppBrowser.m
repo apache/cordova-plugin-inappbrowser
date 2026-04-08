@@ -241,7 +241,6 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
                 if (@available(iOS 13.0, *)) {
@@ -269,9 +268,6 @@
                 // window would never be displayed, which results in a white/blank screen.
                 if (!strongSelf->tmpWindow) {
                     CGRect frame = [[UIScreen mainScreen] bounds];
-                    if (initHidden && osVersion < 11) {
-                        frame.origin.x = -10000;
-                    }
                     strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
                 }
             }
@@ -279,7 +275,7 @@
             [strongSelf->tmpWindow setRootViewController:tmpController];
             [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            if (!initHidden || osVersion < 11) {
+            if (!initHidden) {
                 [self->tmpWindow makeKeyAndVisible];
             }
             [tmpController presentViewController:nav animated:!noAnimate completion:nil];
