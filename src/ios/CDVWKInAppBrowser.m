@@ -811,7 +811,7 @@ BOOL isExiting = NO;
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
     // NOTE: On iOS 26 using `UIBarButtonItem initWithBarButtonSystemItem:` gives constraint warnings,
-    // which is a known UIKit bug. This cannot be fixed.
+    // which is a known UIKit bug.
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
 
