@@ -245,12 +245,28 @@
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
                 if (@available(iOS 13.0, *)) {
-                    UIWindowScene *scene = strongSelf.viewController.view.window.windowScene;
-                    if (scene) {
-                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:scene];
+                    UIWindowScene *windowScene = strongSelf.viewController.view.window.windowScene;
+                    // The main Cordova window's scene reference isn't always available at the time the InAppBrowser
+                    // creates its temporary UIWindow. Fallback to iterate through UIApplication.connectedScenes
+                    // to get an UIWindowScene.
+                    if (!windowScene) {
+                        for (UIScene *connectedScene in [UIApplication sharedApplication].connectedScenes) {
+                            if (connectedScene.activationState == UISceneActivationStateForegroundActive &&
+                                [connectedScene isKindOfClass:[UIWindowScene class]]) {
+                                windowScene = (UIWindowScene *)connectedScene;
+                                break;
+                            }
+                        }
+                    }
+                    if (windowScene) {
+                        strongSelf->tmpWindow = [[UIWindow alloc] initWithWindowScene:windowScene];
                     }
                 }
 
+                // This code should only be executed on pre iOS 13.
+                // On scene-based iOS 13+ versions, initializing a window with initWithFrame:
+                // would produce a window with no scene association, which results that the
+                // window would never be displayed, which results in a white/blank screen.
                 if (!strongSelf->tmpWindow) {
                     CGRect frame = [[UIScreen mainScreen] bounds];
                     if (initHidden && osVersion < 11) {
@@ -561,7 +577,7 @@
 
 - (void)didStartProvisionalNavigation:(WKWebView *)theWebView
 {
-    NSLog(@"didStartProvisionalNavigation");
+    // Do nothing here
 }
 
 - (void)didFinishNavigation:(WKWebView *)theWebView
@@ -727,60 +743,60 @@ BOOL isExiting = NO;
 
     // We add our own constraints, they should not be determined from the frame.
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    // Toolbar init without frame
-    self.toolbar = [[UIToolbar alloc] init];
-    self.toolbar.alpha = 1.000;
-    self.toolbar.barStyle = UIBarStyleBlack;
-    self.toolbar.clearsContextBeforeDrawing = NO;
-    self.toolbar.clipsToBounds = NO;
-    self.toolbar.contentMode = UIViewContentModeScaleToFill;
-    self.toolbar.hidden = NO;
-    self.toolbar.multipleTouchEnabled = NO;
-    self.toolbar.opaque = NO;
-    self.toolbar.userInteractionEnabled = YES;
-    if (_browserOptions.toolbarcolor != nil) { // Set toolbar color if user sets it in options
-        self.toolbar.barTintColor = [self colorFromHexString:_browserOptions.toolbarcolor];
+    
+    self.toolbarBackground = [UIView new];
+    // We add our own constraints, they should not be determined from the frame.
+    self.toolbarBackground.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    // Get toolbar background color by options or set default which is white
+    UIColor *toolbarBackgroundColor = _browserOptions.toolbarcolor ? [self colorFromHexString:_browserOptions.toolbarcolor] : UIColor.whiteColor;
+    
+    // Make toolbar semi-transparent by options, default is YES
+    if (_browserOptions.toolbartranslucent) {
+        // On iOS 18 and older, use a semi-transparent color
+        toolbarBackgroundColor = [toolbarBackgroundColor colorWithAlphaComponent:0.6];
     }
-    if (!_browserOptions.toolbartranslucent) { // Set toolbar translucent to no if user sets it in options
-        self.toolbar.translucent = NO;
+    
+    self.toolbarBackground.backgroundColor = toolbarBackgroundColor;
+    [self.view addSubview:self.toolbarBackground];
+    
+    self.toolbar = [UIToolbar new];
+    // Remove the toolbar background on iOS 18 and older
+    if (@available(iOS 26.0, *)) {
+        // Don't do anything on iOS 26 and newer, there is no background by default
+    } else {
+        // iOS 18 and older: Remove default background, since we provide our own backround
+        // Remove background
+        [self.toolbar setBackgroundImage:[UIImage new]
+                      forToolbarPosition:UIToolbarPositionAny
+                              barMetrics:UIBarMetricsDefault];
+        // barStyle has to be set to UIBarStyleBlack, otherwhise there would be a gray line left,
+        // after the background was removed
+        self.toolbar.barStyle = UIBarStyleBlack;
     }
-    [self.view addSubview:self.toolbar];
     // We add our own constraints, they should not be determined from the frame.
     self.toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-
-    self.addressLabel = [[UILabel alloc] init];
-    self.addressLabel.adjustsFontSizeToFitWidth = NO;
-    self.addressLabel.alpha = 1.000;
-    self.addressLabel.backgroundColor = [UIColor clearColor];
-    self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-    self.addressLabel.clearsContextBeforeDrawing = YES;
-    self.addressLabel.clipsToBounds = YES;
-    self.addressLabel.contentMode = UIViewContentModeScaleToFill;
-    self.addressLabel.enabled = YES;
-    self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-
-    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
-        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
-    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
-        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
-    }
-
-    self.addressLabel.multipleTouchEnabled = NO;
-    self.addressLabel.numberOfLines = 1;
-    self.addressLabel.opaque = NO;
-    self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
+    [self.toolbarBackground addSubview:self.toolbar];
+    
+    // Background view for address label
+    self.addressBackgroundView = [UIView new];
+    self.addressBackgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.6];
+    self.addressBackgroundView.layer.cornerRadius = 15.0;
+    // We add our own constraints, they should not be determined from the frame.
+    self.addressBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.addressBackgroundView];
+    
+    self.addressLabel = [UILabel new];
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
+    self.addressLabel.textColor = UIColor.blackColor;
     self.addressLabel.textAlignment = NSTextAlignmentLeft;
-    self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
-    self.addressLabel.userInteractionEnabled = NO;
-    [self.view addSubview:self.addressLabel];
+    // Truncate at tail of line: "abcd..."
+    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     // We add our own constraints, they should not be determined from the frame.
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
+    [self.addressBackgroundView addSubview:self.addressLabel];
+    
     self.spinner = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
-    self.spinner.alpha = 1.000;
     self.spinner.clearsContextBeforeDrawing = NO;
     self.spinner.clipsToBounds = NO;
     self.spinner.contentMode = UIViewContentModeScaleToFill;
@@ -820,17 +836,26 @@ BOOL isExiting = NO;
         self.backButton.tintColor = [self colorFromHexString:_browserOptions.navigationbuttoncolor];
     }
 
-    // Filter out Navigation Buttons if user requests so
+    // Add toolbar items
+    // Define the close button and flexible space button, they are swapped when lefttoright is set
+    NSArray *closeItems = _browserOptions.lefttoright ? @[flexibleSpaceButton, self.closeButton] : @[self.closeButton, flexibleSpaceButton];
+    // Navigation items are optional
+    NSArray *navigationItems = @[self.backButton, fixedSpaceButton, self.forwardButton];
+
+    // Add close items without navigation items
     if (_browserOptions.hidenavigationbuttons) {
-        if (_browserOptions.lefttoright) {
-            [self.toolbar setItems:@[flexibleSpaceButton, self.closeButton]];
-        } else {
-            [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton]];
-        }
-    } else if (_browserOptions.lefttoright) {
-        [self.toolbar setItems:@[self.backButton, fixedSpaceButton, self.forwardButton, flexibleSpaceButton, self.closeButton]];
+        self.toolbar.items = closeItems;
+
+        // Add close items and navigation items
     } else {
-        [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
+        // left to right is set, first add navigation items, than close items
+        if (_browserOptions.lefttoright) {
+            self.toolbar.items = [navigationItems arrayByAddingObjectsFromArray:closeItems];
+
+            // Default order, first close items than navigation items
+        } else {
+            self.toolbar.items = [closeItems arrayByAddingObjectsFromArray:navigationItems];
+        }
     }
 
     self.webView.navigationDelegate = self;
@@ -850,7 +875,10 @@ BOOL isExiting = NO;
     self.webView.allowsBackForwardNavigationGestures = NO;
 
     // Setup Auto Layout constraints
-    //
+    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
+    BOOL toolbarVisible = _browserOptions.toolbar;
+    BOOL addressLabelVisible = _browserOptions.location;
+
     // Setup horizontal constraints
     // WebView horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
@@ -860,92 +888,121 @@ BOOL isExiting = NO;
         [self.webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
 
-    // Toolbar horizontal constraints
+    // Toolbar background horizontal constraints
     [NSLayoutConstraint activateConstraints:@[
         // Left
-        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [self.toolbarBackground.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
         // Right
-        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
+        [self.toolbarBackground.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor]
     ]];
-
-    // Address label horizontal constraints
+    
+    // Constrain Toolbar inside Toolbar background view with margin
     [NSLayoutConstraint activateConstraints:@[
-        // Left
-        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:5.0],
-        // Right
-        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-5.0]
+        [self.toolbar.topAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.topAnchor],
+        [self.toolbar.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.bottomAnchor],
+        [self.toolbar.leadingAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.leadingAnchor],
+        [self.toolbar.trailingAnchor constraintEqualToAnchor:self.toolbarBackground.layoutMarginsGuide.trailingAnchor]
     ]];
 
-    // Define vertical constraints, in order from top to bottom
-    // The address label and toolbar are optional
-    BOOL toolbarIsAtTop = [_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    BOOL toolbarVisible = _browserOptions.toolbar;
-    BOOL addressLabelVisible = _browserOptions.location;
+    // Address background horizontal constraints with margin
+    [NSLayoutConstraint activateConstraints:@[
+        // Left to safe area for proper layout on landscape
+        [self.addressBackgroundView.leadingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.leadingAnchor],
+        // Right to safe area for proper layout on landscape
+        [self.addressBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.layoutMarginsGuide.trailingAnchor]
+    ]];
+
+    // Constrain Address label inside Address background view with padding
+    [NSLayoutConstraint activateConstraints:@[
+        [self.addressLabel.topAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.topAnchor],
+        [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.bottomAnchor],
+        [self.addressLabel.leadingAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.leadingAnchor],
+        [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.trailingAnchor]
+    ]];
 
     // Center spinner in WebView
     [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
 
-    // Toolbar can be at top
-    if (toolbarIsAtTop) {
-        // Toolbar visible
-        if (toolbarVisible) {
-            // Toolbar top to safe area top
-            [self.toolbar.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-            // Webview top to toolbar bottom
-            [self.webView.topAnchor constraintEqualToAnchor:self.toolbar.bottomAnchor].active = YES;
-
-            // Toolbar not visible
+    // Define vertical constraints, in order from top to bottom
+    // The Address label and Toolbar are optional
+    // Constraints for different cases set by options when Toolbar and/or Address label is visible or not
+    //
+    // Case 1: Toolbar and Address label not visible
+    if (!toolbarVisible && !addressLabelVisible) {
+        // Webview top to top edge
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+        // WebView bottom to bottom edge
+        [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    }
+    
+    // Case 2: Toolbar visible, Address label not visible
+    if (toolbarVisible && !addressLabelVisible) {
+        // Toolbar is at top
+        if (toolbarIsAtTop) {
+            [NSLayoutConstraint activateConstraints:@[
+                // Toolbar background top to top edge
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Webview top to Toolbar background bottom
+                [self.webView.topAnchor constraintEqualToAnchor:self.toolbarBackground.bottomAnchor],
+                // WebView bottom to bottom edge
+                [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+            ]];
+            // Toolbar is at bottom (default)
         } else {
-            // Webview top to safe area top
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
+            [NSLayoutConstraint activateConstraints:@[
+                // WebView top to top edge
+                [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // WebView bottom to Toolbar background top
+                [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.topAnchor],
+                // Toolbar background bottom to bottom edge
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            ]];
         }
+    }
 
-        if (addressLabelVisible) {
-            // Address label top to WebView bottom
-            [self.addressLabel.topAnchor constraintEqualToAnchor:self.webView.bottomAnchor].active = YES;
-            // Address label bottom to safe area bottom
-            [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+    // Case 3: Toolbar not visible, Address label visible
+    if (!toolbarVisible && addressLabelVisible) {
+        [NSLayoutConstraint activateConstraints:@[
+            // Webview top to top edge
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+            // Address background top to web view bottom with spacing
+            [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                 multiplier:1.0],
+            // Address background bottom to safe area bottom
+            [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+        ]];
+    }
 
-            // Address label hidden
+    // Case 4: Toolbar visible and Address label visible (default)
+    if (toolbarVisible && addressLabelVisible) {
+        // Toolbar is at top
+        if (toolbarIsAtTop) {
+            [NSLayoutConstraint activateConstraints:@[
+                // Toolbar background top to top edge
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Webview top to Toolbar background bottom
+                [self.webView.topAnchor constraintEqualToAnchor:self.toolbarBackground.bottomAnchor],
+                // Address background top to web view bottom with spacing
+                [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                     multiplier:1.0],
+                // Address background bottom to safe area bottom
+                [self.addressBackgroundView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor]
+            ]];
+
+            // Toolbar is at bottom (default)
         } else {
-            // WebView to view bottom
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        }
-
-        // Toolbar can be at bottom
-    } else {
-        // WebView top to safe area top
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
-
-        if (addressLabelVisible) {
-            // WebView bottom to address label top
-            [self.webView.bottomAnchor constraintEqualToAnchor:self.addressLabel.topAnchor].active = YES;
-
-            // Address label bottom to toolbar top
-            if (toolbarVisible) {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-
-               // Address label bottom to safe area bottom
-            } else {
-                [self.addressLabel.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
-            }
-
-            // Address label hidden
-        } else {
-            // WebView bottom to toolbar top
-            if (toolbarVisible) {
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbar.topAnchor].active = YES;
-
-                // WebView bottom to view bottom
-            } else {
-                [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-            }
-        }
-
-        // Toolbar bottom to safe area bottom
-        if (toolbarVisible) {
-            [self.toolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+            [NSLayoutConstraint activateConstraints:@[
+                // WebView top to top edge
+                [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Address background top to web view bottom with spacing
+                [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
+                                                                                     multiplier:1.0],
+                // Toolbar background top to address background bottom with spacing
+                [self.toolbarBackground.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.addressBackgroundView.bottomAnchor multiplier:1.0],
+                // Toolbar background bottom to bottom edge
+                [self.toolbarBackground.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            ]];
         }
     }
 }
@@ -974,14 +1031,14 @@ BOOL isExiting = NO;
 
 - (void)showLocationBar:(BOOL)show
 {
-    self.addressLabel.hidden = !show;
+    self.addressBackgroundView.hidden = !show;
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
 
 - (void)showToolBar:(BOOL)show atPosition:(NSString *)toolbarPosition
 {
-    self.toolbar.hidden = !show;
+    self.toolbarBackground.hidden = !show;
     _browserOptions.toolbarposition = toolbarPosition; // Keep state consistent if needed
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
@@ -1076,6 +1133,7 @@ BOOL isExiting = NO;
 
 - (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
+    NSLog(@"didStartProvisionalNavigation");
     // Loading URL, start spinner, update back/forward
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
@@ -1085,7 +1143,9 @@ BOOL isExiting = NO;
     return [self.navigationDelegate didStartProvisionalNavigation:theWebView];
 }
 
-- (void)webView:(WKWebView *)theWebView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
+- (void)webView:(WKWebView *)theWebView
+decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
+decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     NSURL *url = navigationAction.request.URL;
     NSURL *mainDocumentURL = navigationAction.request.mainDocumentURL;
@@ -1101,6 +1161,7 @@ BOOL isExiting = NO;
 
 - (void)webView:(WKWebView *)theWebView didFinishNavigation:(WKNavigation *)navigation
 {
+    NSLog(@"didFinishNavigation");
     // Update URL, stop spinner, update back/forward
     self.addressLabel.text = self.currentURL.absoluteString;
     self.backButton.enabled = theWebView.canGoBack;
