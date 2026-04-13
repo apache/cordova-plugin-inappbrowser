@@ -17,8 +17,29 @@
     under the License.
 */
 
-#import <UIKit/UINavigationController.h>
+const { defineConfig } = require('eslint/config');
+const nodeConfig = require('@cordova/eslint-config/node');
+const nodeTestConfig = require('@cordova/eslint-config/node-tests');
+const browserConfig = require('@cordova/eslint-config/browser-tests');
 
-@interface CDVInAppBrowserNavigationController : UINavigationController
-
-@end
+module.exports = defineConfig([
+    ...browserConfig.map(config => ({
+        ...config,
+        languageOptions: {
+            ...(config?.languageOptions || {}),
+            globals: {
+                ...(config.languageOptions?.globals || {}),
+                require: 'readonly',
+                module: 'readonly'
+            }
+        }
+    })),
+    ...nodeConfig.map(config => ({
+        files: ['eslint.config.js'],
+        ...config
+    })),
+    ...nodeTestConfig.map(config => ({
+        files: ['tests/**/*.js'],
+        ...config
+    }))
+]);

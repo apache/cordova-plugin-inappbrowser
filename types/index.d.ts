@@ -94,14 +94,16 @@ interface InAppBrowserEventListenerObject {
 }
 
 interface InAppBrowserEvent extends Event {
-    /** the eventname, either loadstart, loadstop, loaderror, or exit. */
+    /** the eventname, either `loadstart`, `loadstop`, `loaderror`, `exit`, `message`, or `customscheme`. */
     type: string;
     /** the URL that was loaded. */
     url: string;
-    /** the error code, only in the case of loaderror. */
-    code: number;
-    /** the error message, only in the case of loaderror. */
-    message: string;
+    /** the error code, only in the case of `loaderror`. */
+    code?: number;
+    /** the error message, only in the case of `loaderror`. */
+    message?: string;
+    /** the message contents, only in the case of `message`. A stringified JSON object. */
+    data?: string;
 }
 
 interface Cordova {
