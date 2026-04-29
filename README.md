@@ -221,102 +221,72 @@ The object returned from a call to `cordova.InAppBrowser.open` when the target i
 
 - __callback__: the function that executes when the event fires. The function is passed an `InAppBrowserEvent` object as a parameter.
 
-## Example
+### Example
 
 ```javascript
 
-var inAppBrowserRef;
-
 function showHelp(url) {
 
-    var target = "_blank";
+    let inAppBrowserRef = cordova.InAppBrowser.open(url, "_blank", "location=yes,hidden=yes,beforeload=yes");
 
-    var options = "location=yes,hidden=yes,beforeload=yes";
+    inAppBrowserRef.addEventListener('loadstart', (inAppBrowserEvent) => {
+        document.getElementById("status-message").textContent = "loading please wait ...";
+    });
 
-    inAppBrowserRef = cordova.InAppBrowser.open(url, target, options);
-
-    inAppBrowserRef.addEventListener('loadstart', loadStartCallBack);
-
-    inAppBrowserRef.addEventListener('loadstop', loadStopCallBack);
-
-    inAppBrowserRef.addEventListener('loaderror', loadErrorCallBack);
-
-    inAppBrowserRef.addEventListener('beforeload', beforeloadCallBack);
-
-    inAppBrowserRef.addEventListener('message', messageCallBack);
-}
-
-function loadStartCallBack() {
-
-    $('#status-message').text("loading please wait ...");
-
-}
-
-function loadStopCallBack() {
-
-    if (inAppBrowserRef != undefined) {
+    inAppBrowserRef.addEventListener('loadstop', (inAppBrowserEvent) => {
+        if (inAppBrowserRef == undefined) return;
 
         inAppBrowserRef.insertCSS({ code: "body{font-size: 25px;}" });
-
-        inAppBrowserRef.executeScript({ code: "\
-            var message = 'this is the message';\
-            var messageObj = {my_message: message};\
-            var stringifiedMessageObj = JSON.stringify(messageObj);\
-            webkit.messageHandlers.cordova_iab.postMessage(stringifiedMessageObj);"
+        inAppBrowserRef.executeScript({
+            code:
+            `
+                const message = 'this is the message';
+                const messageObj = {my_message: message};
+                const stringifiedMessageObj = JSON.stringify(messageObj);
+                webkit.messageHandlers.cordova_iab.postMessage(stringifiedMessageObj);
+            `
         });
 
-        $('#status-message').text("");
-
+        document.getElementById("status-message").textContent = "";
         inAppBrowserRef.show();
-    }
+    });
 
+    inAppBrowserRef.addEventListener('loaderror', (inAppBrowserEvent) => {
+        document.getElementById("status-message").textContent = "";
+
+        const scriptErrorMesssage = alert(
+            `Sorry we cannot open that page. Message from the server is : ${inAppBrowserEvent.message}`
+        );
+
+        inAppBrowserRef.executeScript(
+            { code: scriptErrorMesssage }, 
+            // callback
+            (params) => {
+                if (params[0] == null) {
+                    document.getElementById("status-message").textContent =
+                        `Sorry we couldn't open that page. Message from the server is : '${params.message}'`;
+                }
+            }
+        );
+
+        inAppBrowserRef.close();
+        inAppBrowserRef = undefined;
+    });
+
+    inAppBrowserRef.addEventListener('beforeload', (inAppBrowserEvent, callback) => {
+        if (inAppBrowserEvent.url.startsWith("http://www.example.com/")) {
+            // Load this URL in the inAppBrowser.
+            callback(inAppBrowserEvent.url);
+        } else {
+            // The callback is not invoked, so the page will not be loaded.
+            document.getElementById("status-message").textContent = "This browser only opens pages on http://www.example.com/";
+        }
+    });
+
+    inAppBrowserRef.addEventListener('message', (inAppBrowserEvent) => {
+       document.getElementById("status-message").textContent = `message received: ${inAppBrowserEvent.data.my_message}`;
+    });
 }
-
-function loadErrorCallBack(params) {
-
-    $('#status-message').text("");
-
-    var scriptErrorMesssage =
-       "alert('Sorry we cannot open that page. Message from the server is : "
-       + params.message + "');"
-
-    inAppBrowserRef.executeScript({ code: scriptErrorMesssage }, executeScriptCallBack);
-
-    inAppBrowserRef.close();
-
-    inAppBrowserRef = undefined;
-
-}
-
-function executeScriptCallBack(params) {
-
-    if (params[0] == null) {
-
-        $('#status-message').text(
-           "Sorry we couldn't open that page. Message from the server is : '"
-           + params.message + "'");
-    }
-
-}
-
-function beforeloadCallBack(params, callback) {
-
-    if (params.url.startsWith("http://www.example.com/")) {
-
-        // Load this URL in the inAppBrowser.
-        callback(params.url);
-    } else {
-
-        // The callback is not invoked, so the page will not be loaded.
-        $('#status-message').text("This browser only opens pages on http://www.example.com/");
-    }
-
-}
-
-function messageCallBack(params){
-    $('#status-message').text("message received: "+params.data.my_message);
-}
-
 ```
 
 ### Customscheme event Example
