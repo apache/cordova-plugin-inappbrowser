@@ -756,7 +756,10 @@ BOOL isExiting = NO;
     self.toolbarBackground.backgroundColor = toolbarBackgroundColor;
     [self.view addSubview:self.toolbarBackground];
     
-    self.toolbar = [UIToolbar new];
+    // NOTE: Initializing UIToolbar with initWithFrame: instead of `new` prevents
+    // constraint warnings on iOS 18 and older, which has no impact, since auto
+    // layout is used.
+    self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 100.0, 100.0)];
     // Remove the toolbar background on iOS 18 and older
     if (@available(iOS 26.0, *)) {
         // Don't do anything on iOS 26 and newer, there is no background by default
