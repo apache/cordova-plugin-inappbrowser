@@ -29,6 +29,7 @@ description: Open an in-app browser window.
 [![npm - Latest](https://img.shields.io/npm/v/cordova-plugin-inappbrowser/latest?label=Latest%20Release%20(npm))](https://npmjs.com/package/cordova-plugin-inappbrowser)
 [![GitHub](https://img.shields.io/github/package-json/v/apache/cordova-plugin-inappbrowser?label=Development%20(Git))](https://github.com/apache/cordova-plugin-inappbrowser)
 
+[![GitHub - Node Workflow](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ci.yml?query=branch%3Amaster)
 [![Android Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/android.yml)
 [![Chrome Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/chrome.yml)
 [![iOS Testsuite](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml/badge.svg)](https://github.com/apache/cordova-plugin-inappbrowser/actions/workflows/ios.yml)
