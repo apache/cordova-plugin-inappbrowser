@@ -15,4 +15,43 @@
 # specific language governing permissions and limitations
 # under the License.
 
-* text=auto eol=lf
+name: Node CI
+
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+
+      - uses: github/codeql-action/init@v4
+        with:
+          tools: linked
+          languages: javascript, actions
+          queries: security-and-quality
+          config: |
+            paths-ignore:
+              - node_modules
+
+      - name: Run npm install
+        run: npm ci
+        env:
+          CI: true
+
+      - uses: github/codeql-action/analyze@v4

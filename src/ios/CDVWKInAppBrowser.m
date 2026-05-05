@@ -243,7 +243,6 @@
     // Run later to avoid the "took a long time" log message.
     dispatch_async(dispatch_get_main_queue(), ^{
         if (weakSelf.inAppBrowserViewController != nil) {
-            float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (!strongSelf->tmpWindow) {
                 if (@available(iOS 13.0, *)) {
@@ -271,9 +270,6 @@
                 // window would never be displayed, which results in a white/blank screen.
                 if (!strongSelf->tmpWindow) {
                     CGRect frame = [[UIScreen mainScreen] bounds];
-                    if (initHidden && osVersion < 11) {
-                        frame.origin.x = -10000;
-                    }
                     strongSelf->tmpWindow = [[UIWindow alloc] initWithFrame:frame];
                 }
             }
@@ -281,7 +277,7 @@
             [strongSelf->tmpWindow setRootViewController:tmpController];
             [strongSelf->tmpWindow setWindowLevel:UIWindowLevelNormal];
 
-            if (!initHidden || osVersion < 11) {
+            if (!initHidden) {
                 [self->tmpWindow makeKeyAndVisible];
             }
             [tmpController presentViewController:nav animated:!noAnimate completion:nil];
@@ -762,7 +758,10 @@ BOOL isExiting = NO;
     self.toolbarBackground.backgroundColor = toolbarBackgroundColor;
     [self.view addSubview:self.toolbarBackground];
     
-    self.toolbar = [UIToolbar new];
+    // NOTE: Initializing UIToolbar with initWithFrame: instead of `new` prevents
+    // constraint warnings on iOS 18 and older, which has no impact, since auto
+    // layout is used.
+    self.toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 100.0, 100.0)];
     // Remove the toolbar background on iOS 18 and older
     if (@available(iOS 26.0, *)) {
         // Don't do anything on iOS 26 and newer, there is no background by default
@@ -812,6 +811,8 @@ BOOL isExiting = NO;
     // We add our own constraints, they should not be determined from the frame.
     self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
 
+    // NOTE: On iOS 26 using `UIBarButtonItem initWithBarButtonSystemItem:` gives constraint warnings,
+    // which is a known UIKit bug.
     self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:kCloseButtonSystemItem
                                                                      target:self
                                                                      action:@selector(close)];
