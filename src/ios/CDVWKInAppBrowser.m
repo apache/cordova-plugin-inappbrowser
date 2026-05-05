@@ -113,47 +113,8 @@
 - (void)openInInAppBrowser:(NSURL *)url withOptions:(NSString *)options
 {
     CDVInAppBrowserOptions *browserOptions = [CDVInAppBrowserOptions parseOptions:options];
-    WKWebsiteDataStore *dataStore = [WKWebsiteDataStore defaultDataStore];
 
-    if (browserOptions.cleardata) {
-        NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-        [dataStore removeDataOfTypes:[WKWebsiteDataStore allWebsiteDataTypes] modifiedSince:dateFrom completionHandler:^{
-            NSLog(@"Removed all WKWebView data");
-            if (@available(iOS 15.0, *)) {
-                // Since iOS 15 WKProcessPool is deprecated and has no effect
-            } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                // Set for iOS 14 and below a new process pool
-                self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
-#pragma clang diagnostic pop
-            }
-        }];
-    }
-
-    if (browserOptions.clearcache) {
-        // Deletes all cookies
-        WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
-        [cookieStore getAllCookies:^(NSArray *cookies) {
-            NSHTTPCookie *cookie;
-            for (cookie in cookies) {
-                [cookieStore deleteCookie:cookie completionHandler:nil];
-            }
-        }];
-    }
-
-    if (browserOptions.clearsessioncache) {
-        // Deletes session cookies
-        WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
-        [cookieStore getAllCookies:^(NSArray *cookies) {
-            NSHTTPCookie *cookie;
-            for (cookie in cookies) {
-                if (cookie.sessionOnly) {
-                    [cookieStore deleteCookie:cookie completionHandler:nil];
-                }
-            }
-        }];
-    }
+    [self clearWebsiteDataByOptions:browserOptions];
 
     if (self.inAppBrowserViewController == nil) {
         self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithBrowserOptions: browserOptions andSettings:self.commandDelegate.settings];
@@ -212,6 +173,49 @@
     [self.inAppBrowserViewController navigateTo:url];
     if (!browserOptions.hidden) {
         [self show:nil withNoAnimate:browserOptions.hidden];
+    }
+}
+
+/**
+ * Clears website data (cookies, cache, etc.) according to the specified options.
+ * This will clear the data on the Cordova WebView also.
+ *
+ * @param browserOptions The options specifying which types of data to clear.
+ */
+- (void)clearWebsiteDataByOptions:(CDVInAppBrowserOptions *)browserOptions
+{
+    // NOTE: [WKWebsiteDataStore defaultDataStore] will get the default data store of the app,
+    // which is shared between all WKWebViews, which means also the Cordova WebView
+    WKWebsiteDataStore *dataStore = [WKWebsiteDataStore defaultDataStore];
+
+    if (browserOptions.cleardata) {
+        [dataStore fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
+            [dataStore removeDataOfTypes:WKWebsiteDataStore.allWebsiteDataTypes forDataRecords:records completionHandler:^{
+                NSLog(@"Removed all WKWebView data");
+                // Create new WKProcessPool
+                if (@available(iOS 15.0, *)) {
+                    // Since iOS 15 WKProcessPool is deprecated and has no effect
+                } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                    // Set for iOS 14 and below a new process pool
+                    self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+#pragma clang diagnostic pop
+            }
+            }];
+        }];
+    }
+
+    // Deletes all cookies or session cookies
+    if (browserOptions.clearcache || browserOptions.clearsessioncache) {
+        WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
+        [cookieStore getAllCookies:^(NSArray *cookies) {
+            for (NSHTTPCookie *cookie in cookies) {
+                if (browserOptions.clearcache || (browserOptions.clearsessioncache && cookie.sessionOnly)) {
+                    [cookieStore deleteCookie:cookie completionHandler:nil];
+                }
+            }
+        }];
     }
 }
 

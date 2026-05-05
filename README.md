@@ -114,8 +114,8 @@ instance, or the system browser.
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __beforeload__: set to enable the `beforeload` event to modify which pages are actually loaded in the browser. Accepted values are `get` to intercept only GET requests, `post` to intercept on POST requests or `yes` to intercept both GET & POST requests. Note that POST requests are not currently supported and will be ignored (if you set `beforeload=post` it will raise an error).
-    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
+    - __clearcache__:  Set to `yes` to clear the shared browser's cookie cache of your app, which means also the one of the Cordova WebView, before the in-app browser is opened.
+    - __clearsessioncache__: Set to `yes` to clear the shared session cookies from the browser's cache of your app, which means also the one of the Cordova WebView, before the in-app browser is opened.
     - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
     - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
     close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
@@ -139,9 +139,9 @@ instance, or the system browser.
 
     - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
     - __beforeload__: set to enable the `beforeload` event to modify which pages are actually loaded in the browser. Accepted values are `get` to intercept only GET requests, `post` to intercept on POST requests or `yes` to intercept both GET & POST requests. Note that POST requests are not currently supported and will be ignored (if you set `beforeload=post` it will raise an error).
-    - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-    - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened. For WKWebView, requires iOS 11+ on target device.
-    - __cleardata__: set to `yes` to have the browser's entire local storage cleared (cookies, HTML5 local storage, IndexedDB, etc.) before the new window is opened
+    - __clearcache__: Set to `yes` to clear the browser's cookie cache of your app, which means also the one of the Cordova WebView, before the in-app browser is opened.
+    - __clearsessioncache__: Set to `yes` to clear the shared session cookies from the browser's  cache of your app, which means also the one of the Cordova WebView, before the in-app browser is opened.
+    - __cleardata__: Set to `yes` to clear the shared browser's entire local storage of your app, which means also the one of the Cordova WebView, like cookies, HTML5 local storage, IndexedDB, etc., before the in-app browser is opened.
     - __closebuttoncolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default __Done__ button's color. Only applicable if toolbar is not disabled.
     - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
     - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the the bounce of the WKWebView's UIScrollView.
