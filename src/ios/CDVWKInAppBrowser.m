@@ -76,26 +76,32 @@
 - (void)open:(CDVInvokedUrlCommand *)command
 {
     CDVPluginResult *pluginResult;
-
     NSString *url = [command argumentAtIndex:0];
     NSString *target = [command argumentAtIndex:1 withDefault:kInAppBrowserTargetSelf];
     NSString *options = [command argumentAtIndex:2 withDefault:@"" andClass:[NSString class]];
 
-    self.callbackId = command.callbackId;
-
     if (url != nil) {
-        NSURL *baseUrl = [self.webViewEngine URL];
-        NSURL *absoluteUrl = [[NSURL URLWithString:url relativeToURL:baseUrl] absoluteURL];
+        NSURL *absoluteUrl = [[NSURL URLWithString:url
+                                     relativeToURL:[self.webViewEngine URL]] absoluteURL];
 
         if ([self isSystemUrl:absoluteUrl]) {
             target = kInAppBrowserTargetSystem;
         }
 
+        // target=_self - Open in Cordova WebView
         if ([target isEqualToString:kInAppBrowserTargetSelf]) {
             [self openInCordovaWebView:absoluteUrl withOptions:options];
+            
+            // target=_system - Open external
         } else if ([target isEqualToString:kInAppBrowserTargetSystem]) {
             [self openInSystem:absoluteUrl];
-        } else { // _blank or anything else
+            
+            // target=_blank or anything else, open in in-app browser
+        } else {
+            // Only set the command callback id here
+            // Don't set or overwrite it when target _system or _self is called, cause this will
+            // not invoke an in-app browser instance
+            self.callbackId = command.callbackId;
             [self openInInAppBrowser:absoluteUrl withOptions:options];
         }
 
