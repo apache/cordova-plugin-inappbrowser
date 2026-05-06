@@ -465,8 +465,9 @@
 - (void)webView:(WKWebView *)theWebView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     NSURL *url = navigationAction.request.URL;
-    NSURL *mainDocumentURL = navigationAction.request.mainDocumentURL;
-    BOOL isTopLevelNavigation = [url isEqual:mainDocumentURL];
+    BOOL isTopLevelNavigation =
+        (navigationAction.targetFrame == nil) ||
+        navigationAction.targetFrame.isMainFrame;
     BOOL shouldStart = YES;
     BOOL useBeforeLoad = NO;
     NSString *httpMethod = navigationAction.request.HTTPMethod;
@@ -475,12 +476,11 @@
     if ([_beforeload isEqualToString:@"post"]) {
         // TODO: Handle POST requests by preserving POST data then remove this condition.
         errorMessage = @"beforeload doesn't yet support POST requests";
-    } else if (isTopLevelNavigation && (
-        [_beforeload isEqualToString:@"yes"]
-        || ([_beforeload isEqualToString:@"get"] && [httpMethod isEqualToString:@"GET"])
-        // TODO: Comment in when POST requests are handled.
-        // || ([_beforeload isEqualToString:@"post"] && [httpMethod isEqualToString:@"POST"])
-    )) {
+
+        // beforeload only on GET and when the appropriate option is set
+    } else if (isTopLevelNavigation
+               && [httpMethod isEqualToString:@"GET"]
+               && ([_beforeload isEqualToString:@"yes"] || [_beforeload isEqualToString:@"get"])) {
         useBeforeLoad = YES;
     }
 
@@ -1161,9 +1161,9 @@ decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction
 decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     NSURL *url = navigationAction.request.URL;
-    NSURL *mainDocumentURL = navigationAction.request.mainDocumentURL;
-
-    BOOL isTopLevelNavigation = [url isEqual:mainDocumentURL];
+    BOOL isTopLevelNavigation =
+        (navigationAction.targetFrame == nil) ||
+        navigationAction.targetFrame.isMainFrame;
 
     if (isTopLevelNavigation) {
         self.currentURL = url;
