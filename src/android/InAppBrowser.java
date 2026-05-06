@@ -35,6 +35,7 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -923,6 +924,46 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
+                    @Override
+                    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                        final WebView inAppWebView = view;
+                        final WebViewClient webViewClient = new WebViewClient() {
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                                String targetUrl = request.getUrl().toString();
+                                if ("about:blank".equals(targetUrl)) {
+                                    return false;
+                                }
+                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(targetUrl, request.getMethod())) {
+                                    return true;
+                                }
+                                inAppWebView.loadUrl(targetUrl);
+                                return true;
+                            }
+
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                if ("about:blank".equals(url)) {
+                                    return false;
+                                }
+                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(url, null)) {
+                                    return true;
+                                }
+                                inAppWebView.loadUrl(url);
+                                return true;
+                            }
+                        };
+
+                        final WebView newWebView = new WebView(view.getContext());
+                        newWebView.setWebViewClient(webViewClient);
+
+                        final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                        transport.setWebView(newWebView);
+                        resultMsg.sendToTarget();
+
+                        return true;
+                    }
+
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
@@ -1373,6 +1414,11 @@ public class InAppBrowser extends CordovaPlugin {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
+            // Re-arm beforeload after allowing the previously approved navigation.
+            if (beforeload != null && !beforeload.isEmpty()) {
+                this.waitForBeforeload = true;
+            }
+
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
 
@@ -1396,6 +1442,11 @@ public class InAppBrowser extends CordovaPlugin {
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
+
+            // Ensure future navigations can still trigger beforeload after an error.
+            if (beforeload != null && !beforeload.isEmpty()) {
+                this.waitForBeforeload = true;
+            }
 
             try {
                 JSONObject obj = new JSONObject();
