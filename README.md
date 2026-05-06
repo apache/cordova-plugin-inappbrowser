@@ -92,13 +92,13 @@ instance, or the system browser.
 
     var ref = cordova.InAppBrowser.open(url, target, options);
 
-- __ref__: Reference to the `InAppBrowser` window when the target is set to `'_blank'`. _(InAppBrowser)_
+- __ref__: Reference to the `InAppBrowser` window when the target is set to `'_blank'`. _(InAppBrowser)_ On Android, non-whitelisted URLs also fall back to the `InAppBrowser` when the target is set to `'_self'`.
 
 - __url__: The URL to load _(String)_. Call `encodeURI()` on this if the URL contains Unicode characters.
 
 - __target__: The target in which to load the URL, an optional parameter that defaults to `_self`. _(String)_
 
-    - `_self`: Opens in the Cordova WebView if the URL is in the white list, otherwise it opens in the `InAppBrowser`.
+    - `_self`: Opens in the Cordova WebView. On Android, non-whitelisted URLs fall back to the `InAppBrowser`. On iOS, the current implementation does not perform this fallback and navigation remains in the Cordova WebView (subject to `<allow-navigation>`).
     - `_blank`: Opens in the `InAppBrowser`.
     - `_system`: Opens in the system's web browser.
 
@@ -180,6 +180,8 @@ Since the introduction of iPadOS 13, iPads try to adapt their content mode / use
 ```
 
 The example above forces the user agent to contain `iPad`. The other option is to use the value `desktop` to turn the user agent to `Macintosh`.
+
+The current iOS implementation of `target='_self'` does not fall back to `InAppBrowser` for non-whitelisted URLs. If you need guaranteed `InAppBrowser` behavior on iOS, use `target='_blank'`.
 
 ### Browser Quirks
 
@@ -714,11 +716,13 @@ iab.open('https://whitelisted-url.com', 'random_string', 'location=no'); // load
 
 ### Urls that are not white-listed
 
+Platform note: `_self` differs by platform for non-whitelisted URLs. On Android it falls back to `InAppBrowser`. On iOS it stays in the Cordova WebView and is controlled by `<allow-navigation>`.
+
 ```
 var iab = cordova.InAppBrowser;
 
 iab.open('https://url-that-fails-whitelist.com');                  // loads in the InAppBrowser
-iab.open('https://url-that-fails-whitelist.com', '_self');         // loads in the InAppBrowser
+iab.open('https://url-that-fails-whitelist.com', '_self');         // Android: loads in the InAppBrowser, iOS: handled by Cordova WebView rules
 iab.open('https://url-that-fails-whitelist.com', '_system');       // loads in the system browser
 iab.open('https://url-that-fails-whitelist.com', '_blank');        // loads in the InAppBrowser
 iab.open('https://url-that-fails-whitelist.com', 'random_string'); // loads in the InAppBrowser
