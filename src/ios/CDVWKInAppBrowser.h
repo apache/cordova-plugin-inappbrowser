@@ -51,6 +51,7 @@ typedef NSDictionary CDVSettingsDictionary;
 - (void)show:(CDVInvokedUrlCommand *)command;
 - (void)hide:(CDVInvokedUrlCommand *)command;
 - (void)loadAfterBeforeload:(CDVInvokedUrlCommand *)command;
+- (BOOL)isBeforeloadEnabled;
 
 @end
 

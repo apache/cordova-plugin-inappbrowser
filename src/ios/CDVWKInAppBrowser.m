@@ -353,6 +353,11 @@
     [self.inAppBrowserViewController navigateTo:url];
 }
 
+- (BOOL)isBeforeloadEnabled
+{
+    return ![_beforeload isEqualToString:@""];
+}
+
 // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
 // provides a consistent method for injecting JavaScript code into the document.
 //
@@ -1186,11 +1191,28 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 
 - (void)webView:(WKWebView *)theWebView failedNavigation:(NSString *) delegateName withError:(nonnull NSError *)error
 {
-    // Log fail message, stop spinner, update back/forward
-    NSLog(@"webView:%@ - %ld: %@", delegateName, (long)error.code, [error localizedDescription]);
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
     [self.spinner stopAnimating];
+
+    BOOL isBeforeloadEnabled = self.navigationDelegate != nil && [self.navigationDelegate isBeforeloadEnabled];
+    
+    // When using beforeload, navigations are intentionally cancelled and restarted.
+    // This results in expected cancellation errors with code NSURLErrorCancelled or
+    // WebKitErrorDomain code 102. Suppress these expected cancellation errors so
+    // they do not trigger false loaderror events.
+    BOOL isExpectedCancellation =
+        isBeforeloadEnabled && (
+            (error.code == NSURLErrorCancelled) ||
+            ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
+        );
+
+    if (isExpectedCancellation) {
+        return;
+    }
+
+    // Populate error
+    NSLog(@"webView:%@ - %ld: %@", delegateName, (long)error.code, [error localizedDescription]);
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
     [self.navigationDelegate webView:theWebView didFailNavigation:error];
 }
