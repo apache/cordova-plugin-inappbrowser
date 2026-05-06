@@ -163,13 +163,17 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
-            this.callbackContext = callbackContext;
             final String url = args.getString(0);
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
                 t = SELF;
             }
             final String target = t;
+            // Keep the existing callback channel when opening _system from inside
+            // an active InAppBrowser instance (e.g. from beforeload handling).
+            if (!SYSTEM.equals(target)) {
+                this.callbackContext = callbackContext;
+            }
             final HashMap<String, String> features = parseFeature(args.optString(2));
 
             LOG.d(LOG_TAG, "target = " + target);
