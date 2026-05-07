@@ -651,11 +651,11 @@ public class InAppBrowser extends CordovaPlugin {
             }
             String zoom = features.get(ZOOM);
             if (zoom != null) {
-                enableZoom = zoom.equals("yes") ? true : false;
+                enableZoom = zoom.equals("yes");
             }
             String zoomcontrols = features.get(ZOOMCONTROLS);
             if (zoomcontrols != null) {
-                showZoomControls = zoomcontrols.equals("yes") ? true : false;
+                showZoomControls = zoomcontrols.equals("yes");
             }
             String hidden = features.get(HIDDEN);
             if (hidden != null) {
@@ -953,6 +953,9 @@ public class InAppBrowser extends CordovaPlugin {
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
                 settings.setJavaScriptCanOpenWindowsAutomatically(true);
+                // Enables built-in zoom mechanisms, which are on-screen zoom controls and pinch-to-zoom.
+                // The on-screen zoom controls have to be enabled/disabled separately after.
+                // The on-screen zoom controls are deprecated since Android API Level 26 (Android 8).
                 settings.setBuiltInZoomControls(enableZoom);
                 settings.setDisplayZoomControls(showZoomControls);
                 settings.setPluginState(android.webkit.WebSettings.PluginState.ON);
