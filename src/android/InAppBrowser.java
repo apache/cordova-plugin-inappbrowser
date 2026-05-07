@@ -130,7 +130,7 @@ public class InAppBrowser extends CordovaPlugin {
     private CallbackContext callbackContext;
     private boolean showLocationBar = true;
     private boolean enableZoom = true;
-    private boolean showZoomControls = false;
+    private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
@@ -634,7 +634,7 @@ public class InAppBrowser extends CordovaPlugin {
         // Determine if we should hide the location bar.
         showLocationBar = true;
         enableZoom = true;
-        showZoomControls = false;
+        showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
 
