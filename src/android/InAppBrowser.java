@@ -926,34 +926,48 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
                     @Override
                     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                        // New-window navigations (for example window.open or target=_blank)
+                        // are delivered here by WebView. We do not show a second visible
+                        // browser window; instead, we route that navigation back into the
+                        // current InAppBrowser WebView so existing lifecycle and beforeload
+                        // handling remain consistent.
                         final WebView inAppWebView = view;
                         final WebViewClient webViewClient = new WebViewClient() {
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                                String targetUrl = request.getUrl().toString();
-                                if ("about:blank".equals(targetUrl)) {
-                                    return false;
-                                }
-                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(targetUrl, request.getMethod())) {
-                                    return true;
-                                }
-                                inAppWebView.loadUrl(targetUrl);
-                                return true;
+                                return handleNewWindowUrl(request.getUrl().toString(), request.getMethod());
                             }
 
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                if ("about:blank".equals(url)) {
+                                return handleNewWindowUrl(url, null);
+                            }
+
+                            private boolean handleNewWindowUrl(String targetUrl, String method) {
+                                // WebView commonly initializes popup flows with about:blank.
+                                // Forwarding this placeholder URL into the main WebView can
+                                // replace the current page and break subsequent navigation,
+                                // so it must be ignored.
+                                if ("about:blank".equals(targetUrl)) {
                                     return false;
                                 }
-                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(url, null)) {
+
+                                // Reuse the main client so beforeload and scheme routing are
+                                // applied exactly like regular navigations.
+                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(targetUrl, method)) {
                                     return true;
                                 }
-                                inAppWebView.loadUrl(url);
+
+                                // If the main client did not consume the request, continue by
+                                // loading the URL in the currently visible InAppBrowser view.
+                                inAppWebView.loadUrl(targetUrl);
                                 return true;
                             }
                         };
 
+                        // Attach a temporary transport WebView required by the Android
+                        // onCreateWindow contract. Its client forwards navigation decisions
+                        // to the active InAppBrowser WebView/client above.
                         final WebView newWebView = new WebView(view.getContext());
                         newWebView.setWebViewClient(webViewClient);
 
