@@ -933,11 +933,19 @@ public class InAppBrowser extends CordovaPlugin {
                         // handling remain consistent.
                         final WebView inAppWebView = view;
                         final WebViewClient webViewClient = new WebViewClient() {
+                            /**
+                             * New (added in API 24)
+                             * For Android 7 and above.
+                             */
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                                 return handleNewWindowUrl(request.getUrl().toString(), request.getMethod());
                             }
 
+                            /**
+                             * Legacy (deprecated in API 24)
+                             * For Android 6 and below.
+                             */
                             @Override
                             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                                 return handleNewWindowUrl(url, null);
