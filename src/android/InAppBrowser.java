@@ -35,6 +35,7 @@ import android.net.http.SslError;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -930,6 +931,68 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
+                    @Override
+                    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                        // New-window navigations (for example window.open or target=_blank)
+                        // are delivered here by WebView. We do not show a second visible
+                        // browser window; instead, we route that navigation back into the
+                        // current InAppBrowser WebView so existing lifecycle and beforeload
+                        // handling remain consistent.
+                        final WebView inAppWebView = view;
+                        final WebViewClient webViewClient = new WebViewClient() {
+                            /**
+                             * New (added in API 24)
+                             * For Android 7 and above.
+                             */
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                                return handleNewWindowUrl(request.getUrl().toString(), request.getMethod());
+                            }
+
+                            /**
+                             * Legacy (deprecated in API 24)
+                             * For Android 6 and below.
+                             */
+                            @Override
+                            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                return handleNewWindowUrl(url, null);
+                            }
+
+                            private boolean handleNewWindowUrl(String targetUrl, String method) {
+                                // WebView commonly initializes popup flows with about:blank.
+                                // Forwarding this placeholder URL into the main WebView can
+                                // replace the current page and break subsequent navigation,
+                                // so it must be ignored.
+                                if ("about:blank".equals(targetUrl)) {
+                                    return false;
+                                }
+
+                                // Reuse the main client so beforeload and scheme routing are
+                                // applied exactly like regular navigations.
+                                if (currentClient != null && currentClient.shouldOverrideUrlLoading(targetUrl, method)) {
+                                    return true;
+                                }
+
+                                // If the main client did not consume the request, continue by
+                                // loading the URL in the currently visible InAppBrowser view.
+                                inAppWebView.loadUrl(targetUrl);
+                                return true;
+                            }
+                        };
+
+                        // Attach a temporary transport WebView required by the Android
+                        // onCreateWindow contract. Its client forwards navigation decisions
+                        // to the active InAppBrowser WebView/client above.
+                        final WebView newWebView = new WebView(view.getContext());
+                        newWebView.setWebViewClient(webViewClient);
+
+                        final WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                        transport.setWebView(newWebView);
+                        resultMsg.sendToTarget();
+
+                        return true;
+                    }
+
                     public boolean onShowFileChooser (WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams)
                     {
                         LOG.d(LOG_TAG, "File Chooser 5.0+");
@@ -1387,6 +1450,11 @@ public class InAppBrowser extends CordovaPlugin {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
+            // Re-arm beforeload after allowing the previously approved navigation.
+            if (beforeload != null && !beforeload.isEmpty()) {
+                this.waitForBeforeload = true;
+            }
+
             // Set the namespace for postMessage()
             injectDeferredObject("window.webkit={messageHandlers:{cordova_iab:cordova_iab}}", null);
 
@@ -1410,6 +1478,11 @@ public class InAppBrowser extends CordovaPlugin {
 
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
+
+            // Ensure future navigations can still trigger beforeload after an error.
+            if (beforeload != null && !beforeload.isEmpty()) {
+                this.waitForBeforeload = true;
+            }
 
             try {
                 JSONObject obj = new JSONObject();
