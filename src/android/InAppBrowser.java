@@ -169,11 +169,6 @@ public class InAppBrowser extends CordovaPlugin {
                 t = SELF;
             }
             final String target = t;
-            // Keep the existing callback channel when opening _system from inside
-            // an active InAppBrowser instance (e.g. from beforeload handling).
-            if (!SYSTEM.equals(target)) {
-                this.callbackContext = callbackContext;
-            }
             final HashMap<String, String> features = parseFeature(args.optString(2));
 
             LOG.d(LOG_TAG, "target = " + target);
@@ -240,6 +235,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in InAppBrowser
                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
+                            InAppBrowser.this.callbackContext = callbackContext;
                             result = showWebPage(url, features);
                         }
                     }
@@ -251,6 +247,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // BLANK - or anything else
                     else {
                         LOG.d(LOG_TAG, "in blank");
+                        InAppBrowser.this.callbackContext = callbackContext;
                         result = showWebPage(url, features);
                     }
 
