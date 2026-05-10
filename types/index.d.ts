@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Open Technologies Inc
 // Licensed under the MIT license.
 // TypeScript Version: 2.3
-type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme";
+type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme" | "beforeload";
 
 /**
  * The object returned from a call to cordova.InAppBrowser.open.
@@ -37,8 +37,19 @@ interface InAppBrowser {
      *                  exit: event fires when the InAppBrowser window is closed.
      * @param callback  the function that executes when the event fires. The function is
      *                  passed an InAppBrowserEvent object as a parameter.
+     *
+     * NOTE: beforeload is intentionally excluded here and modeled with a dedicated overload because the
+     * callback parameter is of a different type.
      */
-    addEventListener(type: channel, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    addEventListener(type: Exclude<channel, "beforeload">, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    /**
+     * Adds a listener for the beforeload event from the InAppBrowser.
+     * @param type      beforeload: event fires when the InAppBrowser decides whether to load a URL or not.
+     * @param callback  the function that executes when the event fires. The function is
+     *                  passed an InAppBrowserEvent object and a callback function that can be
+     *                  invoked to continue loading with a URL.
+     */
+    addEventListener(type: "beforeload", callback: InAppBrowserBeforeloadEventListener): void;
     /**
      * Adds a listener for an event from the InAppBrowser.
      * @param type      any custom event that might occur.
@@ -56,8 +67,17 @@ interface InAppBrowser {
      *                  exit: event fires when the InAppBrowser window is closed.
      * @param callback  the function that executes when the event fires. The function is
      *                  passed an InAppBrowserEvent object as a parameter.
+     *
+     * NOTE: beforeload is intentionally excluded here and modeled with a dedicated overload because the
+     * callback parameter is of a different type.
      */
-    removeEventListener(type: channel, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    removeEventListener(type: Exclude<channel, "beforeload">, callback: InAppBrowserEventListenerOrEventListenerObject): void;
+    /**
+     * Removes a listener for the beforeload event from the InAppBrowser.
+     * @param type      beforeload: event fires when the InAppBrowser decides whether to load a URL or not.
+     * @param callback  the function that executes when the event fires.
+     */
+    removeEventListener(type: "beforeload", callback: InAppBrowserBeforeloadEventListener): void;
     /** Closes the InAppBrowser window. */
     close(): void;
     /** Hides the InAppBrowser window. Calling this has no effect if the InAppBrowser was already hidden. */
@@ -89,12 +109,14 @@ type InAppBrowserEventListenerOrEventListenerObject = InAppBrowserEventListener 
 
 type InAppBrowserEventListener = (evt: InAppBrowserEvent) => void;
 
+type InAppBrowserBeforeloadEventListener = (evt: InAppBrowserEvent, callback: (url: string) => void) => void;
+
 interface InAppBrowserEventListenerObject {
     handleEvent(evt: InAppBrowserEvent): void;
 }
 
 interface InAppBrowserEvent extends Event {
-    /** the eventname, either `loadstart`, `loadstop`, `loaderror`, `exit`, `message`, or `customscheme`. */
+    /** the eventname, either `loadstart`, `loadstop`, `loaderror`, `exit`, `message`, `customscheme`, or `beforeload`. */
     type: string;
     /** the URL that was loaded. */
     url: string;
