@@ -743,6 +743,36 @@ public class InAppBrowser extends CordovaPlugin {
                 return value;
             }
 
+            /**
+             * Clears cookies according to the active options and invokes completion when finished.
+             *
+             * Cookie clearing APIs are asynchronous (API 22+), so loadUrl must run in the callback
+             * to avoid a race where navigation starts before cookie deletion is complete.
+             */
+            private void clearCookies(final Runnable completion) {
+                final CookieManager cookieManager = CookieManager.getInstance();
+
+                if (clearAllCache) {
+                    cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
+                        @Override
+                        public void onReceiveValue(Boolean value) {
+                            cookieManager.flush();
+                            completion.run();
+                        }
+                    });
+                } else if (clearSessionCache) {
+                    cookieManager.removeSessionCookies(new ValueCallback<Boolean>() {
+                        @Override
+                        public void onReceiveValue(Boolean value) {
+                            cookieManager.flush();
+                            completion.run();
+                        }
+                    });
+                } else {
+                    completion.run();
+                }
+            }
+
             private View createCloseButton(int id) {
                 View _close;
                 Resources activityRes = cordova.getActivity().getResources();
@@ -1026,16 +1056,16 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 settings.setDomStorageEnabled(true);
 
-                if (clearAllCache) {
-                    CookieManager.getInstance().removeAllCookie();
-                } else if (clearSessionCache) {
-                    CookieManager.getInstance().removeSessionCookie();
-                }
-
                 // Enable Thirdparty Cookies
                 CookieManager.getInstance().setAcceptThirdPartyCookies(inAppWebView,true);
 
-                inAppWebView.loadUrl(url);
+                // Delay navigation until cookie clearing is complete (or skipped).
+                clearCookies(new Runnable() {
+                    @Override
+                    public void run() {
+                        inAppWebView.loadUrl(url);
+                    }
+                });
                 inAppWebView.setId(Integer.valueOf(6));
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(useWideViewPort);

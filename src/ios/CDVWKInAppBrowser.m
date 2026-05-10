@@ -120,8 +120,6 @@
 {
     CDVInAppBrowserOptions *browserOptions = [CDVInAppBrowserOptions parseOptions:options];
 
-    [self clearWebsiteDataByOptions:browserOptions];
-
     if (self.inAppBrowserViewController == nil) {
         self.inAppBrowserViewController = [[CDVWKInAppBrowserViewController alloc] initWithBrowserOptions: browserOptions andSettings:self.commandDelegate.settings];
         self.inAppBrowserViewController.navigationDelegate = self;
@@ -176,10 +174,19 @@
     }
     _waitForBeforeload = ![_beforeload isEqualToString:@""];
 
-    [self.inAppBrowserViewController navigateTo:url];
-    if (!browserOptions.hidden) {
-        [self show:nil withNoAnimate:browserOptions.hidden];
-    }
+    __weak CDVWKInAppBrowser *weakSelf = self;
+    // Delay the initial navigation until requested clearing operations complete.
+    [self clearWebsiteDataByOptions:browserOptions completionHandler:^{
+        __strong __typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil || strongSelf.inAppBrowserViewController == nil) {
+            return;
+        }
+
+        [strongSelf.inAppBrowserViewController navigateTo:url];
+        if (!browserOptions.hidden) {
+            [strongSelf show:nil withNoAnimate:browserOptions.hidden];
+        }
+    }];
 }
 
 /**
@@ -187,42 +194,100 @@
  * This will clear the data on the Cordova WebView also.
  *
  * @param browserOptions The options specifying which types of data to clear.
+ * @param completionHandler Called after all requested clearing operations are complete.
  */
-- (void)clearWebsiteDataByOptions:(CDVInAppBrowserOptions *)browserOptions
+- (void)clearWebsiteDataByOptions:(CDVInAppBrowserOptions *)browserOptions completionHandler:(void (^)(void))completionHandler
 {
     // NOTE: [WKWebsiteDataStore defaultDataStore] will get the default data store of the app,
     // which is shared between all WKWebViews, which means also the Cordova WebView
     WKWebsiteDataStore *dataStore = [WKWebsiteDataStore defaultDataStore];
 
+    // Option precedence:
+    // 1) cleardata: clears all web data (including cookies), so cookie options are skipped.
+    // 2) clearcache: clears all cookies (session + persistent).
+    // 3) clearsessioncache: clears only session cookies.
+    // 4) no clear options: continue immediately.
     if (browserOptions.cleardata) {
-        [dataStore fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
-            [dataStore removeDataOfTypes:WKWebsiteDataStore.allWebsiteDataTypes forDataRecords:records completionHandler:^{
-                NSLog(@"Removed all WKWebView data");
-                // Create new WKProcessPool
-                if (@available(iOS 15.0, *)) {
-                    // Since iOS 15 WKProcessPool is deprecated and has no effect
-                } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                    // Set for iOS 14 and below a new process pool
-                    self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
-#pragma clang diagnostic pop
-            }
-            }];
-        }];
+        [self clearData:dataStore completionHandler:completionHandler];
+        return;
     }
 
-    // Deletes all cookies or session cookies
-    if (browserOptions.clearcache || browserOptions.clearsessioncache) {
-        WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
-        [cookieStore getAllCookies:^(NSArray *cookies) {
-            for (NSHTTPCookie *cookie in cookies) {
-                if (browserOptions.clearcache || (browserOptions.clearsessioncache && cookie.sessionOnly)) {
-                    [cookieStore deleteCookie:cookie completionHandler:nil];
-                }
+    if (browserOptions.clearcache) {
+        [self clearCookie:dataStore sessionOnly:NO completionHandler:completionHandler];
+        return;
+    }
+
+    if (browserOptions.clearsessioncache) {
+        [self clearCookie:dataStore sessionOnly:YES completionHandler:completionHandler];
+        return;
+    }
+
+    if (completionHandler != nil) {
+        completionHandler();
+    }
+}
+
+/**
+ * Clears all WKWebView website data types (cookies, local storage, IndexedDB, cache, etc.).
+ */
+- (void)clearData:(WKWebsiteDataStore *)dataStore completionHandler:(void (^)(void))completionHandler
+{
+    [dataStore fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
+        [dataStore removeDataOfTypes:WKWebsiteDataStore.allWebsiteDataTypes forDataRecords:records completionHandler:^{
+            NSLog(@"Removed all WKWebView data");
+            // Create new WKProcessPool
+            if (@available(iOS 15.0, *)) {
+                // Since iOS 15 WKProcessPool is deprecated and has no effect
+            } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                // Set for iOS 14 and below a new process pool
+                self.inAppBrowserViewController.webView.configuration.processPool = [[WKProcessPool alloc] init]; // create new process pool to flush all data
+#pragma clang diagnostic pop
+            }
+
+            if (completionHandler != nil) {
+                completionHandler();
             }
         }];
-    }
+    }];
+}
+
+/**
+ * Clears cookies from the shared cookie store.
+ * sessionOnly=NO: clear all cookies.
+ * sessionOnly=YES: clear only session cookies.
+ */
+- (void)clearCookie:(WKWebsiteDataStore *)dataStore sessionOnly:(BOOL)sessionOnly completionHandler:(void (^)(void))completionHandler
+{
+    WKHTTPCookieStore *cookieStore = dataStore.httpCookieStore;
+    [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *cookies) {
+        NSMutableArray<NSHTTPCookie *> *cookiesToDelete = [NSMutableArray array];
+        for (NSHTTPCookie *cookie in cookies) {
+            if (!sessionOnly || cookie.sessionOnly) {
+                [cookiesToDelete addObject:cookie];
+            }
+        }
+
+        // No cookies available, return
+        if (cookiesToDelete.count == 0) {
+            if (completionHandler != nil) {
+                completionHandler();
+            }
+            return;
+        }
+
+        // [WKHTTPCookieStore deleteCookie] is async, so complete only after the final callback.
+        __block NSUInteger pendingCookieDeletes = cookiesToDelete.count;
+        for (NSHTTPCookie *cookie in cookiesToDelete) {
+            [cookieStore deleteCookie:cookie completionHandler:^{
+                pendingCookieDeletes--;
+                if (pendingCookieDeletes == 0 && completionHandler != nil) {
+                    completionHandler();
+                }
+            }];
+        }
+    }];
 }
 
 - (void)show:(CDVInvokedUrlCommand *)command
