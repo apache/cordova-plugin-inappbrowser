@@ -166,7 +166,6 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
-            this.callbackContext = callbackContext;
             final String url = args.getString(0);
             String t = args.optString(1);
             if (t == null || t.equals("") || t.equals(NULL)) {
@@ -239,6 +238,7 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in InAppBrowser
                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
+                            InAppBrowser.this.callbackContext = callbackContext;
                             result = showWebPage(url, features);
                         }
                     }
@@ -250,6 +250,7 @@ public class InAppBrowser extends CordovaPlugin {
                     // BLANK - or anything else
                     else {
                         LOG.d(LOG_TAG, "in blank");
+                        InAppBrowser.this.callbackContext = callbackContext;
                         result = showWebPage(url, features);
                     }
 
