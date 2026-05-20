@@ -40,6 +40,11 @@
 
 static UIBarButtonSystemItem CDVWKInAppBrowserCloseButtonSystemItem(void)
 {
+    // Since iOS 13 it's possible to use UIBarButtonSystemItemClose
+    // instead of UIBarButtonSystemItemDone which corresponds perfectly
+    // to a close button. Since UIBarButtonSystemItemClose looks akward
+    // on iOS 18 and older, because an X inside a round button is shown,
+    // instead of a text, the close button is only applied since iOS 26.
     if (@available(iOS 26.0, *)) {
         return UIBarButtonSystemItemClose;
     }
