@@ -38,7 +38,19 @@
 
 #define    IAB_BRIDGE_NAME @"cordova_iab"
 
-#define    kCloseButtonSystemItem (@available(iOS 26.0, *) ? UIBarButtonSystemItemClose : UIBarButtonSystemItemDone)
+static UIBarButtonSystemItem CDVWKInAppBrowserCloseButtonSystemItem(void)
+{
+    // Since iOS 13 it's possible to use UIBarButtonSystemItemClose
+    // instead of UIBarButtonSystemItemDone which corresponds perfectly
+    // to a close button. Since UIBarButtonSystemItemClose looks akward
+    // on iOS 18 and older, because an X inside a round button is shown,
+    // instead of a text, the close button is only applied since iOS 26.
+    if (@available(iOS 26.0, *)) {
+        return UIBarButtonSystemItemClose;
+    }
+
+    return UIBarButtonSystemItemDone;
+}
 
 #pragma mark CDVWKInAppBrowser
 
@@ -905,7 +917,7 @@ BOOL isExiting = NO;
 
     // NOTE: On iOS 26 using `UIBarButtonItem initWithBarButtonSystemItem:` gives constraint warnings,
     // which is a known UIKit bug.
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:kCloseButtonSystemItem
+    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:CDVWKInAppBrowserCloseButtonSystemItem()
                                                                      target:self
                                                                      action:@selector(close)];
     self.closeButton.enabled = YES;
@@ -1114,7 +1126,7 @@ BOOL isExiting = NO;
     // If a custom caption is provided, create a title-based button instead.
     self.closeButton = nil;
     // Initialize with title if set, otherwise use the system-localized Close/Done item.
-    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:kCloseButtonSystemItem target:self action:@selector(close)];
+    self.closeButton = title != nil ? [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStylePlain target:self action:@selector(close)] : [[UIBarButtonItem alloc] initWithBarButtonSystemItem:CDVWKInAppBrowserCloseButtonSystemItem() target:self action:@selector(close)];
     self.closeButton.enabled = YES;
     // If color on closebutton is requested then initialize with that that color, otherwise use initialize with default.
     self.closeButton.tintColor = colorString != nil ? [self colorFromHexString:colorString] : [UIColor colorWithRed:60.0 / 255.0 green:136.0 / 255.0 blue:230.0 / 255.0 alpha:1];
