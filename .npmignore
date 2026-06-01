@@ -17,3 +17,6 @@
 
 .*
 tests
+
+# ASF release workspace
+.asf-release/
