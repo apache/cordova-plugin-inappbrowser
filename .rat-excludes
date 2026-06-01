@@ -15,8 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# This file used by ATR
-
 .git/
 node_modules/
+tests/resources/local.pdf
 types/index.d.ts
