@@ -1032,13 +1032,18 @@ BOOL isExiting = NO;
     [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
 
     // Define vertical constraints, in order from top to bottom
+    // Don't extend behind the status bar like also the Safari app does and restraint
+    // everything to safe area top.
+    // Safari renders a native blur/color UIView as the status bar backdrop,
+    // and the web view starts below it. Content never has a chance to appear behind the status bar.
+    // The in-app browser should do the same.
     // The Address label and Toolbar are optional
     // Constraints for different cases set by options when Toolbar and/or Address label is visible or not
     //
     // Case 1: Toolbar and Address label not visible
     if (!toolbarVisible && !addressLabelVisible) {
-        // Webview top to top edge
-        [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+        // Webview top to safe area top, to respect statusbar area
+        [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor].active = YES;
         // WebView bottom to bottom edge
         [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
     }
@@ -1048,8 +1053,8 @@ BOOL isExiting = NO;
         // Toolbar is at top
         if (toolbarIsAtTop) {
             [NSLayoutConstraint activateConstraints:@[
-                // Toolbar background top to top edge
-                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Toolbar background top to safe area top, to respect statusbar area
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
                 // Webview top to Toolbar background bottom
                 [self.webView.topAnchor constraintEqualToAnchor:self.toolbarBackground.bottomAnchor],
                 // WebView bottom to bottom edge
@@ -1058,8 +1063,8 @@ BOOL isExiting = NO;
             // Toolbar is at bottom (default)
         } else {
             [NSLayoutConstraint activateConstraints:@[
-                // WebView top to top edge
-                [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Webview top to safe area top, to respect statusbar area
+                [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
                 // WebView bottom to Toolbar background top
                 [self.webView.bottomAnchor constraintEqualToAnchor:self.toolbarBackground.topAnchor],
                 // Toolbar background bottom to bottom edge
@@ -1071,8 +1076,8 @@ BOOL isExiting = NO;
     // Case 3: Toolbar not visible, Address label visible
     if (!toolbarVisible && addressLabelVisible) {
         [NSLayoutConstraint activateConstraints:@[
-            // Webview top to top edge
-            [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+            // Webview top to safe area top, to respect statusbar area
+            [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
             // Address background top to web view bottom with spacing
             [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
                                                                                  multiplier:1.0],
@@ -1086,8 +1091,8 @@ BOOL isExiting = NO;
         // Toolbar is at top
         if (toolbarIsAtTop) {
             [NSLayoutConstraint activateConstraints:@[
-                // Toolbar background top to top edge
-                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Toolbar background top to safe area top, to respect statusbar area
+                [self.toolbarBackground.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
                 // Webview top to Toolbar background bottom
                 [self.webView.topAnchor constraintEqualToAnchor:self.toolbarBackground.bottomAnchor],
                 // Address background top to web view bottom with spacing
@@ -1100,8 +1105,8 @@ BOOL isExiting = NO;
             // Toolbar is at bottom (default)
         } else {
             [NSLayoutConstraint activateConstraints:@[
-                // WebView top to top edge
-                [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+                // Webview top to safe area top, to respect statusbar area
+                [self.webView.topAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.topAnchor],
                 // Address background top to web view bottom with spacing
                 [self.addressBackgroundView.topAnchor constraintEqualToSystemSpacingBelowAnchor:self.webView.bottomAnchor
                                                                                      multiplier:1.0],
