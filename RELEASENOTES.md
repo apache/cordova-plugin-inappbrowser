@@ -20,13 +20,85 @@
 -->
 # Release Notes
 
-### 6.0.1 (June 1, 2026)
+## 7.0.0
+
+**Breaking Changes:**
+
+* chore(ios)!: Remove unused private method ([#1113](https://github.com/apache/cordova-plugin-inappbrowser/pull/1113)) [[b7ab3d0](https://github.com/apache/cordova-plugin-inappbrowser/commit/b7ab3d0)]
+* refactor(ios)!: remove property `instance` and getter method `getInstance` ([#1116](https://github.com/apache/cordova-plugin-inappbrowser/pull/1116)) [[c5a0979](https://github.com/apache/cordova-plugin-inappbrowser/commit/c5a0979)]
+
+**Features:**
+
+* feat(android): make zoom on-screen controls configurable ([#1023](https://github.com/apache/cordova-plugin-inappbrowser/pull/1023)) [[24c6738](https://github.com/apache/cordova-plugin-inappbrowser/commit/24c6738)]
+* feat(ios): use `UIBarButtonSystemItemClose` since iOS 26 ([#1138](https://github.com/apache/cordova-plugin-inappbrowser/pull/1138)) [[5cf7c2d](https://github.com/apache/cordova-plugin-inappbrowser/commit/5cf7c2d)]
+* feat(ios): Support custom scheme event for iOS ([#1112](https://github.com/apache/cordova-plugin-inappbrowser/pull/1112)) [[03831d7](https://github.com/apache/cordova-plugin-inappbrowser/commit/03831d7)]
+* feat(ios): correct code formatting ([#1100](https://github.com/apache/cordova-plugin-inappbrowser/pull/1100)) [[fb5b469](https://github.com/apache/cordova-plugin-inappbrowser/commit/fb5b469)]
+
+**Fixes:**
+
+* fix: add `data` property for `InAppBrowserEvnet` type ([#1118](https://github.com/apache/cordova-plugin-inappbrowser/pull/1118)) [[18ef50d](https://github.com/apache/cordova-plugin-inappbrowser/commit/18ef50d)]
+* fix: defer navigation until async cookie or data clearing completes ([#1150](https://github.com/apache/cordova-plugin-inappbrowser/pull/1150)) [[1b0be4a](https://github.com/apache/cordova-plugin-inappbrowser/commit/1b0be4a)]
+* fix(android): change callback context only on non-whitelisted urls or target `_blank` ([#1147](https://github.com/apache/cordova-plugin-inappbrowser/pull/1147)) [[694adb0](https://github.com/apache/cordova-plugin-inappbrowser/commit/694adb0)]
+* fix(android): `beforeload` event fires only once ([#1146](https://github.com/apache/cordova-plugin-inappbrowser/pull/1146)) [[160e414](https://github.com/apache/cordova-plugin-inappbrowser/commit/160e414)]
+* fix(android): place footer below WebView instead of overlaying content ([#1148](https://github.com/apache/cordova-plugin-inappbrowser/pull/1148)) [[56fb083](https://github.com/apache/cordova-plugin-inappbrowser/commit/56fb083)]
+* fix(ios): fix white screen on iOS 13+ when in-app browser window scene is nil ([#1131](https://github.com/apache/cordova-plugin-inappbrowser/pull/1131)) [[c1c6544](https://github.com/apache/cordova-plugin-inappbrowser/commit/c1c6544)]
+* fix(ios): render in-app browser underneath the status bar ([#1158](https://github.com/apache/cordova-plugin-inappbrowser/pull/1158)) [[40ff663](https://github.com/apache/cordova-plugin-inappbrowser/commit/40ff663)]
+* fix(ios): replace macro `kCloseButtonSystemItem` with static function to fix XCode warning ([#1153](https://github.com/apache/cordova-plugin-inappbrowser/pull/1153)) [[60a5c73](https://github.com/apache/cordova-plugin-inappbrowser/commit/60a5c73)]
+* fix(ios): check callbackId with regex ([#1152](https://github.com/apache/cordova-plugin-inappbrowser/pull/1152)) [[e0bd9dc](https://github.com/apache/cordova-plugin-inappbrowser/commit/e0bd9dc)]
+* fix(ios): suppress expected cancellation errors when `beforeload` is set ([#1145](https://github.com/apache/cordova-plugin-inappbrowser/pull/1145)) [[0cea6cc](https://github.com/apache/cordova-plugin-inappbrowser/commit/0cea6cc)]
+* fix(ios): Don't call `beforeload` on POST and `beforeload=yes` ([#1144](https://github.com/apache/cordova-plugin-inappbrowser/pull/1144)) [[f71de8f](https://github.com/apache/cordova-plugin-inappbrowser/commit/f71de8f)]
+* fix(ios): set callbackId only on target=_blank, update readme ([#1143](https://github.com/apache/cordova-plugin-inappbrowser/pull/1143)) [[6106897](https://github.com/apache/cordova-plugin-inappbrowser/commit/6106897)]
+* fix(ios): constraint warnings in iOS 18 and older ([#1123](https://github.com/apache/cordova-plugin-inappbrowser/pull/1123)) [[bad3830](https://github.com/apache/cordova-plugin-inappbrowser/commit/bad3830)]
+* fix(ios): add custom toolbar background ([#1132](https://github.com/apache/cordova-plugin-inappbrowser/pull/1132)) [[c140eaf](https://github.com/apache/cordova-plugin-inappbrowser/commit/c140eaf)]
+* fix(ios): constrain address label horizontal to safe area for landscape ([#1126](https://github.com/apache/cordova-plugin-inappbrowser/pull/1126)) [[de95bb2](https://github.com/apache/cordova-plugin-inappbrowser/commit/de95bb2)]
+* fix(ios): full width WebView on landscape ([#1120](https://github.com/apache/cordova-plugin-inappbrowser/pull/1120)) [[22ebb87](https://github.com/apache/cordova-plugin-inappbrowser/commit/22ebb87)]
+* fix(ios): suppress deprecation warning for `processPool` for`deployment-target` greater than 14 ([#1119](https://github.com/apache/cordova-plugin-inappbrowser/pull/1119)) [[105b0ae](https://github.com/apache/cordova-plugin-inappbrowser/commit/105b0ae)]
+* fix(ios): remove use of deprecated `CDVWebViewProcessPoolFactory` ([#1115](https://github.com/apache/cordova-plugin-inappbrowser/pull/1115)) [[f76988e](https://github.com/apache/cordova-plugin-inappbrowser/commit/f76988e)]
+* fix(ios): simplify using `CDVSettingsDictionary` in older cordova-ios versions ([#1105](https://github.com/apache/cordova-plugin-inappbrowser/pull/1105)) [[f67412f](https://github.com/apache/cordova-plugin-inappbrowser/commit/f67412f)]
+* fix(ios): use `cordovaSettingForKey:` instead of `objectForKey:` ([#1106](https://github.com/apache/cordova-plugin-inappbrowser/pull/1106)) [[540bfe3](https://github.com/apache/cordova-plugin-inappbrowser/commit/540bfe3)]
+* fix(ios): set minimum cordova-ios to 6.2.0 ([#1107](https://github.com/apache/cordova-plugin-inappbrowser/pull/1107)) [[15714f4](https://github.com/apache/cordova-plugin-inappbrowser/commit/15714f4)]
+* fix(ios): Use `CDVSettingsDictionary` since cordova-ios 8 [[b52242a](https://github.com/apache/cordova-plugin-inappbrowser/commit/b52242a)]
+* fix(ios): deprecation of `UIActivityIndicatorViewStyleGray` ([#1104](https://github.com/apache/cordova-plugin-inappbrowser/pull/1104)) [[6f413e0](https://github.com/apache/cordova-plugin-inappbrowser/commit/6f413e0)]
+* fix(ios): replace `UIBarStyleBlackOpaque` with `UIBarStyleBlack` ([#1103](https://github.com/apache/cordova-plugin-inappbrowser/pull/1103)) [[d4ae06d](https://github.com/apache/cordova-plugin-inappbrowser/commit/d4ae06d)]
+* fix(ios): remove use of `CDVScreenOrientationDelegate` ([#1101](https://github.com/apache/cordova-plugin-inappbrowser/pull/1101)) [[246f2a0](https://github.com/apache/cordova-plugin-inappbrowser/commit/246f2a0)]
+* fix(ios): use auto layout to respect safe areas ([#1099](https://github.com/apache/cordova-plugin-inappbrowser/pull/1099)) [[375c02b](https://github.com/apache/cordova-plugin-inappbrowser/commit/375c02b)]
+* fix(iOS): IAB not showing up in apps using UIScenes ([#1067](https://github.com/apache/cordova-plugin-inappbrowser/pull/1067)) [[e2d8429](https://github.com/apache/cordova-plugin-inappbrowser/commit/e2d8429)]
+* fix(types): support beforeload listener signature in TypeScript defs ([#1149](https://github.com/apache/cordova-plugin-inappbrowser/pull/1149)) [[e28ca69](https://github.com/apache/cordova-plugin-inappbrowser/commit/e28ca69)]
+
+**Others:**
+
+* doc(readme): improve `addEventListener` examples ([#1142](https://github.com/apache/cordova-plugin-inappbrowser/pull/1142)) [[7a90dde](https://github.com/apache/cordova-plugin-inappbrowser/commit/7a90dde)]
+* doc(readme): update badges ([#1140](https://github.com/apache/cordova-plugin-inappbrowser/pull/1140)) [[d922047](https://github.com/apache/cordova-plugin-inappbrowser/commit/d922047)]
+* chore(ios): remove pre ios 11 code in `show:withNoAnimate:` ([#1135](https://github.com/apache/cordova-plugin-inappbrowser/pull/1135)) [[8d2845b](https://github.com/apache/cordova-plugin-inappbrowser/commit/8d2845b)]
+* chore(ios): resolve variable `safeArea` ([#1121](https://github.com/apache/cordova-plugin-inappbrowser/pull/1121)) [[89cd5fe](https://github.com/apache/cordova-plugin-inappbrowser/commit/89cd5fe)]
+* chore(ios): Cleanup code ([#1117](https://github.com/apache/cordova-plugin-inappbrowser/pull/1117)) [[6b28d2d](https://github.com/apache/cordova-plugin-inappbrowser/commit/6b28d2d)]
+* refactor(ios): refactor code for clearing data ([#1137](https://github.com/apache/cordova-plugin-inappbrowser/pull/1137)) [[f40f41b](https://github.com/apache/cordova-plugin-inappbrowser/commit/f40f41b)]
+* refactor(ios): adding toolbar items ([#1124](https://github.com/apache/cordova-plugin-inappbrowser/pull/1124)) [[b83a9b7](https://github.com/apache/cordova-plugin-inappbrowser/commit/b83a9b7)]
+* refactor(ios): handle constraints in cases ([#1125](https://github.com/apache/cordova-plugin-inappbrowser/pull/1125)) [[ddab657](https://github.com/apache/cordova-plugin-inappbrowser/commit/ddab657)]
+* refactor(ios): remove unused method `invertFrameIfNeeded` ([#1102](https://github.com/apache/cordova-plugin-inappbrowser/pull/1102)) [[dfce3c7](https://github.com/apache/cordova-plugin-inappbrowser/commit/dfce3c7)]
+* doc(ios): constraint warnings on iOS 26 and using `initWithBarButtonSystemItem` ([#1127](https://github.com/apache/cordova-plugin-inappbrowser/pull/1127)) [[42e12dd](https://github.com/apache/cordova-plugin-inappbrowser/commit/42e12dd)]
+* chore: Remove unused inappbrowser.css file ([#1038](https://github.com/apache/cordova-plugin-inappbrowser/pull/1038)) [[eac7303](https://github.com/apache/cordova-plugin-inappbrowser/commit/eac7303)]
+* chore: bump to major 7.0.0-dev ([#1156](https://github.com/apache/cordova-plugin-inappbrowser/pull/1156)) [[cc727aa](https://github.com/apache/cordova-plugin-inappbrowser/commit/cc727aa)]
+* chore: bump version to 6.1.0-dev ([#1108](https://github.com/apache/cordova-plugin-inappbrowser/pull/1108)) [[322182a](https://github.com/apache/cordova-plugin-inappbrowser/commit/322182a)]
+* chore: incremented plugin version 6.0.1-dev [[f27c663](https://github.com/apache/cordova-plugin-inappbrowser/commit/f27c663)]
+* chore: add changelog from 6.0.1 ([#1159](https://github.com/apache/cordova-plugin-inappbrowser/pull/1159)) [[92a53a9](https://github.com/apache/cordova-plugin-inappbrowser/commit/92a53a9)]
+* chore: update npm package ([#1134](https://github.com/apache/cordova-plugin-inappbrowser/pull/1134)) [[4f9d07d](https://github.com/apache/cordova-plugin-inappbrowser/commit/4f9d07d)]
+* chore: gh-action workflow, license header formatting & cleanups ([#1095](https://github.com/apache/cordova-plugin-inappbrowser/pull/1095)) [[1e4ab4b](https://github.com/apache/cordova-plugin-inappbrowser/commit/1e4ab4b)]
+* chore(ci): add/update release workflows ([#1157](https://github.com/apache/cordova-plugin-inappbrowser/pull/1157)) [[e1cb106](https://github.com/apache/cordova-plugin-inappbrowser/commit/e1cb106)]
+* chore(deps-dev): bump @cordova/eslint-config to 6.0.0 w/ lint fixes ([#1096](https://github.com/apache/cordova-plugin-inappbrowser/pull/1096)) [[4cf5c24](https://github.com/apache/cordova-plugin-inappbrowser/commit/4cf5c24)]
+* chore(gitattributes): normalize line endings and binary detection ([#1139](https://github.com/apache/cordova-plugin-inappbrowser/pull/1139)) [[675002f](https://github.com/apache/cordova-plugin-inappbrowser/commit/675002f)]
+* chore(INFRA): Set up default protection ruleset for default and release branches ([#1151](https://github.com/apache/cordova-plugin-inappbrowser/pull/1151)) [[efd32a9](https://github.com/apache/cordova-plugin-inappbrowser/commit/efd32a9)]
+* chore(workflow): update workflows to the latest one of cordova-paramedic ([#1141](https://github.com/apache/cordova-plugin-inappbrowser/pull/1141)) [[3fdfc96](https://github.com/apache/cordova-plugin-inappbrowser/commit/3fdfc96)]
+* ci: remove osx ([#1111](https://github.com/apache/cordova-plugin-inappbrowser/pull/1111)) [[c1eaf3b](https://github.com/apache/cordova-plugin-inappbrowser/commit/c1eaf3b)]
+* ci: sync workflow w/ paramedic ([#1068](https://github.com/apache/cordova-plugin-inappbrowser/pull/1068)) [[dfde59d](https://github.com/apache/cordova-plugin-inappbrowser/commit/dfde59d)]
+
+## 6.0.1 (June 1, 2026)
 
 * [GH-1152](https://github.com/apache/cordova-plugin-inappbrowser/pull/1152) fix(ios): check callbackId with regex
 * [GH-1095](https://github.com/apache/cordova-plugin-inappbrowser/pull/1095) chore: gh-action workflow, license header formatting & cleanups
 * Fix npm audit issues
 
-### 6.0.0 (Nov 10, 2023)
+## 6.0.0 (Nov 10, 2023)
 * [GH-1033](https://github.com/apache/cordova-plugin-inappbrowser/pull/1033) chore: bump to next major release 6.0.0 & update deependencies
 * [GH-1032](https://github.com/apache/cordova-plugin-inappbrowser/pull/1032) chore(lint): update eslint config and apply fixes
 * [GH-1030](https://github.com/apache/cordova-plugin-inappbrowser/pull/1030) fix!: remove deprecated platforms **Windows** & osx
@@ -51,7 +123,7 @@
 * [GH-861](https://github.com/apache/cordova-plugin-inappbrowser/pull/861) fix(android): add space between default useragent and custom AppendUserAgent
 * [GH-881](https://github.com/apache/cordova-plugin-inappbrowser/pull/881) fix(ios): make system open tel, sms, mailto and geo links
 
-### 5.0.0 (Feb 10, 2021)
+## 5.0.0 (Feb 10, 2021)
 * [GH-828](https://github.com/apache/cordova-plugin-inappbrowser/pull/828) feat(ios): add `InAppBrowser`StatusBarStyle 'darkcontent' configuration option
 * [GH-823](https://github.com/apache/cordova-plugin-inappbrowser/pull/823) chore: bump engines requirements
 * [GH-824](https://github.com/apache/cordova-plugin-inappbrowser/pull/824) breaking: cleanup code for old **Android** versions
@@ -60,7 +132,7 @@
 * [GH-821](https://github.com/apache/cordova-plugin-inappbrowser/pull/821) breaking(android): replace magic numbers with **Android**.os.Build constants
 * [GH-717](https://github.com/apache/cordova-plugin-inappbrowser/pull/717) ci(ios): remove wkwebview plugin
 
-### 4.1.0 (Nov 17, 2020)
+## 4.1.0 (Nov 17, 2020)
 * [GH-792](https://github.com/apache/cordova-plugin-inappbrowser/pull/792) fix(android): Add mitigation strategy for CVE-2020-6506
 * [GH-817](https://github.com/apache/cordova-plugin-inappbrowser/pull/817) Updated typings
 * [GH-803](https://github.com/apache/cordova-plugin-inappbrowser/pull/803) fix(android): allow compilation in old `cordova-android` versions
@@ -76,7 +148,7 @@
 * [GH-747](https://github.com/apache/cordova-plugin-inappbrowser/pull/747) refactor(eslint): use cordova-eslint /w fix
 * [GH-737](https://github.com/apache/cordova-plugin-inappbrowser/pull/737) fix(ios): exit event not fired on swipe down
 
-### 4.0.0 (Jun 09, 2020)
+## 4.0.0 (Jun 09, 2020)
 * [GH-715](https://github.com/apache/cordova-plugin-inappbrowser/pull/715) (ios): fix regression in 2706f34
 * [GH-685](https://github.com/apache/cordova-plugin-inappbrowser/pull/685) chore: update install engines
 * [GH-656](https://github.com/apache/cordova-plugin-inappbrowser/pull/656) (ios) Remove fake status bar with hardcoded height to fix issues in **iOS** devices with a notch
@@ -100,7 +172,7 @@
 * [GH-616](https://github.com/apache/cordova-plugin-inappbrowser/pull/616) (android) `InAppBrowser`: java.lang.IllegalArgumentException
 * [GH-635](https://github.com/apache/cordova-plugin-inappbrowser/pull/635) breaking(ios): remove UIWebView
 
-### 3.2.0 (Jan 04, 2020)
+## 3.2.0 (Jan 04, 2020)
 * [GH-503](https://github.com/apache/cordova-plugin-inappbrowser/pull/503) Defensive code to prevent NULL reference exceptions for async
 * [GH-584](https://github.com/apache/cordova-plugin-inappbrowser/pull/584) Add compile-time decision for disabling UIWebView
 * [GH-524](https://github.com/apache/cordova-plugin-inappbrowser/pull/524) Replace "beforeload" with BEFORELOAD
@@ -109,7 +181,7 @@
 * [GH-534](https://github.com/apache/cordova-plugin-inappbrowser/pull/534) Fix `InAppBrowser` not opening on **iOS** 13
 * ci(travis) Upgrade to node8
 
-### 3.1.0 (Jun 27, 2019)
+## 3.1.0 (Jun 27, 2019)
 
 -   chore: fix repo and issue urls and license in package.json and plugin.xml ([`8edfb9e`](https://github.com/apache/cordova-plugin-inappbrowser/commit/8edfb9e))
 -   chore: unknown changes because of linebreak change in binary files ([`e44ad91`](https://github.com/apache/cordova-plugin-inappbrowser/commit/e44ad91))
@@ -150,14 +222,14 @@
 -   fix(android): [CB-14048](https://issues.apache.org/jira/browse/CB-14048): (android) allowedSchemes check empty string fix ([#268](https://github.com/apache/cordova-plugin-inappbrowser/issues/268)) ([`57eda78`](https://github.com/apache/cordova-plugin-inappbrowser/commit/57eda78), [`33aff11`](https://github.com/apache/cordova-plugin-inappbrowser/commit/33aff11))
 
 
-### 3.0.0 (Apr 12, 2018)
+## 3.0.0 (Apr 12, 2018)
 * [CB-13659](https://issues.apache.org/jira/browse/CB-13659) **iOS** Add hidespinner option
 * In file `AppBrowser.java`: New code within `shouldOverrideUrlLoading()` to check for whitelisting custom schemes via a new `AllowedSchemes` preference configuration item.  Allows custom schemes like `mycoolapp://` or `wevotetwitterscheme://`
 * `InAppBrowser.java`: New method `isURLWhileListed` to check for whitelisting of `AllowedSchemes` in a new preference configuration item. There is a new check in `shouldOverrideUrlLoading`, to allow whitelisted custom schemes like "mycoolapp://"
 * Add customisation of the navigation buttons for **iOS**
 * Fix navigation buttons on **iOS**
 
-### 2.0.2 (Jan 24, 2018)
+## 2.0.2 (Jan 24, 2018)
 * [CB-13791](https://issues.apache.org/jira/browse/CB-13791) Add **Android** support for a footer close button
 * [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
 * [CB-13409](https://issues.apache.org/jira/browse/CB-13409) restore gitignore to default
@@ -169,13 +241,13 @@
 * [CB-13409](https://issues.apache.org/jira/browse/CB-13409) Lets user adjust color of toolbar, hide navigation buttons and set custom text on close button
 * [CB-13746](https://issues.apache.org/jira/browse/CB-13746) Add build-tools-26.0.2 to travis
 
-### 2.0.1 (Dec 27, 2017)
+## 2.0.1 (Dec 27, 2017)
 * [CB-13699](https://issues.apache.org/jira/browse/CB-13699) Fix to allow 2.0.0 version install
 
-### 2.0.0 (Dec 15, 2017)
+## 2.0.0 (Dec 15, 2017)
 * [CB-13662](https://issues.apache.org/jira/browse/CB-13662) remove deprecated platforms
 
-### 1.7.2 (Nov 06, 2017)
+## 1.7.2 (Nov 06, 2017)
 * [CB-13473](https://issues.apache.org/jira/browse/CB-13473) (CI) Removed **Browser** builds from AppVeyor
 * [CB-13472](https://issues.apache.org/jira/browse/CB-13472) (CI) Fixed Travis **Android** builds again
 * [CB-13347](https://issues.apache.org/jira/browse/CB-13347) Enable thirdparty cookies on `>=Android 5.0` device
@@ -184,13 +256,13 @@
 * [CB-12586](https://issues.apache.org/jira/browse/CB-12586) (iOS) fix method `hide` doesn't work
 * [CB-12847](https://issues.apache.org/jira/browse/CB-12847) added `bugs` entry to `package.json`.
 
-### 1.7.1 (Apr 27, 2017)
+## 1.7.1 (Apr 27, 2017)
 * [CB-12622](https://issues.apache.org/jira/browse/CB-12622) Added **Android 6.0** build badges to `README`
 * [CB-12266](https://issues.apache.org/jira/browse/CB-12266) (browser platform) loadstop event.url is now a string instead of an object, aligning it with the other platforms.
 * [CB-12685](https://issues.apache.org/jira/browse/CB-12685) added `package.json` to tests folder
 * [CB-11248](https://issues.apache.org/jira/browse/CB-11248) `InAppBrowser` no focus on input text fields
 
-### 1.7.0 (Feb 28, 2017)
+## 1.7.0 (Feb 28, 2017)
 * [CB-12366](https://issues.apache.org/jira/browse/CB-12366) **iOS:** Reduce `tmpWindow` level to prevent overlapping statusbar
 * [CB-12364](https://issues.apache.org/jira/browse/CB-12364) **Windows:** `Inappbrowser` inject file manual tests are not working
 * [CB-12353](https://issues.apache.org/jira/browse/CB-12353) Corrected merges usage in `plugin.xml`
@@ -200,13 +272,13 @@
 * [CB-11136](https://issues.apache.org/jira/browse/CB-11136) (ios) Fix `InAppBrowser` when closing with `WKWebView`
 * [CB-10799](https://issues.apache.org/jira/browse/CB-10799) **iOS:** fix toolbar is shown in incorrect position when in-call status bar
 
-### 1.6.1 (Dec 14, 2016)
+## 1.6.1 (Dec 14, 2016)
 * [CB-12237](https://issues.apache.org/jira/browse/CB-12237) - Update version in package.json to correct 1.6.1-dev
 * [CB-12236](https://issues.apache.org/jira/browse/CB-12236) - Fixed RELEASENOTES for cordova-plugin-inappbrowser
 * [CB-12230](https://issues.apache.org/jira/browse/CB-12230) Removed Windows 8.1 build badges
 * [CB-12224](https://issues.apache.org/jira/browse/CB-12224) Incremented plugin version.
 
-### 1.6.0 (Dec 07, 2016)
+## 1.6.0 (Dec 07, 2016)
 * [CB-12224](https://issues.apache.org/jira/browse/CB-12224) Updated version and RELEASENOTES.md for release 1.6.0
 * [CB-7608](https://issues.apache.org/jira/browse/CB-7608) (android) document useWidthViewPort
 * add option useWidthViewPort
@@ -223,7 +295,7 @@
 * [CB-11694](https://issues.apache.org/jira/browse/CB-11694) Android: Set hadwareBackButton value according option in cordova.InAppBrowser.open
 * [CB-11832](https://issues.apache.org/jira/browse/CB-11832) Incremented plugin version.
 
-### 1.5.1 (Dec 07, 2016)
+## 1.5.1 (Dec 07, 2016)
 * [CB-7608](https://issues.apache.org/jira/browse/CB-7608) (android) document useWidthViewPort
 * add option useWidthViewPort
 * [CB-12184](https://issues.apache.org/jira/browse/CB-12184) executeScript leads to a null pointer on exception on Android.
@@ -560,7 +632,7 @@
 * updating plugin.xml with registry data
 * [CB-4368](https://issues.apache.org/jira/browse/CB-4368) Explicit CoreGraphics.framework dependency should be specified for some core plugins
 
-### 1.5.0 (Sep 08, 2016)
+## 1.5.0 (Sep 08, 2016)
 * [CB-11795](https://issues.apache.org/jira/browse/CB-11795) Add 'protective' entry to cordovaDependencies
 * Add intent scheme to be handled by OS
 * Plugin uses `Android Log class` and not `Cordova LOG class`
@@ -583,14 +655,14 @@
 * [CB-110003](https://issues.apache.org/jira/browse/CB-110003) Adding samples to Readme.
 * [CB-10996](https://issues.apache.org/jira/browse/CB-10996) Adding front matter to README.md
 
-### 1.4.0 (Apr 15, 2016)
+## 1.4.0 (Apr 15, 2016)
 * [CB-7679](https://issues.apache.org/jira/browse/CB-7679) add fix for **iOS** upload.
 * [CB-10944](https://issues.apache.org/jira/browse/CB-10944) `NoSuchMethodError` in `InAppBrowser` plugin
 * [CB-10937](https://issues.apache.org/jira/browse/CB-10937) fix stretched icons
 * [CB-10760](https://issues.apache.org/jira/browse/CB-10760) Fixing README for display on Cordova website
 * [CB-10636](https://issues.apache.org/jira/browse/CB-10636) Add `JSHint` for plugins
 
-### 1.3.0 (Feb 09, 2016)
+## 1.3.0 (Feb 09, 2016)
 * [CB-3360](https://issues.apache.org/jira/browse/CB-3360) Set custom inappbrowser user agent for android
 * [CB-10538](https://issues.apache.org/jira/browse/CB-10538) cordova-plugin-inappbrowser timeout issue
 * [CB-10395](https://issues.apache.org/jira/browse/CB-10395) InAppBrowser's WebView not storing cookies reliable on Android
@@ -599,7 +671,7 @@
 * [CB-7786](https://issues.apache.org/jira/browse/CB-7786) Support mediaPlaybackRequiresUserAction on Android
 * [CB-7500](https://issues.apache.org/jira/browse/CB-7500) executeScript with callback kills/blurs inAppBrowser window on Android
 
-### 1.2.1 (Feb 02, 2016)
+## 1.2.1 (Feb 02, 2016)
 * [CB-10407](https://issues.apache.org/jira/browse/CB-10407) InAppBrowser not firing loadstart event on android
 * [CB-10428](https://issues.apache.org/jira/browse/CB-10428) Fix syntax error when browserifying inAppBrowser plugin
 * handle app store urls in system browser
@@ -611,12 +683,12 @@
 * [CB-10450](https://issues.apache.org/jira/browse/CB-10450) InAppBrowser: Unable to get property 'canGoBack' of undefined on Windows
 * [CB-10441](https://issues.apache.org/jira/browse/CB-10441) Add auto tests for InAppBrowser plugin
 
-### 1.2.0 (Jan 15, 2016)
+## 1.2.0 (Jan 15, 2016)
 * [CB-8180](https://issues.apache.org/jira/browse/CB-8180) Changing methods of interception in `WebViewClient` class
 * [CB-10009](https://issues.apache.org/jira/browse/CB-10009) Improve `InAppBrowser` toolbar look and feel on **Windows**
 * Open a new window on the **Browser** platform
 
-### 1.1.1 (Dec 10, 2015)
+## 1.1.1 (Dec 10, 2015)
 
 * [CB-9445](https://issues.apache.org/jira/browse/CB-9445) Improves executeScript callbacks on iOS
 * [CB-10035](https://issues.apache.org/jira/browse/CB-10035) Incremented plugin version.
@@ -626,7 +698,7 @@
 * [CB-7696](https://issues.apache.org/jira/browse/CB-7696) Document target=_self behavior for Windows
 * [CB-10040](https://issues.apache.org/jira/browse/CB-10040) - Compile Error in InAppBrowser Plugin for iOS - No known instance method for selector 'URLIsWhitelisted:'
 
-### 1.1.0 (Nov 18, 2015)
+## 1.1.0 (Nov 18, 2015)
 * [CB-10035](https://issues.apache.org/jira/browse/CB-10035) Updated `RELEASENOTES` to be newest to oldest
 * Invoke webview if using local file
 * Fixed `zIndex` issue on **Windows 8**, **8.188 where InAppBrowser opens behind default app.
@@ -641,11 +713,11 @@
 * [CB-9378](https://issues.apache.org/jira/browse/CB-9378) Fix InAppBrowser not taking whole screen on **Windows**
 * [CB-9158](https://issues.apache.org/jira/browse/CB-9158) - InAppBrowser `zoomControls` are always set to true
 
-### 1.0.1 (Jun 17, 2015)
+## 1.0.1 (Jun 17, 2015)
 * [CB-9128](https://issues.apache.org/jira/browse/CB-9128) cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
 * fix npm md issue
 
-### 1.0.0 (Apr 15, 2015)
+## 1.0.0 (Apr 15, 2015)
 * [CB-8746](https://issues.apache.org/jira/browse/CB-8746) gave plugin major version bump
 * [CB-7689](https://issues.apache.org/jira/browse/CB-7689) Adds insertCSS support for windows platform
 * [CB-4930](https://issues.apache.org/jira/browse/CB-4930) - (prefix) InAppBrowser should take into account the status bar
@@ -671,13 +743,13 @@
 * [CB-8444](https://issues.apache.org/jira/browse/CB-8444) Add a clobber for `cordova.InAppBrowser.open` (close #80)
 * [CB-8444](https://issues.apache.org/jira/browse/CB-8444) Don't clobber `window.open` - Add new symbol/clobber to access open function (`cordova.InAppBrowser.open`) - Change existing tests to use new symbol (i.e. don't rely on plugin clobber of `window.open`) - Add tests to use `window.open` via manual replace with new symbol - Update docs to deprecate plugin clobber of `window.open`
 
-### 0.6.0 (Feb 04, 2015)
+## 0.6.0 (Feb 04, 2015)
 * [CB-8270](https://issues.apache.org/jira/browse/CB-8270) ios: Remove usage of `[arr JSONString]`, since it's been renamed to `cdv_JSONString`
 * ubuntu: implement `inject*` functions
 * ubuntu: port to oxide
 * [CB-7897](https://issues.apache.org/jira/browse/CB-7897) ios, android: Update to work with whilelist plugins in Cordova 4.x
 
-### 0.5.4 (Dec 02, 2014)
+## 0.5.4 (Dec 02, 2014)
 * [CB-7784](https://issues.apache.org/jira/browse/CB-7784) Exit event is not fired after `InAppBrowser` closing
 * [CB-7697](https://issues.apache.org/jira/browse/CB-7697) Add `locationBar` support to `InAppBrowser` **Windows** platform version
 * [CB-7690](https://issues.apache.org/jira/browse/CB-7690) `InAppBrowser` `loadstart/loadstop` events issues
@@ -691,7 +763,7 @@
 * [CB-7720](https://issues.apache.org/jira/browse/CB-7720) check if event is null since OK string from success callback was removed
 * [CB-7471](https://issues.apache.org/jira/browse/CB-7471) cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
 
-### 0.5.3 (Oct 03, 2014)
+## 0.5.3 (Oct 03, 2014)
 * Windows implementation fixes and improvements
 * zIndex fixed
 * renamed InAppBrowser back to inappbrowser for case sensitive operating systems
@@ -702,7 +774,7 @@
 * Append Windows 8.1 platform configuration in plugin.xml
 * Append Windows 8.1 proxy using x-ms-webview
 
-### 0.5.2 (Sep 17, 2014)
+## 0.5.2 (Sep 17, 2014)
 * [CB-7471](https://issues.apache.org/jira/browse/CB-7471) cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
 * [CB-7490](https://issues.apache.org/jira/browse/CB-7490) Fixes InAppBrowser manual tests crash on windows platform
 * [CB-7249](https://issues.apache.org/jira/browse/CB-7249) cordova-plugin-inappbrowser documentation translation: cordova-plugin-inappbrowser
@@ -716,14 +788,14 @@
 * inappbrowser \_blank target position is fixed
 * amazon-fireos related changes.
 
-### 0.5.1 (Aug 06, 2014)
+## 0.5.1 (Aug 06, 2014)
 * ubuntu: support qt 5.2
 * **FFOS** update InAppBrowserProxy.js
 * **FFOS** app needs to be privileged
 * [CB-6127](https://issues.apache.org/jira/browse/CB-6127) Updated translations for docs
 * [CB-6769](https://issues.apache.org/jira/browse/CB-6769) ios: Fix statusbar color reset wasn't working on iOS7+
 
-### 0.5.0 (Jun 05, 2014)
+## 0.5.0 (Jun 05, 2014)
 * [CB-6127](https://issues.apache.org/jira/browse/CB-6127) Spanish and rench Translations added. Github close #23
 * Clean up whitespace (mainly due to no newline at eof warning)
 * Adding permission info
@@ -738,7 +810,7 @@
 * refactoring fixed
 * [CB-6396](https://issues.apache.org/jira/browse/CB-6396) [Firefox OS] Adding basic support
 
-### 0.4.0 (Apr 17, 2014)
+## 0.4.0 (Apr 17, 2014)
 * [CB-6360](https://issues.apache.org/jira/browse/CB-6360): [ios] Fix for crash on iOS < 6.0 (closes #37)
 * [CB-3324](https://issues.apache.org/jira/browse/CB-3324): [WP8] Add support for back-button inappbrowser [WP8] if there is no history -> InAppBrowser is closed
 * [WP] await async calls, resolve warnings
@@ -752,16 +824,16 @@
 * [CB-6218](https://issues.apache.org/jira/browse/CB-6218): Update docs for BB10
 * [CB-6460](https://issues.apache.org/jira/browse/CB-6460): Update license headers
 
-### 0.3.3 (Mar 5, 2014)
+## 0.3.3 (Mar 5, 2014)
 * [CB-5534](https://issues.apache.org/jira/browse/CB-5534) Fix video/audio does not stop playing when browser is closed
 * [CB-6172](https://issues.apache.org/jira/browse/CB-6172) Fix broken install on case-sensitive file-systems
 
-### 0.3.2 (Feb 26, 2014)
+## 0.3.2 (Feb 26, 2014)
 * Validate that callbackId is correctly formed
 * [CB-6035](https://issues.apache.org/jira/browse/CB-6035) Move js-module so it is not loaded on unsupported platforms
 * Removed some iOS6 Deprecations
 
-### 0.3.1 (Feb 05, 2014)
+## 0.3.1 (Feb 05, 2014)
 * [CB-5756](https://issues.apache.org/jira/browse/CB-5756): Android: Use WebView.evaluateJavascript for script injection on Android 4.4+
 * Didn't test on ICS or lower, getDrawable isn't supported until Jellybean
 * add ubuntu platform
@@ -770,14 +842,14 @@
 * Remove alive from InAppBrowser.js since it didn't catch the case where the browser is closed by the user.
 * [CB-5733](https://issues.apache.org/jira/browse/CB-5733) Fix IAB.close() not working if called before show() animation is done
 
-### 0.2.5 (Dec 4, 2013)
+## 0.2.5 (Dec 4, 2013)
 * Remove merge conflict tag
 * [CB-4724](https://issues.apache.org/jira/browse/CB-4724) fixed UriFormatException
 * add ubuntu platform
 * [CB-3420](https://issues.apache.org/jira/browse/CB-3420) WP feature hidden=yes implemented
 * Added amazon-fireos platform. Change to use amazon-fireos as the platform if user agent string contains 'cordova-amazon-fireos'
 
-### 0.2.4 (Oct 28, 2013)
+## 0.2.4 (Oct 28, 2013)
 * [CB-5128](https://issues.apache.org/jira/browse/CB-5128): added repo + issue tag to plugin.xml for inappbrowser plugin
 * [CB-4995](https://issues.apache.org/jira/browse/CB-4995) Fix crash when WebView is quickly opened then closed.
 * [CB-4930](https://issues.apache.org/jira/browse/CB-4930) - iOS - InAppBrowser should take into account the status bar
@@ -789,11 +861,11 @@
 * [CB-5021](https://issues.apache.org/jira/browse/CB-5021) Expose closeDialog() as a public function and make it safe to call multiple times.
 * [CB-5021](https://issues.apache.org/jira/browse/CB-5021) Make it safe to call close() multiple times
 
-### 0.2.3 (Oct 9, 2013)
+## 0.2.3 (Oct 9, 2013)
 * [CB-4915](https://issues.apache.org/jira/browse/CB-4915) Incremented plugin version on dev branch.
 * [CB-4926](https://issues.apache.org/jira/browse/CB-4926) Fixes inappbrowser plugin loading for windows8
 
-### 0.2.2 (Sept 25, 2013)
+## 0.2.2 (Sept 25, 2013)
 * [CB-4889](https://issues.apache.org/jira/browse/CB-4889) bumping&resetting version
 * [CB-4788](https://issues.apache.org/jira/browse/CB-4788): Modified the onJsPrompt to warn against Cordova calls
 * [windows8] commandProxy was moved
