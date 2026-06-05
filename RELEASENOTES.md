@@ -20,6 +20,12 @@
 -->
 # Release Notes
 
+### 6.0.1 (June 1, 2026)
+
+* [GH-1152](https://github.com/apache/cordova-plugin-inappbrowser/pull/1152) fix(ios): check callbackId with regex
+* [GH-1095](https://github.com/apache/cordova-plugin-inappbrowser/pull/1095) chore: gh-action workflow, license header formatting & cleanups
+* Fix npm audit issues
+
 ### 6.0.0 (Nov 10, 2023)
 * [GH-1033](https://github.com/apache/cordova-plugin-inappbrowser/pull/1033) chore: bump to next major release 6.0.0 & update deependencies
 * [GH-1032](https://github.com/apache/cordova-plugin-inappbrowser/pull/1032) chore(lint): update eslint config and apply fixes
