@@ -118,7 +118,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
     private static final String NAVIGATION_COLOR = "navigationbuttoncolor";
     private static final String HIDE_URL = "hideurlbar";
-    private static final String HIDE_PROGRESS_BAR = "hideprogressbar";
+    private static final String HIDE_SPINNER = "hidespinner";
     private static final String FOOTER = "footer";
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
@@ -151,7 +151,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideNavigationButtons = false;
     private String navigationButtonColor = "";
     private boolean hideUrlBar = false;
-    private boolean hideProgressBar = false;
+    private boolean hideSpinner = false;
     private boolean showFooter = false;
     private String footerColor = "";
     private String beforeload = "";
@@ -705,8 +705,8 @@ public class InAppBrowser extends CordovaPlugin {
             String leftToRightSet = features.get(LEFT_TO_RIGHT);
             leftToRight = leftToRightSet != null && leftToRightSet.equals("yes");
 
-            String hideProgressBarSet = features.get(HIDE_PROGRESS_BAR);
-            hideProgressBar = hideProgressBarSet != null && hideProgressBarSet.equals("yes");
+            String hideSpinnerSet = features.get(HIDE_SPINNER);
+            hideSpinner = hideSpinnerSet != null && hideSpinnerSet.equals("yes");
 
             String toolbarColorSet = features.get(TOOLBAR_COLOR);
             if (toolbarColorSet != null) {
@@ -962,10 +962,12 @@ public class InAppBrowser extends CordovaPlugin {
                 View footerClose = createCloseButton(7);
                 footer.addView(footerClose);
 
-                // Page load progress bar, shown between the toolbar and the WebView
-                final ProgressBar progressBar = new ProgressBar(cordova.getActivity(), null, android.R.attr.progressBarStyleHorizontal);
-                progressBar.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-                progressBar.setMax(100);
+                // Page load spinner, centered over the WebView
+                final ProgressBar spinner = new ProgressBar(cordova.getActivity());
+                RelativeLayout.LayoutParams spinnerLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                spinnerLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                spinner.setLayoutParams(spinnerLayoutParams);
+                spinner.setVisibility(View.GONE);
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
@@ -976,9 +978,8 @@ public class InAppBrowser extends CordovaPlugin {
                     @Override
                     public void onProgressChanged(WebView view, int progress) {
                         super.onProgressChanged(view, progress);
-                        if (hideProgressBar) return;
-                        progressBar.setProgress(progress);
-                        progressBar.setVisibility(progress == 100 ? View.GONE : View.VISIBLE);
+                        if (hideSpinner) return;
+                        spinner.setVisibility(progress == 100 ? View.GONE : View.VISIBLE);
                     }
 
                     @Override
@@ -1172,15 +1173,11 @@ public class InAppBrowser extends CordovaPlugin {
                     main.addView(toolbar);
                 }
 
-                // Don't add the progress bar if it's been disabled
-                if (!hideProgressBar) {
-                    main.addView(progressBar);
-                }
-
                 // Add our webview to our main view/layout
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
                 webViewLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1.0f));
                 webViewLayout.addView(inAppWebView);
+                webViewLayout.addView(spinner);
                 main.addView(webViewLayout);
 
                 // Don't add the footer unless it's been enabled
