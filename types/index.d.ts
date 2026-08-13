@@ -8,6 +8,8 @@
 // TypeScript Version: 2.3
 type channel = "loadstart" | "loadstop" | "loaderror" | "exit" | "message" | "customscheme" | "beforeload";
 
+type InAppBrowserOptions = Record<string, string | number | boolean>;
+
 /**
  * The object returned from a call to cordova.InAppBrowser.open.
  * NOTE: The InAppBrowser window behaves like a standard web browser, and can't access Cordova APIs.
@@ -18,10 +20,12 @@ interface InAppBrowser {
      * Opens a URL in a new InAppBrowser instance, the current browser instance, or the system browser.
      * @param  url     The URL to load.
      * @param  target  The target in which to load the URL, an optional parameter that defaults to _self.
-     * @param  options Options for the InAppBrowser. Optional, defaulting to: location=yes.
-     *                 The options string must not contain any blank space, and each feature's
-     *                 name/value pairs must be separated by a comma. Feature names are case insensitive.
+    * @param  options Options for the InAppBrowser. Optional, defaulting to: { location: true }.
      */
+    open(url: string, target?: string, options?: InAppBrowserOptions): InAppBrowser;
+    /**
+    * @deprecated Pass an options object instead. This string format will be removed in a future major release.
+    */
     open(url: string, target?: string, options?: string): InAppBrowser;
 
     onloadstart(type: Event): void;
