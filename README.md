@@ -297,7 +297,7 @@ function showHelp(url) {
 
 Sometimes you may want to respond to an event happening on the page loaded in the browser,
 for example a button to open the barcode scanner, or closing the browser when a login flow
-was finished. This can done by navigating to a URL with a custom scheme listed in the
+was finished. This can be done by navigating to a URL with a custom scheme listed in the
 `AllowedSchemes` preference in `config.xml`, triggering a `customscheme` event on the
 browser. Multiple values are separated by comma's.
 
