@@ -32,7 +32,7 @@
         self.cleardata = NO;
         self.clearcache = NO;
         self.clearsessioncache = NO;
-        self.hidespinner = NO;
+        self.hideloadingindicator = NO;
 
         self.enableviewportscale = NO;
         self.mediaplaybackrequiresuseraction = NO;
@@ -65,6 +65,12 @@
             NSString *key = [[keyvalue objectAtIndex:0] lowercaseString];
             NSString *value = [keyvalue objectAtIndex:1];
             NSString *value_lc = [value lowercaseString];
+
+            // In version 7.0.1 this was renamed to "hideloadingindicator"
+            // but we still support the old name for backwards compatibility.
+            if ([key isEqualToString:@"hidespinner"]) {
+                key = @"hideloadingindicator";
+            }
 
             BOOL isBoolean = [value_lc isEqualToString:@"yes"] || [value_lc isEqualToString:@"no"];
             NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
