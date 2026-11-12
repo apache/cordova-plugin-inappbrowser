@@ -736,6 +736,7 @@ static UIBarButtonSystemItem CDVWKInAppBrowserCloseButtonSystemItem(void)
     [self.inAppBrowserViewController.webView removeFromSuperview];
     [self.inAppBrowserViewController.webView setUIDelegate:nil];
     [self.inAppBrowserViewController.webView setNavigationDelegate:nil];
+    [self.inAppBrowserViewController.webView removeObserver:self.inAppBrowserViewController forKeyPath:@"estimatedProgress"];
     self.inAppBrowserViewController.webView = nil;
 
     // Set navigationDelegate to nil to ensure no callbacks are received from it.
@@ -758,6 +759,11 @@ static UIBarButtonSystemItem CDVWKInAppBrowserCloseButtonSystemItem(void)
 
 CGFloat lastReducedStatusBarHeight = 0.0;
 BOOL isExiting = NO;
+
+- (void)dealloc
+{
+    [self.webView removeObserver:self forKeyPath:@"estimatedProgress"];
+}
 
 - (id)initWithBrowserOptions:(CDVInAppBrowserOptions *)browserOptions andSettings:(CDVSettingsDictionary *)settings
 {
@@ -838,7 +844,7 @@ BOOL isExiting = NO;
 #endif
 
     [self.view addSubview:self.webView];
-    // The WebView should be behind the other elements like toolbar, address label, spinner
+    // The WebView should be behind the other elements like toolbar, address label, and progress bar
     // Since the WebView is added first, this is already the case.
     // sendSubviewToBack is normally not necessary.
     [self.view sendSubviewToBack:self.webView];
@@ -901,19 +907,14 @@ BOOL isExiting = NO;
     self.addressLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.addressBackgroundView addSubview:self.addressLabel];
     
-    self.spinner = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
-    self.spinner.clearsContextBeforeDrawing = NO;
-    self.spinner.clipsToBounds = NO;
-    self.spinner.contentMode = UIViewContentModeScaleToFill;
-    self.spinner.hidden = NO;
-    self.spinner.hidesWhenStopped = YES;
-    self.spinner.multipleTouchEnabled = NO;
-    self.spinner.opaque = NO;
-    self.spinner.userInteractionEnabled = NO;
-    [self.spinner stopAnimating];
-    [self.view addSubview:self.spinner];
+    self.progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    self.progressView.hidden = YES;
+    self.progressView.userInteractionEnabled = NO;
+    [self.view addSubview:self.progressView];
     // We add our own constraints, they should not be determined from the frame.
-    self.spinner.translatesAutoresizingMaskIntoConstraints = NO;
+    self.progressView.translatesAutoresizingMaskIntoConstraints = NO;
+    // Observe WebKit's estimated load progress to update the native progress indicator.
+    [self.webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
 
     // NOTE: On iOS 26 using `UIBarButtonItem initWithBarButtonSystemItem:` gives constraint warnings,
     // which is a known UIKit bug.
@@ -1027,9 +1028,12 @@ BOOL isExiting = NO;
         [self.addressLabel.trailingAnchor constraintEqualToAnchor:self.addressBackgroundView.layoutMarginsGuide.trailingAnchor]
     ]];
 
-    // Center spinner in WebView
-    [self.spinner.centerXAnchor constraintEqualToAnchor:self.webView.centerXAnchor].active = YES;
-    [self.spinner.centerYAnchor constraintEqualToAnchor:self.webView.centerYAnchor].active = YES;
+    // Position the progress bar at the top edge of the WebView.
+    [NSLayoutConstraint activateConstraints:@[
+        [self.progressView.topAnchor constraintEqualToAnchor:self.webView.topAnchor],
+        [self.progressView.leadingAnchor constraintEqualToAnchor:self.webView.leadingAnchor],
+        [self.progressView.trailingAnchor constraintEqualToAnchor:self.webView.trailingAnchor]
+    ]];
 
     // Define vertical constraints, in order from top to bottom
     // Don't extend behind the status bar like also the Safari app does and restraint
@@ -1219,6 +1223,21 @@ BOOL isExiting = NO;
     }
 }
 
+/**
+ * Mirrors WKWebView's estimated loading progress in the native progress indicator.
+ */
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context
+{
+    if (object == self.webView && [keyPath isEqualToString:@"estimatedProgress"]) {
+        if (!_browserOptions.hideloadingindicator) {
+            self.progressView.progress = self.webView.estimatedProgress;
+        }
+        return;
+    }
+
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+}
+
 - (void)goBack:(id)sender
 {
     [self.webView goBack];
@@ -1246,12 +1265,15 @@ BOOL isExiting = NO;
 - (void)webView:(WKWebView *)theWebView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
     NSLog(@"didStartProvisionalNavigation");
-    // Loading URL, start spinner, update back/forward
+    // Loading URL, show progress bar, update back/forward
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
 
-    if (!_browserOptions.hidespinner) [self.spinner startAnimating];
+    if (!_browserOptions.hideloadingindicator) {
+        self.progressView.progress = 0.0;
+        self.progressView.hidden = NO;
+    }
     return [self.navigationDelegate didStartProvisionalNavigation:theWebView];
 }
 
@@ -1274,12 +1296,12 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 - (void)webView:(WKWebView *)theWebView didFinishNavigation:(WKNavigation *)navigation
 {
     NSLog(@"didFinishNavigation");
-    // Update URL, stop spinner, update back/forward
+    // Update URL, hide progress bar, update back/forward
     self.addressLabel.text = self.currentURL.absoluteString;
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
     theWebView.scrollView.contentInset = UIEdgeInsetsZero;
-    [self.spinner stopAnimating];
+    self.progressView.hidden = YES;
     [self.navigationDelegate didFinishNavigation:theWebView];
 }
 
@@ -1287,7 +1309,7 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     self.backButton.enabled = theWebView.canGoBack;
     self.forwardButton.enabled = theWebView.canGoForward;
-    [self.spinner stopAnimating];
+    self.progressView.hidden = YES;
 
     BOOL isBeforeloadEnabled = self.navigationDelegate != nil && [self.navigationDelegate isBeforeloadEnabled];
     
