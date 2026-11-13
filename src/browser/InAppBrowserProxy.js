@@ -203,9 +203,9 @@ const IAB = {
 
         if (browserWrap && popup) {
             try {
-                popup.contentWindow.eval(code);
+                const result = popup.contentWindow.eval(code);
                 if (hasCallback) {
-                    win([]);
+                    win([result]);
                 }
             } catch (e) {
                 console.error('Error occured while trying to injectScriptCode: ' + JSON.stringify(e));
