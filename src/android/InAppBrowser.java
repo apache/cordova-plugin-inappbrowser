@@ -121,10 +121,11 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String FOOTER_COLOR = "footercolor";
     private static final String BEFORELOAD = "beforeload";
     private static final String FULLSCREEN = "fullscreen";
+    private static final String BACKGROUND_COLOR = "backgroundcolor";
 
     private static final int TOOLBAR_HEIGHT = 48;
 
-    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
+    private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR, BACKGROUND_COLOR);
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -151,6 +152,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean hideUrlBar = false;
     private boolean showFooter = false;
     private String footerColor = "";
+    private String backgroundColor = "";
     private String beforeload = "";
     private boolean fullscreen = true;
     private String[] allowedSchemes;
@@ -718,6 +720,10 @@ public class InAppBrowser extends CordovaPlugin {
             if (footerColorSet != null) {
                 footerColor = footerColorSet;
             }
+            // Reset when the option is absent, so a colour set on one open does
+            // not carry over to later ones for the life of the process.
+            String backgroundColorSet = features.get(BACKGROUND_COLOR);
+            backgroundColor = backgroundColorSet != null ? backgroundColorSet : "";
             if (features.get(BEFORELOAD) != null) {
                 beforeload = features.get(BEFORELOAD);
             }
@@ -840,6 +846,13 @@ public class InAppBrowser extends CordovaPlugin {
                 LinearLayout main = new LinearLayout(cordova.getActivity());
                 main.setOrientation(LinearLayout.VERTICAL);
 
+                // Until the WebView has painted its first frame the dialog window
+                // background shows through, which is what makes the browser flash
+                // the theme colour on open. Painting the root layout removes it.
+                if (!backgroundColor.isEmpty()) {
+                    main.setBackgroundColor(Color.parseColor(backgroundColor));
+                }
+
                 // Toolbar layout
                 RelativeLayout toolbar = new RelativeLayout(cordova.getActivity());
                 //Please, no more black!
@@ -958,6 +971,11 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
+                // iOS sets the web view background explicitly, do the same here so
+                // pages that don't paint their own background match across platforms.
+                if (!backgroundColor.isEmpty()) {
+                    inAppWebView.setBackgroundColor(Color.parseColor(backgroundColor));
+                }
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
