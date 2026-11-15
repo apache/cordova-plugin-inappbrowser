@@ -958,6 +958,10 @@ public class InAppBrowser extends CordovaPlugin {
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
+                // Without an explicit background, the hardware-accelerated WebView surface
+                // paints black until the page's first frame is composited, which used to be
+                // masked by the black system bars the old boxed-in layout left visible.
+                inAppWebView.setBackgroundColor(android.graphics.Color.WHITE);
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
                 // File Chooser Implemented ChromeClient
@@ -1174,6 +1178,7 @@ public class InAppBrowser extends CordovaPlugin {
                     dialog.setContentView(main);
                     dialog.show();
                     dialog.getWindow().setAttributes(lp);
+                    InAppBrowserInsets.apply(dialog, main, toolbar, toolbarColor);
                 }
                 // the goal of openhidden is to load the url and not display it
                 // Show() needs to be called to cause the URL to be loaded
