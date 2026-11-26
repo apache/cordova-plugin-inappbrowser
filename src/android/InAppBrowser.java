@@ -62,6 +62,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -98,6 +99,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String ZOOM = "zoom";
     private static final String ZOOMCONTROLS = "zoomcontrols";
     private static final String HIDDEN = "hidden";
+    private static final String HIDE_LOADING_INDICATOR = "hideloadingindicator";
     private static final String LOAD_START_EVENT = "loadstart";
     private static final String LOAD_STOP_EVENT = "loadstop";
     private static final String LOAD_ERROR_EVENT = "loaderror";
@@ -134,6 +136,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean enableZoom = true;
     private boolean showZoomControls = true;
     private boolean openWindowHidden = false;
+    private boolean hideLoadingIndicator = false;
     private boolean clearAllCache = false;
     private boolean clearSessionCache = false;
     private boolean hadwareBackButton = true;
@@ -639,6 +642,7 @@ public class InAppBrowser extends CordovaPlugin {
         enableZoom = true;
         showZoomControls = true;
         openWindowHidden = false;
+        hideLoadingIndicator = false;
         mediaPlaybackRequiresUserGesture = false;
 
         if (features != null) {
@@ -663,6 +667,10 @@ public class InAppBrowser extends CordovaPlugin {
             String hidden = features.get(HIDDEN);
             if (hidden != null) {
                 openWindowHidden = hidden.equals("yes") ? true : false;
+            }
+            String hideLoadingIndicatorSet = features.get(HIDE_LOADING_INDICATOR);
+            if (hideLoadingIndicatorSet != null) {
+                hideLoadingIndicator = hideLoadingIndicatorSet.equals("yes");
             }
             String hardwareBack = features.get(HARDWARE_BACK_BUTTON);
             if (hardwareBack != null) {
@@ -960,8 +968,24 @@ public class InAppBrowser extends CordovaPlugin {
                 inAppWebView = new WebView(cordova.getActivity());
                 inAppWebView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 inAppWebView.setId(Integer.valueOf(6));
+                final ProgressBar progressBar = new ProgressBar(cordova.getActivity(), null, android.R.attr.progressBarStyleHorizontal);
+                progressBar.setMax(100);
+                // WebChromeClient reports the page load percentage as a value from 0 to 100.
+                progressBar.setIndeterminate(false);
+                progressBar.setVisibility(View.GONE);
                 // File Chooser Implemented ChromeClient
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView) {
+                    @Override
+                    public void onProgressChanged(WebView view, int newProgress) {
+                        super.onProgressChanged(view, newProgress);
+                        if (hideLoadingIndicator) {
+                            return;
+                        }
+
+                        progressBar.setProgress(newProgress);
+                        progressBar.setVisibility(newProgress < 100 ? View.VISIBLE : View.GONE);
+                    }
+
                     @Override
                     public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
                         // New-window navigations (for example window.open or target=_blank)
@@ -1157,6 +1181,9 @@ public class InAppBrowser extends CordovaPlugin {
                 RelativeLayout webViewLayout = new RelativeLayout(cordova.getActivity());
                 webViewLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0, 1.0f));
                 webViewLayout.addView(inAppWebView);
+                RelativeLayout.LayoutParams progressLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, this.dpToPixels(2));
+                progressLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                webViewLayout.addView(progressBar, progressLayoutParams);
                 main.addView(webViewLayout);
 
                 // Don't add the footer unless it's been enabled
